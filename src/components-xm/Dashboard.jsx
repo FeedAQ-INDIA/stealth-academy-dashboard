@@ -140,7 +140,7 @@ export function Dashboard() {
                       <Clock size={18}/>  3 hours 30 minutes</div>
                     <div className="flex flex-row gap-2 items-center mt-2">
                       <span>16% complete</span>
-                      <Progress value={33} /></div>
+                      <Progress value={66} /></div>
 
 
 

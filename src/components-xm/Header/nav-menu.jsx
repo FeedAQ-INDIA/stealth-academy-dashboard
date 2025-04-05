@@ -20,7 +20,7 @@ import {useAuthStore} from "@/zustland/store.js";
 import {Separator} from "@/components/ui/separator.jsx";
 
 
-function NavigationMenuDemo() {
+function NavigationMenuDemo({orientation}) {
     const navigate = useNavigate();
      const [wsSearchDialogOpen, setWsSearchDialogOpen] = useState(false);
 
@@ -42,11 +42,11 @@ function NavigationMenuDemo() {
     }
 
 
-    return (<NavigationMenu className="z-20">
-            <NavigationMenuList>
+    return (<NavigationMenu orientation={orientation}  className="z-20">
+            <NavigationMenuList className={`${orientation === 'vertical' ? ' flex flex-col gap-2 w-full' : 'flex flex-row gap-2'}`}>
 
-                <NavigationMenuItem>
-                    <Link to={'/dashboard'}><Button variant="ghost">DASHBOARD</Button></Link>
+                <NavigationMenuItem  >
+                    <Link   to={'/dashboard'}><Button variant="ghost" >DASHBOARD</Button></Link>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>

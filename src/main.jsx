@@ -14,6 +14,7 @@ import {MyLearningPath} from "@/components-xm/MyLearningPath.jsx";
 import {CourseDetail} from "@/components-xm/CourseDetail.jsx";
 import CourseOverview from "@/components-xm/CourseOverview.jsx";
 import CourseVideoTutorial from "@/components-xm/CourseVideoTutorial.jsx";
+import {AccountDetail} from "@/components-xm/AccountDetail.jsx";
 
 const router = createBrowserRouter([
     {
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
             {
                 path: "/explore",
                 element: <Explore/>,
+            },
+            {
+                path: "/account-settings",
+                element: <AccountDetail/>,
             },
             {
                 path: "/course",

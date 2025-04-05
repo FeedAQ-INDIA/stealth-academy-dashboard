@@ -37,10 +37,10 @@ export default function Header({ userDetail }) {
             </div>
 
             {/* Right-side button */}
-            <div className="hidden sm:flex items-center gap-2 ml-auto">
-                <Link to={`/account-settings/personal-profile?tab=personal-profile`}>
+            <div className="hidden md:flex items-center gap-2 ml-auto">
+                <Link to={`/account-settings/profile`}>
                     <Button variant="secondary">
-                        {userDetail?.nameInitial}
+                        TS
                     </Button>
                 </Link>
             </div>
@@ -54,11 +54,11 @@ export default function Header({ userDetail }) {
                         </Button>
                     </SheetTrigger>
                     <SheetContent side="right" className="p-4 w-64">
-                        <div className="flex flex-row gap-4 mt-4">
-                            <NavigationMenuDemo />
-                            <Link to={`/account-settings/personal-profile?tab=personal-profile`}>
+                        <div className="flex flex-col gap-4 mt-4">
+                            <NavigationMenuDemo orientation={"vertical"}/>
+                            <Link to={`/account-settings/profile`}>
                                 <Button variant="secondary" className="w-full">
-                                    {userDetail?.nameInitial}
+                                    TS
                                 </Button>
                             </Link>
                         </div>

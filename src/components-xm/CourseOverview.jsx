@@ -5,6 +5,7 @@ import {CardTitle} from "@/components/ui/card.jsx";
 import React from "react";
 import {Badge} from "@/components/ui/badge.jsx";
 import {CircleDollarSign, Clock} from "lucide-react";
+import {Button} from "@/components/ui/button.jsx";
 
 function CourseOverview() {
 
@@ -36,10 +37,15 @@ function CourseOverview() {
                     </div>
 
                     {/* Title with responsive spacing */}
-                    <div className=" ">
-                        <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold">
-                            Basic/Core Java
-                        </CardTitle>
+                    <div  className="flex flex-wrap gap-2 w-full mb-3 items-center">
+                        <div className=" ">
+                            <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold">
+                                Basic/Core Java
+                            </CardTitle>
+                        </div>
+                        <div className="ml-auto ">
+                            <Button>START COURSE</Button>
+                        </div>
                     </div>
 
 
