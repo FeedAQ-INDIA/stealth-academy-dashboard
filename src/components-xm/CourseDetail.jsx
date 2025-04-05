@@ -1,5 +1,5 @@
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar.jsx"
-import MainSidebar from "@/components-xm/Workspace/Sidebar/MainSidebar.jsx";
+import CourseSidebar from "@/components-xm/CourseSidebar.jsx";
 
 import {Separator} from "@/components/ui/separator.jsx";
 import {
@@ -13,16 +13,16 @@ import {useAuthStore} from "@/zustland/store.js";
 
 const HEADER_HEIGHT = "4rem";
 
-export function WorkspaceDashboard() {
+export function CourseDetail() {
 
 
     return (<>
             <SidebarProvider className="p-0">
-                <MainSidebar/>
+                <CourseSidebar/>
                 <SidebarInset
                     className=" min-h-[calc(100svh-4em)]  " style={{borderRadius: '0px', margin: '0px'}}>
 
-                    <div className="h-[calc(100svh-4em)] overflow-y-auto ">
+                    <div className="h-[calc(100svh-4em)] overflow-y-auto  ">
                         <Outlet/>
                     </div>
 
