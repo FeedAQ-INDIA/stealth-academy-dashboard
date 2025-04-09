@@ -152,13 +152,31 @@ export function Explore() {
     return (
         <div  className="p-6">
             <div className=" items-center justify-items-center">
-                <div className="my-4">
-                    <h1 className="text-center text-2xl font-medium">Explore Courses</h1>
-                </div>
-                <div className="flex gap-2 w-full md:w-3/4 lg:w-1/2 mx-auto items-center my-8">
-                    <Input type="text" placeholder="What do you want to learn today ?"/>
-                    <Button type="submit"><Search/></Button>
-                </div>
+                {/*<div className="my-4">*/}
+                {/*    <h1 className="text-center text-2xl font-medium">Explore Courses</h1>*/}
+                {/*</div>*/}
+                {/*<div className="flex gap-2 w-full md:w-3/4 lg:w-1/2 mx-auto items-center my-8">*/}
+                {/*    <Input type="text" placeholder="What do you want to learn today ?"/>*/}
+                {/*    <Button type="submit"><Search/></Button>*/}
+                {/*</div>*/}
+                <Card className="border-0 w-full bg-muted/50  my-6 py-6">
+                    <CardHeader>
+                        <CardTitle className="text-center">
+                            What would you like to learn today ?
+                        </CardTitle>
+
+
+                    </CardHeader>
+                    <CardContent>
+                        <div className="my-2">
+                            <div className="flex gap-2 w-full md:w-3/4 lg:w-1/2 mx-auto items-center">
+                                <Input type="text" placeholder="What do you want to learn today ?"/>
+                                <Button type="submit"><Search/></Button>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
                 <div className="my-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-10 items-center">
                         {courseList?.map(a => (<Card className=" border shadow-sm hover:shadow-md cursor-pointer ">

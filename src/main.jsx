@@ -15,6 +15,8 @@ import {CourseDetail} from "@/components-xm/CourseDetail.jsx";
 import CourseOverview from "@/components-xm/CourseOverview.jsx";
 import CourseVideoTutorial from "@/components-xm/CourseVideoTutorial.jsx";
 import {AccountDetail} from "@/components-xm/AccountDetail.jsx";
+import CourseComprehensionReading from "@/components-xm/CourseComprehensionReading.jsx";
+import CourseListenAndRead from "@/components-xm/CourseListenAndRead.jsx";
 
 const router = createBrowserRouter([
     {
@@ -51,6 +53,14 @@ const router = createBrowserRouter([
                     {
                         path: "/course/:CourseId/video/:VideoId",
                         element: <CourseVideoTutorial/>,
+                    },
+                    {
+                        path: "/course/:CourseId/comprehension-reading/:ComprehensionReadingId",
+                        element: <CourseComprehensionReading/>,
+                    },
+                    {
+                        path: "/course/:CourseId/listen-and-read/:ListenAndReadId",
+                        element: <CourseListenAndRead/>,
                     },
                 ]
              },
