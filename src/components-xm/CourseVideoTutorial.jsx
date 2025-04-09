@@ -37,10 +37,13 @@ function CourseVideoTutorial() {
                     </div>
 
                     {/* Title with responsive spacing */}
-                    <div className=" ">
+                    <div className=" flex  items-center gap-2 ">
                         <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold ">
                             What is Java ?
                         </CardTitle>
+                        <div className="ml-auto flex gap-2">
+                            <Button>Previous</Button> <Button>Next</Button>
+                        </div>
                     </div>
 
 

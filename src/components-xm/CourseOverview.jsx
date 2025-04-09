@@ -2,13 +2,77 @@ import {SidebarTrigger} from "@/components/ui/sidebar.jsx";
 import {Separator} from "@/components/ui/separator.jsx";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
 import {CardTitle} from "@/components/ui/card.jsx";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
-import {CircleDollarSign, Clock} from "lucide-react";
+import {CircleDollarSign, Clock, Video} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
-
+import axiosConn from "@/axioscon.js";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion"
+import {useParams} from "react-router-dom";
+import {toast} from "@/components/hooks/use-toast.js";
 function CourseOverview() {
+    const {CourseId} = useParams();
+    const [totalCount, setTotalCount] = useState(0);
+    const [limit, setLimit] = useState(10);
+    const [offset, setOffset] = useState(0);
+    const [courseList, setCourseList] = useState({});
+    const [apiQuery, setApiQuery] = useState({
+        limit: limit, offset: offset, getThisData: {
+            datasource: "Course",  attributes: [], where : {courseId: CourseId},
+            include: [{
+                datasource: "CourseTopic", as: "courseTopic", required: false, order: [], attributes: [], where: {},
+                include:[
+                    {
+                        datasource: "CourseVideo", as: "courseVideo", required: false, order: [], attributes: [], where: {},
+                    }
+                ]
+            },
+            ],
+        },
+    });
 
+    useEffect(() => {
+        fetchCourses();
+    }, [apiQuery]);
+
+    const fetchCourses = () => {
+        axiosConn
+            .post("http://localhost:3000/searchCourse", apiQuery)
+            .then((res) => {
+                console.log(res.data);
+                setCourseList(res.data.data?.results?.[0]);
+                setTotalCount(res.data.data.totalCount);
+                setOffset(res.data.data.offset);
+                setLimit(res.data.data.limit);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+const enroll = () => {
+    axiosConn
+        .post("http://localhost:3000/enroll", {
+            courseId: CourseId
+        })
+        .then((res) => {
+            console.log(res.data);
+            toast({
+                title: 'Enrollment is successfull'
+            })
+        })
+        .catch((err) => {
+            console.log(err);
+            toast({
+                title: 'Error occured while Enrollment'
+            })
+        });
+    }
 
     return (
         <>
@@ -40,11 +104,11 @@ function CourseOverview() {
                     <div  className="flex flex-wrap gap-2 w-full mb-3 items-center">
                         <div className=" ">
                             <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold">
-                                Basic/Core Java
+                                {courseList?.courseTitle}
                             </CardTitle>
                         </div>
                         <div className="ml-auto ">
-                            <Button>START COURSE</Button>
+                            <Button onClick={()=> enroll()}>START COURSE</Button>
                         </div>
                     </div>
 
@@ -53,35 +117,46 @@ function CourseOverview() {
                 <section className="my-8">
                     <div className="flex flex-wrap gap-4 w-full ">
                         <div className="flex gap-1 items-center">
-                            <Clock size={18}/> 3 hours 30 minutes
+                            <Clock size={18}/>  {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}
                         </div>
                         <div className="flex gap-2 items-center">
-                            < CircleDollarSign size={18}/> Free
+                            < CircleDollarSign size={18}/> {courseList?.courseCost == 0 ? 'Free' : 'Rs.'+courseList?.courseCost+'/-'}
                         </div>
                         <div className="flex gap-2 items-center">
-                            <Badge variant="outline">Beginner</Badge>
+                            <Badge variant="outline">{courseList?.courseLevel}</Badge>
                         </div>
                     </div>
                 </section>
                 <section className="my-8">
                     <div>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus adipisci aliquid atque
-                            culpa deserunt ducimus, ea earum enim eos fuga impedit iste natus nemo perspiciatis quam
-                            quis saepe similique! Debitis dolor dolore esse exercitationem, explicabo illo ipsam ipsum
-                            iste laboriosam, maxime nulla, numquam placeat reiciendis sapiente sint sit tempora vel
-                            veritatis vitae voluptates. Reiciendis, unde voluptas? Architecto deserunt et officia velit.
-                            Consequatur ratione sed sunt! Adipisci aspernatur blanditiis deserunt dolores, eaque et fuga
-                            fugiat ipsam itaque magni maiores maxime, necessitatibus nesciunt possimus quo quos,
-                            veritatis voluptate voluptates. Blanditiis ex illo ipsum itaque libero minus quam quibusdam,
-                            recusandae tempora? A accusantium at consequatur deleniti eligendi et, expedita magnam
-                            minima, mollitia nam obcaecati odio quia quos repudiandae vitae. Aliquam aliquid asperiores
-                            aut autem deserunt ducimus eius enim error expedita fugiat harum illo illum ipsa ipsum
-                            laudantium libero maxime obcaecati odio pariatur, quibusdam repellat reprehenderit soluta
-                            vitae voluptates voluptatum. Cupiditate eos excepturi quae.</p>
+                        <p>{courseList?.courseDescription}</p>
                     </div>
                 </section>
                 <section className="my-8">
                     <h1 className="font-medium text-2xl">Course Structure</h1>
+                    <div className="my-3">
+                        {courseList?.courseTopic?.map(a => (
+                            <Accordion type="single" collapsible>
+                                <AccordionItem value="item-1">
+                                    <AccordionTrigger>{a?.courseTopicTitle}</AccordionTrigger>
+                                    <AccordionContent>
+                                        {a?.courseTopicDescription}
+                                        <div>
+                                            <ul>
+                                                {a?.courseVideo?.map(a => (
+                                                    <li className="flex gap-2 items-center">
+                                                        <Video />
+                                                        <span>{a?.courseVideoTitle}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
+                        ))}
+
+                    </div>
                 </section>
             </div>
 
