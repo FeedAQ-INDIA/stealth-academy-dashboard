@@ -14,6 +14,7 @@ import {useAuthStore} from "@/zustland/store.js";
 const HEADER_HEIGHT = "4rem";
 
 export function CourseDetail() {
+    const {CourseId} = useParams();
 
     const [totalCount, setTotalCount] = useState(0);
     const [limit, setLimit] = useState(10);
@@ -36,6 +37,7 @@ export function CourseDetail() {
 
     useEffect(() => {
         fetchCourses();
+        enrollStatus()
     }, [apiQuery]);
 
     const fetchCourses = () => {
@@ -53,10 +55,31 @@ export function CourseDetail() {
             });
     };
 
+    const [isUserEnrolledAlready, setIsUserEnrolledAlready] = useState(false);
+
+    const enrollStatus = () => {
+        axiosConn
+            .post("http://localhost:3000/enrollStatus", {
+                courseId: CourseId
+            })
+            .then((res) => {
+                console.log(res?.data?.data);
+                setIsUserEnrolledAlready(res?.data?.data?.isUserEnrolled)
+            })
+            .catch((err) => {
+                console.log(err);
+                toast({
+                    title: 'Error occured while Enrollment'
+                })
+            });
+    }
+
+
+
 
     return (<>
             <SidebarProvider className="p-0">
-                <CourseSidebar/>
+                {isUserEnrolledAlready? <CourseSidebar/> : <></>}
                 <SidebarInset
                     className=" min-h-[calc(100svh-4em)]  " style={{borderRadius: '0px', margin: '0px'}}>
 

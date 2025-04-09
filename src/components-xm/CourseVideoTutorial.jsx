@@ -70,6 +70,7 @@ function CourseVideoTutorial() {
                         <div className="w-full md:w-1/3 bg-gray-100 p-4 flex items-center justify-center">
                             <p className="overflow-y-auto h-full"> This content box will match the video height on
                                 larger screens.</p>
+
                         </div>
 
 

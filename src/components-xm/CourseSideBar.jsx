@@ -21,6 +21,7 @@ import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/
 import {ArrowLeft, ChevronRight, Clock, Loader} from "lucide-react";
 import {Separator} from "@/components/ui/separator.jsx";
 import {Button} from "@/components/ui/button.jsx";
+import axiosConn from "@/axioscon.js";
 
 
 function CourseSidebar({...props}) {
@@ -79,6 +80,45 @@ function CourseSidebar({...props}) {
     useEffect(() => {
         console.log("Updated urlEndpoint:", urlEndpoint);
     }, [urlEndpoint]);
+
+    const {CourseId} = useParams();
+    const [totalCount, setTotalCount] = useState(0);
+    const [limit, setLimit] = useState(10);
+    const [offset, setOffset] = useState(0);
+    const [courseList, setCourseList] = useState([]);
+    const [apiQuery, setApiQuery] = useState({
+        limit: limit, offset: offset, getThisData: {
+            datasource: "CourseTopic",  attributes: [], where : {courseId: CourseId},
+            include: [
+                    {
+                        datasource: "CourseVideo", as: "courseVideo", required: false, order: [], attributes: [], where: {},
+                    },
+                {
+                    datasource: "CourseWritten", as: "courseWritten", required: false, order: [], attributes: [], where: {},
+                }
+             ],
+        },
+    });
+
+    useEffect(() => {
+        fetchCourses();
+    }, [apiQuery]);
+
+    const fetchCourses = () => {
+        axiosConn
+            .post("http://localhost:3000/searchCourse", apiQuery)
+            .then((res) => {
+                console.log(res.data);
+                setCourseList(res.data.data?.results);
+                setTotalCount(res.data.data.totalCount);
+                setOffset(res.data.data.offset);
+                setLimit(res.data.data.limit);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
 
     return (< >
         <Sidebar className="top-[4rem] h-[calc(100svh-4em)]   " style={{borderRadius: '0px', overflowY: 'auto'}}

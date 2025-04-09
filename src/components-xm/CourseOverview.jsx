@@ -38,6 +38,7 @@ function CourseOverview() {
 
     useEffect(() => {
         fetchCourses();
+        enrollStatus();
     }, [apiQuery]);
 
     const fetchCourses = () => {
@@ -55,6 +56,25 @@ function CourseOverview() {
             });
     };
 
+    const [isUserEnrolledAlready, setIsUserEnrolledAlready] = useState(false);
+
+    const enrollStatus = () => {
+        axiosConn
+            .post("http://localhost:3000/enrollStatus", {
+                courseId: CourseId
+            })
+            .then((res) => {
+                console.log(res?.data?.data);
+                setIsUserEnrolledAlready(res?.data?.data?.isUserEnrolled)
+            })
+            .catch((err) => {
+                console.log(err);
+                toast({
+                    title: 'Error occured while Enrollment'
+                })
+            });
+    }
+
 const enroll = () => {
     axiosConn
         .post("http://localhost:3000/enroll", {
@@ -64,14 +84,35 @@ const enroll = () => {
             console.log(res.data);
             toast({
                 title: 'Enrollment is successfull'
-            })
+            });
+            enrollStatus();
         })
         .catch((err) => {
             console.log(err);
             toast({
-                title: 'Error occured while Enrollment'
+          title: 'Error occured while Enrollment'
+        })
+});
+    }
+
+    const disroll = () => {
+        axiosConn
+            .post("http://localhost:3000/disroll", {
+                courseId: CourseId
             })
-        });
+            .then((res) => {
+                console.log(res.data);
+                toast({
+                    title: 'Disrollment is successfull'
+                });
+                enrollStatus()
+            })
+            .catch((err) => {
+                console.log(err);
+                toast({
+                    title: 'Error occured while Disrollment'
+                })
+            });
     }
 
     return (
@@ -108,7 +149,10 @@ const enroll = () => {
                             </CardTitle>
                         </div>
                         <div className="ml-auto ">
-                            <Button onClick={()=> enroll()}>START COURSE</Button>
+                            {isUserEnrolledAlready?
+                                <Button onClick={()=> disroll()}>LEAVE COURSE</Button>  :
+                                <Button onClick={()=> enroll()}>START COURSE</Button>
+                            }
                         </div>
                     </div>
 

@@ -191,7 +191,7 @@ export function Explore() {
 
                                 <CardFooter className="flex gap-2 ">
                                     <Link to={`/course/${a?.courseId}`} className="  w-full "><Button className="  w-full ">Learn More</Button>
-                                    </Link>   {/*<Button className="  w-full  ">Learn More</Button>*/}
+                                    </Link>
                                 </CardFooter>
                             </Card> )
                         )}

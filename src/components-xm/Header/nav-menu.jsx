@@ -55,7 +55,7 @@ function NavigationMenuDemo({orientation}) {
 
 
                 <NavigationMenuItem>
-                    <Link to={'/my-learning-path'}> <Button variant="ghost">MY LEARNING PATH</Button></Link>
+                    <Link to={'/my-learning-path'}> <Button variant="ghost">MY JOURNEY</Button></Link>
                 </NavigationMenuItem>
 
 
