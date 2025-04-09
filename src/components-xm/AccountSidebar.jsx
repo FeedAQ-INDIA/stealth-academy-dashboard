@@ -33,35 +33,19 @@ function AccountSidebar({...props}) {
         return params.get("tab") || "overview"; // Default to 'overview' tab
     };
 
-    const [selectedTab, setSelectedTab] = useState(getTabFromURL);
-
-
-    // Update the state when the URL changes
-    useEffect(() => {
-        const currentTab = getTabFromURL();
-        console.log(currentTab)
-        setSelectedTab(currentTab);
-    }, [location.search]);
-
-    // Change the URL when the tab changes
-    const handleTabChange = (value) => {
-        setSelectedTab(value);
-        navigate(`?tab=${value}`); // Update the URL without reloading the page
-    };
-
 
     const data = {
         navMain: [
             {
-                title: "MY ACCOUNT", url: "#", items: [{
+                title: "GENERAL", url: "#", items: [{
                     title: "Profile",
-                    url: ` `,
-                    isActive: selectedTab === 'views',
+                    url: `/account-settings/profile`,
+                    isActive: location.pathname === '/account-settings/profile',
                 },
                     {
                         title: "Sign out",
                         url: `https://localhost:3000/auth/logout`,
-                        isActive: selectedTab === 'my-queue',
+                        isActive: location.pathname === 'https://localhost:3000/auth/logout',
 
                     },
 

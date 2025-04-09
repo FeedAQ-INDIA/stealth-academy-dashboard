@@ -17,6 +17,7 @@ import CourseVideoTutorial from "@/components-xm/CourseVideoTutorial.jsx";
 import {AccountDetail} from "@/components-xm/AccountDetail.jsx";
 import CourseComprehensionReading from "@/components-xm/CourseComprehensionReading.jsx";
 import CourseListenAndRead from "@/components-xm/CourseListenAndRead.jsx";
+import MyAccount from "@/components-xm/MyAccountSettings/MyAccount.jsx";
 
 const router = createBrowserRouter([
     {
@@ -41,6 +42,12 @@ const router = createBrowserRouter([
             {
                 path: "/account-settings",
                 element: <AccountDetail/>,
+                children:[
+                    {
+                        path: "/account-settings/profile",
+                        element: <MyAccount/>,
+                    },
+                ]
             },
             {
                 path: "/course",
