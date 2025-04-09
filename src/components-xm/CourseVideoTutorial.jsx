@@ -1,7 +1,7 @@
 import {SidebarTrigger} from "@/components/ui/sidebar.jsx";
 import {Separator} from "@/components/ui/separator.jsx";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
-import {CardTitle} from "@/components/ui/card.jsx";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import React from "react";
 import {Badge} from "@/components/ui/badge.jsx";
 import {CircleDollarSign, Clock} from "lucide-react";
@@ -28,14 +28,15 @@ function CourseVideoTutorial() {
 
                 </div>
             </header>
-
-            <div className="p-6">
-                <section>
+            <Card  className="rounded-none bg-muted/50 border-none">
+                <CardHeader>
                     <div className="flex flex-wrap gap-2 w-full mb-3 justify-items-center">
                         <Badge variant="outline">Video</Badge>
 
                     </div>
 
+                </CardHeader>
+                <CardContent>
                     {/* Title with responsive spacing */}
                     <div className=" flex  items-center gap-2 ">
                         <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold ">
@@ -45,9 +46,14 @@ function CourseVideoTutorial() {
                             <Button>Previous</Button> <Button>Next</Button>
                         </div>
                     </div>
+                </CardContent>
 
 
-                </section>
+
+
+            </Card>
+            <div className="p-6">
+
 
                 <section className="my-8 ">
 
@@ -70,7 +76,6 @@ function CourseVideoTutorial() {
                         <div className="w-full md:w-1/3 bg-gray-100 p-4 flex items-center justify-center">
                             <p className="overflow-y-auto h-full"> This content box will match the video height on
                                 larger screens.</p>
-
                         </div>
 
 

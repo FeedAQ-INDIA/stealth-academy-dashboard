@@ -10,6 +10,8 @@ import {useEffect, useState} from "react";
 import axiosConn from "@/axioscon.js";
 import {useAuthStore} from "@/zustland/store.js";
 
+import { CourseContext } from "./CourseContext.jsx";
+import {toast} from "@/components/hooks/use-toast.js";
 
 const HEADER_HEIGHT = "4rem";
 
@@ -22,7 +24,7 @@ export function CourseDetail() {
     const [courseList, setCourseList] = useState({});
     const [apiQuery, setApiQuery] = useState({
         limit: limit, offset: offset, getThisData: {
-            datasource: "Course",  attributes: [],
+            datasource: "Course",  attributes: [], where : {courseId: CourseId},
             include: [{
                 datasource: "CourseTopic", as: "courseTopic", required: false, order: [], attributes: [], where: {},
                 include:[
@@ -31,7 +33,7 @@ export function CourseDetail() {
                     }
                 ]
             },
-              ],
+            ],
         },
     });
 
@@ -49,6 +51,17 @@ export function CourseDetail() {
                 setTotalCount(res.data.data.totalCount);
                 setOffset(res.data.data.offset);
                 setLimit(res.data.data.limit);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+
+
+        axiosConn
+            .post("http://localhost:3000/getCourseDetail", {courseId: CourseId})
+            .then((res) => {
+                console.log(res.data);
+
             })
             .catch((err) => {
                 console.log(err);
@@ -76,9 +89,53 @@ export function CourseDetail() {
 
 
 
+    const enroll = () => {
+        axiosConn
+            .post("http://localhost:3000/enroll", {
+                courseId: CourseId
+            })
+            .then((res) => {
+                console.log(res.data);
+                toast({
+                    title: 'Enrollment is successfull'
+                });
+                enrollStatus();
+            })
+            .catch((err) => {
+                console.log(err);
+                toast({
+                    title: 'Error occured while Enrollment'
+                })
+            });
+    }
+
+    const disroll = () => {
+        axiosConn
+            .post("http://localhost:3000/disroll", {
+                courseId: CourseId
+            })
+            .then((res) => {
+                console.log(res.data);
+                toast({
+                    title: 'Disrollment is successfull'
+                });
+                enrollStatus()
+            })
+            .catch((err) => {
+                console.log(err);
+                toast({
+                    title: 'Error occured while Disrollment'
+                })
+            });
+    }
+
+
+
 
     return (<>
-            <SidebarProvider className="p-0">
+        <CourseContext.Provider value={{ courseList, isUserEnrolledAlready, enroll, disroll, enrollStatus }}>
+
+        <SidebarProvider className="p-0">
                 {isUserEnrolledAlready? <CourseSidebar/> : <></>}
                 <SidebarInset
                     className=" min-h-[calc(100svh-4em)]  " style={{borderRadius: '0px', margin: '0px'}}>
@@ -90,6 +147,7 @@ export function CourseDetail() {
 
                 </SidebarInset>
             </SidebarProvider>
+        </CourseContext.Provider>
         </>
 
     );

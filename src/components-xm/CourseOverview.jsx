@@ -1,7 +1,7 @@
-import {SidebarTrigger} from "@/components/ui/sidebar.jsx";
+import {SidebarTrigger, useSidebar} from "@/components/ui/sidebar.jsx";
 import {Separator} from "@/components/ui/separator.jsx";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
-import {CardTitle} from "@/components/ui/card.jsx";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
 import {CircleDollarSign, Clock, Video} from "lucide-react";
@@ -15,111 +15,33 @@ import {
 } from "@/components/ui/accordion"
 import {useParams} from "react-router-dom";
 import {toast} from "@/components/hooks/use-toast.js";
+import {useCourse} from "@/components-xm/CourseContext.jsx";
 function CourseOverview() {
     const {CourseId} = useParams();
-    const [totalCount, setTotalCount] = useState(0);
-    const [limit, setLimit] = useState(10);
-    const [offset, setOffset] = useState(0);
-    const [courseList, setCourseList] = useState({});
-    const [apiQuery, setApiQuery] = useState({
-        limit: limit, offset: offset, getThisData: {
-            datasource: "Course",  attributes: [], where : {courseId: CourseId},
-            include: [{
-                datasource: "CourseTopic", as: "courseTopic", required: false, order: [], attributes: [], where: {},
-                include:[
-                    {
-                        datasource: "CourseVideo", as: "courseVideo", required: false, order: [], attributes: [], where: {},
-                    }
-                ]
-            },
-            ],
-        },
-    });
+    const { isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus } = useCourse();
+
+
+
+
+    const {
+        state, open, setOpen, openMobile, setOpenMobile, isMobile, toggleSidebar
+    } = useSidebar()
 
     useEffect(() => {
-        fetchCourses();
-        enrollStatus();
-    }, [apiQuery]);
+        if(isUserEnrolledAlready) {
+            setOpen(true);
+        }else{
+            setOpen(false);
+        }
 
-    const fetchCourses = () => {
-        axiosConn
-            .post("http://localhost:3000/searchCourse", apiQuery)
-            .then((res) => {
-                console.log(res.data);
-                setCourseList(res.data.data?.results?.[0]);
-                setTotalCount(res.data.data.totalCount);
-                setOffset(res.data.data.offset);
-                setLimit(res.data.data.limit);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
+    }, [isUserEnrolledAlready]);
 
-    const [isUserEnrolledAlready, setIsUserEnrolledAlready] = useState(false);
-
-    const enrollStatus = () => {
-        axiosConn
-            .post("http://localhost:3000/enrollStatus", {
-                courseId: CourseId
-            })
-            .then((res) => {
-                console.log(res?.data?.data);
-                setIsUserEnrolledAlready(res?.data?.data?.isUserEnrolled)
-            })
-            .catch((err) => {
-                console.log(err);
-                toast({
-                    title: 'Error occured while Enrollment'
-                })
-            });
-    }
-
-const enroll = () => {
-    axiosConn
-        .post("http://localhost:3000/enroll", {
-            courseId: CourseId
-        })
-        .then((res) => {
-            console.log(res.data);
-            toast({
-                title: 'Enrollment is successfull'
-            });
-            enrollStatus();
-        })
-        .catch((err) => {
-            console.log(err);
-            toast({
-          title: 'Error occured while Enrollment'
-        })
-});
-    }
-
-    const disroll = () => {
-        axiosConn
-            .post("http://localhost:3000/disroll", {
-                courseId: CourseId
-            })
-            .then((res) => {
-                console.log(res.data);
-                toast({
-                    title: 'Disrollment is successfull'
-                });
-                enrollStatus()
-            })
-            .catch((err) => {
-                console.log(err);
-                toast({
-                    title: 'Error occured while Disrollment'
-                })
-            });
-    }
 
     return (
         <>
             <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
-                <SidebarTrigger className="-ml-1"/>
-                <Separator orientation="vertical" className="mr-2 h-4"/>
+                {isUserEnrolledAlready? (<><SidebarTrigger className="-ml-1"/>
+                <Separator orientation="vertical" className="mr-2 h-4"/></>) : <></>}
                 <Breadcrumb>
                     <BreadcrumbList>
 
@@ -132,15 +54,19 @@ const enroll = () => {
 
                 </div>
             </header>
+            <Card className="rounded-none bg-muted/50 border-none">
+                <CardHeader>
 
-            <div className="p-6">
-                <section>
+
                     <div className="flex flex-wrap gap-2 w-full mb-3">
                         <Badge variant="outline">Course</Badge>
 
 
                     </div>
 
+
+                </CardHeader>
+                <CardContent>
                     {/* Title with responsive spacing */}
                     <div  className="flex flex-wrap gap-2 w-full mb-3 items-center">
                         <div className=" ">
@@ -155,9 +81,12 @@ const enroll = () => {
                             }
                         </div>
                     </div>
+                </CardContent>
+
+            </Card>
+            <div className="p-6">
 
 
-                </section>
                 <section className="my-8">
                     <div className="flex flex-wrap gap-4 w-full ">
                         <div className="flex gap-1 items-center">
@@ -180,7 +109,7 @@ const enroll = () => {
                     <h1 className="font-medium text-2xl">Course Structure</h1>
                     <div className="my-3">
                         {courseList?.courseTopic?.map(a => (
-                            <Accordion type="single" collapsible>
+                            <Accordion type="single" key={a?.courseTopicId} collapsible>
                                 <AccordionItem value="item-1">
                                     <AccordionTrigger>{a?.courseTopicTitle}</AccordionTrigger>
                                     <AccordionContent>
@@ -188,7 +117,7 @@ const enroll = () => {
                                         <div>
                                             <ul>
                                                 {a?.courseVideo?.map(a => (
-                                                    <li className="flex gap-2 items-center">
+                                                    <li className="flex gap-2 items-center" key={a?.courseVideoId}>
                                                         <Video />
                                                         <span>{a?.courseVideoTitle}</span>
                                                     </li>
