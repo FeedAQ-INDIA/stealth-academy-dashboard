@@ -137,7 +137,7 @@ export function Explore() {
 
     const fetchCourses = () => {
         axiosConn
-            .post("http://localhost:3000/searchCourse", apiQuery)
+            .post(import.meta.env.VITE_API_URL+"/searchCourse", apiQuery)
             .then((res) => {
                 console.log(res.data);
                 setCourseList(res.data.data?.results);

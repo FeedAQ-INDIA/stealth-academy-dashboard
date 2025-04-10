@@ -66,7 +66,7 @@ function SignInPage() {
 
                         <div className="mt-8 space-y-4">
                             {/* Google Login */}
-                            <Link   to="http://localhost:3000/auth/google">
+                            <Link   to={import.meta.env.VITE_API_URL + "/auth/google"}>
                                 <Button
                                     className="flex items-center w-full gap-3  my-2 "
                                     variant="outline"
@@ -100,7 +100,7 @@ function SignInPage() {
                             </Link>
 
                             {/* Microsoft Login */}
-                            <Link    to="http://localhost:3000/auth/microsoft">
+                            <Link    to={import.meta.env.VITE_API_URL + "/auth/microsoft"}>
                                 <Button
                                     className="flex items-center w-full gap-3  my-2"
                                     variant="outline"

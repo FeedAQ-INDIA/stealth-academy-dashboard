@@ -101,7 +101,7 @@ function SetupAccount() {
 
     const onSubmit = (data) => {
         axiosConn
-            .post("http://localhost:3000/createOrg", {
+            .post(import.meta.env.VITE_API_URL+"/createOrg", {
                 orgName: data.name,
                 orgEmail: data.email,
                 orgNumber: data.contact,
@@ -135,7 +135,7 @@ function SetupAccount() {
     const handleJoinOrg = (data) => {
         console.log('calling handle org join')
         axiosConn
-            .post("http://localhost:3000/joinOrg", {
+            .post(import.meta.env.VITE_API_URL+"/joinOrg", {
                 joinCode: data.inviteCode,
              })
             .then((res) => {

@@ -33,7 +33,7 @@ function CourseVideoTutorial() {
 
     const fetchCourseVideo = () => {
         axiosConn
-            .post("http://localhost:3000/searchCourse", {
+            .post(import.meta.env.VITE_API_URL+"/searchCourse", {
                 limit: 10, offset: 0, getThisData: {
                     datasource: "CourseVideo",  attributes: [], where : {courseVideoId: CourseVideoId},
                 },

@@ -106,7 +106,7 @@ export function MyLearningPath() {
 
   const fetchCourses = () => {
     axiosConn
-        .post("http://localhost:3000/searchCourse", apiQuery)
+        .post(import.meta.env.VITE_API_URL+"/searchCourse", apiQuery)
         .then((res) => {
           console.log(res.data);
           setCourseList(res.data.data?.results?.[0]);
@@ -123,7 +123,7 @@ export function MyLearningPath() {
 
   const disroll = (courseId) => {
     axiosConn
-        .post("http://localhost:3000/disroll", {
+        .post(import.meta.env.VITE_API_URL+"/disroll", {
           courseId: courseId
         })
         .then((res) => {

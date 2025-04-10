@@ -3,7 +3,7 @@ import { refreshToken } from "./utils/refreshTokenUtils";
 import { useAuthStore } from "@/zustland/store"; // ✅ Ensure the correct import path
 
 const axiosConn = axios.create({
-    baseURL: "http://localhost:3000/",
+    baseURL: import.meta.env.VITE_API_URL,
 });
 
 let refreshTokenCount = 0;

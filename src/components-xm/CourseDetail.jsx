@@ -51,7 +51,7 @@ export function CourseDetail() {
     const fetchCourses = () => {
 
         axiosConn
-            .post("http://localhost:3000/getCourseDetail", {courseId: CourseId})
+            .post(import.meta.env.VITE_API_URL+"/getCourseDetail", {courseId: CourseId})
             .then((res) => {
                 console.log(res.data);
                 setCourseList(res.data.data);
@@ -68,7 +68,7 @@ export function CourseDetail() {
 
     const enrollStatus = () => {
         axiosConn
-            .post("http://localhost:3000/enrollStatus", {
+            .post(import.meta.env.VITE_API_URL+"/enrollStatus", {
                 courseId: CourseId
             })
             .then((res) => {
@@ -87,7 +87,7 @@ export function CourseDetail() {
 
     const enroll = () => {
         axiosConn
-            .post("http://localhost:3000/enroll", {
+            .post(import.meta.env.VITE_API_URL+"/enroll", {
                 courseId: CourseId
             })
             .then((res) => {
@@ -107,7 +107,7 @@ export function CourseDetail() {
 
     const disroll = () => {
         axiosConn
-            .post("http://localhost:3000/disroll", {
+            .post(import.meta.env.VITE_API_URL+"/disroll", {
                 courseId: CourseId
             })
             .then((res) => {

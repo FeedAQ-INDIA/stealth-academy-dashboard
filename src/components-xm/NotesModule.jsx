@@ -65,7 +65,7 @@ function NotesModule({courseId, courseTopicId, courseTopicContentId}) {
 
     const fetchNotesModule = () => {
         axiosConn
-            .post("http://localhost:3000/searchCourse", {
+            .post(import.meta.env.VITE_API_URL+"/searchCourse", {
                 limit: 10, offset: 0, getThisData: {
                     datasource: "Notes", attributes: [], where: {courseTopicContentId: courseTopicContentId},
                 },
@@ -81,7 +81,7 @@ function NotesModule({courseId, courseTopicId, courseTopicContentId}) {
 
     function onSubmit(data) {
         axiosConn
-            .post("http://localhost:3000/saveNote", {
+            .post(import.meta.env.VITE_API_URL+"/saveNote", {
                 courseTopicId,
                 courseId,
                 courseTopicContentId,
@@ -101,7 +101,7 @@ function NotesModule({courseId, courseTopicId, courseTopicContentId}) {
 
     const deleteComment = (notesId) => {
         axiosConn
-            .post("http://localhost:3000/deleteNote", {
+            .post(import.meta.env.VITE_API_URL+"/deleteNote", {
                notesId
             })
             .then((res) => {
@@ -120,7 +120,7 @@ function NotesModule({courseId, courseTopicId, courseTopicContentId}) {
     function onCommentUpdate(data) {
         console.log(data);
         axiosConn
-            .post("http://localhost:3000/saveNote", {
+            .post(import.meta.env.VITE_API_URL+"/saveNote", {
                 notesId:data.id,
                 courseTopicId,
                 courseId,

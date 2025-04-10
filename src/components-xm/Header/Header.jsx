@@ -15,7 +15,7 @@ export default function Header( ) {
             {/* Logo */}
             <a
                 className="text-2xl sm:text-3xl font-medium text-black"
-                href="#"
+                href="/dashboard"
                 style={{ fontFamily: "Anta" }}
             >
                 Fee

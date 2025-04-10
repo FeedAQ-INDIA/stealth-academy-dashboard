@@ -15,7 +15,7 @@ export const useAuthStore = create((set) => ({
     },
     fetchUserDetail: async () => {
         try {
-            const res = await axiosConn.post("http://localhost:3000/getUser",
+            const res = await axiosConn.post(import.meta.env.VITE_API_URL+"/getUser",
                 { });
             set({ userDetail: res.data.data, loading: false });  // Set loading to false after fetch
         } catch (error) {
