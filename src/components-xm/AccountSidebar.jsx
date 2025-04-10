@@ -44,8 +44,8 @@ function AccountSidebar({...props}) {
                 },
                     {
                         title: "Sign out",
-                        url: `https://localhost:3000/auth/logout`,
-                        isActive: location.pathname === 'https://localhost:3000/auth/logout',
+                        url: `http://localhost:3000/auth/logout`,
+                        isActive: location.pathname === 'http://localhost:3000/auth/logout',
 
                     },
 

@@ -16,6 +16,7 @@ import {Button} from "@/components/ui/button.jsx";
 import {useParams} from "react-router-dom";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
+import NotesModule from "@/components-xm/NotesModule.jsx";
 
 function CourseWritten() {
 
@@ -81,10 +82,6 @@ function CourseWritten() {
                         <Badge variant="outline">Doc</Badge>
 
                     </div>
-
-                </CardHeader>
-                <CardContent>
-                    {/* Title with responsive spacing */}
                     <div className=" flex  items-center gap-2 ">
                         <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold ">
                             {courseVideoDetail?.courseWrittenTitle}
@@ -93,10 +90,7 @@ function CourseWritten() {
                             <Button>Previous</Button> <Button>Next</Button>
                         </div>
                     </div>
-                </CardContent>
-
-
-
+                </CardHeader>
 
             </Card>
             <div className="p-6">
@@ -111,13 +105,12 @@ function CourseWritten() {
 
 
                 </section>
-                <section className="my-8">
-                    <h1 className="text-lg   font-medium ">Note Book</h1>
-                    <div className="grid w-full gap-2 my-4">
-                        <Textarea className="" placeholder="Type your notes here."/>
-                        <Button className="w-fit ml-auto">Save</Button>
-                    </div>
-                </section>
+                <NotesModule courseId={courseList.courseId}
+                             courseTopicContentId={ courseList?.courseTopic?.
+                             find(a=>a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.
+                             find(a=> a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.
+                                 courseTopicContentId}
+                             courseTopicId={courseVideoDetail.courseTopicId}/>
             </div>
 
         </>)

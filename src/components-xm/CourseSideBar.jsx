@@ -29,7 +29,7 @@ function CourseSidebar({...props}) {
 
     const [data, setData] = useState(null);
 
-    const {isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus} = useCourse();
+    const {isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus,identifyContentTypeIcons} = useCourse();
 
 
     const contentUrlMap = {
@@ -47,6 +47,7 @@ function CourseSidebar({...props}) {
                     isActive: location.pathname === ``,
                     subItems: a?.courseTopicContent?.map(m => ({
                         title: m?.courseTopicContentTitle,
+                        contentType:m?.courseTopicContentType,
                         url: `/course/${courseList?.courseId}/${contentUrlMap[m?.courseTopicContentType]}/${m?.contentId}`,
                         isClickable: true,
                         isActive: location.pathname === `/course/${courseList?.courseId}/${contentUrlMap[m?.courseTopicContentType]}/${m?.contentId}`,
@@ -83,9 +84,9 @@ function CourseSidebar({...props}) {
                         <Clock
                             size={18}/> {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}
                     </div>
-                    <div className="flex gap-2 items-center text-sm mt-2">
-                        <Loader size={18}/> 10 % Completed
-                    </div>
+                    {/*<div className="flex gap-2 items-center text-sm mt-2">*/}
+                    {/*    <Loader size={18}/> 10 % Completed*/}
+                    {/*</div>*/}
                 </div>
             </SidebarHeader>
             <Separator/>
@@ -112,11 +113,22 @@ function CourseSidebar({...props}) {
                                                 {item?.subItems?.map((subItem) => (
 
                                                     <SidebarMenuSubItem>
-                                                        <SidebarMenuSubButton asChild
+                                                        {subItem?.isClickable? <SidebarMenuSubButton asChild
                                                                               isActive={subItem?.isActive}
-                                                                              className="py-5 rounded-1">
-                                                            {subItem?.isClickable?<Link to={subItem?.url}>{subItem?.title}</Link>:<span>{subItem.title}</span>}
-                                                        </SidebarMenuSubButton>
+                                                                              className="flex items-center gap-1 py-5 rounded-1">
+                                                            <Link to={subItem?.url}><div className="flex items-center gap-1">
+                                                            <div>{identifyContentTypeIcons(subItem.contentType)}</div>
+                                                            <div>{subItem?.title} </div>
+                                                            </div></Link>
+                                                        </SidebarMenuSubButton> :
+                                                            <SidebarMenuSubButton asChild
+                                                                                  isActive={subItem?.isActive}
+                                                                                  className="flex items-center gap-1 py-5 rounded-1">
+                                                                <div className="flex items-center gap-1">
+                                                                    <div>{identifyContentTypeIcons(subItem.contentType)}</div>
+                                                                    <div>{<span>{subItem.title}</span>}</div>
+                                                                </div>
+                                                            </SidebarMenuSubButton> }
                                                     </SidebarMenuSubItem>))}
 
                                             </SidebarMenuSub>

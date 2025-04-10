@@ -4,32 +4,33 @@ import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent, CardFooter, CardHeader, CardTitle,} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination"
-import {Link} from "react-router-dom";
-import  {useEffect, useState} from "react";
+import {Pagination, PaginationContent, PaginationItem,} from "@/components/ui/pagination"
+import {Link, useNavigate} from "react-router-dom";
+import {useEffect, useState} from "react";
 import axiosConn from "@/axioscon.js";
 
 export function Explore() {
+    const navigate = useNavigate()
     const [totalCount, setTotalCount] = useState(0);
     const [limit, setLimit] = useState(10);
     const [offset, setOffset] = useState(0);
     const [courseList, setCourseList] = useState([]);
     const [apiQuery, setApiQuery] = useState({
         limit: limit, offset: offset, getThisData: {
-            datasource: "Course",  attributes: [],
+            datasource: "Course", attributes: [],
             include: [{
                 datasource: "CourseTopic", as: "courseTopic", required: false, order: [], attributes: [], where: {},
             },],
         },
     });
+
+    const getSearchValueFromURL = () => {
+        const params = new URLSearchParams(location.search);
+        return params.get("search") || ''; // Default to 'overview' tab
+    };
+
+    const [exploreCourseText, setExploreCourseText] = useState(getSearchValueFromURL);
+
 
     const updateApiQuery = (datasource, keyValueUpdates) => {
         setApiQuery((prevQuery) => {
@@ -131,7 +132,7 @@ export function Explore() {
     };
 
     useEffect(() => {
-         fetchCourses();
+        fetchCourses();
     }, [apiQuery]);
 
     const fetchCourses = () => {
@@ -149,16 +150,37 @@ export function Explore() {
             });
     };
 
+
+    const handleSearchChange = (value) => {
+        const searchValue =  value;
+        const trimmed = searchValue.trim();
+
+        // Update the query param in the URL
+        const params = new URLSearchParams(location.search);
+        if (trimmed) {
+            params.set("search", trimmed);
+        } else {
+            params.delete("search");
+        }
+        navigate({ pathname: location.pathname, search: params.toString() });
+
+        // Call API with appropriate query
+        updateApiQuery("Course", {
+            where: {
+                courseTitle: {
+                    $like: `%${trimmed || ""}%`,
+                },
+            },
+        });
+    };
+
+    useEffect(() => {
+        handleSearchChange(exploreCourseText)
+    }, [exploreCourseText]);
+
     return (
-        <div  className="p-6">
+        <div className="p-6">
             <div className=" items-center justify-items-center">
-                {/*<div className="my-4">*/}
-                {/*    <h1 className="text-center text-2xl font-medium">Explore Courses</h1>*/}
-                {/*</div>*/}
-                {/*<div className="flex gap-2 w-full md:w-3/4 lg:w-1/2 mx-auto items-center my-8">*/}
-                {/*    <Input type="text" placeholder="What do you want to learn today ?"/>*/}
-                {/*    <Button type="submit"><Search/></Button>*/}
-                {/*</div>*/}
                 <Card className="border-0 w-full bg-muted/50  my-6 py-6">
                     <CardHeader>
                         <CardTitle className="text-center">
@@ -170,8 +192,13 @@ export function Explore() {
                     <CardContent>
                         <div className="my-2">
                             <div className="flex gap-2 w-full md:w-3/4 lg:w-1/2 mx-auto items-center">
-                                <Input type="text" placeholder="What do you want to learn today ?"/>
-                                <Button type="submit"><Search/></Button>
+                                <Input type="text" placeholder="What do you want to learn today ?"
+                                       value={exploreCourseText}  onChange={(e) => {
+                                    const value = e.target.value;
+                                    setExploreCourseText(value);
+                                }}
+                                     />
+                                {/*<Button type="submit"><Search/></Button>*/}
                             </div>
                         </div>
                     </CardContent>
@@ -208,58 +235,60 @@ export function Explore() {
                                 </CardContent>
 
                                 <CardFooter className="flex gap-2 ">
-                                    <Link to={`/course/${a?.courseId}`} className="  w-full "><Button className="  w-full ">Learn More</Button>
+                                    <Link to={`/course/${a?.courseId}`} className="  w-full "><Button className="  w-full ">Learn
+                                        More</Button>
                                     </Link>
                                 </CardFooter>
-                            </Card> )
+                            </Card>)
                         )}
 
                     </div>
                 </div>
 
-            </div> <div className="flex flex-row items-center">
-            <div className="text-xs text-muted-foreground">
-                {offset + 1} to {Math.min(offset + limit, totalCount)} of {totalCount} row(s) selected.
             </div>
-            <Pagination className="ml-auto mr-0 w-auto">
-                <PaginationContent>
-                    <PaginationItem>
-                        <Button
-                            size="icon"
-                            variant="outline"
-                            className="h-6 w-6"
-                            onClick={() => {
-                                setOffset(Math.max(offset - limit, 0));
-                                setApiQuery((prevQuery) => ({
-                                    ...prevQuery,
-                                    offset: Math.max(offset - limit, 0),
-                                }));
-                            }}
-                        >
-                            <ChevronLeft className="h-3.5 w-3.5" />
-                            <span className="sr-only">Previous Order</span>
-                        </Button>
-                    </PaginationItem>
-                    <PaginationItem>
-                        <Button
-                            size="icon"
-                            variant="outline"
-                            className="h-6 w-6"
-                            onClick={() => {
-                                setOffset(offset + limit < totalCount ? offset + limit : offset);
-                                setApiQuery((prevQuery) => ({
-                                    ...prevQuery,
-                                    offset: offset + limit < totalCount ? offset + limit : offset,
-                                }));
-                            }}
-                        >
-                            <ChevronRight className="h-3.5 w-3.5" />
-                            <span className="sr-only">Next Order</span>
-                        </Button>
-                    </PaginationItem>
-                </PaginationContent>
-            </Pagination>
-        </div>
+            <div className="flex flex-row items-center">
+                <div className="text-xs text-muted-foreground">
+                    {offset + 1} to {Math.min(offset + limit, totalCount)} of {totalCount} row(s) selected.
+                </div>
+                <Pagination className="ml-auto mr-0 w-auto">
+                    <PaginationContent>
+                        <PaginationItem>
+                            <Button
+                                size="icon"
+                                variant="outline"
+                                className="h-6 w-6"
+                                onClick={() => {
+                                    setOffset(Math.max(offset - limit, 0));
+                                    setApiQuery((prevQuery) => ({
+                                        ...prevQuery,
+                                        offset: Math.max(offset - limit, 0),
+                                    }));
+                                }}
+                            >
+                                <ChevronLeft className="h-3.5 w-3.5"/>
+                                <span className="sr-only">Previous Order</span>
+                            </Button>
+                        </PaginationItem>
+                        <PaginationItem>
+                            <Button
+                                size="icon"
+                                variant="outline"
+                                className="h-6 w-6"
+                                onClick={() => {
+                                    setOffset(offset + limit < totalCount ? offset + limit : offset);
+                                    setApiQuery((prevQuery) => ({
+                                        ...prevQuery,
+                                        offset: offset + limit < totalCount ? offset + limit : offset,
+                                    }));
+                                }}
+                            >
+                                <ChevronRight className="h-3.5 w-3.5"/>
+                                <span className="sr-only">Next Order</span>
+                            </Button>
+                        </PaginationItem>
+                    </PaginationContent>
+                </Pagination>
+            </div>
         </div>
     );
 }

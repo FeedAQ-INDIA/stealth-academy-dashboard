@@ -73,11 +73,6 @@ function CourseOverview() {
 
 
                     </div>
-
-
-                </CardHeader>
-                <CardContent>
-                    {/* Title with responsive spacing */}
                     <div  className="flex flex-wrap gap-2 w-full mb-3 items-center">
                         <div className=" ">
                             <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold">
@@ -91,7 +86,9 @@ function CourseOverview() {
                             }
                         </div>
                     </div>
-                </CardContent>
+
+                </CardHeader>
+
 
             </Card>
             <div className="p-6">
@@ -140,10 +137,10 @@ function CourseOverview() {
                                         {a?.courseTopicDescription}
                                         <div>
                                             <ul>
-                                                {a?.courseVideo?.map(a => (
-                                                    <li className="flex gap-2 items-center" key={a?.courseVideoId}>
+                                                {a?.courseTopicContent?.map(a => (
+                                                    <li className="flex gap-2 items-center my-2" key={a?.contentId}>
                                                         <Video />
-                                                        <span>{a?.courseVideoTitle}</span>
+                                                        <span>{a?.courseTopicContentTitle}</span>
                                                     </li>
                                                 ))}
                                             </ul>

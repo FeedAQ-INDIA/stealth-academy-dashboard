@@ -176,9 +176,9 @@ export function MyLearningPath() {
                         <div className="flex gap-2 items-center">
                           <Clock size={18}/>                                             {`${Math.floor(+(a?.courseDuration) / 60)}hr ${+(a?.courseDuration) % 60}min`}
                         </div>
-                        <div className="flex flex-row gap-2 items-center mt-2">
-                          <span>16% complete</span>
-                          <Progress value={66} /></div>
+                        {/*<div className="flex flex-row gap-2 items-center mt-2">*/}
+                        {/*  <span>16% complete</span>*/}
+                        {/*  <Progress value={66} /></div>*/}
 
 
 
@@ -196,60 +196,7 @@ export function MyLearningPath() {
           </div>
         </CardContent>
       </Card>
-      <Card className="border-0 bg-muted/50  my-6">
-        <CardHeader>
-          <CardTitle>
-            My Certificates
-          </CardTitle>
 
-
-        </CardHeader>
-        <CardContent>
-          <div className="my-2">
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-10 items-center">
-              {courseList?.courses?.map(a => (
-                  <Card className=" border shadow-sm hover:shadow-md cursor-pointer ">
-                    <CardHeader>
-                      {/* Badge row - wraps on smaller screens */}
-                      <div className="flex flex-wrap gap-2 w-full mb-3">
-                        <Badge variant="outline">Course</Badge>
-                        <Badge variant="outline">Beginner</Badge>
-                      </div>
-
-                      {/* Title with responsive spacing */}
-                      <div className=" ">
-                        <CardTitle className="text-lg sm:text-xl  font-semibold">
-                          {a?.courseTitle}
-                        </CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="mb-2 line-clamp-3">{a?.courseDescription}</p>
-                      {/*<p className="my-2 animate-blink text-blue-800 font-medium"> Registration Started</p>*/}
-                      <div className="font-medium  ">
-                        <div className="flex gap-2 items-center">
-                          <Clock size={18}/>                                             {`${Math.floor(+(a?.courseDuration) / 60)}hr ${+(a?.courseDuration) % 60}min`}
-                        </div>
-                        <div className="flex flex-row gap-2 items-center mt-2">
-                          <span>16% complete</span>
-                          <Progress value={66} /></div>
-
-
-
-                      </div>
-                    </CardContent>
-
-                    <CardFooter className="flex gap-2 ">
-                      <Button className="  w-full  " variant="destructive" onClick={()=> disroll(a?.courseId)}>Leave Course</Button>
-                      <Link to={`/course/${a?.courseId}`} className="  w-full "><Button className="  w-full ">Learn More</Button>
-                      </Link>
-                    </CardFooter>
-                  </Card>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

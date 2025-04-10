@@ -82,10 +82,6 @@ function CourseVideoTutorial() {
                         <Badge variant="outline">Video</Badge>
 
                     </div>
-
-                </CardHeader>
-                <CardContent>
-                    {/* Title with responsive spacing */}
                     <div className=" flex  items-center gap-2 ">
                         <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold ">
                             {courseVideoDetail?.courseVideoTitle}
@@ -94,11 +90,7 @@ function CourseVideoTutorial() {
                             <Button>Previous</Button> <Button>Next</Button>
                         </div>
                     </div>
-                </CardContent>
-
-
-
-
+                </CardHeader>
             </Card>
             <div className="p-6">
 
@@ -107,7 +99,7 @@ function CourseVideoTutorial() {
 
                     <div className="flex flex-col md:flex-row gap-4">
                         {/* Video container */}
-                        <div className="w-full md:w-2/3">
+                        <div className="w-full md:w-2/3 mx-auto">
                             <div className="w-full aspect-video">
                                 <iframe
                                     id="player"
@@ -121,10 +113,10 @@ function CourseVideoTutorial() {
                         </div>
 
                         {/* Side panel */}
-                        <div className="w-full md:w-1/3 bg-gray-100 p-4 flex items-center justify-center  shadow-md">
-                            <p className="overflow-y-auto h-full"> This content box will match the video height on
-                                larger screens.</p>
-                        </div>
+                        {/*<div className="w-full md:w-1/3 bg-gray-100 p-4 flex items-center justify-center  shadow-md">*/}
+                        {/*    <p className="overflow-y-auto h-full"> This content box will match the video height on*/}
+                        {/*        larger screens.</p>*/}
+                        {/*</div>*/}
 
 
                     </div>

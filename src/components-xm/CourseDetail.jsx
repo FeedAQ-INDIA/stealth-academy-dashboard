@@ -12,6 +12,7 @@ import {useAuthStore} from "@/zustland/store.js";
 
 import { CourseContext } from "./CourseContext.jsx";
 import {toast} from "@/components/hooks/use-toast.js";
+import {Book, Video} from "lucide-react";
 
 const HEADER_HEIGHT = "4rem";
 
@@ -42,20 +43,12 @@ export function CourseDetail() {
         enrollStatus()
     }, [apiQuery]);
 
-    const fetchCourses = () => {
-        // axiosConn
-        //     .post("http://localhost:3000/searchCourse", apiQuery)
-        //     .then((res) => {
-        //         console.log(res.data);
-        //         setCourseList(res.data.data?.results?.[0]);
-        //         setTotalCount(res.data.data.totalCount);
-        //         setOffset(res.data.data.offset);
-        //         setLimit(res.data.data.limit);
-        //     })
-        //     .catch((err) => {
-        //         console.log(err);
-        //     });
+    const identifyContentTypeIcons = (type) => {
+        if(type == 'CourseVideo') return <Video/>
+        else if(type == 'CourseWritten') return <Book />
+    }
 
+    const fetchCourses = () => {
 
         axiosConn
             .post("http://localhost:3000/getCourseDetail", {courseId: CourseId})
@@ -136,7 +129,7 @@ export function CourseDetail() {
 
 
     return (<>
-        <CourseContext.Provider value={{ courseList, isUserEnrolledAlready, enroll, disroll, enrollStatus }}>
+        <CourseContext.Provider value={{ courseList, isUserEnrolledAlready, enroll, disroll, enrollStatus , identifyContentTypeIcons}}>
 
         <SidebarProvider className="p-0">
                 {isUserEnrolledAlready? <CourseSidebar/> : <></>}
