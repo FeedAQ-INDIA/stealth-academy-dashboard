@@ -27,44 +27,29 @@ function CourseSidebar({...props}) {
     const location = useLocation();
     const navigate = useNavigate();
 
-
-
-    const [selectedTab, setSelectedTab] = useState(location.pathname);
-
-
-    // Update the state when the URL changes
-    useEffect(() => {
-        const currentTab =  location.pathname;
-        console.log(currentTab)
-        setSelectedTab(currentTab);
-    }, [location.pathname]);
-
-
-
-    const [urlEndpoint, setUrlEndpoint] = React.useState("");
-
-    const [data, setData] = useState({});
-    // let data;
-    useEffect(() => {
-        console.log("Updated urlEndpoint:", data);
-    }, [data]);
+    const [data, setData] = useState(null);
 
     const {isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus} = useCourse();
 
 
+    const contentUrlMap = {
+        'CourseVideo' :  'video',
+        'CourseWritten' :  'doc',
+    }
+
     useEffect(() => {
-        if (courseList) {
+        if (courseList && location.pathname) {
            let vav =  courseList?.courseTopic?.map(a => (
                 {
                     title: a?.courseTopicTitle,
                     url: `/course/${courseList?.courseId}`,
                     isClickable: false,
                     isActive: location.pathname === ``,
-                    subItems: a?.courseVideo?.map(m => ({
-                        title: m?.courseVideoTitle,
-                        url: `/course/${courseList?.courseId}/video/${m?.courseVideoId}`,
+                    subItems: a?.courseTopicContent?.map(m => ({
+                        title: m?.courseTopicContentTitle,
+                        url: `/course/${courseList?.courseId}/${contentUrlMap[m?.courseTopicContentType]}/${m?.contentId}`,
                         isClickable: true,
-                        isActive: location.pathname === `/course/${courseList?.courseId}/video/${m?.courseVideoId}`,
+                        isActive: location.pathname === `/course/${courseList?.courseId}/${contentUrlMap[m?.courseTopicContentType]}/${m?.contentId}`,
                     }))
                 }
             ))
@@ -107,17 +92,17 @@ function CourseSidebar({...props}) {
             <SidebarContent>
 
 
-                {data?.navMain?.map((item) => (<SidebarGroup key={item.title}>
+                {data?.navMain?.map((item) => (<SidebarGroup key={item?.title}>
                     <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {item?.items?.map((item) => (item?.subItems?.length > 0 ? (<Collapsible key={item.title}>
+                            {item?.items?.map((item) => (item?.subItems?.length > 0 ? (<Collapsible key={item?.title}>
                                     <SidebarMenuItem>
                                         <CollapsibleTrigger asChild>
-                                            <SidebarMenuButton tooltip={item.title}
+                                            <SidebarMenuButton tooltip={item?.title}
                                                                className="py-5 rounded-1">
 
-                                                <span>{item.title}</span>
+                                                <span>{item?.title}</span>
                                                 <ChevronRight
                                                     className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"/>
                                             </SidebarMenuButton>
@@ -128,19 +113,19 @@ function CourseSidebar({...props}) {
 
                                                     <SidebarMenuSubItem>
                                                         <SidebarMenuSubButton asChild
-                                                                              isActive={subItem.isActive}
+                                                                              isActive={subItem?.isActive}
                                                                               className="py-5 rounded-1">
-                                                            {subItem.isClickable?<Link to={subItem.url}>{subItem.title}</Link>:<span>{subItem.title}</span>}
+                                                            {subItem?.isClickable?<Link to={subItem?.url}>{subItem?.title}</Link>:<span>{subItem.title}</span>}
                                                         </SidebarMenuSubButton>
                                                     </SidebarMenuSubItem>))}
 
                                             </SidebarMenuSub>
                                         </CollapsibleContent>
                                     </SidebarMenuItem>
-                                </Collapsible>) : (<SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild isActive={item.isActive}
+                                </Collapsible>) : (<SidebarMenuItem key={item?.title}>
+                                    <SidebarMenuButton asChild isActive={item?.isActive}
                                                        className="py-5 rounded-1">
-                                        {item.isClickable?  <Link to={item.url}>{item.title}</Link>: <span>{item.title}</span>}
+                                        {item?.isClickable?  <Link to={item?.url}>{item?.title}</Link>: <span>{item?.title}</span>}
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>)
 

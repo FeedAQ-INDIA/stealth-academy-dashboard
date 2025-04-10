@@ -1,6 +1,12 @@
 import {SidebarTrigger, useSidebar} from "@/components/ui/sidebar.jsx";
 import {Separator} from "@/components/ui/separator.jsx";
-import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator
+} from "@/components/ui/breadcrumb.jsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
@@ -48,6 +54,10 @@ function CourseOverview() {
                         <BreadcrumbItem>
                             <BreadcrumbPage>Course</BreadcrumbPage>
                         </BreadcrumbItem>
+                        <BreadcrumbSeparator/>
+                        <BreadcrumbItem>
+                            <BreadcrumbPage className="truncate max-w-[30ch]"  title={courseList?.courseTitle}>{courseList?.courseTitle}</BreadcrumbPage>
+                        </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
                 <div className="ml-auto sm:flex-initial">
@@ -86,7 +96,20 @@ function CourseOverview() {
             </Card>
             <div className="p-6">
 
-
+                <section>
+                    <div className="w-full  md:w-2/3 ">
+                        <div className="w-full aspect-video">
+                            <iframe
+                                id="player"
+                                src="https://www.youtube.com/embed/_WNIvJozdMY?enablejsapi=1"
+                                className="w-full h-full shadow-md"
+                                frameBorder="0"
+                                allow="autoplay; encrypted-media"
+                                allowFullScreen
+                            ></iframe>
+                        </div>
+                    </div>
+                </section>
                 <section className="my-8">
                     <div className="flex flex-wrap gap-4 w-full ">
                         <div className="flex gap-1 items-center">
@@ -100,6 +123,7 @@ function CourseOverview() {
                         </div>
                     </div>
                 </section>
+
                 <section className="my-8">
                     <div>
                         <p>{courseList?.courseDescription}</p>

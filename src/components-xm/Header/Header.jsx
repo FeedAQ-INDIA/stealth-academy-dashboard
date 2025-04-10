@@ -3,8 +3,13 @@ import { Button } from "@/components/ui/button"
 import { Menu } from "lucide-react"
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
 import NavigationMenuDemo from "./nav-menu.jsx"
+import {useAuthStore} from "@/zustland/store.js";
 
-export default function Header({ userDetail }) {
+export default function Header( ) {
+
+    const {userDetail} = useAuthStore()
+
+
     return (
         <header className="flex h-16 items-center justify-between bg-white px-4 shadow-md border-b">
             {/* Logo */}
@@ -40,7 +45,7 @@ export default function Header({ userDetail }) {
             <div className="hidden md:flex items-center gap-2 ml-auto">
                 <Link to={`/account-settings/profile`}>
                     <Button variant="secondary">
-                        TS
+                        {userDetail?.nameInitial}
                     </Button>
                 </Link>
             </div>
@@ -58,7 +63,7 @@ export default function Header({ userDetail }) {
                             <NavigationMenuDemo orientation={"vertical"}/>
                             <Link to={`/account-settings/profile`}>
                                 <Button variant="secondary" className="w-full">
-                                    TS
+                                    {userDetail?.nameInitial}
                                 </Button>
                             </Link>
                         </div>

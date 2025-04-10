@@ -29,7 +29,7 @@ export function CourseDetail() {
                 datasource: "CourseTopic", as: "courseTopic", required: false, order: [], attributes: [], where: {},
                 include:[
                     {
-                        datasource: "CourseVideo", as: "courseVideo", required: false, order: [], attributes: [], where: {},
+                        datasource: "CourseTopicContent", as: "courseTopicContent", required: false, order: [], attributes: [], where: {},
                     }
                 ]
             },
@@ -43,25 +43,28 @@ export function CourseDetail() {
     }, [apiQuery]);
 
     const fetchCourses = () => {
-        axiosConn
-            .post("http://localhost:3000/searchCourse", apiQuery)
-            .then((res) => {
-                console.log(res.data);
-                setCourseList(res.data.data?.results?.[0]);
-                setTotalCount(res.data.data.totalCount);
-                setOffset(res.data.data.offset);
-                setLimit(res.data.data.limit);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+        // axiosConn
+        //     .post("http://localhost:3000/searchCourse", apiQuery)
+        //     .then((res) => {
+        //         console.log(res.data);
+        //         setCourseList(res.data.data?.results?.[0]);
+        //         setTotalCount(res.data.data.totalCount);
+        //         setOffset(res.data.data.offset);
+        //         setLimit(res.data.data.limit);
+        //     })
+        //     .catch((err) => {
+        //         console.log(err);
+        //     });
 
 
         axiosConn
             .post("http://localhost:3000/getCourseDetail", {courseId: CourseId})
             .then((res) => {
                 console.log(res.data);
-
+                setCourseList(res.data.data);
+                // setTotalCount(res.data.data.totalCount);
+                // setOffset(res.data.data.offset);
+                // setLimit(res.data.data.limit);
             })
             .catch((err) => {
                 console.log(err);

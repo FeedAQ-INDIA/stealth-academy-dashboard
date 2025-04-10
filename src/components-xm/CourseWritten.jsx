@@ -17,24 +17,24 @@ import {useParams} from "react-router-dom";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
 
-function CourseVideoTutorial() {
+function CourseWritten() {
 
-    const {CourseId, CourseVideoId} = useParams();
+    const {CourseId, CourseDocId} = useParams();
     const { isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus } = useCourse();
 
     const [courseVideoDetail, setCourseVideoDetail] = useState({});
 
     useEffect(() => {
-         if(courseList && CourseVideoId){
-             fetchCourseVideo();
-         }
-    }, [courseList, CourseVideoId]);
+        if(courseList && CourseDocId){
+            fetchCourseVideo();
+        }
+    }, [courseList, CourseDocId]);
 
     const fetchCourseVideo = () => {
         axiosConn
             .post("http://localhost:3000/searchCourse", {
                 limit: 10, offset: 0, getThisData: {
-                    datasource: "CourseVideo",  attributes: [], where : {courseVideoId: CourseVideoId},
+                    datasource: "CourseWritten",  attributes: [], where : {courseWrittenId: CourseDocId},
                 },
             })
             .then((res) => {
@@ -66,7 +66,7 @@ function CourseVideoTutorial() {
                         </BreadcrumbItem>
                         <BreadcrumbSeparator/>
                         <BreadcrumbItem>
-                            <BreadcrumbPage className="truncate max-w-[30ch]">{courseVideoDetail?.courseVideoTitle}</BreadcrumbPage>
+                            <BreadcrumbPage className="truncate max-w-[30ch]">{courseVideoDetail?.courseWrittenTitle}</BreadcrumbPage>
                         </BreadcrumbItem>
 
                     </BreadcrumbList>
@@ -78,7 +78,7 @@ function CourseVideoTutorial() {
             <Card  className="rounded-none bg-muted/50 border-none">
                 <CardHeader>
                     <div className="flex flex-wrap gap-2 w-full mb-3 justify-items-center">
-                        <Badge variant="outline">Video</Badge>
+                        <Badge variant="outline">Doc</Badge>
 
                     </div>
 
@@ -87,7 +87,7 @@ function CourseVideoTutorial() {
                     {/* Title with responsive spacing */}
                     <div className=" flex  items-center gap-2 ">
                         <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold ">
-                            {courseVideoDetail?.courseVideoTitle}
+                            {courseVideoDetail?.courseWrittenTitle}
                         </CardTitle>
                         <div className="ml-auto flex gap-2">
                             <Button>Previous</Button> <Button>Next</Button>
@@ -104,27 +104,8 @@ function CourseVideoTutorial() {
 
                 <section className="my-8 ">
 
-                    <div className="flex flex-col md:flex-row gap-4">
-                        {/* Video container */}
-                        <div className="w-full md:w-2/3">
-                            <div className="w-full aspect-video">
-                                <iframe
-                                    id="player"
-                                    src={`https://www.youtube.com/embed/${courseVideoDetail?.courseVideoUrl}?enablejsapi=1`}
-                                    className="w-full h-full shadow-md"
-                                    frameBorder="0"
-                                    allow="autoplay; encrypted-media"
-                                    allowFullScreen
-                                ></iframe>
-                            </div>
-                        </div>
-
-                        {/* Side panel */}
-                        <div className="w-full md:w-1/3 bg-gray-100 p-4 flex items-center justify-center  shadow-md">
-                            <p className="overflow-y-auto h-full"> This content box will match the video height on
-                                larger screens.</p>
-                        </div>
-
+                    <div className=" ">
+                      <p>{courseVideoDetail?.courseWrittenHtmlContent}</p>
 
                     </div>
 
@@ -144,4 +125,4 @@ function CourseVideoTutorial() {
 }
 
 
-export default CourseVideoTutorial;
+export default CourseWritten;

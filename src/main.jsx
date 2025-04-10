@@ -18,6 +18,7 @@ import {AccountDetail} from "@/components-xm/AccountDetail.jsx";
 import CourseComprehensionReading from "@/components-xm/CourseComprehensionReading.jsx";
 import CourseListenAndRead from "@/components-xm/CourseListenAndRead.jsx";
 import MyAccount from "@/components-xm/MyAccountSettings/MyAccount.jsx";
+import CourseWritten from "@/components-xm/CourseWritten.jsx";
 
 const router = createBrowserRouter([
     {
@@ -58,8 +59,12 @@ const router = createBrowserRouter([
                         element: <CourseOverview/>,
                     },
                     {
-                        path: "/course/:CourseId/video/:VideoId",
+                        path: "/course/:CourseId/video/:CourseVideoId",
                         element: <CourseVideoTutorial/>,
+                    },
+                    {
+                        path: "/course/:CourseId/doc/:CourseDocId",
+                        element: <CourseWritten/>,
                     },
                     {
                         path: "/course/:CourseId/comprehension-reading/:ComprehensionReadingId",

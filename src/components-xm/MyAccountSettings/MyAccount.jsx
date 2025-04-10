@@ -2,7 +2,7 @@ import {SidebarTrigger} from "@/components/ui/sidebar.jsx";
 import {Separator} from "@/components/ui/separator.jsx";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
 import {Card, CardHeader, CardTitle} from "@/components/ui/card.jsx";
-import React from "react";
+import React, {useEffect} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
 import {CircleDollarSign, Clock} from "lucide-react";
 import {Textarea} from "@/components/ui/textarea.jsx";
@@ -10,9 +10,56 @@ import {Button} from "@/components/ui/button.jsx";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
 import {Label} from "@/components/ui/label.jsx";
 import {Input} from "@/components/ui/input.jsx";
+import {z} from "zod";
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.jsx";
+import {useAuthStore} from "@/zustland/store.js";
+import axiosConn from "@/axioscon.js";
+import {toast} from "@/components/hooks/use-toast.js";
+
 
 function MyAccount() {
+    const {userDetail, fetchUserDetail} = useAuthStore()
 
+    const createAccountSchema = z.object({
+        firstName:  z.string()
+            .min(1, "Name must be at least one character long.") ,
+        lastName: z.string().optional(),
+        number: z.string().optional(),
+
+    });
+    const createAccountForm = useForm({
+        resolver: zodResolver(createAccountSchema),
+        defaultValues: {firstName: "", lastName: "", number: '' },
+    });
+
+    useEffect(() => {
+        if(userDetail){
+            createAccountForm.reset({
+                firstName: userDetail.firstName,
+                lastName: userDetail.lastName,
+                number: userDetail.number,
+             });
+        }
+    }, [userDetail]);
+
+    function onSubmit(data){
+        axiosConn.post('http://localhost:3000/saveUserDetail', {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            number: data.number,
+        }).then(res => {
+            toast({
+                title: "User updated successfully!",
+            });
+            fetchUserDetail()
+        }).catch(err => {
+            toast({
+                title: "User updation failed!",
+            });
+        });
+    }
 
     return (
         <>
@@ -35,36 +82,79 @@ function MyAccount() {
                     </CardHeader>
                 </Card>
                 <div className="my-16">
+                    <Form {...createAccountForm}>
+                        <form
+                            onSubmit={createAccountForm.handleSubmit(onSubmit)}
+                            className="w-full space-y-6"
+                        >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="grid w-full   items-center gap-1.5">
-                            <Label htmlFor="email">First Name</Label>
-                            <Input type="text" id="firstName" placeholder="First Name" />
+                            <FormField
+                                control={createAccountForm.control}
+                                name="firstName"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>First Name</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="First Name" {...field} />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
                         </div>
                         <div className="grid w-full  items-center gap-1.5">
-                            <Label htmlFor="email">Last Name</Label>
-                            <Input type="text" id="lastName" placeholder="Last Name" />
+                            <FormField
+                                control={createAccountForm.control}
+                                name="lastName"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Last Name</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Last Name" {...field} />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
                         </div>
                         <div className="grid w-full  items-center gap-1.5">
+
                             <Label htmlFor="email">Email</Label>
-                            <Input type="email" id="email" placeholder="Email" />
+                            <Input type="email" id="email" value={userDetail.email} readOnly />
                         </div>
                         <div className="grid w-full  items-center gap-1.5">
-                            <Label htmlFor="phoneNumber">Phone Number</Label>
-                            <Input type="tel" id="phoneNumber" placeholder="Phone Number" />
+                            <FormField
+                                control={createAccountForm.control}
+                                name="number"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Phone Number</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Phone Number" {...field} />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
                         </div>
                         <div className="grid w-full  items-center gap-1.5">
                             <Label htmlFor="language">Language</Label>
                             <Input type="text" id="language" value="English" readOnly />
                         </div>
                         <div className="grid w-full  items-center gap-1.5">
-                            <Label htmlFor="country">Phone Number</Label>
+                            <Label htmlFor="country">Country</Label>
                             <Input type="text" id="country" value="India" readOnly />
                         </div>
                     </div>
                     <div className="flex gap-4 my-6">
                        <Button variant="outline">Reset</Button> <Button>Save</Button>
                     </div>
-
+                        </form>
+                    </Form>
                 </div>
             </div>
 
