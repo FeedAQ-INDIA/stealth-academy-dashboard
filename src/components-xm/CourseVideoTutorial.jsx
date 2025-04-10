@@ -16,6 +16,7 @@ import {Button} from "@/components/ui/button.jsx";
 import {useParams} from "react-router-dom";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
+import NotesModule from "@/components-xm/NotesModule.jsx";
 
 function CourseVideoTutorial() {
 
@@ -40,7 +41,7 @@ function CourseVideoTutorial() {
             .then((res) => {
                 console.log(res.data);
                 setCourseVideoDetail(res.data.data?.results?.[0]);
-                // setTotalCount(res.data.data.totalCount);
+                 // setTotalCount(res.data.data.totalCount);
                 // setOffset(res.data.data.offset);
                 // setLimit(res.data.data.limit);
             })
@@ -130,13 +131,12 @@ function CourseVideoTutorial() {
 
 
                 </section>
-                <section className="my-8">
-                    <h1 className="text-lg   font-medium ">Note Book</h1>
-                    <div className="grid w-full gap-2 my-4">
-                        <Textarea className="" placeholder="Type your notes here."/>
-                        <Button className="w-fit ml-auto">Save</Button>
-                    </div>
-                </section>
+                <NotesModule courseId={courseList.courseId}
+                             courseTopicContentId={ courseList?.courseTopic?.
+                             find(a=>a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.
+                             find(a=> a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.
+                                 courseTopicContentId}
+                             courseTopicId={courseVideoDetail.courseTopicId}/>
             </div>
 
         </>)
