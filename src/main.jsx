@@ -88,21 +88,53 @@ const router = createBrowserRouter([
 ]);
 
 
-try {
-    if (window.location.pathname != "/signin") {
-        await refreshToken();
+// try {
+//     if (window.location.pathname != "/signin") {
+//         await refreshToken();
+//     }
+// } catch (err) {
+//     console.log(err);
+// }
+
+async function runTokenRefresh() {
+    if (window.location.pathname !== "/signin") {
+        await refreshToken().catch((err) => {
+            console.error("Refresh token logic failed:", err.message);
+            // Optionally redirect or show login page
+        });
     }
-} catch (err) {
-    console.log(err);
 }
 
-createRoot(document.getElementById("root")).render(
-    <StrictMode>
-        {/*<Provider store={store} >*/}
-        {" "}
-        {/* Wrap with Provider */}
-        <RouterProvider router={router}/>
-        <Toaster/>
-        {/*</Provider>*/}
-    </StrictMode>
-);
+
+(async function initApp() {
+    if (window.location.pathname !== "/signin") {
+        try {
+            await runTokenRefresh();
+        } catch (err) {
+            console.error("Refresh token logic failed:", err.message);
+        }
+    }
+
+    createRoot(document.getElementById("root")).render(
+        <StrictMode>
+            {/*<Provider store={store} >*/}
+            {" "}
+            {/* Wrap with Provider */}
+            <RouterProvider router={router}/>
+            <Toaster/>
+            {/*</Provider>*/}
+        </StrictMode>
+     );
+})();
+
+//
+// createRoot(document.getElementById("root")).render(
+//     <StrictMode>
+//         {/*<Provider store={store} >*/}
+//         {" "}
+//         {/* Wrap with Provider */}
+//         <RouterProvider router={router}/>
+//         <Toaster/>
+//         {/*</Provider>*/}
+//     </StrictMode>
+// );

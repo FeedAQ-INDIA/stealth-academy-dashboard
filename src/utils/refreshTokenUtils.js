@@ -15,7 +15,7 @@ export const refreshToken = async () => {
     // Correct way to update Zustand store from a non-React function
     useAuthStore.getState().setAccessToken(newAccessToken);
 
-    return {isSuccess : true , isTemp : response?.data?.isTemp};
+    return {isSuccess : true };
   } catch (error) {
     console.error("Failed to refresh token:", error?.response?.data || error.message);
     throw new Error("Token Refresh Failed");

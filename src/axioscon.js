@@ -48,12 +48,8 @@ axiosConn.interceptors.response.use(
 
                 try {
                     console.log("Token expired, refreshing token...");
-                    let {isSuccess , isTemp } = await refreshToken();
+                    let {isSuccess  } = await refreshToken();
                     refreshTokenCount = 0 ;
-                    if(isTemp){
-                        window.location='/setupaccount'
-                    }
-
 
                     const { accessToken } = useAuthStore.getState(); // ✅ Correct way to get Zustand state
                     console.log("New Access Token:", accessToken);
