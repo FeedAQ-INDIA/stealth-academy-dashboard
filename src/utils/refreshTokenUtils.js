@@ -4,7 +4,7 @@ import axiosConn from "@/axioscon.js";
 export const refreshToken = async () => {
   try {
     const response = await axiosConn.post(
-        `http://localhost:3000/auth/refresh-token`,
+            import.meta.env.VITE_API_URL+`/auth/refresh-token`,
         {},
         { withCredentials: true }
     );

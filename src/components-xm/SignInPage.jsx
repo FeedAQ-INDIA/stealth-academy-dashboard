@@ -26,7 +26,7 @@ function SignInPage() {
     return (
         <div
             className="min-h-screen w-full flex items-center justify-center bg-cover bg-center px-4"
-            style={{ backgroundImage: `url(${backgroundImage})` }}
+
         >
             <div className="w-full max-w-md sm:max-w-lg md:max-w-xl p-4">
                 <Card className="w-full p-6 sm:p-8 rounded-none shadow-lg  ">

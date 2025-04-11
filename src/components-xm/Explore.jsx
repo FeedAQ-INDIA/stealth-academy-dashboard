@@ -246,7 +246,7 @@ export function Explore() {
                 </div>
 
             </div>
-            <div className="flex flex-row items-center">
+            {courseList.length > 0 ? <div className="flex flex-row items-center">
                 <div className="text-xs text-muted-foreground">
                     {offset + 1} to {Math.min(offset + limit, totalCount)} of {totalCount} row(s) selected.
                 </div>
@@ -288,7 +288,7 @@ export function Explore() {
                         </PaginationItem>
                     </PaginationContent>
                 </Pagination>
-            </div>
+            </div>: <></>}
         </div>
     );
 }
