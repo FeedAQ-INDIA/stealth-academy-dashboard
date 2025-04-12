@@ -8,11 +8,11 @@ function App() {
     const location = useLocation();
 
 
-    const {fetchUserDetail, loading: loadingStore, userDetail} = useAuthStore();
+    const {fetchUserDetail, loading: loadingStore, userDetail, fetchUserEnrolledCourseIdList} = useAuthStore();
 
 
     useEffect(() => {
-        fetchUserDetail(); // Fetch user details and let Zustand update the state
+          fetchUserDetail(); // Fetch user details and let Zustand update the state
     }, []); // Runs only once on mount
 
     useEffect(() => {
@@ -21,6 +21,10 @@ function App() {
             console.log('redirecting to signin')
             window.location = '/signin';
         }
+        else{
+            fetchUserEnrolledCourseIdList(userDetail?.userId)
+        }
+
     }, [userDetail]); // Redirect only after userDetail updates
 
 

@@ -4,7 +4,8 @@ import axiosConn from "@/axioscon.js";
 export const useAuthStore = create((set) => ({
     accessToken: null,
     userDetail: null,
-      loading:true,
+    loading:true,
+    userEnrolledCourseIdList: [],
     setAccessToken: (accessToken) => {
         set((state) => ({accessToken:  accessToken}));
         console.log("zustland useAuthStore.setAccessToken ",  accessToken);
@@ -21,6 +22,24 @@ export const useAuthStore = create((set) => ({
         } catch (error) {
             console.error("Error fetching user details:", error);
             set({ loading: false });  // Set loading to false even on error
+        }
+    },
+    fetchUserEnrolledCourseIdList: async (userId) => {
+        console.log("User :: ", userId)
+        if(userId){
+            try {
+                const res = await axiosConn.post(import.meta.env.VITE_API_URL+"/searchCourse",
+                    {
+                        limit: 10, offset: 0, getThisData: {
+                            datasource: "UserEnrollment",  attributes: ["courseId"], where : {userId:  userId},
+                        },
+                    });
+                console.log( res.data?.data?.results?.map(a => a.courseId));
+                set({ userEnrolledCourseIdList: res.data?.data?.results?.map(a => a.courseId), loading: false });  // Set loading to false after fetch
+            } catch (error) {
+                console.error("Error fetching user details:", error);
+                set({ loading: false });  // Set loading to false even on error
+            }
         }
     },
 

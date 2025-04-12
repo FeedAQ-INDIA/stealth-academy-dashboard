@@ -22,6 +22,7 @@ import {
 import {useParams} from "react-router-dom";
 import {toast} from "@/components/hooks/use-toast.js";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
+import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
 function CourseOverview() {
     const {CourseId} = useParams();
     const { isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus } = useCourse();
@@ -58,6 +59,10 @@ function CourseOverview() {
                         <BreadcrumbItem>
                             <BreadcrumbPage className="truncate max-w-[30ch]"  title={courseList?.courseTitle}>{courseList?.courseTitle}</BreadcrumbPage>
                         </BreadcrumbItem>
+                        <BreadcrumbSeparator/>
+                        <BreadcrumbItem>
+                            <BreadcrumbPage className="truncate max-w-[30ch]"  >Overview</BreadcrumbPage>
+                        </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
                 <div className="ml-auto sm:flex-initial">
@@ -69,9 +74,9 @@ function CourseOverview() {
 
 
                     <div className="flex flex-wrap gap-2 w-full mb-3">
+                        <Badge className="animate-blink bg-green-600 text-white">FREE</Badge>
+
                         <Badge variant="outline">Course</Badge>
-
-
                     </div>
                     <div  className="flex flex-wrap gap-2 w-full mb-3 items-center">
                         <div className=" ">
@@ -92,65 +97,107 @@ function CourseOverview() {
 
             </Card>
             <div className="p-6">
+                <section className="mb-8">
+                    <Card className="border-0 bg-muted/50">
+                        <CardHeader>
+                            <div className="flex flex-wrap gap-4 w-full ">
+                                <div className="flex gap-1 items-center">
+                                    <Clock size={18}/>  {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}
+                                </div>
+                                <div className="flex gap-2 items-center">
+                                    < CircleDollarSign size={18}/> {courseList?.courseCost == 0 ? 'Free' : 'Rs.'+courseList?.courseCost+'/-'}
+                                </div>
+                                <div className="flex gap-2 items-center">
+                                    <Badge variant="outline">{courseList?.courseLevel}</Badge>
+                                </div>
+                            </div>
+                        </CardHeader>
 
+                    </Card>
+
+                </section>
                 <section>
-                    <div className="w-full  md:w-2/3 ">
-                        <div className="w-full aspect-video">
-                            <iframe
-                                id="player"
-                                src="https://www.youtube.com/embed/_WNIvJozdMY?enablejsapi=1"
-                                className="w-full h-full shadow-md"
-                                frameBorder="0"
-                                allow="autoplay; encrypted-media"
-                                allowFullScreen
-                            ></iframe>
-                        </div>
-                    </div>
-                </section>
-                <section className="my-8">
-                    <div className="flex flex-wrap gap-4 w-full ">
-                        <div className="flex gap-1 items-center">
-                            <Clock size={18}/>  {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}
-                        </div>
-                        <div className="flex gap-2 items-center">
-                            < CircleDollarSign size={18}/> {courseList?.courseCost == 0 ? 'Free' : 'Rs.'+courseList?.courseCost+'/-'}
-                        </div>
-                        <div className="flex gap-2 items-center">
-                            <Badge variant="outline">{courseList?.courseLevel}</Badge>
-                        </div>
-                    </div>
+                    <Card className="border-0 bg-[#ffdd00]">
+                        <CardHeader>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+                                <div>
+
+                                    <div className="w-full aspect-video  justify-items-center ">
+                                        <iframe
+                                            id="player"
+                                            src={`https://www.youtube.com/embed/_WNIvJozdMY/?enablejsapi=1`}
+                                            className="w-full h-full shadow-md"
+                                            frameBorder="0"
+                                            allow="autoplay; encrypted-media; gyroscope; accelerometer"
+                                            allowFullScreen
+                                        ></iframe>
+
+                                    </div>
+                                </div>
+                                <div >
+                                    <h1 className="text-xl font-medium">What's there in this course ? </h1>
+                                    {/*<p>Member since {userDetail?.created_date}</p>*/}
+                                </div>
+                            </div>
+
+
+                        </CardHeader>
+                    </Card>
+
+
                 </section>
 
+
                 <section className="my-8">
-                    <div>
-                        <p>{courseList?.courseDescription}</p>
-                    </div>
+                    <Card className="border-0 bg-muted/50">
+                        <CardHeader>
+                            <CardTitle className="">
+                                Description
+                            </CardTitle>
+
+                        </CardHeader>
+                        <CardContent>
+                            <div>
+                                <p>{courseList?.courseDescription}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </section>
                 <section className="my-8">
-                    <h1 className="font-medium text-2xl">Course Structure</h1>
-                    <div className="my-3">
-                        {courseList?.courseTopic?.map(a => (
-                            <Accordion type="single" key={a?.courseTopicId} collapsible>
-                                <AccordionItem value="item-1">
-                                    <AccordionTrigger>{a?.courseTopicTitle}</AccordionTrigger>
-                                    <AccordionContent>
-                                        {a?.courseTopicDescription}
-                                        <div>
-                                            <ul>
-                                                {a?.courseTopicContent?.map(a => (
-                                                    <li className="flex gap-2 items-center my-2" key={a?.contentId}>
-                                                        <Video />
-                                                        <span>{a?.courseTopicContentTitle}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-                        ))}
+                    <Card className="border-0 bg-muted/50">
+                        <CardHeader>
+                            <CardTitle className="">
+                                Course Structure
+                            </CardTitle>
 
-                    </div>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="my-3">
+                                {courseList?.courseTopic?.map(a => (
+                                    <Accordion type="single" key={a?.courseTopicId} collapsible>
+                                        <AccordionItem value="item-1">
+                                            <AccordionTrigger>{a?.courseTopicTitle}</AccordionTrigger>
+                                            <AccordionContent>
+                                                {a?.courseTopicDescription}
+                                                <div>
+                                                    <ul>
+                                                        {a?.courseTopicContent?.map(a => (
+                                                            <li className="flex gap-2 items-center my-2" key={a?.contentId}>
+                                                                <Video />
+                                                                <span>{a?.courseTopicContentTitle}</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    </Accordion>
+                                ))}
+
+                            </div>
+                        </CardContent>
+                    </Card>
+
                 </section>
             </div>
 

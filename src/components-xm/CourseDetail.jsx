@@ -5,7 +5,7 @@ import {Separator} from "@/components/ui/separator.jsx";
 import {
     Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb.jsx";
-import {Outlet, useNavigate, useParams} from "react-router-dom";
+import {Outlet, useLocation, useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import axiosConn from "@/axioscon.js";
 import {useAuthStore} from "@/zustland/store.js";
@@ -38,9 +38,11 @@ export function CourseDetail() {
         },
     });
 
+    const { userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore();
+
     useEffect(() => {
         fetchCourses();
-        enrollStatus()
+        enrollStatus();
     }, [apiQuery]);
 
     const identifyContentTypeIcons = (type) => {
@@ -73,7 +75,8 @@ export function CourseDetail() {
             })
             .then((res) => {
                 console.log(res?.data?.data);
-                setIsUserEnrolledAlready(res?.data?.data?.isUserEnrolled)
+                setIsUserEnrolledAlready(res?.data?.data?.isUserEnrolled);
+
             })
             .catch((err) => {
                 console.log(err);
@@ -96,6 +99,8 @@ export function CourseDetail() {
                     title: 'Enrollment is successfull'
                 });
                 enrollStatus();
+                fetchUserEnrolledCourseIdList(userDetail.userId)
+
             })
             .catch((err) => {
                 console.log(err);
@@ -115,7 +120,9 @@ export function CourseDetail() {
                 toast({
                     title: 'Disrollment is successfull'
                 });
-                enrollStatus()
+                enrollStatus();
+                fetchUserEnrolledCourseIdList(userDetail.userId)
+
             })
             .catch((err) => {
                 console.log(err);
@@ -125,6 +132,12 @@ export function CourseDetail() {
             });
     }
 
+    const navigate = useNavigate();
+    useEffect(()=>{
+        if(!isUserEnrolledAlready) {
+            navigate('/course/'+CourseId)
+        }
+    },[isUserEnrolledAlready])
 
 
 

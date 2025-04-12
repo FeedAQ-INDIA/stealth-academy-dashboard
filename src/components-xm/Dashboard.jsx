@@ -7,7 +7,7 @@ import {Input} from "@/components/ui/input";
 import {Progress} from "@/components/ui/progress";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar"
 import {Link, useNavigate} from "react-router-dom";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import axiosConn from "@/axioscon.js";
 import {useAuthStore} from "@/zustland/store.js";
 import {toast} from "@/components/hooks/use-toast.js";
@@ -62,6 +62,7 @@ export function Dashboard() {
                     title: 'Disrollment is successfull'
                 });
                 fetchCourses()
+                fetchUserEnrolledCourseIdList(userDetail.userId)
             })
             .catch((err) => {
                 console.log(err);
@@ -126,6 +127,7 @@ export function Dashboard() {
                                     <CardHeader>
                                         {/* Badge row - wraps on smaller screens */}
                                         <div className="flex flex-wrap gap-2 w-full mb-3">
+                                            <Badge className="animate-blink bg-green-600 text-white">FREE</Badge>
                                             <Badge variant="outline">Course</Badge>
                                             <Badge variant="outline">Beginner</Badge>
                                         </div>

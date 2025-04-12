@@ -8,6 +8,8 @@ import {Pagination, PaginationContent, PaginationItem,} from "@/components/ui/pa
 import {Link, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import axiosConn from "@/axioscon.js";
+import {useAuthStore} from "@/zustland/store.js";
+import {toast} from "@/components/hooks/use-toast.js";
 
 export function Explore() {
     const navigate = useNavigate()
@@ -28,6 +30,7 @@ export function Explore() {
         const params = new URLSearchParams(location.search);
         return params.get("search") || ''; // Default to 'overview' tab
     };
+    const { userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore();
 
     const [exploreCourseText, setExploreCourseText] = useState(getSearchValueFromURL);
 
@@ -133,6 +136,8 @@ export function Explore() {
 
     useEffect(() => {
         fetchCourses();
+        console.log("userEnrolledCourseIdList :: ", userEnrolledCourseIdList)
+
     }, [apiQuery]);
 
     const fetchCourses = () => {
@@ -178,6 +183,28 @@ export function Explore() {
         handleSearchChange(exploreCourseText)
     }, [exploreCourseText]);
 
+    const disroll = (courseId) => {
+        axiosConn
+            .post(import.meta.env.VITE_API_URL+"/disroll", {
+                courseId: courseId
+            })
+            .then((res) => {
+                console.log(res.data);
+                toast({
+                    title: 'Disrollment is successfull'
+                });
+                fetchCourses();
+                fetchUserEnrolledCourseIdList(userDetail.userId)
+            })
+            .catch((err) => {
+                console.log(err);
+                toast({
+                    title: 'Error occured while Disrollment'
+                })
+            });
+    }
+
+
     return (
         <div className="p-6">
             <div className=" items-center justify-items-center">
@@ -210,6 +237,7 @@ export function Explore() {
                                 <CardHeader>
                                     {/* Badge row - wraps on smaller screens */}
                                     <div className="flex flex-wrap gap-2 w-full mb-3">
+                                        <Badge className="animate-blink bg-green-600 text-white">FREE</Badge>
                                         <Badge variant="outline">Course</Badge>
                                         <Badge variant="outline">Beginner</Badge>
                                     </div>
@@ -235,8 +263,11 @@ export function Explore() {
                                 </CardContent>
 
                                 <CardFooter className="flex gap-2 ">
-                                    <Link to={`/course/${a?.courseId}`} className="  w-full "><Button className="  w-full ">Learn
-                                        More</Button>
+                                    {userEnrolledCourseIdList.includes(a?.courseId)?
+                                        <Button className="  w-full  " variant="destructive"
+                                                onClick={() => disroll(a?.courseId)}>Leave Course</Button> :<></>}
+                                    <Link to={`/course/${a?.courseId}`} className="  w-full "><Button
+                                        className="  w-full ">Learn More</Button>
                                     </Link>
                                 </CardFooter>
                             </Card>)

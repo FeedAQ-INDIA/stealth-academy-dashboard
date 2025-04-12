@@ -59,7 +59,7 @@ function CourseSidebar({...props}) {
                 navMain: [
                     {
                         title: "COURSE", url: "#", items: [{
-                            title: "Overview",
+                            title: "OVERVIEW",
                             url: `/course/${courseList?.courseId}`,
                             isClickable: true,
                             isActive: location.pathname === `/course/${courseList?.courseId}`,
@@ -74,13 +74,13 @@ function CourseSidebar({...props}) {
     }, [courseList, location.pathname])
 
     return (< >
-        <Sidebar className="top-[4rem] h-[calc(100svh-4em)]  shadow-md " style={{borderRadius: '0px', overflowY: 'auto'}}
+        <Sidebar className="top-[4rem] h-[calc(100svh-4em)]  shadow-md px-0" style={{borderRadius: '0px', overflowY: 'auto'}}
                  variant="inset">
 
             <SidebarHeader>
                 <h2 className="text-lg font-medium">{courseList?.courseTitle} </h2>
                 <div className=" ">
-                    <div className="flex gap-2 items-center text-sm mt-2">
+                    <div className="flex gap-2 items-center text-sm my-2">
                         <Clock
                             size={18}/> {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}
                     </div>

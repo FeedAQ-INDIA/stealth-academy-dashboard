@@ -13,7 +13,7 @@ import {Badge} from "@/components/ui/badge.jsx";
 import {CircleDollarSign, Clock} from "lucide-react";
 import {Textarea} from "@/components/ui/textarea.jsx";
 import {Button} from "@/components/ui/button.jsx";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
 import NotesModule from "@/components-xm/NotesModule.jsx";
@@ -24,6 +24,7 @@ function CourseVideoTutorial() {
     const { isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus } = useCourse();
 
     const [courseVideoDetail, setCourseVideoDetail] = useState({});
+
 
     useEffect(() => {
          if(courseList && CourseVideoId){

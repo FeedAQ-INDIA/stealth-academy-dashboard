@@ -77,7 +77,7 @@ import {
 } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
 import {useAuthStore} from "@/zustland/store.js";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import axiosConn from "@/axioscon.js";
 import {toast} from "@/components/hooks/use-toast.js";
 import {Link} from "react-router-dom";
@@ -158,6 +158,7 @@ export function MyLearningPath() {
                     <CardHeader>
                       {/* Badge row - wraps on smaller screens */}
                       <div className="flex flex-wrap gap-2 w-full mb-3">
+                        <Badge className="animate-blink bg-green-600 text-white">FREE</Badge>
                         <Badge variant="outline">Course</Badge>
                         <Badge variant="outline">Beginner</Badge>
                       </div>
