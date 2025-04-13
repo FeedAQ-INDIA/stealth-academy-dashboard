@@ -20,6 +20,13 @@ import CourseListenAndRead from "@/components-xm/CourseListenAndRead.jsx";
 import MyAccount from "@/components-xm/MyAccountSettings/MyAccount.jsx";
 import CourseWritten from "@/components-xm/CourseWritten.jsx";
 
+
+// Normalize double slashes in URL
+const normalizedPath = window.location.pathname.replace(/\/{2,}/g, '/');
+if (window.location.pathname !== normalizedPath) {
+  window.history.replaceState({}, '', normalizedPath + window.location.search);
+}
+
 const router = createBrowserRouter([
     {
         path: "/signin",
