@@ -79,6 +79,30 @@ function CourseWritten() {
             });
     }
 
+    const deleteUserEnrollmentData = () => {
+
+        axiosConn
+            .post(import.meta.env.VITE_API_URL + "/deleteUserEnrollmentData", {
+                userEnrollmentId: userEnrollmentObj?.userEnrollmentId,
+                courseId: courseList.courseId,
+                courseTopicContentId: courseTopicContent.courseTopicContentId,
+                courseTopicId: courseVideoDetail.courseTopicId
+            })
+            .then((res) => {
+                console.log(res.data);
+                toast({
+                    title: "status is updated"
+                });
+                fetchUserEnrollmentData()
+            })
+            .catch((err) => {
+                console.log(err);
+                toast({
+                    title: "status updation failed"
+                })
+            });
+    }
+
     const [prevContent, setPrevContent] = useState({}); ;
     const [nextContent, setNextContent] = useState({}); ;
 
@@ -173,6 +197,9 @@ function CourseWritten() {
                                     className="text-blue-800 font-medium">Completed</span></h3> : <Button className="w-fit" size="sm" onClick={() => saveUserEnrollmentData()}>Mark as
                                     Complete</Button>
                                 }
+                            {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0 ?
+                                <p className='text-right cursor-pointer hover:text-blue-800 hover:underline  hover:underline-offset-4' onClick={() => deleteUserEnrollmentData()}>Undo</p> : <></>
+                            }
                         </div>
 
                     </div>

@@ -117,28 +117,23 @@ function CourseOverview() {
                 <section>
                     <Card className="border-0 bg-[#ffdd00]">
                         <CardHeader>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
-                                <div>
-
-                                    <div className="w-full aspect-video  justify-items-center ">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-center">
+                                <div className="flex justify-center w-full">
+                                    <div className="aspect-video w-full max-w-2xl shadow-md">
                                         <iframe
                                             id="player"
-                                            src={`https://www.youtube.com/embed/_WNIvJozdMY/?enablejsapi=1`}
-                                            className="w-full h-full shadow-md"
+                                            src="https://www.youtube.com/embed/_WNIvJozdMY/?enablejsapi=1"
+                                            className="w-full h-full"
                                             frameBorder="0"
                                             allow="autoplay; encrypted-media; gyroscope; accelerometer"
                                             allowFullScreen
                                         ></iframe>
-
                                     </div>
                                 </div>
-                                <div >
+                                <div>
                                     <h1 className="text-xl font-medium">What's there in this course ? </h1>
-                                    {/*<p>Member since {userDetail?.created_date}</p>*/}
                                 </div>
                             </div>
-
-
                         </CardHeader>
                     </Card>
 
@@ -193,6 +188,15 @@ function CourseOverview() {
                                                         {a?.courseTopicContent?.map(a => (
                                                             <li className="flex gap-2 items-center my-2" key={a?.courseTopicContentId}>
                                                                 {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == a?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0?  <Check  color="#11a72a"/> : <></> }
+                                                                <Badge>
+                                                                    {(() => {
+                                                                        const totalMinutes = +a?.courseTopicContentDuration || 0;
+                                                                        const hours = Math.floor(totalMinutes / 60);
+                                                                        const minutes = totalMinutes % 60;
+
+                                                                        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                                                                    })()}
+                                                                </Badge>
                                                                 <Video />
                                                                 <span>{a?.courseTopicContentTitle}</span>
                                                             </li>
