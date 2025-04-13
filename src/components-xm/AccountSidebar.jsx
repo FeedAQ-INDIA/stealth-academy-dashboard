@@ -20,7 +20,6 @@ import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible.jsx";
 import {ArrowLeft, ChevronRight, Clock, Loader} from "lucide-react";
 import {Separator} from "@/components/ui/separator.jsx";
-import {Button} from "@/components/ui/button.jsx";
 
 
 function AccountSidebar({...props}) {

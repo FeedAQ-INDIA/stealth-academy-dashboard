@@ -4,8 +4,7 @@ import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/comp
 import {CardTitle} from "@/components/ui/card.jsx";
 import React from "react";
 import {Badge} from "@/components/ui/badge.jsx";
-import {CircleDollarSign, Clock} from "lucide-react";
-import {Textarea} from "@/components/ui/textarea.jsx";
+ import {Textarea} from "@/components/ui/textarea.jsx";
 import {Button} from "@/components/ui/button.jsx";
 import AudioRecorder from "@/components-xm/AudioRecorder.jsx";
 
