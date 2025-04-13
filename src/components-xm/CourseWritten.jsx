@@ -7,11 +7,10 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.jsx";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx";
+import {Card, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
-import {Check, CircleDollarSign, Clock} from "lucide-react";
-import {Textarea} from "@/components/ui/textarea.jsx";
+import {Check} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
 import {useParams} from "react-router-dom";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
@@ -22,76 +21,47 @@ import {toast} from "@/components/hooks/use-toast.js";
 function CourseWritten() {
 
     const {CourseId, CourseDocId} = useParams();
-    const { userEnrollmentObj,isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus } = useCourse();
+    const {userEnrollmentObj, userEnrollmentCourseLog, fetchUserEnrollmentData, isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus} = useCourse();
 
     const [courseVideoDetail, setCourseVideoDetail] = useState({});
     const [courseTopicContent, setCourseTopicContent] = useState({});
-    const [userEnrollmentLog, setUserEnrollmentLog] = useState(null);
 
     useEffect(() => {
-        if(courseList && CourseDocId){
+        if (courseList && CourseDocId) {
             fetchCourseVideo();
         }
     }, [courseList, userEnrollmentObj, CourseDocId]);
 
     const fetchCourseVideo = () => {
         axiosConn
-            .post(import.meta.env.VITE_API_URL+"/searchCourse", {
+            .post(import.meta.env.VITE_API_URL + "/searchCourse", {
                 limit: 10, offset: 0, getThisData: {
-                    datasource: "CourseWritten",  attributes: [], where : {courseWrittenId: CourseDocId},
+                    datasource: "CourseWritten", attributes: [], where: {courseWrittenId: CourseDocId},
                 },
             })
             .then((res) => {
                 console.log(res.data);
-                const video =res.data.data?.results?.[0]
+                const video = res.data.data?.results?.[0]
                 setCourseVideoDetail(video);
-                setCourseTopicContent(courseList?.courseTopic?.
-                find(a=>a.courseTopicId == video.courseTopicId)?.courseTopicContent?.
-                find(a=> a.contentId == video.courseWrittenId && a.courseTopicContentType == 'CourseWritten'))
+                setCourseTopicContent(courseList?.courseTopic?.find(a => a.courseTopicId == video.courseTopicId)?.courseTopicContent?.find(a => a.contentId == video.courseWrittenId && a.courseTopicContentType == 'CourseWritten'))
             })
             .catch((err) => {
                 console.log(err);
             });
     }
 
-
-    useEffect(() => {
-        fetchUserEnrollmentData()
-    },[courseVideoDetail])
-
-    const fetchUserEnrollmentData = () => {
-        axiosConn
-            .post(import.meta.env.VITE_API_URL+"/searchCourse", {
-                limit: 10, offset: 0, getThisData: {
-                    datasource: "UserEnrollmentLog",  attributes: [],
-                    where : {
-                        userEnrollmentId: userEnrollmentObj?.userEnrollmentId,
-                        courseId: CourseId,
-                        courseTopicContentId: courseTopicContent.courseTopicContentId,
-                        courseTopicId: courseVideoDetail.courseTopicId
-                    },
-                },
-            })
-            .then((res) => {
-                console.log(res.data);
-                setUserEnrollmentLog(res.data.data?.results?.[0]);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    }
 
 
 
     const saveUserEnrollmentData = () => {
 
         axiosConn
-            .post(import.meta.env.VITE_API_URL+"/saveUserEnrollmentData", {
-                userEnrollmentId : userEnrollmentObj?.userEnrollmentId,
-                courseId : courseList.courseId,
-                courseTopicContentId : courseTopicContent.courseTopicContentId,
-                courseTopicId : courseVideoDetail.courseTopicId,
-                enrollmentStatus : 'COMPLETED'
+            .post(import.meta.env.VITE_API_URL + "/saveUserEnrollmentData", {
+                userEnrollmentId: userEnrollmentObj?.userEnrollmentId,
+                courseId: courseList.courseId,
+                courseTopicContentId: courseTopicContent.courseTopicContentId,
+                courseTopicId: courseVideoDetail.courseTopicId,
+                enrollmentStatus: 'COMPLETED'
             })
             .then((res) => {
                 console.log(res.data);
@@ -109,7 +79,6 @@ function CourseWritten() {
     }
 
 
-
     return (
         <>
             <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
@@ -123,11 +92,13 @@ function CourseWritten() {
                         </BreadcrumbItem>
                         <BreadcrumbSeparator/>
                         <BreadcrumbItem>
-                            <BreadcrumbPage className="truncate max-w-[30ch]" title={courseList?.courseTitle}>{courseList?.courseTitle}</BreadcrumbPage>
+                            <BreadcrumbPage className="truncate max-w-[30ch]"
+                                            title={courseList?.courseTitle}>{courseList?.courseTitle}</BreadcrumbPage>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator/>
                         <BreadcrumbItem>
-                            <BreadcrumbPage className="truncate max-w-[30ch]">{courseVideoDetail?.courseWrittenTitle}</BreadcrumbPage>
+                            <BreadcrumbPage
+                                className="truncate max-w-[30ch]">{courseVideoDetail?.courseWrittenTitle}</BreadcrumbPage>
                         </BreadcrumbItem>
 
                     </BreadcrumbList>
@@ -146,7 +117,7 @@ function CourseWritten() {
             </Card>
 
 
-            <Card  className="rounded-none bg-muted/50 border-none">
+            <Card className="rounded-none bg-muted/50 border-none">
                 <CardHeader>
                     <div className="flex flex-wrap gap-2 w-full mb-3 justify-items-center">
                         <Badge variant="outline">Doc</Badge>
@@ -164,16 +135,18 @@ function CourseWritten() {
                         <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold ">
                             {courseVideoDetail?.courseWrittenTitle}
                         </CardTitle>
-                        <div className="ml-auto flex gap-2">
-                            <div className="ml-auto">
-                                {userEnrollmentLog ==null?  <Button className="w-fit" size="sm" onClick={() => saveUserEnrollmentData()}>Mark as Complete</Button>
-                                    : <h3 className="flex gap-1 " ><Check  color="#11a72a" /><span className="text-blue-800 font-medium">Completed</span></h3> }
-                            </div>                        </div>
+                        <div className="ml-auto">
+                            {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0  ?
+                                <h3 className="flex gap-1 "><Check color="#11a72a"/><span
+                                    className="text-blue-800 font-medium">Completed</span></h3> : <Button className="w-fit" size="sm" onClick={() => saveUserEnrollmentData()}>Mark as
+                                    Complete</Button>
+                                }
+                        </div>
+
                     </div>
                 </CardHeader>
 
             </Card>
-
 
 
             <div className="p-6">
@@ -182,17 +155,14 @@ function CourseWritten() {
                 <section className="my-8 ">
 
                     <div className=" ">
-                      <p>{courseVideoDetail?.courseWrittenHtmlContent}</p>
+                        <p>{courseVideoDetail?.courseWrittenHtmlContent}</p>
 
                     </div>
 
 
                 </section>
                 <NotesModule courseId={courseList.courseId}
-                             courseTopicContentId={ courseList?.courseTopic?.
-                             find(a=>a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.
-                             find(a=> a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.
-                                 courseTopicContentId}
+                             courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.courseTopicContentId}
                              courseTopicId={courseVideoDetail.courseTopicId}/>
             </div>
 

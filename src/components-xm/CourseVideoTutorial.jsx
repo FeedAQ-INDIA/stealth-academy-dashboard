@@ -7,13 +7,12 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.jsx";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx";
+import {Card, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
-import {Check, CircleDollarSign, Clock} from "lucide-react";
-import {Textarea} from "@/components/ui/textarea.jsx";
+import {Check} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
-import {useNavigate, useParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
 import NotesModule from "@/components-xm/NotesModule.jsx";
@@ -22,31 +21,39 @@ import {toast} from "@/components/hooks/use-toast.js";
 function CourseVideoTutorial() {
 
     const {CourseId, CourseVideoId} = useParams();
-    const { userEnrollmentLog, userEnrollmentCourseLog, userEnrollmentObj, fetchUserEnrollmentData, isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus } = useCourse();
+    const {
+        userEnrollmentLog,
+        userEnrollmentCourseLog,
+        userEnrollmentObj,
+        fetchUserEnrollmentData,
+        isUserEnrolledAlready,
+        courseList,
+        enroll,
+        disroll,
+        enrollStatus
+    } = useCourse();
 
     const [courseVideoDetail, setCourseVideoDetail] = useState({});
     const [courseTopicContent, setCourseTopicContent] = useState({});
 
     useEffect(() => {
-         if(courseList && CourseVideoId){
-             fetchCourseVideo();
-         }
+        if (courseList && CourseVideoId) {
+            fetchCourseVideo();
+        }
     }, [courseList, userEnrollmentObj, CourseVideoId]);
 
     const fetchCourseVideo = () => {
         axiosConn
-            .post(import.meta.env.VITE_API_URL+"/searchCourse", {
+            .post(import.meta.env.VITE_API_URL + "/searchCourse", {
                 limit: 10, offset: 0, getThisData: {
-                    datasource: "CourseVideo",  attributes: [], where : {courseVideoId: CourseVideoId},
+                    datasource: "CourseVideo", attributes: [], where: {courseVideoId: CourseVideoId},
                 },
             })
             .then((res) => {
                 console.log(res.data);
-                const video =res.data.data?.results?.[0]
+                const video = res.data.data?.results?.[0]
                 setCourseVideoDetail(video);
-                setCourseTopicContent(courseList?.courseTopic?.
-                find(a=>a.courseTopicId == video.courseTopicId)?.courseTopicContent?.
-                find(a=> a.contentId == video.courseVideoId && a.courseTopicContentType == 'CourseVideo'))
+                setCourseTopicContent(courseList?.courseTopic?.find(a => a.courseTopicId == video.courseTopicId)?.courseTopicContent?.find(a => a.contentId == video.courseVideoId && a.courseTopicContentType == 'CourseVideo'))
             })
             .catch((err) => {
                 console.log(err);
@@ -55,13 +62,13 @@ function CourseVideoTutorial() {
 
     const saveUserEnrollmentData = () => {
 
-         axiosConn
-            .post(import.meta.env.VITE_API_URL+"/saveUserEnrollmentData", {
-                userEnrollmentId : userEnrollmentObj?.userEnrollmentId,
-                courseId : courseList.courseId,
-                courseTopicContentId : courseTopicContent.courseTopicContentId,
-                courseTopicId : courseVideoDetail.courseTopicId,
-                enrollmentStatus : 'COMPLETED'
+        axiosConn
+            .post(import.meta.env.VITE_API_URL + "/saveUserEnrollmentData", {
+                userEnrollmentId: userEnrollmentObj?.userEnrollmentId,
+                courseId: courseList.courseId,
+                courseTopicContentId: courseTopicContent.courseTopicContentId,
+                courseTopicId: courseVideoDetail.courseTopicId,
+                enrollmentStatus: 'COMPLETED'
             })
             .then((res) => {
                 console.log(res.data);
@@ -79,7 +86,6 @@ function CourseVideoTutorial() {
     }
 
 
-
     return (
         <>
             <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
@@ -93,11 +99,13 @@ function CourseVideoTutorial() {
                         </BreadcrumbItem>
                         <BreadcrumbSeparator/>
                         <BreadcrumbItem>
-                            <BreadcrumbPage className="truncate max-w-[30ch]" title={courseList?.courseTitle}>{courseList?.courseTitle}</BreadcrumbPage>
+                            <BreadcrumbPage className="truncate max-w-[30ch]"
+                                            title={courseList?.courseTitle}>{courseList?.courseTitle}</BreadcrumbPage>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator/>
                         <BreadcrumbItem>
-                            <BreadcrumbPage className="truncate max-w-[30ch]">{courseVideoDetail?.courseVideoTitle}</BreadcrumbPage>
+                            <BreadcrumbPage
+                                className="truncate max-w-[30ch]">{courseVideoDetail?.courseVideoTitle}</BreadcrumbPage>
                         </BreadcrumbItem>
 
                     </BreadcrumbList>
@@ -116,7 +124,7 @@ function CourseVideoTutorial() {
             </Card>
 
 
-            <Card  className="rounded-none bg-muted/50 border-none">
+            <Card className="rounded-none bg-muted/50 border-none">
                 <CardHeader>
                     <div className="flex flex-wrap gap-2 w-full mb-3 justify-items-center">
                         <Badge variant="outline">Video</Badge>
@@ -128,7 +136,7 @@ function CourseVideoTutorial() {
 
                                 return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
                             })()}
-                             </Badge>
+                        </Badge>
 
                     </div>
                     <div className=" flex  items-center gap-2 ">
@@ -137,9 +145,12 @@ function CourseVideoTutorial() {
                         </CardTitle>
 
                         <div className="ml-auto">
-                             {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0 ==null?  <Button className="w-fit" size="sm" onClick={() => saveUserEnrollmentData()}>Mark as Complete</Button>
-                           : <h3 className="flex gap-1 " ><Check  color="#11a72a" /><span className="text-blue-800 font-medium">Completed</span></h3> }
-                         </div>
+                            {userEnrollmentCourseLog?.filter(b => (b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED'))?.length > 0   ?
+                                <h3 className="flex gap-1 "><Check color="#11a72a"/><span
+                                    className="text-blue-800 font-medium">Completed</span></h3>: <Button className="w-fit" size="sm" onClick={() => saveUserEnrollmentData()}>Mark as
+                                    Complete</Button>
+                                 }
+                        </div>
 
                     </div>
                 </CardHeader>
@@ -176,10 +187,7 @@ function CourseVideoTutorial() {
 
                 </section>
                 <NotesModule courseId={courseList.courseId}
-                             courseTopicContentId={ courseList?.courseTopic?.
-                             find(a=>a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.
-                             find(a=> a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.
-                                 courseTopicContentId}
+                             courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}
                              courseTopicId={courseVideoDetail.courseTopicId}/>
             </div>
 
