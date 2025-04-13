@@ -12,7 +12,7 @@ import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
 import {Check} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
 import NotesModule from "@/components-xm/NotesModule.jsx";
@@ -35,7 +35,7 @@ function CourseVideoTutorial() {
 
     const [courseVideoDetail, setCourseVideoDetail] = useState({});
     const [courseTopicContent, setCourseTopicContent] = useState({});
-
+    const navigate = useNavigate();
     useEffect(() => {
         if (courseList && CourseVideoId) {
             fetchCourseVideo();
@@ -85,6 +85,36 @@ function CourseVideoTutorial() {
             });
     }
 
+    const [prevContent, setPrevContent] = useState({}); ;
+    const [nextContent, setNextContent] = useState({}); ;
+
+    useEffect(() => {
+        const allContents = courseList?.courseTopic?.flatMap(topic =>
+            topic?.courseTopicContent?.map(content => ({
+                ...content,
+                courseTopicTitle: topic.courseTopicTitle // optional, helpful for display
+            })) || []
+        );
+
+        const currentIndex = allContents.findIndex(
+            content => content.courseTopicContentId === courseTopicContent?.courseTopicContentId
+        );
+
+        setPrevContent(currentIndex > 0 ? allContents[currentIndex - 1] : null);
+         setNextContent(currentIndex < allContents.length - 1 ? allContents[currentIndex + 1] : null);
+
+    }, [courseList, courseTopicContent]);
+
+    const navigateToNextModule = (context) => {
+        console.log(context);
+        if(context.courseTopicContentType == 'CourseVideo'){
+            navigate(`/course/${context?.courseTopicId}/video/${context?.contentId}`);
+        } else if(context.courseTopicContentType == 'CourseWritten'){
+            navigate(`/course/${context?.courseTopicId}/doc/${context?.contentId}`);
+
+        }
+    }
+
 
     return (
         <>
@@ -117,8 +147,8 @@ function CourseVideoTutorial() {
             <Card className="rounded-none border-none">
                 <CardHeader className="flex items-centergap-2 w-full p-2">
                     <div className="flex gap-2 justify-between ">
-                        <Button className="w-fit" size="sm">Previous</Button>
-                        <Button className="w-fit" size="sm">Next</Button>
+                        <Button className="w-fit" size="sm" disabled={prevContent == null} onClick={()=>navigateToNextModule(prevContent)}>Previous</Button>
+                        <Button className="w-fit" size="sm" disabled={nextContent == null} onClick={()=>navigateToNextModule(nextContent)}>Next</Button>
                     </div>
                 </CardHeader>
             </Card>
@@ -159,30 +189,34 @@ function CourseVideoTutorial() {
 
 
                 <section className="my-8 ">
+                    <Card className="my-8  shadow-none border-none rounded-none">
+                        <CardHeader>
+                            <div className="flex flex-col md:flex-row gap-4">
+                                {/* Video container */}
+                                <div className="w-full md:w-2/3 mx-auto">
+                                    <div className="w-full aspect-video">
+                                        <iframe
+                                            id="player"
+                                            src={`https://www.youtube.com/embed/${courseVideoDetail?.courseVideoUrl}?enablejsapi=1`}
+                                            className="w-full h-full shadow-md"
+                                            frameBorder="0"
+                                            allow="autoplay; encrypted-media"
+                                            allowFullScreen
+                                        ></iframe>
+                                    </div>
+                                </div>
 
-                    <div className="flex flex-col md:flex-row gap-4">
-                        {/* Video container */}
-                        <div className="w-full md:w-2/3 mx-auto">
-                            <div className="w-full aspect-video">
-                                <iframe
-                                    id="player"
-                                    src={`https://www.youtube.com/embed/${courseVideoDetail?.courseVideoUrl}?enablejsapi=1`}
-                                    className="w-full h-full shadow-md"
-                                    frameBorder="0"
-                                    allow="autoplay; encrypted-media"
-                                    allowFullScreen
-                                ></iframe>
+                                {/* Side panel */}
+                                {/*<div className="w-full md:w-1/3 bg-gray-100 p-4 flex items-center justify-center  shadow-md">*/}
+                                {/*    <p className="overflow-y-auto h-full"> This content box will match the video height on*/}
+                                {/*        larger screens.</p>*/}
+                                {/*</div>*/}
+
+
                             </div>
-                        </div>
 
-                        {/* Side panel */}
-                        {/*<div className="w-full md:w-1/3 bg-gray-100 p-4 flex items-center justify-center  shadow-md">*/}
-                        {/*    <p className="overflow-y-auto h-full"> This content box will match the video height on*/}
-                        {/*        larger screens.</p>*/}
-                        {/*</div>*/}
-
-
-                    </div>
+                        </CardHeader>
+                    </Card>
 
 
                 </section>

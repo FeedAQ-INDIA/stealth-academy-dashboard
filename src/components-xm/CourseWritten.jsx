@@ -12,7 +12,7 @@ import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
 import {Check} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
 import NotesModule from "@/components-xm/NotesModule.jsx";
@@ -25,6 +25,7 @@ function CourseWritten() {
 
     const [courseVideoDetail, setCourseVideoDetail] = useState({});
     const [courseTopicContent, setCourseTopicContent] = useState({});
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (courseList && CourseDocId) {
@@ -78,6 +79,37 @@ function CourseWritten() {
             });
     }
 
+    const [prevContent, setPrevContent] = useState({}); ;
+    const [nextContent, setNextContent] = useState({}); ;
+
+    useEffect(() => {
+        const allContents = courseList?.courseTopic?.flatMap(topic =>
+            topic?.courseTopicContent?.map(content => ({
+                ...content,
+                courseTopicTitle: topic.courseTopicTitle // optional, helpful for display
+            })) || []
+        );
+
+        const currentIndex = allContents.findIndex(
+            content => content.courseTopicContentId === courseTopicContent?.courseTopicContentId
+        );
+
+        setPrevContent(currentIndex > 0 ? allContents[currentIndex - 1] : null);
+        setNextContent(currentIndex < allContents.length - 1 ? allContents[currentIndex + 1] : null);
+
+    }, [courseList, courseTopicContent]);
+
+    const navigateToNextModule = (context) => {
+        console.log(context);
+        if(context.courseTopicContentType == 'CourseVideo'){
+            navigate(`/course/${context?.courseTopicId}/video/${context?.contentId}`);
+        } else if(context.courseTopicContentType == 'CourseWritten'){
+            navigate(`/course/${context?.courseTopicId}/doc/${context?.contentId}`);
+
+        }
+    }
+
+
 
     return (
         <>
@@ -110,8 +142,8 @@ function CourseWritten() {
             <Card className="rounded-none border-none">
                 <CardHeader className="flex items-centergap-2 w-full p-2">
                     <div className="flex gap-2 justify-between ">
-                        <Button className="w-fit" size="sm">Previous</Button>
-                        <Button className="w-fit" size="sm">Next</Button>
+                        <Button className="w-fit" size="sm" disabled={prevContent == null} onClick={()=>navigateToNextModule(prevContent)}>Previous</Button>
+                        <Button className="w-fit" size="sm" disabled={nextContent == null} onClick={()=>navigateToNextModule(nextContent)}>Next</Button>
                     </div>
                 </CardHeader>
             </Card>

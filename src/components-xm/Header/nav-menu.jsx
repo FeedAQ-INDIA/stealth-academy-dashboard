@@ -45,17 +45,17 @@ function NavigationMenuDemo({orientation}) {
     return (<NavigationMenu orientation={orientation}  className="z-20">
             <NavigationMenuList className={`${orientation === 'vertical' ? ' flex flex-col gap-2 w-full' : 'flex flex-row gap-2'}`}>
 
-                <NavigationMenuItem  >
-                    <Link   to={'/dashboard'}><Button variant="ghost" >DASHBOARD</Button></Link>
+                <NavigationMenuItem    >
+                    <Link   to={'/dashboard'}><Button variant={`${window.location.href.includes('dashboard')? 'secondary' : 'ghost' }`}    >DASHBOARD</Button></Link>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                    <Link to={'/explore'}><Button variant="ghost">EXPLORE</Button></Link>
+                    <Link to={'/explore'}><Button  variant={`${window.location.href.includes('explore')? 'secondary' : 'ghost' }`}>EXPLORE</Button></Link>
                 </NavigationMenuItem>
 
 
                 <NavigationMenuItem>
-                    <Link to={'/my-learning-path'}> <Button variant="ghost">MY JOURNEY</Button></Link>
+                    <Link to={'/my-learning-path'}> <Button variant={`${window.location.href.includes('my-learning-path')? 'secondary' : 'ghost' }`}>MY JOURNEY</Button></Link>
                 </NavigationMenuItem>
 
 

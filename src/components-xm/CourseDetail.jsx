@@ -165,7 +165,6 @@ export function CourseDetail() {
 
 
 
-
     return (<>
         <CourseContext.Provider value={{ courseList, userEnrollmentObj, userEnrollmentCourseLog,fetchUserEnrollmentData, isUserEnrolledAlready, enroll, disroll, enrollStatus , identifyContentTypeIcons}}>
 

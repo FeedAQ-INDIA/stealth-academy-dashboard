@@ -28,6 +28,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import {Card, CardHeader} from "@/components/ui/card.jsx";
 
 
 function NotesModule({courseId, courseTopicId, courseTopicContentId}) {
@@ -146,7 +147,8 @@ function NotesModule({courseId, courseTopicId, courseTopicContentId}) {
     return (
         <>
 
-            <section className="my-8">
+            <Card className="my-8 bg-muted/50">
+                <CardHeader>
                 <h1 className="text-lg   font-medium ">Note Book</h1>
                 <Form {...createNotesForm}>
                     <form
@@ -267,8 +269,8 @@ function NotesModule({courseId, courseTopicId, courseTopicContentId}) {
 
 
                 </ol>
-
-            </section>
+            </CardHeader>
+            </Card>
 
         </>)
 
