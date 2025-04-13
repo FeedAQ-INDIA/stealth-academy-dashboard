@@ -24,7 +24,7 @@ import {useCourse} from "@/components-xm/CourseContext.jsx";
 import {Badge} from "@/components/ui/badge.jsx";
 
 
-function CourseSidebar({...props}) {
+function CourseSidebar() {
     const location = useLocation();
     const navigate = useNavigate();
     const {CourseId} = useParams();
@@ -163,4 +163,4 @@ function CourseSidebar({...props}) {
     </ >);
 }
 
-export default CourseSidebar;
+export default CourseSidebar
