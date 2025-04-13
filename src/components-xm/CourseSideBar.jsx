@@ -15,21 +15,23 @@ import {
     SidebarMenuSubButton,
     SidebarMenuSubItem,
 } from "@/components/ui/sidebar.jsx";
-import {Link, useLocation, useNavigate} from "react-router-dom";
+import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible.jsx";
-import {ChevronRight, Clock, Loader} from "lucide-react";
+import {Check, ChevronRight, Clock, Loader} from "lucide-react";
 import {Separator} from "@/components/ui/separator.jsx";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
+import {Badge} from "@/components/ui/badge.jsx";
 
 
 function CourseSidebar({...props}) {
     const location = useLocation();
     const navigate = useNavigate();
+    const {CourseId} = useParams();
 
     const [data, setData] = useState(null);
 
-    const {isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus,identifyContentTypeIcons} = useCourse();
+    const {userEnrollmentCourseLog, isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus,identifyContentTypeIcons} = useCourse();
 
 
     const contentUrlMap = {
@@ -47,6 +49,7 @@ function CourseSidebar({...props}) {
                     isActive: location.pathname === ``,
                     subItems: a?.courseTopicContent?.map(m => ({
                         title: m?.courseTopicContentTitle,
+                        courseTopicContentId : m?.courseTopicContentId,
                         contentType:m?.courseTopicContentType,
                         url: `/course/${courseList?.courseId}/${contentUrlMap[m?.courseTopicContentType]}/${m?.contentId}`,
                         isClickable: true,
@@ -117,8 +120,12 @@ function CourseSidebar({...props}) {
                                                                               isActive={subItem?.isActive}
                                                                               className="flex items-center gap-1 py-5 rounded-1">
                                                             <Link to={subItem?.url}><div className="flex items-center gap-1">
-                                                            <div>{identifyContentTypeIcons(subItem.contentType)}</div>
+                                                                {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == subItem?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0?  <Check  color="#11a72a"/> : <></> }
+
+                                                                <div>{identifyContentTypeIcons(subItem.contentType)}</div>
                                                             <div>{subItem?.title} </div>
+
+
                                                             </div></Link>
                                                         </SidebarMenuSubButton> :
                                                             <SidebarMenuSubButton asChild

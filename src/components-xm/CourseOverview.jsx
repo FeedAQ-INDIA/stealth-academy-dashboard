@@ -10,7 +10,7 @@ import {
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
-import {CircleDollarSign, Clock, Video} from "lucide-react";
+import {Check, CircleDollarSign, Clock, Video} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
 import axiosConn from "@/axioscon.js";
 import {
@@ -25,14 +25,11 @@ import {useCourse} from "@/components-xm/CourseContext.jsx";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
 function CourseOverview() {
     const {CourseId} = useParams();
-    const { isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus } = useCourse();
-
-
-
+    const { userEnrollmentCourseLog, isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus } = useCourse();
 
     const {
         state, open, setOpen, openMobile, setOpenMobile, isMobile, toggleSidebar
-    } = useSidebar()
+    } = useSidebar();
 
     useEffect(() => {
         if(isUserEnrolledAlready) {
@@ -42,6 +39,7 @@ function CourseOverview() {
         }
 
     }, [isUserEnrolledAlready]);
+
 
 
     return (
@@ -176,13 +174,25 @@ function CourseOverview() {
                                 {courseList?.courseTopic?.map(a => (
                                     <Accordion type="single" key={a?.courseTopicId} collapsible>
                                         <AccordionItem value="item-1">
-                                            <AccordionTrigger>{a?.courseTopicTitle}</AccordionTrigger>
+                                            <AccordionTrigger className="flex items-center gap-2  justify-start">
+                                                <Badge>
+                                                    {(() => {
+                                                        const totalMinutes = +a?.courseTopicDuration || 0;
+                                                        const hours = Math.floor(totalMinutes / 60);
+                                                        const minutes = totalMinutes % 60;
+
+                                                        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                                                    })()}
+                                                </Badge>
+                                                <span>{a?.courseTopicTitle}</span>
+                                            </AccordionTrigger>
                                             <AccordionContent>
                                                 {a?.courseTopicDescription}
                                                 <div>
                                                     <ul>
                                                         {a?.courseTopicContent?.map(a => (
-                                                            <li className="flex gap-2 items-center my-2" key={a?.contentId}>
+                                                            <li className="flex gap-2 items-center my-2" key={a?.courseTopicContentId}>
+                                                                {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == a?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0?  <Check  color="#11a72a"/> : <></> }
                                                                 <Video />
                                                                 <span>{a?.courseTopicContentTitle}</span>
                                                             </li>

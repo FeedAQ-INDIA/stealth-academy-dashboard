@@ -57,16 +57,14 @@ export function CourseDetail() {
             .then((res) => {
                 console.log(res.data);
                 setCourseList(res.data.data);
-                // setTotalCount(res.data.data.totalCount);
-                // setOffset(res.data.data.offset);
-                // setLimit(res.data.data.limit);
             })
             .catch((err) => {
                 console.log(err);
             });
     };
 
-    const [isUserEnrolledAlready, setIsUserEnrolledAlready] = useState(false);
+    const [isUserEnrolledAlready, setIsUserEnrolledAlready] = useState(null);
+    const [userEnrollmentObj, setUserEnrollmentObj] = useState({});
 
     const enrollStatus = () => {
         axiosConn
@@ -76,7 +74,7 @@ export function CourseDetail() {
             .then((res) => {
                 console.log(res?.data?.data);
                 setIsUserEnrolledAlready(res?.data?.data?.isUserEnrolled);
-
+                setUserEnrollmentObj(res?.data?.data?.enrollmentData?.[0]);
             })
             .catch((err) => {
                 console.log(err);
@@ -136,13 +134,40 @@ export function CourseDetail() {
     useEffect(()=>{
         if(!isUserEnrolledAlready) {
             navigate('/course/'+CourseId)
+        }else if(isUserEnrolledAlready){
+            fetchUserEnrollmentData()
         }
     },[isUserEnrolledAlready])
 
 
+    const [userEnrollmentCourseLog, setUserEnrollmentCourseLog] = useState(null);
+
+    const fetchUserEnrollmentData = () => {
+        axiosConn
+            .post(import.meta.env.VITE_API_URL+"/searchCourse", {
+                limit: 10, offset: 0, getThisData: {
+                    datasource: "UserEnrollmentLog",  attributes: [],
+                    where : {
+                        userId: userDetail.userId,
+                        courseId: CourseId,
+                    },
+                },
+            })
+            .then((res) => {
+                console.log(res.data);
+                setUserEnrollmentCourseLog(res.data.data?.results);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
+
+
+
 
     return (<>
-        <CourseContext.Provider value={{ courseList, isUserEnrolledAlready, enroll, disroll, enrollStatus , identifyContentTypeIcons}}>
+        <CourseContext.Provider value={{ courseList, userEnrollmentObj, userEnrollmentCourseLog,fetchUserEnrollmentData, isUserEnrolledAlready, enroll, disroll, enrollStatus , identifyContentTypeIcons}}>
 
         <SidebarProvider className="p-0">
                 {isUserEnrolledAlready? <CourseSidebar/> : <></>}
