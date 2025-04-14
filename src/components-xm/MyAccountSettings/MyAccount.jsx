@@ -45,7 +45,7 @@ function MyAccount() {
     }, [userDetail]);
 
     function onSubmit(data){
-        axiosConn.post('http://localhost:3000/saveUserDetail', {
+        axiosConn.post(import.meta.env.VITE_API_URL+'/saveUserDetail', {
             firstName: data.firstName,
             lastName: data.lastName,
             number: data.number,

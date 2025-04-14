@@ -43,8 +43,8 @@ function AccountSidebar({...props}) {
                 },
                     {
                         title: "Sign out",
-                        url: `http://localhost:3000/auth/logout`,
-                        isActive: location.pathname === 'http://localhost:3000/auth/logout',
+                        url: `${import.meta.env.VITE_API_URL}/auth/logout`,
+                        isActive: location.pathname === import.meta.env.VITE_API_URL+'/auth/logout',
 
                     },
 

@@ -245,7 +245,7 @@ function SetupAccount() {
                             </CardContent>
                             <CardFooter className="mt-auto">
                                 <div className="w-full">
-                                    <Link to={`http://localhost:3000/auth/logout`}>
+                                    <Link to={`${import.meta.env.VITE_API_URL}/auth/logout`}>
                                         <Button size="sm" variant="ghost" className="text-center w-full mt-2">
                                             Sign Out
                                         </Button>
