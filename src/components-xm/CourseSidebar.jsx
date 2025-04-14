@@ -118,19 +118,19 @@ function CourseSidebar() {
                                                     <SidebarMenuSubItem>
                                                         {subItem?.isClickable? <SidebarMenuSubButton asChild
                                                                               isActive={subItem?.isActive}
-                                                                              className="flex items-center gap-1 py-5 rounded-1">
+                                                                              className="flex items-center gap-1 py-2 rounded-1 h-fit">
                                                             <Link to={subItem?.url}><div className="flex items-center gap-1">
-                                                                {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == subItem?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0?  <Check  color="#11a72a"/> : <></> }
+                                                                {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == subItem?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0?  <Check  color="#11a72a" className="flex-shrink-0"/> : <></> }
 
                                                                 <div>{identifyContentTypeIcons(subItem.contentType)}</div>
-                                                            <div>{subItem?.title} </div>
+                                                            <div className="">{subItem?.title} </div>
 
 
                                                             </div></Link>
                                                         </SidebarMenuSubButton> :
                                                             <SidebarMenuSubButton asChild
                                                                                   isActive={subItem?.isActive}
-                                                                                  className="flex items-center gap-1 py-5 rounded-1">
+                                                                                  className="flex items-center gap-1 py-5 rounded-1 h-fit">
                                                                 <div className="flex items-center gap-1">
                                                                     <div>{identifyContentTypeIcons(subItem.contentType)}</div>
                                                                     <div>{<span>{subItem.title}</span>}</div>

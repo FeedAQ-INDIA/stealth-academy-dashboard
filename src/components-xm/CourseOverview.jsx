@@ -114,31 +114,31 @@ function CourseOverview() {
                     </Card>
 
                 </section>
-                <section>
-                    <Card className="border-0 bg-[#ffdd00]">
-                        <CardHeader>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-center">
-                                <div className="flex justify-center w-full">
-                                    <div className="aspect-video w-full max-w-2xl shadow-md">
-                                        <iframe
-                                            id="player"
-                                            src="https://www.youtube.com/embed/_WNIvJozdMY/?enablejsapi=1"
-                                            className="w-full h-full"
-                                            frameBorder="0"
-                                            allow="autoplay; encrypted-media; gyroscope; accelerometer"
-                                            allowFullScreen
-                                        ></iframe>
-                                    </div>
-                                </div>
-                                <div>
-                                    <h1 className="text-xl font-medium">What's there in this course ? </h1>
-                                </div>
-                            </div>
-                        </CardHeader>
-                    </Card>
+                {/*<section>*/}
+                {/*    <Card className="border-0 bg-[#ffdd00]">*/}
+                {/*        <CardHeader>*/}
+                {/*            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-center">*/}
+                {/*                <div className="flex justify-center w-full">*/}
+                {/*                    <div className="aspect-video w-full max-w-2xl shadow-md">*/}
+                {/*                        <iframe*/}
+                {/*                            id="player"*/}
+                {/*                            src="https://www.youtube.com/embed/_WNIvJozdMY/?enablejsapi=1"*/}
+                {/*                            className="w-full h-full"*/}
+                {/*                            frameBorder="0"*/}
+                {/*                            allow="autoplay; encrypted-media; gyroscope; accelerometer"*/}
+                {/*                            allowFullScreen*/}
+                {/*                        ></iframe>*/}
+                {/*                    </div>*/}
+                {/*                </div>*/}
+                {/*                <div>*/}
+                {/*                    <h1 className="text-xl font-medium">What's there in this course ? </h1>*/}
+                {/*                </div>*/}
+                {/*            </div>*/}
+                {/*        </CardHeader>*/}
+                {/*    </Card>*/}
 
 
-                </section>
+                {/*</section>*/}
 
 
                 <section className="my-8">

@@ -173,7 +173,7 @@ export function Explore() {
         updateApiQuery("Course", {
             where: {
                 courseTitle: {
-                    $like: `%${trimmed || ""}%`,
+                    $like: `%${trimmed.toUpperCase() || ""}%`,
                 },
             },
         });
