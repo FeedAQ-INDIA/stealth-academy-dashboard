@@ -36,7 +36,7 @@ function AccountSidebar({...props}) {
     const data = {
         navMain: [
             {
-                title: "GENERAL", url: "#", items: [{
+                title: "", url: "#", items: [{
                     title: "Profile",
                     url: `/account-settings/profile`,
                     isActive: location.pathname === '/account-settings/profile',

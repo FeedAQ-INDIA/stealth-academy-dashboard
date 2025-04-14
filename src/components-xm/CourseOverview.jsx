@@ -141,7 +141,7 @@ function CourseOverview() {
                 {/*</section>*/}
 
 
-                <section className="my-8">
+                <section className="my-4">
                     <Card className="border-0 bg-muted/50">
                         <CardHeader>
                             <CardTitle className="">

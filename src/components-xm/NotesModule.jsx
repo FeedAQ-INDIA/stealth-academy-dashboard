@@ -31,7 +31,7 @@ import {
 import {Card, CardHeader} from "@/components/ui/card.jsx";
 
 
-function NotesModule({courseId, courseTopicId, courseTopicContentId}) {
+function NotesModule({courseId, courseTopicId, courseTopicContentId, refreshTrigger}) {
 
     const {isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus} = useCourse();
 
@@ -62,7 +62,7 @@ function NotesModule({courseId, courseTopicId, courseTopicContentId}) {
         if (courseTopicContentId) {
             fetchNotesModule();
         }
-    }, [courseTopicContentId]);
+    }, [courseTopicContentId, refreshTrigger]);
 
     const fetchNotesModule = () => {
         axiosConn
@@ -94,6 +94,7 @@ function NotesModule({courseId, courseTopicId, courseTopicContentId}) {
                     title: "Notes Saved Successfully"
                 });
                 fetchNotesModule();
+                createNotesForm.reset()
             })
             .catch((err) => {
                 console.log(err);
@@ -147,43 +148,44 @@ function NotesModule({courseId, courseTopicId, courseTopicContentId}) {
     return (
         <>
 
-            <Card className="my-8 bg-muted/50">
+
+            <Card className="my-4 bg-muted/50 rounded-none bg-white">
                 <CardHeader>
                 <h1 className="text-lg   font-medium ">Note Book</h1>
-                <Form {...createNotesForm}>
-                    <form
-                        onSubmit={createNotesForm.handleSubmit(onSubmit)}
-                        className="w-full space-y-6"
-                    >
-                        <div className="grid w-full gap-2 my-4">
-                            <FormField
-                                control={createNotesForm.control}
-                                name="notesText"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormControl>
-                                            <Textarea placeholder="Type your notes here." {...field} />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <div className="flex gap-2">
-
-                            <Button size="sm" type="button" onClick={() => createNotesForm.reset()}>
-                                Reset
-                            </Button>
-                            <Button size="sm" type="submit">Save</Button>
-                        </div>
-                    </form>
-                </Form>
+                {/*<Form {...createNotesForm}>*/}
+                {/*    <form*/}
+                {/*        onSubmit={createNotesForm.handleSubmit(onSubmit)}*/}
+                {/*        className="w-full space-y-6"*/}
+                {/*    >*/}
+                {/*        <div className="grid w-full gap-2 my-4">*/}
+                {/*            <FormField*/}
+                {/*                control={createNotesForm.control}*/}
+                {/*                name="notesText"*/}
+                {/*                render={({field}) => (*/}
+                {/*                    <FormItem>*/}
+                {/*                        <FormControl>*/}
+                {/*                            <Textarea placeholder="Type your notes here." {...field} />*/}
+                {/*                        </FormControl>*/}
+                {/*                        <FormMessage/>*/}
+                {/*                    </FormItem>*/}
+                {/*                )}*/}
+                {/*            />*/}
+                {/*        </div>*/}
+                {/*        <div className="flex gap-2">*/}
+                
+                {/*            <Button size="sm" type="button" onClick={() => createNotesForm.reset()}>*/}
+                {/*                Reset*/}
+                {/*            </Button>*/}
+                {/*            <Button size="sm" type="submit">Save</Button>*/}
+                {/*        </div>*/}
+                {/*    </form>*/}
+                {/*</Form>*/}
 
                 <ol className="mt-4  ">
                     {notesList.map((a) => (
                         <li className="" key={a.notesId}>
 
-                            <div className="flex items-start  hover:bg-muted/50 rounded-lg py-3 px-4">
+                            <div className="flex items-start  rounded-lg py-3  ">
 
 
                                 <div>

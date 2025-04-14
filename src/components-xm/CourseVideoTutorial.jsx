@@ -17,6 +17,10 @@ import {useCourse} from "@/components-xm/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
 import NotesModule from "@/components-xm/NotesModule.jsx";
 import {toast} from "@/components/hooks/use-toast.js";
+import {Input} from "@/components/ui/input.jsx";
+import {Textarea} from "@/components/ui/textarea.jsx";
+import {Label} from "@/components/ui/label.jsx";
+import CreateNotesModule from "@/components-xm/CreateNotesModule.jsx";
 
 function CourseVideoTutorial() {
 
@@ -142,6 +146,11 @@ function CourseVideoTutorial() {
         }
     }
 
+    const [triggerNotesRefresh, setTriggerNotesRefresh] = useState(false);
+
+    const handleNotesSave = () => {
+        setTriggerNotesRefresh(prev => !prev);
+    };
 
     return (
         <>
@@ -217,12 +226,12 @@ function CourseVideoTutorial() {
             <div className="p-6">
 
 
-                <section className="my-8 ">
-                    <Card className="  shadow-none border-none rounded-none">
-                        <CardHeader>
-                            <div className="flex flex-col md:flex-row gap-4">
+                <section className="my-4 ">
+                    <Card className="  shadow-none border-none rounded-none ">
+                        <div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {/* Video container */}
-                                <div className="w-full md:w-2/3 mx-auto">
+                                <div className="w-full md:col-span-2">
                                     <div className="w-full aspect-video">
                                         <iframe
                                             id="player"
@@ -235,21 +244,25 @@ function CourseVideoTutorial() {
                                     </div>
                                 </div>
 
-                                {/* Side panel */}
-                                {/*<div className="w-full md:w-1/3 bg-gray-100 p-4 flex items-center justify-center  shadow-md">*/}
-                                {/*    <p className="overflow-y-auto h-full"> This content box will match the video height on*/}
-                                {/*        larger screens.</p>*/}
-                                {/*</div>*/}
+                                {/* Notes container */}
+                                <div className="w-full bg-gray-100 p-4 shadow-md flex flex-col">
+                                    <Label className="mb-2">Create Notes</Label>
+                                    <div className="w-full flex-1 resize-none ">
+                                        <CreateNotesModule handleNotesSave={handleNotesSave}  courseId={courseList.courseId}
+                                                            courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}
+                                                            courseTopicId={courseVideoDetail.courseTopicId}/>
+                                    </div>
 
-
+                                </div>
                             </div>
 
-                        </CardHeader>
+                        </div>
                     </Card>
 
 
                 </section>
-                <NotesModule courseId={courseList.courseId}
+
+                <NotesModule refreshTrigger={triggerNotesRefresh} courseId={courseList.courseId}
                              courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}
                              courseTopicId={courseVideoDetail.courseTopicId}/>
             </div>

@@ -61,7 +61,7 @@ function CourseSidebar() {
             setData({
                 navMain: [
                     {
-                        title: "COURSE", url: "#", items: [{
+                        title: "", url: "#", items: [{
                             title: "OVERVIEW",
                             url: `/course/${courseList?.courseId}`,
                             isClickable: true,

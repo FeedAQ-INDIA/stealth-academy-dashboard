@@ -17,6 +17,7 @@ import {useCourse} from "@/components-xm/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
 import NotesModule from "@/components-xm/NotesModule.jsx";
 import {toast} from "@/components/hooks/use-toast.js";
+import CreateNotesModule from "@/components-xm/CreateNotesModule.jsx";
 
 function CourseWritten() {
 
@@ -133,6 +134,11 @@ function CourseWritten() {
         }
     }
 
+    const [triggerNotesRefresh, setTriggerNotesRefresh] = useState(false);
+
+    const handleNotesSave = () => {
+        setTriggerNotesRefresh(prev => !prev);
+    };
 
 
     return (
@@ -211,7 +217,7 @@ function CourseWritten() {
             <div className="p-6">
 
 
-                <section className="my-8 ">
+                <section className="my-4 ">
 
                     <div className=" ">
                         <p>{courseVideoDetail?.courseWrittenHtmlContent}</p>
@@ -220,7 +226,10 @@ function CourseWritten() {
 
 
                 </section>
-                <NotesModule courseId={courseList.courseId}
+                <CreateNotesModule handleNotesSave={handleNotesSave} courseId={courseList.courseId}
+                             courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.courseTopicContentId}
+                             courseTopicId={courseVideoDetail.courseTopicId}/>
+                <NotesModule refreshTrigger={triggerNotesRefresh}  courseId={courseList.courseId}
                              courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.courseTopicContentId}
                              courseTopicId={courseVideoDetail.courseTopicId}/>
             </div>
