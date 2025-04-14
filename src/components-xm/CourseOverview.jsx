@@ -75,6 +75,12 @@ function CourseOverview() {
                         <Badge className="animate-blink bg-green-600 text-white">FREE</Badge>
 
                         <Badge variant="outline">Course</Badge>
+                        <Badge variant="outline">                                     {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}
+                        </Badge>
+                        {/*<Badge className="flex gap-1" variant="outline">                                    < CircleDollarSign size={18}/> {courseList?.courseCost == 0 ? 'Free' : 'Rs.'+courseList?.courseCost+'/-'}*/}
+                        {/*</Badge>*/}
+                        <Badge variant="outline"> {courseList?.courseLevel}
+                        </Badge>
                     </div>
                     <div  className="flex flex-wrap gap-2 w-full mb-3 items-center">
                         <div className=" ">
@@ -95,25 +101,7 @@ function CourseOverview() {
 
             </Card>
             <div className="p-6">
-                <section className="mb-8">
-                    <Card className="border-0 bg-muted/50">
-                        <CardHeader>
-                            <div className="flex flex-wrap gap-4 w-full ">
-                                <div className="flex gap-1 items-center">
-                                    <Clock size={18}/>  {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}
-                                </div>
-                                <div className="flex gap-2 items-center">
-                                    < CircleDollarSign size={18}/> {courseList?.courseCost == 0 ? 'Free' : 'Rs.'+courseList?.courseCost+'/-'}
-                                </div>
-                                <div className="flex gap-2 items-center">
-                                    <Badge variant="outline">{courseList?.courseLevel}</Badge>
-                                </div>
-                            </div>
-                        </CardHeader>
 
-                    </Card>
-
-                </section>
                 {/*<section>*/}
                 {/*    <Card className="border-0 bg-[#ffdd00]">*/}
                 {/*        <CardHeader>*/}

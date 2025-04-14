@@ -61,11 +61,11 @@ function AccountSidebar({...props}) {
 
 
     return (< >
-        <Sidebar className="top-[4rem] h-[calc(100svh-4em)]   " style={{borderRadius: '0px', overflowY: 'auto'}}
+        <Sidebar className="top-[4rem] h-[calc(100svh-4em)] border-r shadow-md px-0   " style={{borderRadius: '0px', overflowY: 'auto'}}
                  variant="inset">
 
             <SidebarHeader>
-                <h2 className="text-lg font-medium">MY ACCOUNT</h2>
+                <h2 className="text-lg font-medium text-center">MY ACCOUNT</h2>
 
             </SidebarHeader>
             <Separator/>

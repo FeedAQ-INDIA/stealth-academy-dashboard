@@ -77,16 +77,16 @@ function CourseSidebar() {
     }, [courseList, location.pathname])
 
     return (< >
-        <Sidebar className="top-[4rem] h-[calc(100svh-4em)]  shadow-md px-0" style={{borderRadius: '0px', overflowY: 'auto'}}
+        <Sidebar className="top-[4rem] h-[calc(100svh-4em)]  shadow-md px-0 border-r" style={{borderRadius: '0px', overflowY: 'auto'}}
                  variant="inset">
 
             <SidebarHeader>
-                <h2 className="text-lg font-medium">{courseList?.courseTitle} </h2>
+                <h2 className="text-lg font-medium   line-clamp-1">{courseList?.courseTitle} </h2>
                 <div className=" ">
-                    <div className="flex gap-2 items-center text-sm my-2">
-                        <Clock
-                            size={18}/> {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}
-                    </div>
+                    {/*<div className="flex gap-2 items-center text-sm my-2">*/}
+                    {/*    <Clock*/}
+                    {/*        size={18}/> {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}*/}
+                    {/*</div>*/}
                     {/*<div className="flex gap-2 items-center text-sm mt-2">*/}
                     {/*    <Loader size={18}/> 10 % Completed*/}
                     {/*</div>*/}
