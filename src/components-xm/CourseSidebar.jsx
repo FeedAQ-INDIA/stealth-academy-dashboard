@@ -22,6 +22,7 @@ import {Check, ChevronRight, Clock, Loader} from "lucide-react";
 import {Separator} from "@/components/ui/separator.jsx";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
 import {Badge} from "@/components/ui/badge.jsx";
+import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
 
 
 function CourseSidebar() {
@@ -76,8 +77,8 @@ function CourseSidebar() {
         }
     }, [courseList, location.pathname])
 
-    return (< >
-        <Sidebar className="top-[4rem] h-[calc(100svh-4em)]  shadow-md px-0 border-r" style={{borderRadius: '0px', overflowY: 'auto'}}
+    return (<>
+        <Sidebar className="top-[4rem] h-[calc(100svh-4em)]    shadow-md px-0 border-r" style={{borderRadius: '0px', overflowY: 'auto'}}
                  variant="inset">
 
             <SidebarHeader>
@@ -119,10 +120,16 @@ function CourseSidebar() {
                                                         {subItem?.isClickable? <SidebarMenuSubButton asChild
                                                                               isActive={subItem?.isActive}
                                                                               className="flex items-center gap-1 py-2 rounded-1 h-fit">
-                                                            <Link to={subItem?.url}><div className="flex items-center gap-1">
-                                                                {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == subItem?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0?  <Check  color="#11a72a" className="flex-shrink-0"/> : <></> }
+                                                            <Link to={subItem?.url}><div className="flex items-center gap-2">
 
-                                                                <div>{identifyContentTypeIcons(subItem.contentType)}</div>
+                                                                {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == subItem?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0?
+                                                                    <Avatar className="border shadow-sm">
+                                                                        <AvatarFallback><Check  color="#11a72a" className="flex-shrink-0"/></AvatarFallback>
+                                                                    </Avatar> :  <Avatar  className="border shadow-sm">
+                                                                        <AvatarFallback> </AvatarFallback>
+                                                                    </Avatar> }
+
+                                                                {/*<div>{identifyContentTypeIcons(subItem.contentType)}</div>*/}
                                                             <div className="">{subItem?.title} </div>
 
 

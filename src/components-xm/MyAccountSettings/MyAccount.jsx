@@ -65,11 +65,11 @@ function MyAccount() {
                     <CardHeader>
                         <div className="flex flex-sm justify-items-center gap-4 items-center">
                             <Avatar className="w-12 h-12">
-                                <AvatarFallback className="text-xl">TS</AvatarFallback>
+                                <AvatarFallback className="text-xl">{userDetail?.nameInitial}</AvatarFallback>
                             </Avatar>
                             <div>
-                                <h1 className="text-xl font-medium">Welcome TECHFUSION STUDIO</h1>
-                                <p>Member since 2021</p>
+                                <h1 className="text-xl font-medium">Welcome {userDetail?.derivedUserName}</h1>
+                                <p>Member since {userDetail?.created_date}</p>
                             </div>
                         </div>
 

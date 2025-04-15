@@ -169,7 +169,7 @@ export function CourseDetail() {
                 <SidebarInset
                     className=" min-h-[calc(100svh-4em)]  " style={{borderRadius: '0px', margin: '0px'}}>
 
-                    <div className="h-[calc(100svh-4em)] overflow-y-auto  ">
+                    <div className="h-[calc(100svh-4em)] overflow-y-auto   ">
                         <Outlet/>
                     </div>
 

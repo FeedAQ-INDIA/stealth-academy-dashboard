@@ -220,7 +220,8 @@ function CourseWritten() {
                 <section className="my-4 ">
 
                     <div className=" ">
-                        <p>{courseVideoDetail?.courseWrittenHtmlContent}</p>
+                        <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
+{courseVideoDetail?.courseWrittenHtmlContent}</pre>
 
                     </div>
 

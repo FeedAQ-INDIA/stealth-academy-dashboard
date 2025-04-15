@@ -52,15 +52,14 @@ function CreateNotesModule({courseId, courseTopicId, courseTopicContentId, handl
     return (
         <>
             <Form {...createNotesForm}
-                  className="flex-1 flex flex-col">
+                  >
                 <form
                     onSubmit={createNotesForm.handleSubmit(onSubmit)}
-                    className="flex-1 flex flex-col"
-                >
+                 >
                     <div>
                         <FormField
                             control={createNotesForm.control}
-                            name="notesText" className="w-full h-full "
+                            name="notesText"
                             render={({field}) => (
                                 <FormItem>
                                     <FormControl>

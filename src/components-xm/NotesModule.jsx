@@ -149,7 +149,7 @@ function NotesModule({courseId, courseTopicId, courseTopicContentId, refreshTrig
         <>
 
 
-            <Card className="my-4 bg-muted/50 rounded-none bg-white">
+            <Card className="my-8 bg-muted/50 rounded-none bg-white">
                 <CardHeader>
                 <h1 className="text-lg   font-medium ">Note Book</h1>
                 {/*<Form {...createNotesForm}>*/}

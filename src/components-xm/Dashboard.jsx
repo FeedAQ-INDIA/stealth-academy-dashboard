@@ -1,4 +1,4 @@
-import {Clock, Search,} from "lucide-react";
+import {Clock, Search, Terminal,} from "lucide-react";
 
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
@@ -11,6 +11,7 @@ import React, {useEffect, useState} from "react";
 import axiosConn from "@/axioscon.js";
 import {useAuthStore} from "@/zustland/store.js";
 import {toast} from "@/components/hooks/use-toast.js";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
 
 
 export function Dashboard() {
@@ -81,7 +82,7 @@ export function Dashboard() {
                 <CardHeader>
                     <div className="flex flex-sm justify-items-center gap-4 items-center">
                         <Avatar className="w-12 h-12">
-                            <AvatarFallback className="text-xl">TS</AvatarFallback>
+                            <AvatarFallback className="text-xl">{userDetail?.nameInitial}</AvatarFallback>
                         </Avatar>
                         <div>
                             <h1 className="text-xl font-medium">Welcome {userDetail?.derivedUserName}</h1>
@@ -121,6 +122,7 @@ export function Dashboard() {
                 </CardHeader>
                 <CardContent>
                     <div className="my-2">
+                        {courseList?.length > 0 ?
                         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-10 items-center">
                             {courseList?.courses?.map(a => (
                                 <Card className=" border shadow-sm hover:shadow-md cursor-pointer ">
@@ -153,18 +155,38 @@ export function Dashboard() {
 
 
                                         </div>
+
                                     </CardContent>
 
-                                    <CardFooter className="flex gap-2 ">
-                                        <Button className="  w-full  " variant="destructive"
+                                    <CardFooter className="flex w-full flex-wrap gap-2">
+                                        <Button className=" flex-1 " variant="destructive"
                                                 onClick={() => disroll(a?.courseId)}>Leave Course</Button>
-                                        <Link to={`/course/${a?.courseId}`} className="  w-full "><Button
+                                        <Link to={`/course/${a?.courseId}`} className="  flex-1 "><Button
                                             className="  w-full ">Learn More</Button>
                                         </Link>
                                     </CardFooter>
                                 </Card>
                             ))}
                         </div>
+                        :
+                            <Alert>   <Terminal className="h-4 w-4" />
+                                <div className="flex flex-row md:flex-row flex-wrap gap-2 items-center">
+                                    <div>
+                                        <AlertTitle>No Enrollment found</AlertTitle>
+                                        <AlertDescription>
+                                            <p>You are not enrolled in any course</p>
+
+                                        </AlertDescription>
+                                    </div>
+
+                                     <div className="md:ml-auto">
+                                         <Link to='/explore'>
+                                             <Button className="mt-2 flex-1" size={'sm'}>Start your journey today</Button>
+                                         </Link>
+                                    </div>
+                                </div>
+
+                            </Alert>}
                     </div>
                 </CardContent>
             </Card>

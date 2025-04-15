@@ -6,7 +6,7 @@ import {Card, CardContent, CardFooter, CardHeader, CardTitle,} from "@/component
 import {Input} from "@/components/ui/input";
 import {Pagination, PaginationContent, PaginationItem,} from "@/components/ui/pagination"
 import {Link, useNavigate} from "react-router-dom";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import axiosConn from "@/axioscon.js";
 import {useAuthStore} from "@/zustland/store.js";
 import {toast} from "@/components/hooks/use-toast.js";
@@ -262,11 +262,11 @@ export function Explore() {
                                     </div>
                                 </CardContent>
 
-                                <CardFooter className="flex gap-2 ">
+                                <CardFooter className="flex w-full flex-wrap gap-2">
                                     {userEnrolledCourseIdList.includes(a?.courseId)?
-                                        <Button className="  w-full  " variant="destructive"
+                                        <Button className=" flex-1 " variant="destructive"
                                                 onClick={() => disroll(a?.courseId)}>Leave Course</Button> :<></>}
-                                    <Link to={`/course/${a?.courseId}`} className="  w-full "><Button
+                                    <Link to={`/course/${a?.courseId}`} className="  flex-1 "><Button
                                         className="  w-full ">Learn More</Button>
                                     </Link>
                                 </CardFooter>
