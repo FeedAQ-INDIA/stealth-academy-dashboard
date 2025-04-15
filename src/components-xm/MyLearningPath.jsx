@@ -224,6 +224,79 @@ export function MyLearningPath() {
         </CardContent>
       </Card>
 
+      <Card className="border-0 bg-muted/50  my-6">
+        <CardHeader>
+          <CardTitle>
+            My Completions
+          </CardTitle>
+
+
+        </CardHeader>
+        <CardContent>
+          <div className="my-2">
+            {courseList?.courses?.length>0 ?
+
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-10 items-center">
+                  {courseList?.courses?.map(a => (
+                      <Card className=" border shadow-sm hover:shadow-md cursor-pointer ">
+                        <CardHeader>
+                          {/* Badge row - wraps on smaller screens */}
+                          <div className="flex flex-wrap gap-2 w-full mb-3">
+                            <Badge className="animate-blink bg-green-600 text-white">CERTIFIED</Badge>
+
+                          </div>
+
+                          {/* Title with responsive spacing */}
+                          <div className=" ">
+                            <CardTitle className="text-lg sm:text-xl  font-semibold">
+                              {a?.courseTitle}
+                            </CardTitle>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="mb-2 line-clamp-3">{a?.courseDescription}</p>
+                           <div className="font-medium  ">
+                            <div className="flex gap-2 items-center">
+                              <Clock size={18}/>{`${Math.floor(+(a?.courseDuration) / 60)} hr ${+(a?.courseDuration) % 60} min`}
+                            </div>
+                          </div>
+                        </CardContent>
+
+
+                        <CardFooter className="flex w-full flex-wrap gap-2">
+                          <Button className=" flex-1 " variant="outline"
+                                  >Download Certificate</Button>
+                          <Link to={`/course/${a?.courseId}`} className="  flex-1 "><Button
+                              className="  w-full ">Learn More</Button>
+                          </Link>
+                        </CardFooter>
+                      </Card>
+                  ))}
+                </div>
+                :
+                <Alert>   <Terminal className="h-4 w-4" />
+                  <div className="flex flex-row md:flex-row flex-wrap gap-2 items-center">
+                    <div>
+                      <AlertTitle>No Enrollment found</AlertTitle>
+                      <AlertDescription>
+                        <p>You are not enrolled in any course</p>
+
+                      </AlertDescription>
+                    </div>
+
+                    <div className="md:ml-auto">
+                      <Link to='/explore'>
+                        <Button className="mt-2 flex-1" size={'sm'}>Start your journey today</Button>
+                      </Link>
+
+                    </div>
+                  </div>
+
+                </Alert>}
+          </div>
+        </CardContent>
+      </Card>
+
     </div>
   );
 }

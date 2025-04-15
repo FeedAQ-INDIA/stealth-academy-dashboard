@@ -19,7 +19,7 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion"
-import {useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import {toast} from "@/components/hooks/use-toast.js";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
@@ -89,6 +89,7 @@ function CourseOverview() {
                             </CardTitle>
                         </div>
                         <div className="ml-auto ">
+                            <Link to={`/course/${CourseId}/quiz/1`}>QUIZ</Link>
                             {isUserEnrolledAlready?
                                 <Button onClick={()=> disroll()}>LEAVE COURSE</Button>  :
                                 <Button onClick={()=> enroll()}>START COURSE</Button>

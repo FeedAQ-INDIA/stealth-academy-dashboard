@@ -7,7 +7,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.jsx";
-import {Card, CardHeader, CardTitle} from "@/components/ui/card.jsx";
+import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
 import {Check} from "lucide-react";
@@ -18,41 +18,55 @@ import axiosConn from "@/axioscon.js";
 import NotesModule from "@/components-xm/NotesModule.jsx";
 import {toast} from "@/components/hooks/use-toast.js";
 import CreateNotesModule from "@/components-xm/CreateNotesModule.jsx";
+import {Checkbox} from "@/components/ui/checkbox.jsx";
 
-function CourseWritten() {
+function CourseQuiz() {
 
-    const {CourseId, CourseDocId} = useParams();
-    const {userEnrollmentObj, userEnrollmentCourseLog, fetchUserEnrollmentData, isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus} = useCourse();
+    const {CourseId, CourseQuizId} = useParams();
+    const {
+        userEnrollmentObj,
+        userEnrollmentCourseLog,
+        fetchUserEnrollmentData,
+        isUserEnrolledAlready,
+        courseList,
+        enroll,
+        disroll,
+        enrollStatus
+    } = useCourse();
 
-    const [courseVideoDetail, setCourseVideoDetail] = useState({});
+    const [courseQuizDetail, setCourseQuizDetail] = useState({});
     const [courseTopicContent, setCourseTopicContent] = useState({});
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (courseList && CourseDocId) {
+        if (courseList && CourseQuizId) {
             fetchCourseVideo();
         }
-    }, [courseList, userEnrollmentObj, CourseDocId]);
+    }, [courseList, userEnrollmentObj, CourseQuizId]);
 
     const fetchCourseVideo = () => {
         axiosConn
             .post(import.meta.env.VITE_API_URL + "/searchCourse", {
                 limit: 10, offset: 0, getThisData: {
-                    datasource: "CourseWritten", attributes: [], where: {courseWrittenId: CourseDocId},
+                    datasource: "CourseQuiz", attributes: [], where: {courseQuizId: CourseQuizId},
+                    include:[
+                        {
+                            datasource: "QuizQuestion",
+                            as: "quizquestion"
+                        }
+                    ]
                 },
             })
             .then((res) => {
                 console.log(res.data);
                 const video = res.data.data?.results?.[0]
-                setCourseVideoDetail(video);
-                setCourseTopicContent(courseList?.courseTopic?.find(a => a.courseTopicId == video.courseTopicId)?.courseTopicContent?.find(a => a.contentId == video.courseWrittenId && a.courseTopicContentType == 'CourseWritten'))
+                setCourseQuizDetail(video);
+                setCourseTopicContent(courseList?.courseTopic?.find(a => a.courseTopicId == video.courseTopicId)?.courseTopicContent?.find(a => a.contentId == video.courseVideoId && a.courseTopicContentType == 'CourseVideo'))
             })
             .catch((err) => {
                 console.log(err);
             });
     }
-
-
 
 
     const saveUserEnrollmentData = () => {
@@ -62,7 +76,7 @@ function CourseWritten() {
                 userEnrollmentId: userEnrollmentObj?.userEnrollmentId,
                 courseId: courseList.courseId,
                 courseTopicContentId: courseTopicContent.courseTopicContentId,
-                courseTopicId: courseVideoDetail.courseTopicId,
+                courseTopicId: courseQuizDetail.courseTopicId,
                 enrollmentStatus: 'COMPLETED'
             })
             .then((res) => {
@@ -87,7 +101,7 @@ function CourseWritten() {
                 userEnrollmentId: userEnrollmentObj?.userEnrollmentId,
                 courseId: courseList.courseId,
                 courseTopicContentId: courseTopicContent.courseTopicContentId,
-                courseTopicId: courseVideoDetail.courseTopicId
+                courseTopicId: courseQuizDetail.courseTopicId
             })
             .then((res) => {
                 console.log(res.data);
@@ -104,8 +118,10 @@ function CourseWritten() {
             });
     }
 
-    const [prevContent, setPrevContent] = useState({}); ;
-    const [nextContent, setNextContent] = useState({}); ;
+    const [prevContent, setPrevContent] = useState({});
+
+    const [nextContent, setNextContent] = useState({});
+
 
     useEffect(() => {
         const allContents = courseList?.courseTopic?.flatMap(topic =>
@@ -126,19 +142,15 @@ function CourseWritten() {
 
     const navigateToNextModule = (context) => {
         console.log(context);
-        if(context.courseTopicContentType == 'CourseVideo'){
+        if (context.courseTopicContentType == 'CourseVideo') {
             navigate(`/course/${context?.courseTopicId}/video/${context?.contentId}`);
-        } else if(context.courseTopicContentType == 'CourseWritten'){
+        } else if (context.courseTopicContentType == 'CourseWritten') {
             navigate(`/course/${context?.courseTopicId}/doc/${context?.contentId}`);
-
+        }  else if (context.courseTopicContentType == 'CourseVideo') {
+            navigate(`/course/${context?.courseTopicId}/quiz/${context?.contentId}`);
         }
     }
 
-    const [triggerNotesRefresh, setTriggerNotesRefresh] = useState(false);
-
-    const handleNotesSave = () => {
-        setTriggerNotesRefresh(prev => !prev);
-    };
 
 
     return (
@@ -160,7 +172,7 @@ function CourseWritten() {
                         <BreadcrumbSeparator/>
                         <BreadcrumbItem>
                             <BreadcrumbPage
-                                className="truncate max-w-[30ch]">{courseVideoDetail?.courseWrittenTitle}</BreadcrumbPage>
+                                className="truncate max-w-[30ch]">{courseQuizDetail?.courseQuizTitle}</BreadcrumbPage>
                         </BreadcrumbItem>
 
                     </BreadcrumbList>
@@ -172,8 +184,10 @@ function CourseWritten() {
             <Card className="rounded-none border-none">
                 <CardHeader className="flex items-centergap-2 w-full p-2">
                     <div className="flex gap-2 justify-between ">
-                        <Button className="w-fit" size="sm" disabled={prevContent == null} onClick={()=>navigateToNextModule(prevContent)}>Previous</Button>
-                        <Button className="w-fit" size="sm" disabled={nextContent == null} onClick={()=>navigateToNextModule(nextContent)}>Next</Button>
+                        <Button className="w-fit" size="sm" disabled={prevContent == null}
+                                onClick={() => navigateToNextModule(prevContent)}>Previous</Button>
+                        <Button className="w-fit" size="sm" disabled={nextContent == null}
+                                onClick={() => navigateToNextModule(nextContent)}>Next</Button>
                     </div>
                 </CardHeader>
             </Card>
@@ -182,7 +196,7 @@ function CourseWritten() {
             <Card className="rounded-none bg-muted/50 border-none">
                 <CardHeader>
                     <div className="flex flex-wrap gap-2 w-full mb-3 justify-items-center">
-                        <Badge variant="outline">Doc</Badge>
+                        <Badge variant="outline">Quiz</Badge>
                         <Badge variant="outline">
                             {(() => {
                                 const totalMinutes = +courseTopicContent?.courseTopicContentDuration || 0;
@@ -195,16 +209,18 @@ function CourseWritten() {
                     </div>
                     <div className=" flex  items-center gap-2 ">
                         <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold ">
-                            {courseVideoDetail?.courseWrittenTitle}
+                            {courseQuizDetail?.courseQuizTitle}
                         </CardTitle>
                         <div className="ml-auto">
-                            {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0  ?
-                                <h3 className="flex gap-1 "><Check color="#11a72a"/><span
-                                    className="text-blue-800 font-medium">Completed</span></h3> : <Button className="w-fit" size="sm" onClick={() => saveUserEnrollmentData()}>Mark as
-                                    Complete</Button>
-                                }
                             {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0 ?
-                                <p className='text-right cursor-pointer hover:text-blue-800 hover:underline  hover:underline-offset-4' onClick={() => deleteUserEnrollmentData()}>Undo</p> : <></>
+                                <h3 className="flex gap-1 "><Check color="#11a72a"/><span
+                                    className="text-blue-800 font-medium">Completed</span></h3> :
+                                <Button className="w-fit" size="sm" onClick={() => saveUserEnrollmentData()}>Mark as
+                                    Complete</Button>
+                            }
+                            {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0 ?
+                                <p className='text-right cursor-pointer hover:text-blue-800 hover:underline  hover:underline-offset-4'
+                                   onClick={() => deleteUserEnrollmentData()}>Undo</p> : <></>
                             }
                         </div>
 
@@ -219,27 +235,52 @@ function CourseWritten() {
 
                 <section className="my-4 ">
 
-                    <div className=" ">
+                    <Card className=" ">
 
-
-                        <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
-{courseVideoDetail?.courseWrittenHtmlContent}</pre>
-
-                    </div>
+                        <CardHeader>
+                            <CardTitle className="text-base">What type of language is java ?</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ol>
+                                <li className="flex items-center space-x-4 my-4">
+                                    <Checkbox id="terms" />
+                                    <label
+                                        htmlFor="terms"
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                        Accept terms and conditions
+                                    </label>
+                                 </li>
+                                <li className="flex items-center space-x-4  my-4">
+                                    <Checkbox id="terms" />
+                                    <label
+                                        htmlFor="terms"
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                        Accept terms and conditions
+                                    </label>
+                                </li>
+                                <li className="flex items-center space-x-4  my-4">
+                                    <Checkbox id="terms" />
+                                    <label
+                                        htmlFor="terms"
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                        Accept terms and conditions
+                                    </label>
+                                </li>
+                            </ol>
+                        </CardContent>
+                        <CardFooter className="flex gap-2">
+                            <Button size="sm">Prev</Button>
+                            <Button size="sm">Next</Button>
+                            <Button size="sm">Submit</Button>
+                        </CardFooter>
+                    </Card>
 
 
                 </section>
-                <Separator className="my-8"/>
-                <section className="my-4 ">
-                    <h1 className="text-lg   font-medium mb-2">Create Notes</h1>
-                    <CreateNotesModule handleNotesSave={handleNotesSave} courseId={courseList.courseId}
-                                       courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.courseTopicContentId}
-                                       courseTopicId={courseVideoDetail.courseTopicId}/>
-                </section>
-            
-                <NotesModule refreshTrigger={triggerNotesRefresh}  courseId={courseList.courseId}
-                             courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.courseTopicContentId}
-                             courseTopicId={courseVideoDetail.courseTopicId}/>
+
             </div>
 
         </>)
@@ -247,4 +288,4 @@ function CourseWritten() {
 }
 
 
-export default CourseWritten;
+export default CourseQuiz;
