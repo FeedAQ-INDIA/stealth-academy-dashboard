@@ -153,7 +153,7 @@ export function MyLearningPath() {
         </CardHeader>
         <CardContent>
           <div className="my-2">
-            {courseList?.length > 0 ?
+            {courseList?.courses?.length>0 ?
 
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-10 items-center">
               {courseList?.courses?.map(a => (

@@ -21,7 +21,7 @@ export function Dashboard() {
     const [totalCount, setTotalCount] = useState(0);
     const [limit, setLimit] = useState(10);
     const [offset, setOffset] = useState(0);
-    const [courseList, setCourseList] = useState({});
+    const [courseList, setCourseList] = useState(null);
     const [apiQuery, setApiQuery] = useState({
         limit: limit, offset: offset, getThisData: {
             datasource: "User", attributes: [], where: {userId: userDetail?.userId},
@@ -122,7 +122,7 @@ export function Dashboard() {
                 </CardHeader>
                 <CardContent>
                     <div className="my-2">
-                        {courseList?.length > 0 ?
+                        {courseList?.courses?.length>0 ?
                         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-10 items-center">
                             {courseList?.courses?.map(a => (
                                 <Card className=" border shadow-sm hover:shadow-md cursor-pointer ">
