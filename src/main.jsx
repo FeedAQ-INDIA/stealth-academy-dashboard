@@ -19,6 +19,7 @@ import CourseComprehensionReading from "@/components-xm/CourseComprehensionReadi
 import CourseListenAndRead from "@/components-xm/CourseListenAndRead.jsx";
 import MyAccount from "@/components-xm/MyAccountSettings/MyAccount.jsx";
 import CourseWritten from "@/components-xm/CourseWritten.jsx";
+import CourseDocThirdParty from "@/components-xm/CourseDocThirdParty.jsx";
 
 
  
@@ -70,9 +71,15 @@ const router = createBrowserRouter([
                         element: <CourseWritten/>,
                     },
                     {
+                        path: "/course/:CourseId/pdf/:CourseDocId",
+                        element: <CourseDocThirdParty/>,
+                    },
+                    {
                         path: "/course/:CourseId/comprehension-reading/:ComprehensionReadingId",
                         element: <CourseComprehensionReading/>,
                     },
+
+
                     {
                         path: "/course/:CourseId/listen-and-read/:ListenAndReadId",
                         element: <CourseListenAndRead/>,

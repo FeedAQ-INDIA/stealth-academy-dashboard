@@ -247,9 +247,9 @@ function CourseVideoTutorial() {
                                     </div>
 
                                     {/* Notes container */}
-                                    <div className="w-full  p-4 border flex flex-col">
+                                    <div className="w-full  p-4 border flex flex-col shadow-md">
                                         <Label className="mb-4">Create Notes</Label>
-                                        <div className="w-full flex-1 resize-none ">
+                                        <div className="w-full flex flex-col h-full">
                                             <CreateNotesModule handleNotesSave={handleNotesSave}  courseId={courseList.courseId}
                                                                courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}
                                                                courseTopicId={courseVideoDetail.courseTopicId}/>

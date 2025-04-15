@@ -54,26 +54,26 @@ function CreateNotesModule({courseId, courseTopicId, courseTopicContentId, handl
             <Form {...createNotesForm}
                   >
                 <form
-                    onSubmit={createNotesForm.handleSubmit(onSubmit)}
+                    onSubmit={createNotesForm.handleSubmit(onSubmit)}  className="flex flex-col h-full "
                  >
-                    <div>
+                    <div className="flex-1 ">
                         <FormField
                             control={createNotesForm.control}
                             name="notesText"
                             render={({field}) => (
-                                <FormItem>
+                                <FormItem  className="flex-1 w-full h-full  ">
                                     <FormControl>
                                         <Textarea placeholder="Type your notes here." {...field}
-                                                  className="flex-1 w-full  "
-                                        />
+                                                  className="flex-1 w-full h-full lg:resize-none  "
+s                                        />
                                     </FormControl>
                                     <FormMessage/>
                                 </FormItem>
                             )}
                         />
                     </div>
-                    <div className="flex gap-2 mt-2">
-                        <Button className="w-full" variant="outline" size="sm"
+                    <div className="flex gap-2 mt-4">
+                        <Button className="w-full" variant="outline" size="sm" type="button"
                                 onClick={() => createNotesForm.reset()}>Reset</Button>
                         <Button type="submit" className="w-full" size="sm">Save</Button>
                     </div>

@@ -19,7 +19,7 @@ import NotesModule from "@/components-xm/NotesModule.jsx";
 import {toast} from "@/components/hooks/use-toast.js";
 import CreateNotesModule from "@/components-xm/CreateNotesModule.jsx";
 
-function CourseWritten() {
+function CourseDocThirdParty() {
 
     const {CourseId, CourseDocId} = useParams();
     const {userEnrollmentObj, userEnrollmentCourseLog, fetchUserEnrollmentData, isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus} = useCourse();
@@ -130,7 +130,6 @@ function CourseWritten() {
             navigate(`/course/${context?.courseTopicId}/video/${context?.contentId}`);
         } else if(context.courseTopicContentType == 'CourseWritten'){
             navigate(`/course/${context?.courseTopicId}/doc/${context?.contentId}`);
-
         }
     }
 
@@ -202,7 +201,7 @@ function CourseWritten() {
                                 <h3 className="flex gap-1 "><Check color="#11a72a"/><span
                                     className="text-blue-800 font-medium">Completed</span></h3> : <Button className="w-fit" size="sm" onClick={() => saveUserEnrollmentData()}>Mark as
                                     Complete</Button>
-                                }
+                            }
                             {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0 ?
                                 <p className='text-right cursor-pointer hover:text-blue-800 hover:underline  hover:underline-offset-4' onClick={() => deleteUserEnrollmentData()}>Undo</p> : <></>
                             }
@@ -220,18 +219,20 @@ function CourseWritten() {
                 <section className="my-4 ">
 
                     <div className=" ">
-
-
-                        <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
-{courseVideoDetail?.courseWrittenHtmlContent}</pre>
-
+                        <iframe
+                            src={'https://nvlpubs.nist.gov/nistpubs/specialpublications/NIST.SP.800-207.pdf'}
+                            width="100%"
+                            height="600px"
+                            style={{ border: 'none' }}
+                            title="PDF Viewer"
+                        ></iframe>
                     </div>
 
 
                 </section>
                 <CreateNotesModule handleNotesSave={handleNotesSave} courseId={courseList.courseId}
-                             courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.courseTopicContentId}
-                             courseTopicId={courseVideoDetail.courseTopicId}/>
+                                   courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.courseTopicContentId}
+                                   courseTopicId={courseVideoDetail.courseTopicId}/>
                 <NotesModule refreshTrigger={triggerNotesRefresh}  courseId={courseList.courseId}
                              courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.courseTopicContentId}
                              courseTopicId={courseVideoDetail.courseTopicId}/>
@@ -242,4 +243,4 @@ function CourseWritten() {
 }
 
 
-export default CourseWritten;
+export default CourseDocThirdParty;

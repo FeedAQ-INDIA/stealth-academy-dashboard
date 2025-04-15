@@ -1,6 +1,6 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {Link, useNavigate, useParams,} from "react-router-dom";
+import {Link, useLocation, useNavigate, useParams,} from "react-router-dom";
 
 import {cn} from "@/lib/utils.js";
 import {
@@ -24,6 +24,7 @@ function NavigationMenuDemo({orientation}) {
     const navigate = useNavigate();
      const [wsSearchDialogOpen, setWsSearchDialogOpen] = useState(false);
 
+     const location = useLocation();
 
     const handleNavigate = (url) => {
         console.log(url)
@@ -47,16 +48,16 @@ function NavigationMenuDemo({orientation}) {
             <NavigationMenuList className={`${orientation === 'vertical' ? ' flex flex-col gap-2 w-full' : 'flex flex-row gap-2'}`}>
 
                 <NavigationMenuItem    >
-                    <Link   to={'/dashboard'}><Button variant={`${window.location.href.includes('dashboard')? 'secondary' : 'ghost' }`}    >DASHBOARD</Button></Link>
+                    <Link   to={'/dashboard'}><Button variant={`${location.pathname.includes('dashboard')? 'secondary' : 'ghost' }`}    >DASHBOARD</Button></Link>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                    <Link to={'/explore'}><Button  variant={`${window.location.href.includes('explore')? 'secondary' : 'ghost' }`}>EXPLORE</Button></Link>
+                    <Link to={'/explore'}><Button  variant={`${location.pathname.includes('explore')? 'secondary' : 'ghost' }`}>EXPLORE</Button></Link>
                 </NavigationMenuItem>
 
 
                 <NavigationMenuItem>
-                    <Link to={'/my-learning-path'}> <Button variant={`${window.location.href.includes('my-learning-path')? 'secondary' : 'ghost' }`}>MY JOURNEY</Button></Link>
+                    <Link to={'/my-learning-path'}> <Button variant={`${location.pathname.includes('my-learning-path')? 'secondary' : 'ghost' }`}>MY JOURNEY</Button></Link>
                 </NavigationMenuItem>
 
 
