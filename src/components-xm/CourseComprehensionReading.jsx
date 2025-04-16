@@ -7,6 +7,7 @@ import {Badge} from "@/components/ui/badge.jsx";
  import {Textarea} from "@/components/ui/textarea.jsx";
 import {Button} from "@/components/ui/button.jsx";
 import AudioRecorder from "@/components-xm/AudioRecorder.jsx";
+import {Link} from "react-router-dom";
 
 function CourseComprehensionReading() {
 
@@ -20,7 +21,7 @@ function CourseComprehensionReading() {
                     <BreadcrumbList>
 
                         <BreadcrumbItem>
-                            <BreadcrumbPage>Course</BreadcrumbPage>
+                            <BreadcrumbPage><Link to={`/explore`}>Course</Link></BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>

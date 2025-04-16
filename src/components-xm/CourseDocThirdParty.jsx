@@ -12,7 +12,7 @@ import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
 import {Check} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
-import {useNavigate, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
 import NotesModule from "@/components-xm/NotesModule.jsx";
@@ -149,7 +149,7 @@ function CourseDocThirdParty() {
                     <BreadcrumbList>
 
                         <BreadcrumbItem>
-                            <BreadcrumbPage>Course</BreadcrumbPage>
+                            <BreadcrumbPage><Link to={`/explore`}>Course</Link></BreadcrumbPage>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator/>
                         <BreadcrumbItem>

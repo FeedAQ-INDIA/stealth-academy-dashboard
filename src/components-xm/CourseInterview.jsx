@@ -4,6 +4,7 @@ import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/comp
 import {CardTitle} from "@/components/ui/card.jsx";
 import React from "react";
 import {Badge} from "@/components/ui/badge.jsx";
+import {Link} from "react-router-dom";
 
 function CourseVideoTutorial() {
 
@@ -17,7 +18,7 @@ function CourseVideoTutorial() {
                     <BreadcrumbList>
 
                         <BreadcrumbItem>
-                            <BreadcrumbPage>Course</BreadcrumbPage>
+                            <BreadcrumbPage><Link to={`/explore`}>Course</Link></BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>

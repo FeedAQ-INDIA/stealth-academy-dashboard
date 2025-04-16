@@ -8,6 +8,7 @@ import {CircleDollarSign, Clock} from "lucide-react";
 import {Textarea} from "@/components/ui/textarea.jsx";
 import {Button} from "@/components/ui/button.jsx";
 import AudioRecorder from "@/components-xm/AudioRecorder.jsx";
+import {Link} from "react-router-dom";
 
 function CourseListenAndRead() {
 
@@ -21,7 +22,7 @@ function CourseListenAndRead() {
                     <BreadcrumbList>
 
                         <BreadcrumbItem>
-                            <BreadcrumbPage>Course</BreadcrumbPage>
+                            <BreadcrumbPage><Link to={`/explore`}>Course</Link></BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>

@@ -51,7 +51,7 @@ function CourseOverview() {
                     <BreadcrumbList>
 
                         <BreadcrumbItem>
-                            <BreadcrumbPage>Course</BreadcrumbPage>
+                            <BreadcrumbPage><Link to={`/explore`}>Course</Link></BreadcrumbPage>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator/>
                         <BreadcrumbItem>
