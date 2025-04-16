@@ -61,7 +61,7 @@ function CourseQuiz() {
                 console.log(res.data);
                 const video = res.data.data?.results?.[0]
                 setCourseQuizDetail(video);
-                setCourseTopicContent(courseList?.courseTopic?.find(a => a.courseTopicId == video.courseTopicId)?.courseTopicContent?.find(a => a.contentId == video.courseVideoId && a.courseTopicContentType == 'CourseVideo'))
+                setCourseTopicContent(courseList?.courseTopic?.find(a => a.courseTopicId == video.courseTopicId)?.courseTopicContent?.find(a => a.contentId == video.courseQuizId && a.courseTopicContentType == 'CourseQuiz'))
             })
             .catch((err) => {
                 console.log(err);
@@ -146,7 +146,7 @@ function CourseQuiz() {
             navigate(`/course/${context?.courseTopicId}/video/${context?.contentId}`);
         } else if (context.courseTopicContentType == 'CourseWritten') {
             navigate(`/course/${context?.courseTopicId}/doc/${context?.contentId}`);
-        }  else if (context.courseTopicContentType == 'CourseVideo') {
+        }  else if (context.courseTopicContentType == 'CourseQuiz') {
             navigate(`/course/${context?.courseTopicId}/quiz/${context?.contentId}`);
         }
     }

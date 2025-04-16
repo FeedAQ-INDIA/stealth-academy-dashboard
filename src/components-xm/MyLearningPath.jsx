@@ -82,15 +82,18 @@ import axiosConn from "@/axioscon.js";
 import {toast} from "@/components/hooks/use-toast.js";
 import {Link} from "react-router-dom";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
+import {useCourse} from "@/components-xm/CourseContext.jsx";
 
 
 export function MyLearningPath() {
 
-  const {userDetail} = useAuthStore()
+  const {userDetail,  userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore()
   const [totalCount, setTotalCount] = useState(0);
   const [limit, setLimit] = useState(10);
   const [offset, setOffset] = useState(0);
   const [courseList, setCourseList] = useState({});
+
+
   const [apiQuery, setApiQuery] = useState({
     limit: limit, offset: offset, getThisData: {
       datasource: "User",  attributes: [], where : {userId: userDetail?.userId},
@@ -133,6 +136,8 @@ export function MyLearningPath() {
             title: 'Disrollment is successfull'
           });
           fetchCourses()
+          fetchUserEnrolledCourseIdList(userDetail.userId)
+
         })
         .catch((err) => {
           console.log(err);
@@ -277,9 +282,9 @@ export function MyLearningPath() {
                 <Alert>   <Terminal className="h-4 w-4" />
                   <div className="flex flex-row md:flex-row flex-wrap gap-2 items-center">
                     <div>
-                      <AlertTitle>No Enrollment found</AlertTitle>
+                      <AlertTitle>No Completions found</AlertTitle>
                       <AlertDescription>
-                        <p>You are not enrolled in any course</p>
+                        <p>You have not completed in any course</p>
 
                       </AlertDescription>
                     </div>

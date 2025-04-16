@@ -89,8 +89,7 @@ function CourseOverview() {
                             </CardTitle>
                         </div>
                         <div className="ml-auto ">
-                            <Link to={`/course/${CourseId}/quiz/1`}>QUIZ</Link>
-                            {isUserEnrolledAlready?
+                             {isUserEnrolledAlready?
                                 <Button onClick={()=> disroll()}>LEAVE COURSE</Button>  :
                                 <Button onClick={()=> enroll()}>START COURSE</Button>
                             }

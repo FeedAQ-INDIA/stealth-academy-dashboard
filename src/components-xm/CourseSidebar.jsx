@@ -38,6 +38,7 @@ function CourseSidebar() {
     const contentUrlMap = {
         'CourseVideo' :  'video',
         'CourseWritten' :  'doc',
+        'CourseQuiz' :  'quiz',
     }
 
     useEffect(() => {

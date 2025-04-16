@@ -15,7 +15,7 @@ import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
 
 
 export function Dashboard() {
-    const {userDetail} = useAuthStore()
+    const {userDetail,  userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore()
     const navigate = useNavigate()
 
     const [totalCount, setTotalCount] = useState(0);
@@ -63,8 +63,7 @@ export function Dashboard() {
                     title: 'Disrollment is successfull'
                 });
                 fetchCourses()
-                fetchUserEnrolledCourseIdList(userDetail.userId)
-            })
+             })
             .catch((err) => {
                 console.log(err);
                 toast({
