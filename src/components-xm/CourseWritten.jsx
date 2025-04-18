@@ -18,8 +18,10 @@ import axiosConn from "@/axioscon.js";
 import NotesModule from "@/components-xm/NotesModule.jsx";
 import {toast} from "@/components/hooks/use-toast.js";
 import CreateNotesModule from "@/components-xm/CreateNotesModule.jsx";
+import {useAuthStore} from "@/zustland/store.js";
 
 function CourseWritten() {
+    const { userDetail } = useAuthStore();
 
     const {CourseId, CourseDocId} = useParams();
     const {userEnrollmentObj, userEnrollmentCourseLog, fetchUserEnrollmentData, isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus} = useCourse();
@@ -130,7 +132,8 @@ function CourseWritten() {
             navigate(`/course/${context?.courseTopicId}/video/${context?.contentId}`);
         } else if(context.courseTopicContentType == 'CourseWritten'){
             navigate(`/course/${context?.courseTopicId}/doc/${context?.contentId}`);
-
+        } else if (context.courseTopicContentType == 'CourseQuiz') {
+            navigate(`/course/${context?.courseTopicId}/quiz/${context?.contentId}`);
         }
     }
 
@@ -237,7 +240,7 @@ function CourseWritten() {
                                        courseTopicId={courseVideoDetail.courseTopicId}/>
                 </section>
             
-                <NotesModule refreshTrigger={triggerNotesRefresh}  courseId={courseList.courseId}
+                <NotesModule refreshTrigger={triggerNotesRefresh}  courseId={courseList.courseId} userDetail={userDetail.userId}
                              courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.courseTopicContentId}
                              courseTopicId={courseVideoDetail.courseTopicId}/>
             </div>

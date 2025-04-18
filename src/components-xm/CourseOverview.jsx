@@ -23,9 +23,12 @@ import {Link, useParams} from "react-router-dom";
 import {toast} from "@/components/hooks/use-toast.js";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
+import {useAuthStore} from "@/zustland/store.js";
+import NotesModule from "@/components-xm/NotesModule.jsx";
 function CourseOverview() {
     const {CourseId} = useParams();
     const { userEnrollmentCourseLog, isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus } = useCourse();
+    const { userDetail } = useAuthStore();
 
     const {
         state, open, setOpen, openMobile, setOpenMobile, isMobile, toggleSidebar
@@ -40,7 +43,34 @@ function CourseOverview() {
 
     }, [isUserEnrolledAlready]);
 
+    useEffect(() => {
+        fetchNotes();
+    }, []);
 
+    const [notesList, setNotesList] = useState([]);
+
+    const fetchNotes = () => {
+        axiosConn
+            .post(import.meta.env.VITE_API_URL + "/searchCourse", {
+                limit: 10, offset: 0, getThisData: {
+                    datasource: "Notes", attributes: [], where: {courseId: CourseId, userId : userDetail.userId},
+                },
+            })
+            .then((res) => {
+                console.log(res.data);
+                const notes = res.data.data?.results
+                setNotesList(notes);
+             })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
+    const [triggerNotesRefresh, setTriggerNotesRefresh] = useState(false);
+
+    const handleNotesSave = () => {
+        setTriggerNotesRefresh(prev => !prev);
+    };
 
     return (
         <>
@@ -200,6 +230,23 @@ function CourseOverview() {
                         </CardContent>
                     </Card>
 
+                </section>
+
+                <section className="my-4">
+                    <Card className="border-0 bg-muted/50">
+                        <CardHeader>
+                            <CardTitle className="">
+                                Notes
+                            </CardTitle>
+
+                        </CardHeader>
+                        <CardContent>
+                            <div>
+
+                                <NotesModule refreshTrigger={triggerNotesRefresh} courseId={courseList.courseId} userId={userDetail.userId} />
+                            </div>
+                        </CardContent>
+                    </Card>
                 </section>
             </div>
 

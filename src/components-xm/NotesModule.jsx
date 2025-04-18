@@ -31,7 +31,7 @@ import {
 import {Card, CardHeader} from "@/components/ui/card.jsx";
 
 
-function NotesModule({courseId, courseTopicId, courseTopicContentId, refreshTrigger}) {
+function NotesModule({userId, courseId, courseTopicId, courseTopicContentId, refreshTrigger}) {
 
     const {isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus} = useCourse();
 
@@ -68,7 +68,7 @@ function NotesModule({courseId, courseTopicId, courseTopicContentId, refreshTrig
         axiosConn
             .post(import.meta.env.VITE_API_URL+"/searchCourse", {
                 limit: 10, offset: 0, getThisData: {
-                    datasource: "Notes", attributes: [], where: {courseTopicContentId: courseTopicContentId},
+                    datasource: "Notes", attributes: [], where: {courseTopicContentId: courseTopicContentId, userId:userId},
                 },
             })
             .then((res) => {

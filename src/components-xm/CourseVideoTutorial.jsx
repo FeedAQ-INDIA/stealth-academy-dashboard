@@ -8,7 +8,7 @@ import {
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.jsx";
 import {Card, CardHeader, CardTitle} from "@/components/ui/card.jsx";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useRef} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
 import {Check, MessageCircle} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
@@ -21,9 +21,11 @@ import {Input} from "@/components/ui/input.jsx";
 import {Textarea} from "@/components/ui/textarea.jsx";
 import {Label} from "@/components/ui/label.jsx";
 import CreateNotesModule from "@/components-xm/CreateNotesModule.jsx";
+import {useAuthStore} from "@/zustland/store.js";
+import YouTubePlayer from "@/components-xm/YoutubePlayer.jsx";
 
 function CourseVideoTutorial() {
-
+    const { userDetail } = useAuthStore();
     const {CourseId, CourseVideoId} = useParams();
     const {
         userEnrollmentLog,
@@ -45,6 +47,7 @@ function CourseVideoTutorial() {
             fetchCourseVideo();
         }
     }, [courseList, userEnrollmentObj, CourseVideoId]);
+    const  [playerRefresh, setPlayerRefresh] = useState(false);
 
     const fetchCourseVideo = () => {
         axiosConn
@@ -58,6 +61,7 @@ function CourseVideoTutorial() {
                 const video = res.data.data?.results?.[0]
                 setCourseVideoDetail(video);
                 setCourseTopicContent(courseList?.courseTopic?.find(a => a.courseTopicId == video.courseTopicId)?.courseTopicContent?.find(a => a.contentId == video.courseVideoId && a.courseTopicContentType == 'CourseVideo'))
+                setPlayerRefresh(!playerRefresh)
             })
             .catch((err) => {
                 console.log(err);
@@ -142,7 +146,8 @@ function CourseVideoTutorial() {
             navigate(`/course/${context?.courseTopicId}/video/${context?.contentId}`);
         } else if(context.courseTopicContentType == 'CourseWritten'){
             navigate(`/course/${context?.courseTopicId}/doc/${context?.contentId}`);
-
+        } else if (context.courseTopicContentType == 'CourseQuiz') {
+            navigate(`/course/${context?.courseTopicId}/quiz/${context?.contentId}`);
         }
     }
 
@@ -152,6 +157,8 @@ function CourseVideoTutorial() {
         setTriggerNotesRefresh(prev => !prev);
     };
     const [isOpen, setIsOpen] = useState(false);
+
+
 
     return (
         <>
@@ -235,14 +242,17 @@ function CourseVideoTutorial() {
                                     {/* Video container */}
                                     <div className="w-full md:col-span-2">
                                         <div className="w-full aspect-video">
-                                            <iframe
-                                                id="player"
-                                                src={`https://www.youtube.com/embed/${courseVideoDetail?.courseVideoUrl}?enablejsapi=1`}
-                                                className="w-full h-full shadow-md"
-                                                frameBorder="0"
-                                                allow="autoplay; encrypted-media"
-                                                allowFullScreen
-                                            ></iframe>
+                                            {/*<iframe*/}
+                                            {/*    id={`${courseVideoDetail.courseVideoId}`}*/}
+                                            {/*    src={`https://www.youtube.com/embed/${courseVideoDetail?.courseVideoUrl}?enablejsapi=1`}*/}
+                                            {/*    className="w-full h-full shadow-md"*/}
+                                            {/*    frameBorder="0"*/}
+                                            {/*    allow="autoplay; encrypted-media"*/}
+                                            {/*    allowFullScreen*/}
+                                            {/*></iframe>*/}
+                                                      <YouTubePlayer saveUserEnrollmentData={saveUserEnrollmentData} playerRefresh={playerRefresh} videoId={courseVideoDetail?.courseVideoUrl} playerId={`player-${courseVideoDetail?.courseVideoId}`} />
+
+
                                         </div>
                                     </div>
 
@@ -264,7 +274,7 @@ function CourseVideoTutorial() {
 
                     </section>
 
-                    <NotesModule refreshTrigger={triggerNotesRefresh} courseId={courseList.courseId}
+                    <NotesModule refreshTrigger={triggerNotesRefresh} courseId={courseList.courseId} userId={userDetail.userId}
                                  courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}
                                  courseTopicId={courseVideoDetail.courseTopicId}/>
                 </div>
