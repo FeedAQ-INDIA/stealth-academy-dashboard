@@ -180,7 +180,7 @@ function CourseVideoTutorial() {
                             <BreadcrumbSeparator/>
                             <BreadcrumbItem>
                                 <BreadcrumbPage
-                                    className="truncate max-w-[30ch]">{courseVideoDetail?.courseVideoTitle}</BreadcrumbPage>
+                                    className="truncate max-w-[30ch]">{courseTopicContent?.courseTopicContentTitle}</BreadcrumbPage>
                             </BreadcrumbItem>
 
                         </BreadcrumbList>
@@ -216,7 +216,7 @@ function CourseVideoTutorial() {
                         </div>
                         <div className=" flex  items-center gap-2 ">
                             <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold ">
-                                {courseVideoDetail?.courseVideoTitle}
+                                {courseTopicContent?.courseTopicContentTitle}
                             </CardTitle>
 
                             <div className="ml-auto">
@@ -257,7 +257,7 @@ function CourseVideoTutorial() {
                                     </div>
 
                                     {/* Notes container */}
-                                    <div className="w-full  p-4 border flex flex-col shadow-md">
+                                    <div className="w-full flex flex-col ">
                                         <Label className="mb-4">Create Notes</Label>
                                         <div className="w-full flex flex-col h-full">
                                             <CreateNotesModule handleNotesSave={handleNotesSave}  courseId={courseList.courseId}

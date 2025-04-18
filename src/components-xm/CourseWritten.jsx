@@ -224,20 +224,26 @@ function CourseWritten() {
 
                     <div className=" ">
 
-
-                        <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
-{courseVideoDetail?.courseWrittenHtmlContent}</pre>
+               <p   >
+                        {courseVideoDetail?.courseWrittenHtmlContent}
+ </p>
+{/*                        <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>*/}
+{/*{courseVideoDetail?.courseWrittenHtmlContent}</pre>*/}
 
                     </div>
 
 
                 </section>
-                <Separator className="my-8"/>
-                <section className="my-4 ">
-                    <h1 className="text-lg   font-medium mb-2">Create Notes</h1>
-                    <CreateNotesModule handleNotesSave={handleNotesSave} courseId={courseList.courseId}
-                                       courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.courseTopicContentId}
-                                       courseTopicId={courseVideoDetail.courseTopicId}/>
+                 <section className="mt-8">
+                    <Card className="rounded-none bg-muted/50">
+                        <CardHeader>
+                            <h1 className="text-lg   font-medium mb-2">Create Notes</h1>
+                            <CreateNotesModule handleNotesSave={handleNotesSave} courseId={courseList.courseId}
+                                               courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.courseTopicContentId}
+                                               courseTopicId={courseVideoDetail.courseTopicId}/>
+                        </CardHeader>
+                    </Card>
+
                 </section>
             
                 <NotesModule refreshTrigger={triggerNotesRefresh}  courseId={courseList.courseId} userDetail={userDetail.userId}

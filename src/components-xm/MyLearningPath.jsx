@@ -9,6 +9,7 @@ import axiosConn from "@/axioscon.js";
 import {toast} from "@/components/hooks/use-toast.js";
 import {Link} from "react-router-dom";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
+import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
 
 
 export function MyLearningPath() {
@@ -73,6 +74,21 @@ export function MyLearningPath() {
     }
     return (
         <div className="p-6">
+
+            <Card className="border-0 bg-[#ffdd00]">
+                <CardHeader>
+                    <div className="flex flex-sm justify-items-center gap-4 items-center">
+                        <Avatar className="w-12 h-12">
+                            <AvatarFallback className="text-xl">{userDetail?.nameInitial}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                            <h1 className="text-xl font-medium">Welcome {userDetail?.derivedUserName}</h1>
+                            <p>Member since {userDetail?.created_date}</p>
+                        </div>
+                    </div>
+                </CardHeader>
+            </Card>
+
             <Card className="border-0 bg-muted/50  my-6">
                 <CardHeader>
                     <CardTitle>
