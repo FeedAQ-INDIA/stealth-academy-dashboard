@@ -7,7 +7,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.jsx";
-import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card.jsx";
+import {Card, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
 import {Check} from "lucide-react";
@@ -15,10 +15,10 @@ import {Button} from "@/components/ui/button.jsx";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
-import NotesModule from "@/components-xm/NotesModule.jsx";
 import {toast} from "@/components/hooks/use-toast.js";
-import CreateNotesModule from "@/components-xm/CreateNotesModule.jsx";
 import {Checkbox} from "@/components/ui/checkbox.jsx";
+import QuizRender from "@/components-xm/QuizRender.jsx";
+import {useAuthStore} from "@/zustland/store.js";
 
 function CourseQuiz() {
 
@@ -33,6 +33,7 @@ function CourseQuiz() {
         disroll,
         enrollStatus
     } = useCourse();
+    const { userDetail } = useAuthStore();
 
     const [courseQuizDetail, setCourseQuizDetail] = useState({});
     const [courseTopicContent, setCourseTopicContent] = useState({});
@@ -48,13 +49,7 @@ function CourseQuiz() {
         axiosConn
             .post(import.meta.env.VITE_API_URL + "/searchCourse", {
                 limit: 10, offset: 0, getThisData: {
-                    datasource: "CourseQuiz", attributes: [], where: {courseQuizId: CourseQuizId},
-                    include:[
-                        {
-                            datasource: "QuizQuestion",
-                            as: "quizquestion"
-                        }
-                    ]
+                    datasource: "CourseQuiz", attributes: [], where: {courseQuizId: CourseQuizId}
                 },
             })
             .then((res) => {
@@ -62,11 +57,13 @@ function CourseQuiz() {
                 const video = res.data.data?.results?.[0]
                 setCourseQuizDetail(video);
                 setCourseTopicContent(courseList?.courseTopic?.find(a => a.courseTopicId == video.courseTopicId)?.courseTopicContent?.find(a => a.contentId == video.courseQuizId && a.courseTopicContentType == 'CourseQuiz'))
+                console.log(courseList?.courseTopic?.find(a => a.courseTopicId == video.courseTopicId)?.courseTopicContent?.find(a => a.contentId == video.courseQuizId && a.courseTopicContentType == 'CourseQuiz'))
             })
             .catch((err) => {
                 console.log(err);
             });
     }
+
 
 
     const saveUserEnrollmentData = () => {
@@ -146,11 +143,12 @@ function CourseQuiz() {
             navigate(`/course/${context?.courseTopicId}/video/${context?.contentId}`);
         } else if (context.courseTopicContentType == 'CourseWritten') {
             navigate(`/course/${context?.courseTopicId}/doc/${context?.contentId}`);
-        }  else if (context.courseTopicContentType == 'CourseQuiz') {
+        } else if (context.courseTopicContentType == 'CourseQuiz') {
             navigate(`/course/${context?.courseTopicId}/quiz/${context?.contentId}`);
         }
     }
 
+    const [isQuizStarted, setIsQuizStarted] = useState(false);
 
 
     return (
@@ -172,7 +170,7 @@ function CourseQuiz() {
                         <BreadcrumbSeparator/>
                         <BreadcrumbItem>
                             <BreadcrumbPage
-                                className="truncate max-w-[30ch]">{courseQuizDetail?.courseQuizTitle}</BreadcrumbPage>
+                                className="truncate max-w-[30ch]">{courseTopicContent?.courseTopicContentTitle}</BreadcrumbPage>
                         </BreadcrumbItem>
 
                     </BreadcrumbList>
@@ -209,7 +207,7 @@ function CourseQuiz() {
                     </div>
                     <div className=" flex  items-center gap-2 ">
                         <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold ">
-                            {courseQuizDetail?.courseQuizTitle}
+                            {courseTopicContent?.courseTopicContentTitle}
                         </CardTitle>
                         <div className="ml-auto">
                             {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0 ?
@@ -234,51 +232,7 @@ function CourseQuiz() {
 
 
                 <section className="my-4 ">
-
-                    <Card className=" ">
-
-                        <CardHeader>
-                            <CardTitle className="text-base">What type of language is java ?</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <ol>
-                                <li className="flex items-center space-x-4 my-4">
-                                    <Checkbox id="terms" />
-                                    <label
-                                        htmlFor="terms"
-                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                    >
-                                        Accept terms and conditions
-                                    </label>
-                                 </li>
-                                <li className="flex items-center space-x-4  my-4">
-                                    <Checkbox id="terms" />
-                                    <label
-                                        htmlFor="terms"
-                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                    >
-                                        Accept terms and conditions
-                                    </label>
-                                </li>
-                                <li className="flex items-center space-x-4  my-4">
-                                    <Checkbox id="terms" />
-                                    <label
-                                        htmlFor="terms"
-                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                    >
-                                        Accept terms and conditions
-                                    </label>
-                                </li>
-                            </ol>
-                        </CardContent>
-                        <CardFooter className="flex gap-2">
-                            <Button size="sm">Prev</Button>
-                            <Button size="sm">Next</Button>
-                            <Button size="sm">Submit</Button>
-                        </CardFooter>
-                    </Card>
-
-
+                    <QuizRender saveUserEnrollmentData={saveUserEnrollmentData}/>
                 </section>
 
             </div>

@@ -243,8 +243,7 @@ function CourseOverview() {
                         <CardContent>
                             <div>
 
-                                <NotesModule refreshTrigger={triggerNotesRefresh} courseId={courseList.courseId} userId={userDetail.userId} />
-                            </div>
+                             </div>
                         </CardContent>
                     </Card>
                 </section>
