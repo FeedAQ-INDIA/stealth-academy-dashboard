@@ -32,7 +32,7 @@ function CourseSidebar() {
 
     const [data, setData] = useState(null);
 
-    const {userEnrollmentCourseLog, isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus,identifyContentTypeIcons} = useCourse();
+    const {userEnrollmentObj, userEnrollmentCourseLog, isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus,identifyContentTypeIcons} = useCourse();
 
 
     const contentUrlMap = {
@@ -63,7 +63,7 @@ function CourseSidebar() {
             setData({
                 navMain: [
                     {
-                        title: "", url: "#", items: [{
+                        title: `COURSE STATUS - ${userEnrollmentObj?.enrollmentStatus  || ''}` , url: "#", items: [{
                             title: "OVERVIEW",
                             url: `/course/${courseList?.courseId}`,
                             isClickable: true,
@@ -85,13 +85,10 @@ function CourseSidebar() {
             <SidebarHeader>
                 <h2 className="text-lg font-medium   line-clamp-1">{courseList?.courseTitle} </h2>
                 <div className=" ">
-                    {/*<div className="flex gap-2 items-center text-sm my-2">*/}
-                    {/*    <Clock*/}
-                    {/*        size={18}/> {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}*/}
-                    {/*</div>*/}
-                    {/*<div className="flex gap-2 items-center text-sm mt-2">*/}
-                    {/*    <Loader size={18}/> 10 % Completed*/}
-                    {/*</div>*/}
+                    {/*{userEnrollmentObj?.enrollmentStatus  ?*/}
+                    {/*    <Badge  className="animate-blink bg-blue-600 text-white"  variant="outline">*/}
+                    {/*        {userEnrollmentObj?.enrollmentStatus}</Badge>*/}
+                    {/*    : <></>}*/}
                 </div>
             </SidebarHeader>
             <Separator/>

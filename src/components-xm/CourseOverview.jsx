@@ -27,7 +27,7 @@ import {useAuthStore} from "@/zustland/store.js";
 import NotesModule from "@/components-xm/NotesModule.jsx";
 function CourseOverview() {
     const {CourseId} = useParams();
-    const { userEnrollmentCourseLog, isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus } = useCourse();
+    const { userEnrollmentObj,userEnrollmentCourseLog, isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus } = useCourse();
     const { userDetail } = useAuthStore();
 
     const {
@@ -80,14 +80,14 @@ function CourseOverview() {
                 <Breadcrumb>
                     <BreadcrumbList>
 
-                        <BreadcrumbItem>
-                            <BreadcrumbPage><Link to={`/explore`}>Course</Link></BreadcrumbPage>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator/>
-                        <BreadcrumbItem>
-                            <BreadcrumbPage className="truncate max-w-[30ch]"  title={courseList?.courseTitle}>{courseList?.courseTitle}</BreadcrumbPage>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator/>
+                        {/*<BreadcrumbItem>*/}
+                        {/*    <BreadcrumbPage><Link to={`/explore`}>Course</Link></BreadcrumbPage>*/}
+                        {/*</BreadcrumbItem>*/}
+                        {/*<BreadcrumbSeparator/>*/}
+                        {/*<BreadcrumbItem>*/}
+                        {/*    <BreadcrumbPage className="truncate max-w-[30ch]"  title={courseList?.courseTitle}>{courseList?.courseTitle}</BreadcrumbPage>*/}
+                        {/*</BreadcrumbItem>*/}
+                        {/*<BreadcrumbSeparator/>*/}
                         <BreadcrumbItem>
                             <BreadcrumbPage className="truncate max-w-[30ch]"  >Overview</BreadcrumbPage>
                         </BreadcrumbItem>
@@ -97,41 +97,44 @@ function CourseOverview() {
 
                 </div>
             </header>
-            <Card className="rounded-none bg-muted/50 border-none">
-                <CardHeader>
+
+            <div className="p-4">
+                <Card className="rounded-none bg-muted/50 border-none">
+                    <CardHeader>
 
 
-                    <div className="flex flex-wrap gap-2 w-full mb-3">
-                        <Badge className="animate-blink bg-green-600 text-white">FREE</Badge>
-
-                        <Badge variant="outline">Course</Badge>
-                        <Badge variant="outline">                                     {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}
-                        </Badge>
-                        {/*<Badge className="flex gap-1" variant="outline">                                    < CircleDollarSign size={18}/> {courseList?.courseCost == 0 ? 'Free' : 'Rs.'+courseList?.courseCost+'/-'}*/}
-                        {/*</Badge>*/}
-                        <Badge variant="outline"> {courseList?.courseLevel}
-                        </Badge>
-                    </div>
-                    <div  className="flex flex-wrap gap-2 w-full mb-3 items-center">
-                        <div className=" ">
-                            <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold">
-                                {courseList?.courseTitle}
-                            </CardTitle>
+                        <div className="flex flex-wrap gap-2 w-full mb-3">
+                            <Badge className="animate-blink bg-green-600 text-white">FREE</Badge>
+                            {userEnrollmentObj?.enrollmentStatus  ?
+                                <Badge  className="animate-blink bg-blue-600 text-white"  variant="outline">
+                                    {userEnrollmentObj?.enrollmentStatus}</Badge>
+                                : <></>}
+                            <Badge variant="outline">Course</Badge>
+                            <Badge variant="outline">                                     {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}
+                            </Badge>
+                            {/*<Badge className="flex gap-1" variant="outline">                                    < CircleDollarSign size={18}/> {courseList?.courseCost == 0 ? 'Free' : 'Rs.'+courseList?.courseCost+'/-'}*/}
+                            {/*</Badge>*/}
+                            <Badge variant="outline"> {courseList?.courseLevel}
+                            </Badge>
                         </div>
-                        <div className="ml-auto ">
-                             {isUserEnrolledAlready?
-                                <Button onClick={()=> disroll()}>LEAVE COURSE</Button>  :
-                                <Button onClick={()=> enroll()}>START COURSE</Button>
-                            }
+                        <div  className="flex flex-wrap gap-2 w-full mb-3 items-center">
+                            <div className=" ">
+                                <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold">
+                                    {courseList?.courseTitle}
+                                </CardTitle>
+                            </div>
+                            <div className="ml-auto ">
+                                {isUserEnrolledAlready?
+                                    <Button onClick={()=> disroll()}>LEAVE COURSE</Button>  :
+                                    <Button onClick={()=> enroll()}>START COURSE</Button>
+                                }
+                            </div>
                         </div>
-                    </div>
 
-                </CardHeader>
+                    </CardHeader>
 
 
-            </Card>
-            <div className="p-6">
-
+                </Card>
                 {/*<section>*/}
                 {/*    <Card className="border-0 bg-[#ffdd00]">*/}
                 {/*        <CardHeader>*/}

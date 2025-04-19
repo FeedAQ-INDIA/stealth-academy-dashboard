@@ -205,6 +205,7 @@ export function Explore() {
     }
 
 
+
     return (
         <div className="p-6">
             <div className=" items-center justify-items-center">
@@ -232,12 +233,14 @@ export function Explore() {
                 </Card>
 
                 <div className="my-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-10 items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 my-10 items-center">
                         {courseList?.map(a => (<Card className=" border shadow-sm hover:shadow-md cursor-pointer ">
                                 <CardHeader>
                                     {/* Badge row - wraps on smaller screens */}
                                     <div className="flex flex-wrap gap-2 w-full mb-3">
                                         <Badge className="animate-blink bg-green-600 text-white">FREE</Badge>
+                                        {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId) ?   <Badge  className="animate-blink bg-blue-600 text-white"  variant="outline">{userEnrolledCourseIdList?.find(m => m.courseId == a.courseId)?.enrollmentStatus }</Badge>
+                                        : <></>}
                                         <Badge variant="outline">Course</Badge>
                                         <Badge variant="outline">Beginner</Badge>
                                     </div>
@@ -263,9 +266,13 @@ export function Explore() {
                                 </CardContent>
 
                                 <CardFooter className="flex w-full flex-wrap gap-2">
-                                    {userEnrolledCourseIdList.includes(a?.courseId)?
+                                    {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId && (m.enrollmentStatus != 'COMPLETED' && m.enrollmentStatus != 'CERTIFIED')) ?
                                         <Button className=" flex-1 " variant="destructive"
                                                 onClick={() => disroll(a?.courseId)}>Leave Course</Button> :<></>}
+                                    {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId && ( m.enrollmentStatus == 'CERTIFIED')) ?
+                                        <Button className=" flex-1 " variant="outline"
+                                                >Download Certificate</Button> :<></>}
+
                                     <Link to={`/course/${a?.courseId}`} className="  flex-1 "><Button
                                         className="  w-full ">Learn More</Button>
                                     </Link>

@@ -99,10 +99,10 @@ export function MyLearningPath() {
                 </CardHeader>
                 <CardContent>
                     <div className="my-2">
-                        {courseList?.courses?.length > 0 ?
+                        {courseList?.courses?.filter(a => a.user_enrollment?.enrollmentStatus!= 'COMPLETED' && a.user_enrollment?.enrollmentStatus!= 'CERTIFIED')?.length > 0 ?
 
                             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-10 items-center">
-                                {courseList?.courses?.map(a => (
+                                {courseList?.courses?.filter(a =>  a.user_enrollment?.enrollmentStatus!= 'COMPLETED' && a.user_enrollment?.enrollmentStatus!= 'CERTIFIED')?.map(a => (
                                     <Card className=" border shadow-sm hover:shadow-md cursor-pointer ">
                                         <CardHeader>
                                             {/* Badge row - wraps on smaller screens */}
@@ -181,14 +181,14 @@ export function MyLearningPath() {
                 </CardHeader>
                 <CardContent>
                     <div className="my-2">
-                        {courseList?.courses?.filter(a => a.user_enrollment?.enrollment_status == 'COMPLETED')?.length > 0 ?
+                        {courseList?.courses?.filter(a => a.user_enrollment?.enrollmentStatus == 'COMPLETED')?.length > 0 ?
 
                             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-10 items-center">
-                                {courseList?.courses?.filter(a => a.user_enrollment?.enrollment_status == 'COMPLETED')?.map(a => (
+                                {courseList?.courses?.filter(a => a.user_enrollment?.enrollmentStatus == 'COMPLETED')?.map(a => (
                                     <Card className=" border shadow-sm hover:shadow-md cursor-pointer ">
                                     <CardHeader>
                                     <div className="flex flex-wrap gap-2 w-full mb-3">
-                                    <Badge className="animate-blink bg-green-600 text-white">CERTIFIED</Badge>
+                                    <Badge className="animate-blink bg-green-600 text-white">{a.user_enrollment?.enrollmentStatus}</Badge>
 
                                     </div>
 
@@ -210,8 +210,9 @@ export function MyLearningPath() {
 
 
                 <CardFooter className="flex w-full flex-wrap gap-2">
-                    <Button className=" flex-1 " variant="outline"
-                    >Download Certificate</Button>
+                    {a.user_enrollment?.enrollmentStatus=='CERTIFIED' ?<Button className=" flex-1 " variant="outline"
+                    >Download Certificate</Button> : <></>}
+
                     <Link to={`/course/${a?.courseId}`} className="  flex-1 "><Button
                         className="  w-full ">Learn More</Button>
                     </Link>

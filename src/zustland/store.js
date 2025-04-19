@@ -31,11 +31,11 @@ export const useAuthStore = create((set) => ({
                 const res = await axiosConn.post(import.meta.env.VITE_API_URL+"/searchCourse",
                     {
                         limit: 10, offset: 0, getThisData: {
-                            datasource: "UserEnrollment",  attributes: ["courseId"], where : {userId:  userId},
+                            datasource: "UserEnrollment",  attributes: ["courseId", "enrollmentStatus"], where : {userId:  userId},
                         },
                     });
                 console.log( res.data?.data?.results?.map(a => a.courseId));
-                set({ userEnrolledCourseIdList: res.data?.data?.results?.map(a => a.courseId), loading: false });  // Set loading to false after fetch
+                set({ userEnrolledCourseIdList: res.data?.data?.results, loading: false });  // Set loading to false after fetch
             } catch (error) {
                 console.error("Error fetching user details:", error);
                 set({ loading: false });  // Set loading to false even on error

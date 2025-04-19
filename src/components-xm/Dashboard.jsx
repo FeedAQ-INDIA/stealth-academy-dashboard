@@ -121,9 +121,9 @@ export function Dashboard() {
                 </CardHeader>
                 <CardContent>
                     <div className="my-2">
-                        {courseList?.courses?.length>0 ?
+                        {courseList?.courses?.filter(a => a.user_enrollment?.enrollmentStatus!= 'COMPLETED' && a.user_enrollment?.enrollmentStatus!= 'CERTIFIED')?.length > 0 ?
                         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-10 items-center">
-                            {courseList?.courses?.map(a => (
+                            {courseList?.courses?.filter(a =>  a.user_enrollment?.enrollmentStatus!= 'COMPLETED' && a.user_enrollment?.enrollmentStatus!= 'CERTIFIED')?.map(a => (
                                 <Card className=" border shadow-sm hover:shadow-md cursor-pointer ">
                                     <CardHeader>
                                         {/* Badge row - wraps on smaller screens */}
