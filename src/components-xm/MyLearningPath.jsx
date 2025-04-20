@@ -91,9 +91,12 @@ export function MyLearningPath() {
 
             <Card className="border-0 bg-muted/50  my-6">
                 <CardHeader>
-                    <CardTitle>
-                        My Enrolled Courses
-                    </CardTitle>
+                    <CardTitle className="flex gap-2">
+                        My Enrolled Content
+                        {  courseList?.courses?.filter(a => a.user_enrollment?.enrollmentStatus!= 'COMPLETED' && a.user_enrollment?.enrollmentStatus!= 'CERTIFIED')?.length > 0 ?
+                            <Badge variant="secondary">{courseList?.courses?.filter(a => a.user_enrollment?.enrollmentStatus!= 'COMPLETED' && a.user_enrollment?.enrollmentStatus!= 'CERTIFIED')?.length}</Badge> : <></>
+                        }
+                        </CardTitle>
 
 
                 </CardHeader>
@@ -173,8 +176,10 @@ export function MyLearningPath() {
 
             <Card className="border-0 bg-muted/50  my-6">
                 <CardHeader>
-                    <CardTitle>
-                        My Completions
+                    <CardTitle  className="flex gap-2">
+                        My Completions       { courseList?.courses?.filter(a => a.user_enrollment?.enrollmentStatus == 'COMPLETED')?.length > 0 ?
+                        <Badge variant="secondary">{courseList?.courses?.filter(a => a.user_enrollment?.enrollmentStatus == 'COMPLETED')?.length}</Badge> : <></>
+                    }
                     </CardTitle>
 
 

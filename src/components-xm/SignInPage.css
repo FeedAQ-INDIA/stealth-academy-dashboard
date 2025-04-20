@@ -1,0 +1,40 @@
+.watermark-bg::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 200%;
+    background-image: repeating-linear-gradient(
+            -45deg,
+            rgba(0, 0, 0, 0.03) 0,
+            rgba(0, 0, 0, 0.03) 1px,
+            transparent 1px,
+            transparent 40px
+    ),
+    repeating-linear-gradient(
+            -45deg,
+            transparent 0,
+            transparent 10px,
+            rgba(0, 0, 0, 0.03) 10px,
+            rgba(0, 0, 0, 0.03) 11px
+    );
+    background-size: 150px 150px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.watermark-text::after {
+    content: "FeedAQ  FeedAQ  FeedAQ  FeedAQ  FeedAQ  FeedAQ  FeedAQ  FeedAQ  FeedAQ  FeedAQ";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: rotate(-30deg) translate(-50%, -50%);
+    font-size: 4rem;
+    font-weight: bold;
+    font-family: 'Anta', sans-serif;
+    color: rgba(0, 0, 0, 0.03);
+    white-space: nowrap;
+    z-index: 0;
+    pointer-events: none;
+}

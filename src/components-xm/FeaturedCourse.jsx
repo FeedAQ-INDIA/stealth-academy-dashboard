@@ -11,7 +11,7 @@ import axiosConn from "@/axioscon.js";
 import {useAuthStore} from "@/zustland/store.js";
 import {toast} from "@/components/hooks/use-toast.js";
 
-export function Explore() {
+export function FeaturedCourse() {
     const navigate = useNavigate()
     const [totalCount, setTotalCount] = useState(0);
     const [limit, setLimit] = useState(10);
@@ -207,40 +207,19 @@ export function Explore() {
 
 
     return (
-        <div className="p-6">
+        <div className=" ">
+
             <div className=" items-center justify-items-center">
-                <Card className="border-0 w-full bg-muted/50  my-6 py-6 ">
-                    <CardHeader>
-                        <CardTitle className="text-center">
-                            What would you like to learn today ?
-                        </CardTitle>
 
-
-                    </CardHeader>
-                    <CardContent>
-                        <div className="my-2">
-                            <div className="flex gap-2 w-full md:w-3/4 lg:w-1/2 mx-auto items-center">
-                                <Input type="text" placeholder="What do you want to learn today ?"
-                                       value={exploreCourseText}  onChange={(e) => {
-                                    const value = e.target.value;
-                                    setExploreCourseText(value);
-                                }}
-                                     />
-                                {/*<Button type="submit"><Search/></Button>*/}
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <div className="my-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 my-10 items-center">
+                <div className=" ">
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 my-4 items-center">
                         {courseList?.map(a => (<Card className=" border shadow-sm hover:shadow-md cursor-pointer ">
                                 <CardHeader>
                                     {/* Badge row - wraps on smaller screens */}
                                     <div className="flex flex-wrap gap-2 w-full mb-3">
                                         <Badge className="animate-blink bg-green-600 text-white">FREE</Badge>
                                         {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId) ?   <Badge  className="animate-blink bg-blue-600 text-white"  variant="outline">{userEnrolledCourseIdList?.find(m => m.courseId == a.courseId)?.enrollmentStatus }</Badge>
-                                        : <></>}
+                                            : <></>}
                                         <Badge variant="outline">Course</Badge>
                                         <Badge variant="outline">Beginner</Badge>
                                     </div>
@@ -271,7 +250,7 @@ export function Explore() {
                                                 onClick={() => disroll(a?.courseId)}>Leave Course</Button> :<></>}
                                     {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId && ( m.enrollmentStatus == 'CERTIFIED')) ?
                                         <Button className=" flex-1 " variant="outline"
-                                                >Download Certificate</Button> :<></>}
+                                        >Download Certificate</Button> :<></>}
 
                                     <Link to={`/course/${a?.courseId}`} className="  flex-1 "><Button
                                         className="  w-full ">Learn More</Button>
@@ -284,7 +263,7 @@ export function Explore() {
                 </div>
 
             </div>
-            {courseList.length > 0 ? <div className="flex flex-row items-center">
+            {courseList.length > 0 ? <div className="flex flex-row items-center ">
                 <div className="text-xs text-muted-foreground">
                     {offset + 1} to {Math.min(offset + limit, totalCount)} of {totalCount} row(s) selected.
                 </div>

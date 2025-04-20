@@ -19,17 +19,23 @@ import {
     AlertDescription,
     AlertTitle,
 } from "@/components/ui/alert"
+import "./SignInPage.css"
+
 function SignInPage() {
 
 
 
     return (
         <div
-            className="min-h-screen w-full flex items-center justify-center bg-cover bg-center px-4"
+            className="min-h-screen w-full flex items-center justify-center bg-cover bg-center px-4  "
 
         >
-            <div className="w-full max-w-md sm:max-w-lg md:max-w-xl p-4">
-                <Card className="w-full p-6 sm:p-8 rounded-none shadow-lg  ">
+
+
+            <div className="  w-full max-w-md sm:max-w-lg md:max-w-xl p-4">
+
+
+                <Card className="w-full p-4 sm:p-8 rounded-none shadow-none md:shadow-lg  border-none md:border ">
                     <CardHeader>
                         <CardTitle className="mb-4 text-center">
                             <a
