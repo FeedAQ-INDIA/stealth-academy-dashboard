@@ -110,10 +110,10 @@ function CourseOverview() {
                                     {userEnrollmentObj?.enrollmentStatus}</Badge>
                                 : <></>}
                             <Badge variant="outline">Course</Badge>
-                            <Badge variant="outline">                                     {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}
+                            <Badge variant="outline">
+                                {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}
                             </Badge>
-                            {/*<Badge className="flex gap-1" variant="outline">                                    < CircleDollarSign size={18}/> {courseList?.courseCost == 0 ? 'Free' : 'Rs.'+courseList?.courseCost+'/-'}*/}
-                            {/*</Badge>*/}
+
                             <Badge variant="outline"> {courseList?.courseLevel}
                             </Badge>
                         </div>
@@ -124,9 +124,11 @@ function CourseOverview() {
                                 </CardTitle>
                             </div>
                             <div className="ml-auto ">
-                                {isUserEnrolledAlready?
+                                {(userEnrollmentObj?.enrollmentStatus != 'CERTIFIED' &&
+                                    userEnrollmentObj?.enrollmentStatus != 'COMPLETED') ?
+                                    (isUserEnrolledAlready?
                                     <Button onClick={()=> disroll()}>LEAVE COURSE</Button>  :
-                                    <Button onClick={()=> enroll()}>START COURSE</Button>
+                                    <Button onClick={()=> enroll()}>START COURSE</Button>) : <></>
                                 }
                             </div>
                         </div>

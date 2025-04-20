@@ -252,7 +252,7 @@ function CourseVideoTutorial() {
                                             {/*    allow="autoplay; encrypted-media"*/}
                                             {/*    allowFullScreen*/}
                                             {/*></iframe>*/}
-                                                      <YouTubePlayer saveUserEnrollmentData={saveUserEnrollmentData} playerRefresh={playerRefresh} videoId={courseVideoDetail?.courseVideoUrl} playerId={`player-${courseVideoDetail?.courseVideoId}`} />
+                                                      <YouTubePlayer   saveUserEnrollmentData={saveUserEnrollmentData} playerRefresh={playerRefresh} videoId={courseVideoDetail?.courseVideoUrl} playerId={`player-${courseVideoDetail?.courseVideoId}`} />
 
 
                                         </div>

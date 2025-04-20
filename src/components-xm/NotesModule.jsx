@@ -29,6 +29,9 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import {Card, CardHeader} from "@/components/ui/card.jsx";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
+import {Terminal} from "lucide-react";
+import {Link} from "react-router-dom";
 
 
 function NotesModule({userId, courseId, courseTopicId, courseTopicContentId, refreshTrigger}) {
@@ -152,35 +155,8 @@ function NotesModule({userId, courseId, courseTopicId, courseTopicContentId, ref
             <Card className="my-8 bg-muted/50 rounded-none border-none">
                 <CardHeader>
                 <h1 className="text-lg   font-medium ">Note Book</h1>
-                {/*<Form {...createNotesForm}>*/}
-                {/*    <form*/}
-                {/*        onSubmit={createNotesForm.handleSubmit(onSubmit)}*/}
-                {/*        className="w-full space-y-6"*/}
-                {/*    >*/}
-                {/*        <div className="grid w-full gap-2 my-4">*/}
-                {/*            <FormField*/}
-                {/*                control={createNotesForm.control}*/}
-                {/*                name="notesText"*/}
-                {/*                render={({field}) => (*/}
-                {/*                    <FormItem>*/}
-                {/*                        <FormControl>*/}
-                {/*                            <Textarea placeholder="Type your notes here." {...field} />*/}
-                {/*                        </FormControl>*/}
-                {/*                        <FormMessage/>*/}
-                {/*                    </FormItem>*/}
-                {/*                )}*/}
-                {/*            />*/}
-                {/*        </div>*/}
-                {/*        <div className="flex gap-2">*/}
-                
-                {/*            <Button size="sm" type="button" onClick={() => createNotesForm.reset()}>*/}
-                {/*                Reset*/}
-                {/*            </Button>*/}
-                {/*            <Button size="sm" type="submit">Save</Button>*/}
-                {/*        </div>*/}
-                {/*    </form>*/}
-                {/*</Form>*/}
 
+                    {notesList.length > 0 ?
                 <ol className="mt-4  ">
                     {notesList.map((a) => (
                         <li className="" key={a.notesId}>
@@ -270,7 +246,19 @@ function NotesModule({userId, courseId, courseTopicId, courseTopicContentId, ref
                     ))}
 
 
-                </ol>
+                </ol> :
+                    <Alert className="my-4">   <Terminal className="h-4 w-4 " />
+                             <div>
+                                <AlertTitle>No Notes Present</AlertTitle>
+                                <AlertDescription>
+                                    <p>You can take down notes</p>
+
+                                </AlertDescription>
+                            </div>
+
+
+
+                    </Alert>}
             </CardHeader>
             </Card>
 

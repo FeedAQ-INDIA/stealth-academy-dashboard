@@ -39,7 +39,8 @@ function CourseSidebar() {
         'CourseVideo' :  'video',
         'CourseWritten' :  'doc',
         'CourseQuiz' :  'quiz',
-    }
+        'ComprehensionReading' :  'comprehension-reading',
+     }
 
     useEffect(() => {
         if (courseList && location.pathname) {
@@ -79,7 +80,7 @@ function CourseSidebar() {
     }, [courseList, location.pathname])
 
     return (<>
-        <Sidebar className="top-[4rem] h-[calc(100svh-4em)]    shadow-md px-0 border-r" style={{borderRadius: '0px', overflowY: 'auto'}}
+        <Sidebar className="top-[4rem] h-[calc(100svh-4em)]    shadow-lg px-0 border-r " style={{borderRadius: '0px', overflowY: 'auto'}}
                  variant="inset">
 
             <SidebarHeader>
@@ -95,7 +96,7 @@ function CourseSidebar() {
             <SidebarContent>
 
 
-                {data?.navMain?.map((item) => (<SidebarGroup key={item?.title}>
+                {data?.navMain?.map((item) => (<SidebarGroup key={item?.title}  className="font-medium text-lg">
                     <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
