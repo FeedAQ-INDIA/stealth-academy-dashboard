@@ -230,7 +230,7 @@ function CourseQuiz() {
                 </Card>
 
                 <section className="my-4 ">
-                    <QuizRender saveUserEnrollmentData={saveUserEnrollmentData}/>
+                    <QuizRender saveUserEnrollmentData={saveUserEnrollmentData} fetchCourseVideo={fetchCourseVideo} deleteUserEnrollmentData={deleteUserEnrollmentData}/>
                 </section>
 
             </div>

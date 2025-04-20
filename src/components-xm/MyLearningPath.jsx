@@ -110,9 +110,10 @@ export function MyLearningPath() {
                                         <CardHeader>
                                             {/* Badge row - wraps on smaller screens */}
                                             <div className="flex flex-wrap gap-2 w-full mb-3">
-                                                <Badge className="animate-blink bg-green-600 text-white">FREE</Badge>
                                                 <Badge variant="outline">Course</Badge>
-                                                <Badge variant="outline">Beginner</Badge>
+                                                <Badge  className="animate-blink bg-blue-600 text-white"  variant="outline">{a.user_enrollment?.enrollmentStatus}</Badge>
+
+                                                {a?.courseTags?.map(i => <Badge variant="outline">{i}</Badge>)}
                                             </div>
 
                                             {/* Title with responsive spacing */}
@@ -195,6 +196,7 @@ export function MyLearningPath() {
                                     <div className="flex flex-wrap gap-2 w-full mb-3">
                                     <Badge className="animate-blink bg-green-600 text-white">{a.user_enrollment?.enrollmentStatus}</Badge>
 
+                                        {a?.courseTags?.map(i => <Badge variant="outline">{i}</Badge>)}
                                     </div>
 
                                     <div className=" ">

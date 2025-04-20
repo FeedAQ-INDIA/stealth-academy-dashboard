@@ -18,14 +18,15 @@ import {
 import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible.jsx";
-import {Check, ChevronRight, Clock, Loader} from "lucide-react";
+import {Check, ChevronRight, CircleChevronLeft, Clock, Loader, SquareArrowLeft} from "lucide-react";
 import {Separator} from "@/components/ui/separator.jsx";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
 import {Badge} from "@/components/ui/badge.jsx";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
+import {Button} from "@/components/ui/button.jsx";
 
 
-function CourseSidebar() {
+function CourseSidebar({...props}) {
     const location = useLocation();
     const navigate = useNavigate();
     const {CourseId} = useParams();
@@ -75,21 +76,25 @@ function CourseSidebar() {
             })
 
         }else{
-            return "Loading..."
+            return  <div>Loading...</div>
         }
-    }, [courseList, location.pathname])
+    }, [courseList,userEnrollmentObj, location.pathname])
 
     return (<>
         <Sidebar className="top-[4rem] h-[calc(100svh-4em)]    shadow-lg px-0 border-r " style={{borderRadius: '0px', overflowY: 'auto'}}
-                 variant="inset">
+                 variant="inset" collapsible="icon" {...props}>
 
             <SidebarHeader>
-                <h2 className="text-lg font-medium   line-clamp-1">{courseList?.courseTitle} </h2>
+                <h2 className="text-lg font-medium   line-clamp-1 text-black text-center">{courseList?.courseTitle} </h2>
                 <div className=" ">
                     {/*{userEnrollmentObj?.enrollmentStatus  ?*/}
                     {/*    <Badge  className="animate-blink bg-blue-600 text-white"  variant="outline">*/}
                     {/*        {userEnrollmentObj?.enrollmentStatus}</Badge>*/}
                     {/*    : <></>}*/}
+                    <Link to={'/explore'}>
+                        <Button className="w-full flex gap-2 text-muted-foreground" size="sm" variant="outline"><SquareArrowLeft />Explore more courses</Button>
+
+                    </Link>
                 </div>
             </SidebarHeader>
             <Separator/>
@@ -97,7 +102,9 @@ function CourseSidebar() {
 
 
                 {data?.navMain?.map((item) => (<SidebarGroup key={item?.title}  className="font-medium text-lg">
-                    <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+                 <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+
+
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {item?.items?.map((item) => (item?.subItems?.length > 0 ? (<Collapsible key={item?.title}>

@@ -7,8 +7,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.jsx";
-import {Card, CardHeader, CardTitle} from "@/components/ui/card.jsx";
-import React, {useEffect, useState, useRef} from "react";
+ import React, {useEffect, useState, useRef} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
 import {Check, MessageCircle} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
@@ -23,6 +22,21 @@ import {Label} from "@/components/ui/label.jsx";
 import CreateNotesModule from "@/components-xm/CreateNotesModule.jsx";
 import {useAuthStore} from "@/zustland/store.js";
 import YouTubePlayer from "@/components-xm/YoutubePlayer.jsx";
+ import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+  import {
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+} from "@/components/ui/tabs"
+
 
 function CourseVideoTutorial() {
     const { userDetail } = useAuthStore();
@@ -238,7 +252,7 @@ function CourseVideoTutorial() {
 
 
                     <section className="my-4 ">
-                        <Card className="  shadow-none border-none rounded-none ">
+                        <Card className="  shadow-none border-none rounded-none  ">
                             <div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     {/* Video container */}
@@ -276,9 +290,12 @@ function CourseVideoTutorial() {
 
                     </section>
 
-                    <NotesModule refreshTrigger={triggerNotesRefresh} courseId={courseList.courseId} userId={userDetail.userId}
-                                 courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}
-                                 courseTopicId={courseVideoDetail.courseTopicId}/>
+                    <section  className="my-4 ">
+                        <NotesModule refreshTrigger={triggerNotesRefresh} courseId={courseList.courseId} userId={userDetail.userId}
+                                     courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}
+                                     courseTopicId={courseVideoDetail.courseTopicId}/>
+                    </section>
+
                 </div>
 
 

@@ -28,7 +28,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import {Card, CardHeader} from "@/components/ui/card.jsx";
+import {Card, CardContent, CardHeader} from "@/components/ui/card.jsx";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
 import {Terminal} from "lucide-react";
 import {Link} from "react-router-dom";
@@ -155,100 +155,101 @@ function NotesModule({userId, courseId, courseTopicId, courseTopicContentId, ref
             <Card className="my-8 bg-muted/50 rounded-none border-none">
                 <CardHeader>
                 <h1 className="text-lg   font-medium ">Note Book</h1>
-
+                </CardHeader>
+                <CardContent>
                     {notesList.length > 0 ?
-                <ol className="mt-4  ">
-                    {notesList.map((a) => (
-                        <li className="" key={a.notesId}>
+                        <ol className="mt-4  ">
+                            {notesList.map((a) => (
+                                <li className="" key={a.notesId}>
 
-                            <div className="flex items-start  rounded-lg py-3  ">
+                                    <div className="flex items-start  rounded-lg py-3  ">
 
 
-                                <div>
-                                    <p className=" my-2 text-sm font-normal	 text-muted-foreground">
+                                        <div>
+                                            <p className=" my-2 text-sm font-normal	 text-muted-foreground">
 
-                               {a?.created_date} {a?.created_time}
-                                     </p>
-                                    <p>{a.notesText}</p>
-                                      <div className="flex gap-2 mt-2">
-                                        <Dialog  open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-                                            <DialogTrigger asChild>
-                                                <p onClick={()=>{editNotesForm.reset({id:a?.notesId, notesText: a?.notesText})}} className=" text-blue-600 cursor-pointer">Edit</p>
-                                            </DialogTrigger>
-                                            <DialogContent className="sm:max-w-[425px]">
-                                                <DialogHeader>
-                                                    <DialogTitle>Edit Comment</DialogTitle>
+                                                {a?.created_date} {a?.created_time}
+                                            </p>
+                                            <p>{a.notesText}</p>
+                                            <div className="flex gap-2 mt-2">
+                                                <Dialog  open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+                                                    <DialogTrigger asChild>
+                                                        <p onClick={()=>{editNotesForm.reset({id:a?.notesId, notesText: a?.notesText})}} className=" text-blue-600 cursor-pointer">Edit</p>
+                                                    </DialogTrigger>
+                                                    <DialogContent className="sm:max-w-[425px]">
+                                                        <DialogHeader>
+                                                            <DialogTitle>Edit Comment</DialogTitle>
 
-                                                </DialogHeader>
+                                                        </DialogHeader>
 
-                                                <Form {...editNotesForm}>
-                                                    <form
-                                                        onSubmit={editNotesForm.handleSubmit(onCommentUpdate)}
-                                                        className="w-full space-y-6"
-                                                    >
-                                                        <div>
-                                                            <FormField
-                                                                control={editNotesForm.control}
-                                                                name="notesText"
-                                                                render={({field}) => (
-                                                                    <FormItem>
-                                                                        <FormControl>
-                                                                            <Textarea
-                                                                                placeholder="Type your comment here."
-                                                                                {...field}
-                                                                            />
-                                                                        </FormControl>
-                                                                        <FormMessage/>
-                                                                    </FormItem>
-                                                                )}
-                                                            />
-                                                        </div>
+                                                        <Form {...editNotesForm}>
+                                                            <form
+                                                                onSubmit={editNotesForm.handleSubmit(onCommentUpdate)}
+                                                                className="w-full space-y-6"
+                                                            >
+                                                                <div>
+                                                                    <FormField
+                                                                        control={editNotesForm.control}
+                                                                        name="notesText"
+                                                                        render={({field}) => (
+                                                                            <FormItem>
+                                                                                <FormControl>
+                                                                                    <Textarea
+                                                                                        placeholder="Type your comment here."
+                                                                                        {...field}
+                                                                                    />
+                                                                                </FormControl>
+                                                                                <FormMessage/>
+                                                                            </FormItem>
+                                                                        )}
+                                                                    />
+                                                                </div>
 
-                                                        <DialogFooter>
+                                                                <DialogFooter>
 
-                                                            <Button type="button" variant="secondary" onClick={() => editNotesForm.reset()} >Reset</Button>
-                                                            <DialogClose asChild>
-                                                                <Button type="button" variant="secondary">
-                                                                    Close
-                                                                </Button>
-                                                            </DialogClose>
-                                                            <Button type="submit">Save changes</Button>
-                                                        </DialogFooter>
-                                                    </form>
-                                                </Form>
+                                                                    <Button type="button" variant="secondary" onClick={() => editNotesForm.reset()} >Reset</Button>
+                                                                    <DialogClose asChild>
+                                                                        <Button type="button" variant="secondary">
+                                                                            Close
+                                                                        </Button>
+                                                                    </DialogClose>
+                                                                    <Button type="submit">Save changes</Button>
+                                                                </DialogFooter>
+                                                            </form>
+                                                        </Form>
 
-                                            </DialogContent>
-                                        </Dialog>
-                                          <AlertDialog>
-                                              <AlertDialogTrigger asChild>
-                                                  <p className=" text-red-600 cursor-pointer"  >Delete</p>
-                                              </AlertDialogTrigger>
-                                              <AlertDialogContent>
-                                                  <AlertDialogHeader>
-                                                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                                      <AlertDialogDescription>
-                                                          This action cannot be undone. This will permanently delete this notes from our servers.
-                                                      </AlertDialogDescription>
-                                                  </AlertDialogHeader>
-                                                  <AlertDialogFooter>
-                                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                      <AlertDialogAction onClick={()=>
-                                                          deleteComment(a?.notesId)
-                                                      }>Continue</AlertDialogAction>
-                                                  </AlertDialogFooter>
-                                              </AlertDialogContent>
-                                          </AlertDialog>
+                                                    </DialogContent>
+                                                </Dialog>
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <p className=" text-red-600 cursor-pointer"  >Delete</p>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                This action cannot be undone. This will permanently delete this notes from our servers.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                            <AlertDialogAction onClick={()=>
+                                                                deleteComment(a?.notesId)
+                                                            }>Continue</AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
 
-                        </li>
-                    ))}
+                                </li>
+                            ))}
 
 
-                </ol> :
-                    <Alert className="my-4">   <Terminal className="h-4 w-4 " />
-                             <div>
+                        </ol> :
+                        <Alert className="my-4">   <Terminal className="h-4 w-4 " />
+                            <div>
                                 <AlertTitle>No Notes Present</AlertTitle>
                                 <AlertDescription>
                                     <p>You can take down notes</p>
@@ -258,8 +259,10 @@ function NotesModule({userId, courseId, courseTopicId, courseTopicContentId, ref
 
 
 
-                    </Alert>}
-            </CardHeader>
+                        </Alert>}
+                </CardContent>
+        
+          
             </Card>
 
         </>)

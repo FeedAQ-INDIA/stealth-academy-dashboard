@@ -21,7 +21,7 @@ import QuizQuestionCard from "@/components-xm/QuizQuestionCard.jsx";
 import QuizResultReview from "@/components-xm/QuizResultReview.jsx";
 import {useAuthStore} from "@/zustland/store.js";
 
-function QuizRender({saveUserEnrollmentData}) {
+function QuizRender({saveUserEnrollmentData, deleteUserEnrollmentData, fetchCourseVideo}) {
 
     const {CourseId, CourseQuizId} = useParams();
     const {
@@ -128,12 +128,26 @@ function QuizRender({saveUserEnrollmentData}) {
             toast({title: "Error submitting quiz", variant: "destructive"});
         }
     };
-    const handleRetake = () => {
-        setSelectedAnswers({});
-        setSubmitted(false);
-        setServerResult(null);
-        toast({ title: "You can retake the quiz now!" });
-        navigate(`/course/${CourseId}/quiz/${CourseQuizId}`);
+    const handleRetake = async () => {
+
+       await axiosConn.post(import.meta.env.VITE_API_URL + "/clearQuizResult", {
+            userId: userDetail.userId,
+            courseId: CourseId,
+            courseQuizId: CourseQuizId,
+         }).then(res => {
+             console.log(res.data);
+           fetchCourseVideo();
+           deleteUserEnrollmentData()
+           setSelectedAnswers({});
+           setSubmitted(false);
+           setServerResult(null);
+           toast({ title: "You can retake the quiz now!" });
+           navigate(`/course/${CourseId}/quiz/${CourseQuizId}`);
+       }).catch(err => {
+           console.log(err);
+       });
+
+
     };
     return (
         <>
