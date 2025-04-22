@@ -16,13 +16,6 @@ import {FeaturedCourse} from "@/components-xm/FeaturedCourse.jsx";
 
 
 
- import {
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselNext,
-    CarouselPrevious,
-} from "@/components/ui/carousel"
 
 export function Dashboard() {
     const {userDetail,  userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore()
