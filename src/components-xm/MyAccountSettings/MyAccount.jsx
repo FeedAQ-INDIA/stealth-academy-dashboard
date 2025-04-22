@@ -11,6 +11,10 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/
 import {useAuthStore} from "@/zustland/store.js";
 import axiosConn from "@/axioscon.js";
 import {toast} from "@/components/hooks/use-toast.js";
+import {SidebarTrigger} from "@/components/ui/sidebar.jsx";
+import {Separator} from "@/components/ui/separator.jsx";
+import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
+import {CircleArrowLeft, CircleArrowRight} from "lucide-react";
 
 
 function MyAccount() {
@@ -34,7 +38,7 @@ function MyAccount() {
             createAccountForm.reset({
                 firstName: userDetail.firstName,
                 lastName: userDetail.lastName,
-                number: userDetail.number,
+                number: userDetail.number || '',
             });
         }
     }, [userDetail]);
@@ -59,6 +63,23 @@ function MyAccount() {
     return (
         <>
 
+            <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
+                <SidebarTrigger className="-ml-1"/>
+                <Separator orientation="vertical" className="mr-2 h-4"/>
+                <Breadcrumb>
+                    <BreadcrumbList>
+
+                        <BreadcrumbItem>
+                            <BreadcrumbPage
+                                className="truncate max-w-[30ch]">My Account</BreadcrumbPage>
+                        </BreadcrumbItem>
+
+                    </BreadcrumbList>
+                </Breadcrumb>
+                <div className="ml-auto sm:flex-initial">
+
+                </div>
+            </header>
 
             <div className="p-6">
                 <Card className="border-0 bg-[#ffdd00]">
