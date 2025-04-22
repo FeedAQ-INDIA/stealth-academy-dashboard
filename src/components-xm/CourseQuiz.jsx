@@ -10,7 +10,7 @@ import {
 import {Card, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
-import {Check} from "lucide-react";
+import {Check, CircleArrowLeft, CircleArrowRight} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
@@ -176,19 +176,14 @@ function CourseQuiz() {
                     </BreadcrumbList>
                 </Breadcrumb>
                 <div className="ml-auto sm:flex-initial">
-
+                    <div className="flex gap-2 ">
+                        <Button className="w-fit" size="sm" disabled={prevContent == null}
+                                onClick={() => navigateToNextModule(prevContent)}><CircleArrowLeft/></Button>
+                        <Button className="w-fit" size="sm" disabled={nextContent == null}
+                                onClick={() => navigateToNextModule(nextContent)}><CircleArrowRight/></Button>
+                    </div>
                 </div>
             </header>
-            <Card className="rounded-none border-none">
-                <CardHeader className="flex items-centergap-2 w-full p-2">
-                    <div className="flex gap-2 justify-between ">
-                        <Button className="w-fit" size="sm" disabled={prevContent == null}
-                                onClick={() => navigateToNextModule(prevContent)}>Previous</Button>
-                        <Button className="w-fit" size="sm" disabled={nextContent == null}
-                                onClick={() => navigateToNextModule(nextContent)}>Next</Button>
-                    </div>
-                </CardHeader>
-            </Card>
 
 
 
@@ -214,12 +209,15 @@ function CourseQuiz() {
                                 {courseTopicContent?.courseTopicContentTitle}
                             </CardTitle>
                             <div className="ml-auto">
-                                {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0 ?
-                                    <h3 className="flex gap-1 "><Check color="#11a72a"/><span
-                                        className="text-blue-800 font-medium">Completed</span></h3> :<></>
+                                {userEnrollmentCourseLog?.filter(b => (b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED'))?.length > 0 ?
+                                    <span className="completed-stamp">Completed</span>
+
+                                    : <Button className="w-fit" size="sm" onClick={() => saveUserEnrollmentData()}>Mark
+                                        as
+                                        Complete</Button>
                                 }
                                 {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0 ?
-                                    <p className='text-right cursor-pointer hover:text-blue-800 hover:underline  hover:underline-offset-4'
+                                    <p className='text-right cursor-pointer hover:text-blue-800 hover:underline  hover:underline-offset-4 italic'
                                        onClick={() => deleteUserEnrollmentData()}>Undo</p> : <></>
                                 }
                             </div>

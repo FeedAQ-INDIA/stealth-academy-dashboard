@@ -85,7 +85,7 @@ function CourseSidebar({...props}) {
                 >
 
             <SidebarHeader>
-                <h2 className="text-lg font-medium   line-clamp-1 text-black text-center">{courseList?.courseTitle} </h2>
+                <h2 className="text-lg font-medium   text-black text-center">{courseList?.courseTitle} </h2>
                 <div className=" ">
                     {/*{userEnrollmentObj?.enrollmentStatus  ?*/}
                     {/*    <Badge  className="animate-blink bg-blue-600 text-white"  variant="outline">*/}
