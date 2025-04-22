@@ -154,7 +154,7 @@ function NotesModule({userId, courseId, courseTopicId, courseTopicContentId, ref
 
             <Card className="my-8 bg-muted/50 rounded-none border-none">
                 <CardHeader>
-                <h1 className="text-lg   font-medium ">Note Book</h1>
+                <h1 className="text-lg   font-medium ">Notes</h1>
                 </CardHeader>
                 <CardContent>
                     {notesList.length > 0 ?
@@ -170,7 +170,8 @@ function NotesModule({userId, courseId, courseTopicId, courseTopicContentId, ref
 
                                                 {a?.created_date} {a?.created_time}
                                             </p>
-                                            <p>{a.notesText}</p>
+
+                                            <p  className="whitespace-pre-wrap break-words">{a.notesText}</p>
                                             <div className="flex gap-2 mt-2">
                                                 <Dialog  open={editDialogOpen} onOpenChange={setEditDialogOpen}>
                                                     <DialogTrigger asChild>

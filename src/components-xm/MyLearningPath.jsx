@@ -111,7 +111,7 @@ export function MyLearningPath() {
                                             {/* Badge row - wraps on smaller screens */}
                                             <div className="flex flex-wrap gap-2 w-full mb-3">
                                                 <Badge variant="outline">Course</Badge>
-                                                <Badge  className="animate-blink bg-blue-600 text-white"  variant="outline">{a.user_enrollment?.enrollmentStatus}</Badge>
+                                                <Badge  variant="outline">{a.user_enrollment?.enrollmentStatus}</Badge>
 
                                                 {a?.courseTags?.map(i => <Badge variant="outline">{i}</Badge>)}
                                             </div>

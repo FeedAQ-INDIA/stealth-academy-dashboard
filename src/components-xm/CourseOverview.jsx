@@ -105,10 +105,10 @@ function CourseOverview() {
 
                         <div className="flex flex-wrap gap-2 w-full mb-3">
                             <Badge className="animate-blink bg-green-600 text-white">FREE</Badge>
-                            {userEnrollmentObj?.enrollmentStatus  ?
-                                <Badge  className="animate-blink bg-blue-600 text-white"  variant="outline">
-                                    {userEnrollmentObj?.enrollmentStatus}</Badge>
-                                : <></>}
+                            {/*{userEnrollmentObj?.enrollmentStatus  ?*/}
+                            {/*    <Badge  className="animate-blink bg-blue-600 text-white"  variant="outline">*/}
+                            {/*        {userEnrollmentObj?.enrollmentStatus}</Badge>*/}
+                            {/*    : <></>}*/}
                             <Badge variant="outline">Course</Badge>
                             <Badge variant="outline">
                                 {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}
@@ -124,11 +124,14 @@ function CourseOverview() {
                                 </CardTitle>
                             </div>
                             <div className="ml-auto ">
-                                {(userEnrollmentObj?.enrollmentStatus != 'CERTIFIED' &&
-                                    userEnrollmentObj?.enrollmentStatus != 'COMPLETED') ?
-                                    (isUserEnrolledAlready?
-                                    <Button onClick={()=> disroll()}>LEAVE COURSE</Button>  :
-                                    <Button onClick={()=> enroll()}>START COURSE</Button>) : <></>
+                                { (isUserEnrolledAlready?
+                                    <>
+                                        {userEnrollmentObj?.enrollmentStatus  ?
+                                            <span  className="completed-stamp"   >
+                                                {userEnrollmentObj?.enrollmentStatus}</span>
+                                            : <></>}
+                                    </>  :
+                                    <Button onClick={()=> enroll()}>START COURSE</Button>)
                                 }
                             </div>
                         </div>
@@ -174,8 +177,9 @@ function CourseOverview() {
                         </CardHeader>
                         <CardContent>
                             <div>
-                                <p>{courseList?.courseDescription}</p>
-                            </div>
+                                <div className="whitespace-pre-wrap break-words">
+                                    {courseList?.courseDescription}
+                                </div>                            </div>
                         </CardContent>
                     </Card>
                 </section>
@@ -252,6 +256,16 @@ function CourseOverview() {
                         </CardContent>
                     </Card>
                 </section>
+
+                <section className="my-4 flex">
+                    {(userEnrollmentObj?.enrollmentStatus != 'CERTIFIED' &&
+                        userEnrollmentObj?.enrollmentStatus != 'COMPLETED') ?
+                        (isUserEnrolledAlready?
+                            <Button className="ml-auto" onClick={()=> disroll()}>LEAVE COURSE</Button>  :
+                            <></> ) : <></>
+                    }
+                </section>
+
             </div>
 
         </>)

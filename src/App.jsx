@@ -2,6 +2,8 @@ import {Outlet, useLocation, useNavigate} from "react-router-dom";
 import Header from "./components-xm/Header/Header.jsx";
 import {useEffect} from "react";
 import {useAuthStore} from "@/zustland/store.js";
+import "./App.css"
+
 
 function App() {
     const navigate = useNavigate();
@@ -22,7 +24,11 @@ function App() {
             window.location = '/signin';
         }
         else{
-            fetchUserEnrolledCourseIdList(userDetail?.userId)
+            fetchUserEnrolledCourseIdList(userDetail?.userId);
+            console.log('App.jsx  :: ', location.pathname)
+            if(location.pathname == '/') {
+                navigate('/dashboard')
+            }
         }
 
     }, [userDetail]); // Redirect only after userDetail updates

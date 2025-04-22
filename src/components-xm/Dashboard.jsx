@@ -15,6 +15,15 @@ import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
 import {FeaturedCourse} from "@/components-xm/FeaturedCourse.jsx";
 
 
+
+ import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "@/components/ui/carousel"
+
 export function Dashboard() {
     const {userDetail,  userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore()
     const navigate = useNavigate()
@@ -76,6 +85,7 @@ export function Dashboard() {
 
     const [exploreCourseText, setExploreCourseText] = useState("");
 
+
     return (
         <div className="p-6">
             <Card className="border-0 bg-[#ffdd00]">
@@ -111,6 +121,7 @@ export function Dashboard() {
                     </div>
                 </CardContent>
             </Card>
+
 
 
             <Card className="border-0 bg-muted/50  my-6 py-6">

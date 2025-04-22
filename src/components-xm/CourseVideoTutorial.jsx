@@ -1,45 +1,25 @@
 import {SidebarTrigger} from "@/components/ui/sidebar.jsx";
 import {Separator} from "@/components/ui/separator.jsx";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator
-} from "@/components/ui/breadcrumb.jsx";
- import React, {useEffect, useState, useRef} from "react";
+import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
+import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
-import {Check, MessageCircle} from "lucide-react";
+import {CircleArrowLeft, CircleArrowRight} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
-import {Link, useNavigate, useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
 import NotesModule from "@/components-xm/NotesModule.jsx";
 import {toast} from "@/components/hooks/use-toast.js";
-import {Input} from "@/components/ui/input.jsx";
-import {Textarea} from "@/components/ui/textarea.jsx";
 import {Label} from "@/components/ui/label.jsx";
 import CreateNotesModule from "@/components-xm/CreateNotesModule.jsx";
 import {useAuthStore} from "@/zustland/store.js";
 import YouTubePlayer from "@/components-xm/YoutubePlayer.jsx";
- import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
-  import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from "@/components/ui/tabs"
+import {Card, CardContent, CardHeader, CardTitle,} from "@/components/ui/card"
+import "./CourseVideoTutorial.css"
 
 
 function CourseVideoTutorial() {
-    const { userDetail } = useAuthStore();
+    const {userDetail} = useAuthStore();
     const {CourseId, CourseVideoId} = useParams();
     const {
         userEnrollmentLog,
@@ -61,7 +41,7 @@ function CourseVideoTutorial() {
             fetchCourseVideo();
         }
     }, [courseList, userEnrollmentObj, CourseVideoId]);
-    const  [playerRefresh, setPlayerRefresh] = useState(false);
+    const [playerRefresh, setPlayerRefresh] = useState(false);
 
     const fetchCourseVideo = () => {
         axiosConn
@@ -135,9 +115,10 @@ function CourseVideoTutorial() {
     }
 
 
+    const [prevContent, setPrevContent] = useState({});
 
-    const [prevContent, setPrevContent] = useState({}); ;
-    const [nextContent, setNextContent] = useState({}); ;
+    const [nextContent, setNextContent] = useState({});
+
 
     useEffect(() => {
         const allContents = courseList?.courseTopic?.flatMap(topic =>
@@ -152,15 +133,15 @@ function CourseVideoTutorial() {
         );
 
         setPrevContent(currentIndex > 0 ? allContents[currentIndex - 1] : null);
-         setNextContent(currentIndex < allContents.length - 1 ? allContents[currentIndex + 1] : null);
+        setNextContent(currentIndex < allContents.length - 1 ? allContents[currentIndex + 1] : null);
 
     }, [courseList, courseTopicContent]);
 
     const navigateToNextModule = (context) => {
         console.log(context);
-        if(context.courseTopicContentType == 'CourseVideo'){
+        if (context.courseTopicContentType == 'CourseVideo') {
             navigate(`/course/${context?.courseTopicId}/video/${context?.contentId}`);
-        } else if(context.courseTopicContentType == 'CourseWritten'){
+        } else if (context.courseTopicContentType == 'CourseWritten') {
             navigate(`/course/${context?.courseTopicId}/doc/${context?.contentId}`);
         } else if (context.courseTopicContentType == 'CourseQuiz') {
             navigate(`/course/${context?.courseTopicId}/quiz/${context?.contentId}`);
@@ -173,7 +154,6 @@ function CourseVideoTutorial() {
         setTriggerNotesRefresh(prev => !prev);
     };
     const [isOpen, setIsOpen] = useState(false);
-
 
 
     return (
@@ -202,17 +182,22 @@ function CourseVideoTutorial() {
                         </BreadcrumbList>
                     </Breadcrumb>
                     <div className="ml-auto sm:flex-initial">
-
+                        <div className="flex gap-2 ">
+                            <Button className="w-fit" size="sm" disabled={prevContent == null}
+                                    onClick={() => navigateToNextModule(prevContent)}><CircleArrowLeft/></Button>
+                            <Button className="w-fit" size="sm" disabled={nextContent == null}
+                                    onClick={() => navigateToNextModule(nextContent)}><CircleArrowRight/></Button>
+                        </div>
                     </div>
                 </header>
-                <Card className="rounded-none border-none">
-                    <CardHeader className="flex items-centergap-2 w-full p-2">
-                        <div className="flex gap-2 justify-between ">
-                            <Button className="w-fit" size="sm" disabled={prevContent == null} onClick={()=>navigateToNextModule(prevContent)}>Previous</Button>
-                            <Button className="w-fit" size="sm" disabled={nextContent == null} onClick={()=>navigateToNextModule(nextContent)}>Next</Button>
-                        </div>
-                    </CardHeader>
-                </Card>
+                {/*<Card className="rounded-none border-none">*/}
+                {/*    <CardHeader className="flex items-centergap-2 w-full p-2">*/}
+                {/*        <div className="flex gap-2 justify-between ">*/}
+                {/*            <Button className="w-fit" size="sm" disabled={prevContent == null} onClick={()=>navigateToNextModule(prevContent)}>Previous</Button>*/}
+                {/*            <Button className="w-fit" size="sm" disabled={nextContent == null} onClick={()=>navigateToNextModule(nextContent)}>Next</Button>*/}
+                {/*        </div>*/}
+                {/*    </CardHeader>*/}
+                {/*</Card>*/}
 
 
                 <div className="p-4">
@@ -231,19 +216,28 @@ function CourseVideoTutorial() {
                                 </Badge>
 
                             </div>
-                            <div className=" flex  items-center gap-2 ">
+                            <div className=" flex flex-col md:flex-row md:items-center gap-2 ">
                                 <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold ">
                                     {courseTopicContent?.courseTopicContentTitle}
                                 </CardTitle>
 
-                                <div className="ml-auto">
-                                    {userEnrollmentCourseLog?.filter(b => (b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED'))?.length > 0   ?
-                                        <h3 className="flex gap-1 "><Check color="#11a72a"/><span
-                                            className="text-blue-800 font-medium">Completed</span></h3>: <Button className="w-fit" size="sm" onClick={() => saveUserEnrollmentData()}>Mark as
+                                <div className="md:ml-auto">
+                                    {/*{userEnrollmentCourseLog?.filter(b => (b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED'))?.length > 0   ?*/}
+                                    {/*    <h3 className="flex gap-1 "><Check color="#11a72a"/><span*/}
+                                    {/*        className="text-blue-800 font-medium">Completed</span></h3>: <Button className="w-fit" size="sm" onClick={() => saveUserEnrollmentData()}>Mark as*/}
+                                    {/*        Complete</Button>*/}
+                                    {/*}*/}
+
+                                    {userEnrollmentCourseLog?.filter(b => (b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED'))?.length > 0 ?
+                                        <span className="completed-stamp">Completed</span>
+
+                                        : <Button className="w-fit" size="sm" onClick={() => saveUserEnrollmentData()}>Mark
+                                            as
                                             Complete</Button>
                                     }
                                     {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0 ?
-                                        <p className='text-right cursor-pointer hover:text-blue-800 hover:underline  hover:underline-offset-4' onClick={() => deleteUserEnrollmentData()}>Undo</p> : <></>
+                                        <p className='text-right cursor-pointer hover:text-blue-800 hover:underline  hover:underline-offset-4 italic'
+                                           onClick={() => deleteUserEnrollmentData()}>Undo</p> : <></>
                                     }                        </div>
 
                             </div>
@@ -266,7 +260,10 @@ function CourseVideoTutorial() {
                                             {/*    allow="autoplay; encrypted-media"*/}
                                             {/*    allowFullScreen*/}
                                             {/*></iframe>*/}
-                                                      <YouTubePlayer   saveUserEnrollmentData={saveUserEnrollmentData} playerRefresh={playerRefresh} videoId={courseVideoDetail?.courseVideoUrl} playerId={`player-${courseVideoDetail?.courseVideoId}`} />
+                                            <YouTubePlayer saveUserEnrollmentData={saveUserEnrollmentData}
+                                                           playerRefresh={playerRefresh}
+                                                           videoId={courseVideoDetail?.courseVideoUrl}
+                                                           playerId={`player-${courseVideoDetail?.courseVideoId}`}/>
 
 
                                         </div>
@@ -276,7 +273,8 @@ function CourseVideoTutorial() {
                                     <div className="w-full flex flex-col ">
                                         <Label className="mb-4">Create Notes</Label>
                                         <div className="w-full flex flex-col h-full">
-                                            <CreateNotesModule handleNotesSave={handleNotesSave}  courseId={courseList.courseId}
+                                            <CreateNotesModule handleNotesSave={handleNotesSave}
+                                                               courseId={courseList.courseId}
                                                                courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}
                                                                courseTopicId={courseVideoDetail.courseTopicId}/>
                                         </div>
@@ -290,11 +288,34 @@ function CourseVideoTutorial() {
 
                     </section>
 
-                    <section  className="my-4 ">
-                        <NotesModule refreshTrigger={triggerNotesRefresh} courseId={courseList.courseId} userId={userDetail.userId}
+                    <section className=" ">
+
+                    </section>
+
+
+
+                    <section className="my-4 ">
+                        <Card className="rounded-none bg-muted/50 border-none">
+                            <CardHeader className="px-4">
+                                <CardTitle>Overview</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="whitespace-pre-wrap break-words">
+                                    {courseVideoDetail?.courseVideoDescription}
+                                </div>
+                            </CardContent>
+
+
+                        </Card>
+                    </section>
+
+                    <section className="my-4 ">
+                        <NotesModule refreshTrigger={triggerNotesRefresh} courseId={courseList.courseId}
+                                     userId={userDetail.userId}
                                      courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}
                                      courseTopicId={courseVideoDetail.courseTopicId}/>
                     </section>
+
 
                 </div>
 

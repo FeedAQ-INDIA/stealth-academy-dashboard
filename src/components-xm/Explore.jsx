@@ -1,4 +1,4 @@
-import {ChevronLeft, ChevronRight, Clock, Search,} from "lucide-react";
+import {ChevronLeft, ChevronRight, Clock, ExternalLink, GraduationCap, LogOut, Search,} from "lucide-react";
 
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
@@ -209,7 +209,7 @@ export function Explore() {
     return (
         <div className="p-6">
             <div className=" items-center justify-items-center">
-                <Card className="border-0 w-full bg-muted/50  my-6 py-6 ">
+                <Card className="border-0 w-full bg-muted/50  py-6 ">
                     <CardHeader>
                         <CardTitle className="text-center">
                             What would you like to learn today ?
@@ -239,7 +239,7 @@ export function Explore() {
                                     {/* Badge row - wraps on smaller screens */}
                                     <div className="flex flex-wrap gap-2 w-full mb-3">
                                         <Badge className="animate-blink bg-green-600 text-white">FREE</Badge>
-                                        {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId) ?   <Badge  className="animate-blink bg-blue-600 text-white"  variant="outline">{userEnrolledCourseIdList?.find(m => m.courseId == a.courseId)?.enrollmentStatus }</Badge>
+                                        {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId) ?   <Badge  variant="outline">{userEnrolledCourseIdList?.find(m => m.courseId == a.courseId)?.enrollmentStatus }</Badge>
                                         : <></>}
                                         <Badge variant="outline">Course</Badge>
                                         <Badge variant="outline">Beginner</Badge>
@@ -247,7 +247,7 @@ export function Explore() {
 
                                     {/* Title with responsive spacing */}
                                     <div className=" ">
-                                        <CardTitle className="text-lg sm:text-xl  font-semibold">
+                                        <CardTitle className="text-lg sm:text-xl  font-semibold line-clamp-2 ">
                                             {a?.courseTitle}
                                         </CardTitle>
                                     </div>
@@ -268,13 +268,13 @@ export function Explore() {
                                 <CardFooter className="flex w-full flex-wrap gap-2">
                                     {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId && (m.enrollmentStatus != 'COMPLETED' && m.enrollmentStatus != 'CERTIFIED')) ?
                                         <Button className=" flex-1 " variant="destructive"
-                                                onClick={() => disroll(a?.courseId)}>Leave Course</Button> :<></>}
+                                                onClick={() => disroll(a?.courseId)}><LogOut />Leave Course</Button> :<></>}
                                     {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId && ( m.enrollmentStatus == 'CERTIFIED')) ?
                                         <Button className=" flex-1 " variant="outline"
-                                                >Download Certificate</Button> :<></>}
+                                                ><GraduationCap />Download Certificate</Button> :<></>}
 
                                     <Link to={`/course/${a?.courseId}`} className="  flex-1 "><Button
-                                        className="  w-full ">Learn More</Button>
+                                        className="  w-full "><ExternalLink /> Learn More</Button>
                                     </Link>
                                 </CardFooter>
                             </Card>)

@@ -223,12 +223,9 @@ function CourseWritten() {
                 <section className="my-4 ">
 
                     <div className=" ">
+                        <div className="whitespace-pre-wrap break-words">
+                            {courseVideoDetail?.courseWrittenHtmlContent}                        </div>
 
-               <p   >
-                        {courseVideoDetail?.courseWrittenHtmlContent}
- </p>
-{/*                        <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>*/}
-{/*{courseVideoDetail?.courseWrittenHtmlContent}</pre>*/}
 
                     </div>
 

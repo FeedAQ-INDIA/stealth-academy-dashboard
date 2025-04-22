@@ -49,7 +49,7 @@ function QuizRender({saveUserEnrollmentData, deleteUserEnrollmentData, fetchCour
     const fetchCourseQuizQuestion = () => {
         axiosConn
             .post(import.meta.env.VITE_API_URL + "/searchCourse", {
-                limit: 10, offset: 0, getThisData: {
+                limit: 50, offset: 0, getThisData: {
                     datasource: "QuizQuestion", attributes: [], where: {courseQuizId: CourseQuizId},
 
                 },

@@ -65,7 +65,7 @@ function CourseSidebar({...props}) {
             setData({
                 navMain: [
                     {
-                        title: `COURSE STATUS - ${userEnrollmentObj?.enrollmentStatus  || ''}` , url: "#", items: [{
+                        title: `` , url: "#", items: [{
                             title: "OVERVIEW",
                             url: `/course/${courseList?.courseId}`,
                             isClickable: true,
@@ -78,11 +78,11 @@ function CourseSidebar({...props}) {
         }else{
             return  <div>Loading...</div>
         }
-    }, [courseList,userEnrollmentObj, location.pathname])
+    }, [courseList, location.pathname])
 
     return (<>
         <Sidebar className="top-[4rem] h-[calc(100svh-4em)]    shadow-lg px-0 border-r " style={{borderRadius: '0px', overflowY: 'auto'}}
-                 variant="inset" collapsible="icon" {...props}>
+                >
 
             <SidebarHeader>
                 <h2 className="text-lg font-medium   line-clamp-1 text-black text-center">{courseList?.courseTitle} </h2>
@@ -91,17 +91,24 @@ function CourseSidebar({...props}) {
                     {/*    <Badge  className="animate-blink bg-blue-600 text-white"  variant="outline">*/}
                     {/*        {userEnrollmentObj?.enrollmentStatus}</Badge>*/}
                     {/*    : <></>}*/}
+
+                    {/*<p className=" text-xs font-medium text-muted-foreground text-center mb-2" >*/}
+                    {/*         COURSE STATUS - {userEnrollmentObj?.enrollmentStatus  || ''}*/}
+
+                    {/*</p>*/}
+                    <p  className="completed-stamp text-base tracking-wide"   >
+                                                {userEnrollmentObj?.enrollmentStatus}</p>
                     <Link to={'/explore'}>
-                        <Button className="w-full flex gap-2 text-muted-foreground" size="sm" variant="outline"><SquareArrowLeft />Explore more courses</Button>
+                        <Button className="w-full flex gap-2 text-muted-foreground" size="sm" variant="ghost"><SquareArrowLeft />Explore more courses</Button>
 
                     </Link>
                 </div>
             </SidebarHeader>
             <Separator/>
-            <SidebarContent>
+            <SidebarContent >
 
 
-                {data?.navMain?.map((item) => (<SidebarGroup key={item?.title}  className="font-medium text-lg">
+                {data?.navMain?.map((item) => (<SidebarGroup key={item?.title}  className="font-medium text-xs">
                  <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
 
 
