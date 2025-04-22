@@ -22,9 +22,8 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
                 {/* Badge row - wraps on smaller screens */}
                 <div className="flex flex-wrap gap-2 w-full mb-3">
                     <Badge className="animate-blink bg-green-600 text-white">FREE</Badge>
-                    {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId) ?   <Badge  variant="outline">{userEnrolledCourseIdList?.find(m => m.courseId == a.courseId)?.enrollmentStatus }</Badge>
-                        : <></>}
                     <Badge variant="outline">Course</Badge>
+                    {a?.courseSource ? <Badge variant="outline">{a?.courseSource}</Badge> : <></>}
                     <Badge variant="outline">Beginner</Badge>
                 </div>
 
@@ -46,16 +45,23 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
                         {`${Math.floor(+(a?.courseDuration) / 60)}hr ${+(a?.courseDuration) % 60}min`}
                     </div>
                 </div>
+
             </CardContent>
 
-            <CardFooter className="flex w-full flex-wrap gap-2">
+            <CardFooter className="flex w-full flex-wrap gap-2 items-center">
                 {/*{userEnrolledCourseIdList?.find(m => m.courseId == a.courseId && (m.enrollmentStatus != 'COMPLETED' && m.enrollmentStatus != 'CERTIFIED')) ?*/}
                 {/*    <Button className=" flex-1 " variant="destructive"*/}
                 {/*            onClick={() => disroll(a?.courseId)}><LogOut />Leave Course</Button> :<></>}*/}
                 {/*{userEnrolledCourseIdList?.find(m => m.courseId == a.courseId && ( m.enrollmentStatus == 'CERTIFIED')) ?*/}
                 {/*    <Button className=" flex-1 " variant="outline"*/}
                 {/*    ><GraduationCap />Download Certificate</Button> :<></>}*/}
-
+                <div  className=" items-center">
+                    {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId) ?  <div className="  items-center">
+                        <p className="completed-stamp text-base text-black ">Enrolled</p>
+                        <p className="completed-stamp text-base">{userEnrolledCourseIdList?.find(m => m.courseId == a.courseId)?.enrollmentStatus }</p>
+                    </div>
+                    : <></>}
+                </div>
                 <Link to={`/course/${a?.courseId}`} className="  flex-1 "><Button
                     className="  w-full "><ExternalLink /> Learn More</Button>
                 </Link>
