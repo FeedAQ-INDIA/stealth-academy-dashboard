@@ -1,43 +1,51 @@
 import {SidebarTrigger, useSidebar} from "@/components/ui/sidebar.jsx";
 import {Separator} from "@/components/ui/separator.jsx";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator
-} from "@/components/ui/breadcrumb.jsx";
+import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
-import {Check, CircleDollarSign, Clock, Video} from "lucide-react";
+import {Check, Video} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
 import axiosConn from "@/axioscon.js";
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "@/components/ui/accordion"
-import {Link, useParams} from "react-router-dom";
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger,} from "@/components/ui/accordion"
+import {useParams} from "react-router-dom";
 import {toast} from "@/components/hooks/use-toast.js";
 import {useCourse} from "@/components-xm/CourseContext.jsx";
-import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
 import {useAuthStore} from "@/zustland/store.js";
-import NotesModule from "@/components-xm/NotesModule.jsx";
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import {Input} from "@/components/ui/input.jsx";
+
+
 function CourseOverview() {
     const {CourseId} = useParams();
-    const { userEnrollmentObj,userEnrollmentCourseLog, isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus } = useCourse();
-    const { userDetail } = useAuthStore();
+    const {
+        userEnrollmentObj,
+        userEnrollmentCourseLog,
+        isUserEnrolledAlready,
+        courseList,
+        enroll,
+        disroll,
+        enrollStatus
+    } = useCourse();
+    const {userDetail} = useAuthStore();
 
     const {
         state, open, setOpen, openMobile, setOpenMobile, isMobile, toggleSidebar
     } = useSidebar();
 
     useEffect(() => {
-        if(isUserEnrolledAlready) {
+        if (isUserEnrolledAlready) {
             setOpen(true);
-        }else{
+        } else {
             setOpen(false);
         }
 
@@ -53,14 +61,14 @@ function CourseOverview() {
         axiosConn
             .post(import.meta.env.VITE_API_URL + "/searchCourse", {
                 limit: 10, offset: 0, getThisData: {
-                    datasource: "Notes", attributes: [], where: {courseId: CourseId, userId : userDetail.userId},
+                    datasource: "Notes", attributes: [], where: {courseId: CourseId, userId: userDetail.userId},
                 },
             })
             .then((res) => {
                 console.log(res.data);
                 const notes = res.data.data?.results
                 setNotesList(notes);
-             })
+            })
             .catch((err) => {
                 console.log(err);
             });
@@ -72,11 +80,13 @@ function CourseOverview() {
         setTriggerNotesRefresh(prev => !prev);
     };
 
+    const [deleteConfirmation, setDeleteConfirmation] = useState("");
+
     return (
         <>
             <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
-                {isUserEnrolledAlready? (<><SidebarTrigger className="-ml-1"/>
-                <Separator orientation="vertical" className="mr-2 h-4"/></>) : <></>}
+                {isUserEnrolledAlready ? (<><SidebarTrigger className="-ml-1"/>
+                    <Separator orientation="vertical" className="mr-2 h-4"/></>) : <></>}
                 <Breadcrumb>
                     <BreadcrumbList>
 
@@ -89,7 +99,7 @@ function CourseOverview() {
                         {/*</BreadcrumbItem>*/}
                         {/*<BreadcrumbSeparator/>*/}
                         <BreadcrumbItem>
-                            <BreadcrumbPage className="truncate max-w-[30ch]"  >Overview</BreadcrumbPage>
+                            <BreadcrumbPage className="truncate max-w-[30ch]">Overview</BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
@@ -117,21 +127,22 @@ function CourseOverview() {
                             <Badge variant="outline"> {courseList?.courseLevel}
                             </Badge>
                         </div>
-                        <div  className="flex flex-wrap gap-2 w-full mb-3 items-center">
+                        <div className="flex flex-wrap gap-2 w-full mb-3 items-center">
                             <div className=" ">
                                 <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold">
                                     {courseList?.courseTitle}
                                 </CardTitle>
                             </div>
                             <div className="ml-auto ">
-                                { (isUserEnrolledAlready?
+                                {(isUserEnrolledAlready ?
                                     <>
-                                        {userEnrollmentObj?.enrollmentStatus  ?
-                                            <span  className="completed-stamp"   >
-                                                {userEnrollmentObj?.enrollmentStatus}</span>
-                                            : <></>}
-                                    </>  :
-                                    <Button onClick={()=> enroll()}>START COURSE</Button>)
+                                        <div className="completed-stamp">
+                                            ENROLLED
+                                        </div>
+                                        <p className='text-sm text-right cursor-pointer hover:text-blue-800 hover:underline  hover:underline-offset-4 italic'>View
+                                            Order</p>
+                                    </> :
+                                    <Button onClick={() => enroll()}>ENROLL</Button>)
                                 }
                             </div>
                         </div>
@@ -141,7 +152,7 @@ function CourseOverview() {
 
                 </Card>
                 {/*<section>*/}
-                {/*    <Card className="border-0 bg-[#ffdd00]">*/}
+                {/*    <CourseCard className="border-0 bg-[#ffdd00]">*/}
                 {/*        <CardHeader>*/}
                 {/*            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-center">*/}
                 {/*                <div className="flex justify-center w-full">*/}
@@ -161,7 +172,7 @@ function CourseOverview() {
                 {/*                </div>*/}
                 {/*            </div>*/}
                 {/*        </CardHeader>*/}
-                {/*    </Card>*/}
+                {/*    </CourseCard>*/}
 
 
                 {/*</section>*/}
@@ -179,7 +190,8 @@ function CourseOverview() {
                             <div>
                                 <div className="whitespace-pre-wrap break-words">
                                     {courseList?.courseDescription}
-                                </div>                            </div>
+                                </div>
+                            </div>
                         </CardContent>
                     </Card>
                 </section>
@@ -213,8 +225,10 @@ function CourseOverview() {
                                                 <div>
                                                     <ul>
                                                         {a?.courseTopicContent?.map(a => (
-                                                            <li className="flex gap-2 items-center my-2" key={a?.courseTopicContentId}>
-                                                                {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == a?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0?  <Check  color="#11a72a"/> : <></> }
+                                                            <li className="flex gap-2 items-center my-2"
+                                                                key={a?.courseTopicContentId}>
+                                                                {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == a?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0 ?
+                                                                    <Check color="#11a72a"/> : <></>}
                                                                 <Badge>
                                                                     {(() => {
                                                                         const totalMinutes = +a?.courseTopicContentDuration || 0;
@@ -224,7 +238,7 @@ function CourseOverview() {
                                                                         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
                                                                     })()}
                                                                 </Badge>
-                                                                <Video />
+                                                                <Video/>
                                                                 <span>{a?.courseTopicContentTitle}</span>
                                                             </li>
                                                         ))}
@@ -252,7 +266,7 @@ function CourseOverview() {
                         <CardContent>
                             <div>
 
-                             </div>
+                            </div>
                         </CardContent>
                     </Card>
                 </section>
@@ -260,9 +274,55 @@ function CourseOverview() {
                 <section className="my-4 flex">
                     {(userEnrollmentObj?.enrollmentStatus != 'CERTIFIED' &&
                         userEnrollmentObj?.enrollmentStatus != 'COMPLETED') ?
-                        (isUserEnrolledAlready?
-                            <Button className="ml-auto" onClick={()=> disroll()}>LEAVE COURSE</Button>  :
-                            <></> ) : <></>
+                        (isUserEnrolledAlready ?
+
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button className="ml-auto" variant="destructive">LEAVE COURSE</Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-md">
+                                    <DialogHeader>
+                                        <DialogTitle>Are You Sure You Want To Leave The Course ?</DialogTitle>
+                                        <DialogDescription>
+                                            Type in {courseList?.courseTitle} in the below input field and click on
+                                            confirm to Leave the course
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="flex items-center ">
+
+                                        <Input
+                                            id="link"
+                                            value={deleteConfirmation}
+                                            onChange={(e) => setDeleteConfirmation(e.target.value?.trim())}
+                                        />
+
+                                    </div>
+                                    <DialogFooter className="sm:justify-start">
+                                        <DialogClose asChild>
+                                            <Button type="button" variant="secondary">
+                                                Close
+                                            </Button>
+                                        </DialogClose>
+                                        <Button
+                                            disabled={courseList?.courseTitle?.trim() === deleteConfirmation?.trim() ? false : true}
+                                            onClick={() => {
+                                                if (courseList?.courseTitle.trim() === deleteConfirmation?.trim()) {
+                                                    disroll();
+                                                    setDeleteConfirmation('')
+                                                } else {
+                                                    toast({
+                                                        title: 'Cannot leave the course'
+                                                    })
+                                                }
+                                            }}>
+                                            Leave Course
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+
+                            :
+                            <></>) : <></>
                     }
                 </section>
 

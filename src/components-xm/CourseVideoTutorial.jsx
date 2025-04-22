@@ -140,11 +140,11 @@ function CourseVideoTutorial() {
     const navigateToNextModule = (context) => {
         console.log(context);
         if (context.courseTopicContentType == 'CourseVideo') {
-            navigate(`/course/${context?.courseTopicId}/video/${context?.contentId}`);
+            navigate(`/course/${context?.courseId}/video/${context?.contentId}`);
         } else if (context.courseTopicContentType == 'CourseWritten') {
-            navigate(`/course/${context?.courseTopicId}/doc/${context?.contentId}`);
+            navigate(`/course/${context?.courseId}/doc/${context?.contentId}`);
         } else if (context.courseTopicContentType == 'CourseQuiz') {
-            navigate(`/course/${context?.courseTopicId}/quiz/${context?.contentId}`);
+            navigate(`/course/${context?.courseId}/quiz/${context?.contentId}`);
         }
     }
 
@@ -190,14 +190,14 @@ function CourseVideoTutorial() {
                         </div>
                     </div>
                 </header>
-                {/*<Card className="rounded-none border-none">*/}
+                {/*<CourseCard className="rounded-none border-none">*/}
                 {/*    <CardHeader className="flex items-centergap-2 w-full p-2">*/}
                 {/*        <div className="flex gap-2 justify-between ">*/}
                 {/*            <Button className="w-fit" size="sm" disabled={prevContent == null} onClick={()=>navigateToNextModule(prevContent)}>Previous</Button>*/}
                 {/*            <Button className="w-fit" size="sm" disabled={nextContent == null} onClick={()=>navigateToNextModule(nextContent)}>Next</Button>*/}
                 {/*        </div>*/}
                 {/*    </CardHeader>*/}
-                {/*</Card>*/}
+                {/*</CourseCard>*/}
 
 
                 <div className="p-4">

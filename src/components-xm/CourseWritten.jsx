@@ -128,14 +128,15 @@ function CourseWritten() {
 
     const navigateToNextModule = (context) => {
         console.log(context);
-        if(context.courseTopicContentType == 'CourseVideo'){
-            navigate(`/course/${context?.courseTopicId}/video/${context?.contentId}`);
-        } else if(context.courseTopicContentType == 'CourseWritten'){
-            navigate(`/course/${context?.courseTopicId}/doc/${context?.contentId}`);
+        if (context.courseTopicContentType == 'CourseVideo') {
+            navigate(`/course/${context?.courseId}/video/${context?.contentId}`);
+        } else if (context.courseTopicContentType == 'CourseWritten') {
+            navigate(`/course/${context?.courseId}/doc/${context?.contentId}`);
         } else if (context.courseTopicContentType == 'CourseQuiz') {
-            navigate(`/course/${context?.courseTopicId}/quiz/${context?.contentId}`);
+            navigate(`/course/${context?.courseId}/quiz/${context?.contentId}`);
         }
     }
+
 
     const [triggerNotesRefresh, setTriggerNotesRefresh] = useState(false);
 

@@ -117,17 +117,6 @@ export function Dashboard() {
 
 
 
-            <Card className="border-0 bg-muted/50  my-6 py-6">
-<CardHeader>
-    <CardTitle>
-        Featured Content
-    </CardTitle>
-</CardHeader>
-                <CardContent>
-                    <FeaturedCourse/>
-                </CardContent>
-            </Card>
-
         </div>
     );
 }

@@ -97,7 +97,7 @@ function CourseSidebar({...props}) {
 
                     {/*</p>*/}
                     <p  className="completed-stamp text-base tracking-wide"   >
-                                                {userEnrollmentObj?.enrollmentStatus}</p>
+                        <span className="text-black font-light">Course Status</span> : {userEnrollmentObj?.enrollmentStatus}</p>
                     <Link to={'/explore'}>
                         <Button className="w-full flex gap-2 text-muted-foreground" size="sm" variant="ghost"><SquareArrowLeft />Explore more courses</Button>
 
