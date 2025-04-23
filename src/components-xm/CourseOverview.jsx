@@ -284,7 +284,7 @@ function CourseOverview() {
                                     <DialogHeader>
                                         <DialogTitle>Are You Sure You Want To Leave The Course ?</DialogTitle>
                                         <DialogDescription>
-                                            Type in {courseList?.courseTitle} in the below input field and click on
+                                            Type in <span className="font-medium text-black italic">{courseList?.courseTitle}</span> in the below input field and click on
                                             confirm to Leave the course
                                         </DialogDescription>
                                     </DialogHeader>
