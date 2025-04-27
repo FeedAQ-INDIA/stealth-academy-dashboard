@@ -4,13 +4,13 @@ import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/comp
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
-import {Check, Video} from "lucide-react";
+import {AlertCircle, Check, Terminal, Video} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
 import axiosConn from "@/axioscon.js";
-import {Accordion, AccordionContent, AccordionItem, AccordionTrigger,} from "@/components/ui/accordion"
-import {useParams} from "react-router-dom";
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger,} from "@/components/ui/accordion.jsx"
+import {Link, useParams} from "react-router-dom";
 import {toast} from "@/components/hooks/use-toast.js";
-import {useCourse} from "@/components-xm/CourseContext.jsx";
+import {useCourse} from "@/components-xm/Course/CourseContext.jsx";
 import {useAuthStore} from "@/zustland/store.js";
 import {
     Dialog,
@@ -21,8 +21,9 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog.jsx"
 import {Input} from "@/components/ui/input.jsx";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
 
 
 function CourseOverview() {
@@ -114,18 +115,14 @@ function CourseOverview() {
 
 
                         <div className="flex flex-wrap gap-2 w-full mb-3">
-                            <Badge className="animate-blink bg-green-600 text-white">FREE</Badge>
-                            {/*{userEnrollmentObj?.enrollmentStatus  ?*/}
-                            {/*    <Badge  className="animate-blink bg-blue-600 text-white"  variant="outline">*/}
-                            {/*        {userEnrollmentObj?.enrollmentStatus}</Badge>*/}
-                            {/*    : <></>}*/}
-                            <Badge variant="outline">Course</Badge>
+
+                            <Badge className="animate-blink bg-green-600 text-white">{courseList?.courseCost == 0 ? 'FREE' : `Rs.${courseList?.courseCost}/-`}</Badge>
+                            <Badge variant="outline">{courseList?.courseType}</Badge>
                             <Badge variant="outline">
                                 {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}
                             </Badge>
-
-                            <Badge variant="outline"> {courseList?.courseLevel}
-                            </Badge>
+                            {courseList?.courseSource ? <Badge variant="outline">{courseList?.courseSource}</Badge> : <></>}
+                            {courseList?.courseLevel ? <Badge variant="outline">{courseList?.courseLevel}</Badge> : <></>}
                         </div>
                         <div className="flex flex-wrap gap-2 w-full mb-3 items-center">
                             <div className=" ">
@@ -176,6 +173,32 @@ function CourseOverview() {
 
 
                 {/*</section>*/}
+
+                {!userDetail?.number ? <section className="my-4">
+
+                    <Alert  variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+
+                        <div className="flex flex-row md:flex-row flex-wrap gap-2 items-center">
+                            <div>
+
+                                <AlertTitle>Phone number missing in your account</AlertTitle>
+                                <AlertDescription>
+                                    <p>Please update your phone number to receive updates regarding this {courseList?.courseType}</p>
+
+                                </AlertDescription>
+                            </div>
+
+                            <div className="md:ml-auto">
+                                <Link to='/account-settings/profile'>
+                                    <Button className="mt-2 flex-1" size={'sm'}  variant="destructive">Update</Button>
+                                </Link>
+
+                            </div>
+                        </div>
+
+                    </Alert>
+                </section> : <></>}
 
 
                 <section className="my-4">
@@ -278,7 +301,7 @@ function CourseOverview() {
 
                             <Dialog>
                                 <DialogTrigger asChild>
-                                    <Button className="ml-auto" variant="destructive">LEAVE COURSE</Button>
+                                    <Button className="ml-auto" variant="destructive">{ `LEAVE ${courseList.courseType}`}</Button>
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-md">
                                     <DialogHeader>
@@ -303,20 +326,25 @@ function CourseOverview() {
                                                 Close
                                             </Button>
                                         </DialogClose>
-                                        <Button
-                                            disabled={courseList?.courseTitle?.trim() === deleteConfirmation?.trim() ? false : true}
-                                            onClick={() => {
-                                                if (courseList?.courseTitle.trim() === deleteConfirmation?.trim()) {
-                                                    disroll();
-                                                    setDeleteConfirmation('')
-                                                } else {
-                                                    toast({
-                                                        title: 'Cannot leave the course'
-                                                    })
-                                                }
-                                            }}>
-                                            Leave Course
-                                        </Button>
+                                        {courseList?.courseCost == 0 ?
+                                            <Button
+                                                disabled={courseList?.courseTitle?.trim() === deleteConfirmation?.trim() ? false : true}
+                                                onClick={() => {
+                                                    if (courseList?.courseTitle.trim() === deleteConfirmation?.trim()) {
+                                                        disroll();
+                                                        setDeleteConfirmation('')
+                                                    } else {
+                                                        toast({
+                                                            title: courseList.courseType === "COURSE"? 'Failed to leave the course' : 'Failed to leave the webinar'
+                                                        })
+                                                    }
+                                                }}>
+                                                Confirm
+                                            </Button> :
+                                            <></>
+
+                                        }
+
                                     </DialogFooter>
                                 </DialogContent>
                             </Dialog>

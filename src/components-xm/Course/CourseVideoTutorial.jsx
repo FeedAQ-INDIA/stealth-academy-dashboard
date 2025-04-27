@@ -6,15 +6,15 @@ import {Badge} from "@/components/ui/badge.jsx";
 import {CircleArrowLeft, CircleArrowRight} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
 import {useNavigate, useParams} from "react-router-dom";
-import {useCourse} from "@/components-xm/CourseContext.jsx";
+import {useCourse} from "@/components-xm/Course/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
-import NotesModule from "@/components-xm/NotesModule.jsx";
+import NotesModule from "@/components-xm/Notes/NotesModule.jsx";
 import {toast} from "@/components/hooks/use-toast.js";
 import {Label} from "@/components/ui/label.jsx";
-import CreateNotesModule from "@/components-xm/CreateNotesModule.jsx";
+import CreateNotesModule from "@/components-xm/Notes/CreateNotesModule.jsx";
 import {useAuthStore} from "@/zustland/store.js";
-import YouTubePlayer from "@/components-xm/YoutubePlayer.jsx";
-import {Card, CardContent, CardHeader, CardTitle,} from "@/components/ui/card"
+import YouTubePlayer from "@/components-xm/Modules/YoutubePlayer.jsx";
+import {Card, CardContent, CardHeader, CardTitle,} from "@/components/ui/card.jsx"
 import "./CourseVideoTutorial.css"
 
 

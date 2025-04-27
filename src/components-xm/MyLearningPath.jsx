@@ -10,7 +10,7 @@ import {toast} from "@/components/hooks/use-toast.js";
 import {Link} from "react-router-dom";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
-import {CourseCard} from "@/components-xm/CourseCard.jsx";
+import {CourseCard} from "@/components-xm/Modules/CourseCard.jsx";
 
 
 export function MyLearningPath() {
@@ -27,6 +27,16 @@ export function MyLearningPath() {
             datasource: "User", attributes: [], where: {userId: userDetail?.userId},
             include: [{
                 datasource: "Course", as: "courses", required: false, order: [], attributes: [], where: {},
+            },
+            ],
+        },
+    });
+
+    const [apiQuery1, setApiQuery1] = useState({
+        limit: limit, offset: offset, getThisData: {
+            datasource: "User", attributes: [], where: {userId: userDetail?.userId},
+            include: [{
+                datasource: "Webinar", as: "webinars", required: false, order: [], attributes: [], where: {},
             },
             ],
         },
@@ -52,27 +62,8 @@ export function MyLearningPath() {
     };
 
 
-    const disroll = (courseId) => {
-        axiosConn
-            .post(import.meta.env.VITE_API_URL + "/disroll", {
-                courseId: courseId
-            })
-            .then((res) => {
-                console.log(res.data);
-                toast({
-                    title: 'Disrollment is successfull'
-                });
-                fetchCourses()
-                fetchUserEnrolledCourseIdList(userDetail.userId)
 
-            })
-            .catch((err) => {
-                console.log(err);
-                toast({
-                    title: 'Error occured while Disrollment'
-                })
-            });
-    }
+
     return (
         <div className="p-6">
 
@@ -104,48 +95,7 @@ export function MyLearningPath() {
 
                             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-6 items-center">
                                 {courseList?.courses?.map(a => (
-                                    // <Card className=" border shadow-sm hover:shadow-md cursor-pointer ">
-                                    //     <CardHeader>
-                                    //         {/* Badge row - wraps on smaller screens */}
-                                    //         <div className="flex flex-wrap gap-2 w-full mb-3">
-                                    //             <Badge variant="outline">Course</Badge>
-                                    //             <Badge  variant="outline">{a.user_enrollment?.enrollmentStatus}</Badge>
-                                    //
-                                    //             {a?.courseTags?.map(i => <Badge variant="outline">{i}</Badge>)}
-                                    //         </div>
-                                    //
-                                    //         {/* Title with responsive spacing */}
-                                    //         <div className=" ">
-                                    //             <CardTitle className="text-lg sm:text-xl  font-semibold">
-                                    //                 {a?.courseTitle}
-                                    //             </CardTitle>
-                                    //         </div>
-                                    //     </CardHeader>
-                                    //     <CardContent>
-                                    //         <p className="mb-2 line-clamp-3">{a?.courseDescription}</p>
-                                    //         {/*<p className="my-2 animate-blink text-blue-800 font-medium"> Registration Started</p>*/}
-                                    //         <div className="font-medium  ">
-                                    //             <div className="flex gap-2 items-center">
-                                    //                 <Clock
-                                    //                     size={18}/> {`${Math.floor(+(a?.courseDuration) / 60)}hr ${+(a?.courseDuration) % 60}min`}
-                                    //             </div>
-                                    //             {/*<div className="flex flex-row gap-2 items-center mt-2">*/}
-                                    //             {/*  <span>16% complete</span>*/}
-                                    //             {/*  <Progress value={66} /></div>*/}
-                                    //
-                                    //
-                                    //         </div>
-                                    //     </CardContent>
-                                    //
-                                    //
-                                    //     <CardFooter className="flex w-full flex-wrap gap-2">
-                                    //         <Button className=" flex-1 " variant="destructive"
-                                    //                 onClick={() => disroll(a?.courseId)}>Leave Course</Button>
-                                    //         <Link to={`/course/${a?.courseId}`} className="  flex-1 "><Button
-                                    //             className="  w-full ">Learn More</Button>
-                                    //         </Link>
-                                    //     </CardFooter>
-                                    // </Card>
+
                                     <CourseCard userEnrolledCourseIdList={userEnrolledCourseIdList} a={a}/>
                                 ))}
                             </div>
@@ -172,6 +122,8 @@ export function MyLearningPath() {
                             </Alert>}
                     </div>
                 </CardContent>
+
+
             </Card>
 
 </div>

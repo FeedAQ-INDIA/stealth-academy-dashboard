@@ -1,10 +1,10 @@
 import {ChevronLeft, ChevronRight, Clock, ExternalLink, GraduationCap, LogOut, Search,} from "lucide-react";
 
-import {Badge} from "@/components/ui/badge";
-import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardFooter, CardHeader, CardTitle,} from "@/components/ui/card";
-import {Input} from "@/components/ui/input";
-import {Pagination, PaginationContent, PaginationItem,} from "@/components/ui/pagination"
+import {Badge} from "@/components/ui/badge.jsx";
+import {Button} from "@/components/ui/button.jsx";
+import {Card, CardContent, CardFooter, CardHeader, CardTitle,} from "@/components/ui/card.jsx";
+import {Input} from "@/components/ui/input.jsx";
+import {Pagination, PaginationContent, PaginationItem,} from "@/components/ui/pagination.jsx"
 import {Link, useNavigate} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import axiosConn from "@/axioscon.js";
@@ -21,11 +21,11 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
             <CardHeader>
                 {/* Badge row - wraps on smaller screens */}
                 <div className="flex flex-wrap gap-2 w-full mb-3">
-                    <Badge className="animate-blink bg-green-600 text-white">FREE</Badge>
-                    <Badge variant="outline">Course</Badge>
+                    <Badge className="animate-blink bg-green-600 text-white">{a?.courseCost == 0 ? 'FREE' : `Rs.${a?.courseCost}/-`}</Badge>
+                    <Badge variant="outline">{a?.courseType}</Badge>
                     {a?.courseSource ? <Badge variant="outline">{a?.courseSource}</Badge> : <></>}
-                    <Badge variant="outline">Beginner</Badge>
-                </div>
+                    {a?.courseLevel ? <Badge variant="outline">{a?.courseLevel}</Badge> : <></>}
+                 </div>
 
                 {/* Title with responsive spacing */}
                 <div className=" ">
@@ -62,8 +62,8 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
                     </div>
                     : <></>}
                 </div>
-                <Link to={`/course/${a?.courseId}`} className="  flex-1 "><Button
-                    className="  w-full "><ExternalLink /> Learn More</Button>
+                <Link to={`/${a?.courseType === "COURSE" ? 'course' : 'webinar' }/${a?.courseId}`} className="  flex-1 "><Button
+                    className="  w-full "><ExternalLink />  Learn More</Button>
                 </Link>
             </CardFooter>
         </Card>

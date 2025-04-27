@@ -1,5 +1,5 @@
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar.jsx"
-import CourseSidebar from "@/components-xm/CourseSidebar.jsx";
+import CourseSidebar from "@/components-xm/Course/CourseSidebar.jsx";
 
 import {Outlet, useLocation, useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";

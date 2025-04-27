@@ -1,16 +1,17 @@
-import {ChevronLeft, ChevronRight, Clock, ExternalLink, GraduationCap, LogOut, Search,} from "lucide-react";
-
-import {Badge} from "@/components/ui/badge";
+import {ChevronLeft, ChevronRight,} from "lucide-react";
 import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardFooter, CardHeader, CardTitle,} from "@/components/ui/card";
+import {Card, CardContent, CardHeader, CardTitle,} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
 import {Pagination, PaginationContent, PaginationItem,} from "@/components/ui/pagination"
-import {Link, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import axiosConn from "@/axioscon.js";
 import {useAuthStore} from "@/zustland/store.js";
 import {toast} from "@/components/hooks/use-toast.js";
-import {CourseCard} from "@/components-xm/CourseCard.jsx";
+import {CourseCard} from "@/components-xm/Modules/CourseCard.jsx";
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select"
+import {WebinarCard} from "@/components-xm/Modules/WebinarCard.jsx";
+
 
 export function Explore() {
     const navigate = useNavigate()
@@ -18,23 +19,34 @@ export function Explore() {
     const [limit, setLimit] = useState(10);
     const [offset, setOffset] = useState(0);
     const [courseList, setCourseList] = useState([]);
-    const [apiQuery, setApiQuery] = useState({
-        limit: limit, offset: offset, getThisData: {
-            datasource: "Course", attributes: [],
-            include: [{
-                datasource: "CourseTopic", as: "courseTopic", required: false, order: [], attributes: [], where: {},
-            },],
-        },
-    });
 
-    const getSearchValueFromURL = () => {
+
+    const getSearchValueFromURL = (key) => {
         const params = new URLSearchParams(location.search);
-        return params.get("search") || ''; // Default to 'overview' tab
+        if (key == 'search') {
+            return params.get(key) || ''; // Default to 'overview' tab
+        } else {
+            return params.get(key) || null;
+        }
     };
-    const { userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore();
 
-    const [exploreCourseText, setExploreCourseText] = useState(getSearchValueFromURL);
 
+    const {userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore();
+
+    const [exploreCourseText, setExploreCourseText] = useState(getSearchValueFromURL("search"));
+    const [exploreType, setExploreType] = useState(getSearchValueFromURL("type") || "COURSE");
+
+
+    const [apiQuery, setApiQuery] = useState((getSearchValueFromURL("type") || "COURSE") == "COURSE" ? {
+            limit: limit, offset: offset, getThisData: {
+                datasource: "Course", attributes: [],
+            },
+        } :
+        {
+            limit: limit, offset: offset, getThisData: {
+                datasource: "Webinar", attributes: [],
+            },
+        });
 
     const updateApiQuery = (datasource, keyValueUpdates) => {
         setApiQuery((prevQuery) => {
@@ -104,37 +116,6 @@ export function Explore() {
         });
     };
 
-    const fetchValueByDatasourceAndKey = (datasource, key) => {
-        const {getThisData} = apiQuery;
-
-        // Helper function to search recursively through includes
-        const findInNestedIncludes = (includes) => {
-            for (const include of includes) {
-                // Check if the datasource matches
-                if (include.datasource === datasource) {
-                    return include[key]; // Return the value for the specified key
-                }
-
-                // If there are nested includes, search deeper
-                if (include.include) {
-                    const result = findInNestedIncludes(include.include);
-                    if (result !== undefined) {
-                        return result; // Return if found in nested includes
-                    }
-                }
-            }
-            return undefined; // Return undefined if not found
-        };
-
-        // Check main datasource
-        if (getThisData.datasource === datasource) {
-            return getThisData[key]; // Return the value for the specified key
-        }
-
-        // Search in nested includes
-        return findInNestedIncludes(getThisData.include);
-    };
-
     useEffect(() => {
         fetchCourses();
         console.log("userEnrolledCourseIdList :: ", userEnrolledCourseIdList)
@@ -143,7 +124,7 @@ export function Explore() {
 
     const fetchCourses = () => {
         axiosConn
-            .post(import.meta.env.VITE_API_URL+"/searchCourse", apiQuery)
+            .post(import.meta.env.VITE_API_URL + "/searchCourse", apiQuery)
             .then((res) => {
                 console.log(res.data);
                 setCourseList(res.data.data?.results);
@@ -157,36 +138,62 @@ export function Explore() {
     };
 
 
-    const handleSearchChange = (value) => {
-        const searchValue =  value;
+    const handleSearchChange = (value, type) => {
+        type = type.trim();
+        const searchValue = value;
         const trimmed = searchValue.trim();
 
         // Update the query param in the URL
         const params = new URLSearchParams(location.search);
         if (trimmed) {
             params.set("search", trimmed);
+            params.set("type", type)
         } else {
             params.delete("search");
+            params.delete("type");
         }
-        navigate({ pathname: location.pathname, search: params.toString() });
-
+        navigate({pathname: location.pathname, search: params.toString()});
+        console.log(apiQuery)
         // Call API with appropriate query
-        updateApiQuery("Course", {
-            where: {
-                courseTitle: {
-                    $like: `%${trimmed.toUpperCase() || ""}%`,
+        if (type == "COURSE") {
+            updateApiQuery("Course", {
+                where: {
+                    courseTitle: {
+                        $like: `%${trimmed.toUpperCase() || ""}%`,
+                    },
                 },
-            },
-        });
+            });
+        } else {
+            updateApiQuery("Webinar", {
+                where: {
+                    webinarTitle: {
+                        $like: `%${trimmed.toUpperCase() || ""}%`,
+                    },
+                },
+            });
+        }
+
     };
 
     useEffect(() => {
-        handleSearchChange(exploreCourseText)
-    }, [exploreCourseText]);
+        console.log(exploreType);
+        setApiQuery(exploreType == "COURSE" ? {
+                limit: limit, offset: offset, getThisData: {
+                    datasource: "Course", attributes: [],
+                },
+            } :
+            {
+                limit: limit, offset: offset, getThisData: {
+                    datasource: "Webinar", attributes: [],
+                },
+            });
+        handleSearchChange(exploreCourseText, exploreType)
+    }, [exploreCourseText, exploreType]);
+
 
     const disroll = (courseId) => {
         axiosConn
-            .post(import.meta.env.VITE_API_URL+"/disroll", {
+            .post(import.meta.env.VITE_API_URL + "/disroll", {
                 courseId: courseId
             })
             .then((res) => {
@@ -206,7 +213,6 @@ export function Explore() {
     }
 
 
-
     return (
         <div className="p-6">
             <div className=" items-center justify-items-center">
@@ -222,11 +228,23 @@ export function Explore() {
                         <div className="my-2">
                             <div className="flex gap-2 w-full md:w-3/4 lg:w-1/2 mx-auto items-center">
                                 <Input type="text" placeholder="What do you want to learn today ?"
-                                       value={exploreCourseText}  onChange={(e) => {
+                                       value={exploreCourseText} onChange={(e) => {
                                     const value = e.target.value;
                                     setExploreCourseText(value);
                                 }}
-                                     />
+                                />
+                                <Select onValueChange={(val) => setExploreType(val)}
+                                        defaultValue={exploreType}>
+                                    <SelectTrigger className="w-fit">
+                                        <SelectValue placeholder="Select Type"/>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectItem value="COURSE">COURSE</SelectItem>
+                                            <SelectItem value="WEBINAR">WEBINAR</SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
                                 {/*<Button type="submit"><Search/></Button>*/}
                             </div>
                         </div>
@@ -234,14 +252,16 @@ export function Explore() {
                 </Card>
 
                 <div className="my-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 my-10 items-center">
-                        {courseList?.map(a => (
-                            <CourseCard userEnrolledCourseIdList={userEnrolledCourseIdList} a={a}/>
-
+                    <div
+                        className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 my-10 items-center">
+                        {courseList?.map((a) =>
+                            exploreType === "COURSE" ? (
+                                <CourseCard key={a.id} userEnrolledCourseIdList={userEnrolledCourseIdList} a={a} />
+                            ) : (
+                                <WebinarCard key={a.id} userEnrolledCourseIdList={userEnrolledCourseIdList} a={a} />
                             )
                         )}
-
-                    </div>
+                     </div>
                 </div>
 
             </div>
@@ -287,7 +307,7 @@ export function Explore() {
                         </PaginationItem>
                     </PaginationContent>
                 </Pagination>
-            </div>: <></>}
+            </div> : <></>}
         </div>
     );
 }

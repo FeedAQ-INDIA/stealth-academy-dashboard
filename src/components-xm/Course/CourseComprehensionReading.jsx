@@ -6,7 +6,7 @@ import React from "react";
 import {Badge} from "@/components/ui/badge.jsx";
  import {Textarea} from "@/components/ui/textarea.jsx";
 import {Button} from "@/components/ui/button.jsx";
-import AudioRecorder from "@/components-xm/AudioRecorder.jsx";
+import AudioRecorder from "@/components-xm/Modules/AudioRecorder.jsx";
 import {Link} from "react-router-dom";
 
 function CourseComprehensionReading() {

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Textarea} from "@/components/ui/textarea.jsx";
 import {Button} from "@/components/ui/button.jsx";
-import {useCourse} from "@/components-xm/CourseContext.jsx";
+import {useCourse} from "@/components-xm/Course/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
@@ -16,7 +16,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog.jsx"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -27,7 +27,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog.jsx"
 import {Card, CardContent, CardHeader} from "@/components/ui/card.jsx";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
 import {Terminal} from "lucide-react";

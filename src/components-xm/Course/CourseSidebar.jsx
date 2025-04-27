@@ -20,7 +20,7 @@ import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible.jsx";
 import {Check, ChevronRight, CircleChevronLeft, Clock, Loader, SquareArrowLeft} from "lucide-react";
 import {Separator} from "@/components/ui/separator.jsx";
-import {useCourse} from "@/components-xm/CourseContext.jsx";
+import {useCourse} from "@/components-xm/Course/CourseContext.jsx";
 import {Badge} from "@/components/ui/badge.jsx";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
 import {Button} from "@/components/ui/button.jsx";

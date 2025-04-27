@@ -13,11 +13,11 @@ import {Badge} from "@/components/ui/badge.jsx";
 import {Check, CircleArrowLeft, CircleArrowRight} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
 import {Link, useNavigate, useParams} from "react-router-dom";
-import {useCourse} from "@/components-xm/CourseContext.jsx";
+import {useCourse} from "@/components-xm/Course/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
 import {toast} from "@/components/hooks/use-toast.js";
 import {Checkbox} from "@/components/ui/checkbox.jsx";
-import QuizRender from "@/components-xm/QuizRender.jsx";
+import QuizRender from "@/components-xm/Course/QuizRender.jsx";
 import {useAuthStore} from "@/zustland/store.js";
 
 function CourseQuiz() {

@@ -11,16 +11,18 @@ import ErrorPage from "./components-xm/error-page.jsx";
 import {Dashboard} from "@/components-xm/Dashboard.jsx";
 import {Explore} from "@/components-xm/Explore.jsx";
 import {MyLearningPath} from "@/components-xm/MyLearningPath.jsx";
-import {CourseDetail} from "@/components-xm/CourseDetail.jsx";
-import CourseOverview from "@/components-xm/CourseOverview.jsx";
-import CourseVideoTutorial from "@/components-xm/CourseVideoTutorial.jsx";
-import {AccountDetail} from "@/components-xm/AccountDetail.jsx";
-import CourseComprehensionReading from "@/components-xm/CourseComprehensionReading.jsx";
-import CourseListenAndRead from "@/components-xm/CourseListenAndRead.jsx";
-import MyAccount from "@/components-xm/MyAccountSettings/MyAccount.jsx";
-import CourseWritten from "@/components-xm/CourseWritten.jsx";
-import CourseDocThirdParty from "@/components-xm/CourseDocThirdParty.jsx";
-import CourseQuiz from "@/components-xm/CourseQuiz.jsx";
+import {CourseDetail} from "@/components-xm/Course/CourseDetail.jsx";
+import CourseOverview from "@/components-xm/Course/CourseOverview.jsx";
+import CourseVideoTutorial from "@/components-xm/Course/CourseVideoTutorial.jsx";
+import {AccountDetail} from "@/components-xm/AccountSettings/AccountDetail.jsx";
+import CourseComprehensionReading from "@/components-xm/Course/CourseComprehensionReading.jsx";
+import CourseListenAndRead from "@/components-xm/Course/CourseListenAndRead.jsx";
+import MyAccount from "@/components-xm/AccountSettings/MyAccount.jsx";
+import CourseWritten from "@/components-xm/Course/CourseWritten.jsx";
+import CourseDocThirdParty from "@/components-xm/Course/CourseDocThirdParty.jsx";
+import CourseQuiz from "@/components-xm/Course/CourseQuiz.jsx";
+import {WebinarDetail} from "@/components-xm/Webinar/WebinarDetail.jsx";
+import WebinarOverview from "@/components-xm/Webinar/WebinarOverview.jsx";
 
 
  
@@ -92,6 +94,17 @@ const router = createBrowserRouter([
                     },
                 ]
              },
+
+            {
+                path: "/webinar",
+                element: <WebinarDetail/>,
+                children:[
+                    {
+                        path: "/webinar/:WebinarId",
+                        element: <WebinarOverview/>,
+                    },
+                ]
+            },
 
             {
                 path: "/my-learning-path",

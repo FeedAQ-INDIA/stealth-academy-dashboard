@@ -13,12 +13,12 @@ import {Badge} from "@/components/ui/badge.jsx";
 import {Check} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
 import {Link, useNavigate, useParams} from "react-router-dom";
-import {useCourse} from "@/components-xm/CourseContext.jsx";
+import {useCourse} from "@/components-xm/Course/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
 import {toast} from "@/components/hooks/use-toast.js";
 import {Checkbox} from "@/components/ui/checkbox.jsx";
-import QuizQuestionCard from "@/components-xm/QuizQuestionCard.jsx";
-import QuizResultReview from "@/components-xm/QuizResultReview.jsx";
+import QuizQuestionCard from "@/components-xm/Course/QuizQuestionCard.jsx";
+import QuizResultReview from "@/components-xm/Course/QuizResultReview.jsx";
 import {useAuthStore} from "@/zustland/store.js";
 
 function QuizRender({saveUserEnrollmentData, deleteUserEnrollmentData, fetchCourseVideo}) {

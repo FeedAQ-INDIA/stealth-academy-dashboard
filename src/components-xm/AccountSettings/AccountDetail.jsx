@@ -2,7 +2,7 @@ import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sid
 
 import {Outlet, useNavigate, useParams} from "react-router-dom";
 
-import AccountSidebar from "@/components-xm/AccountSidebar.jsx";
+import AccountSidebar from "@/components-xm/AccountSettings/AccountSidebar.jsx";
 
 
 const HEADER_HEIGHT = "4rem";
