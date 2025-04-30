@@ -63,10 +63,10 @@ function WebinarOverview() {
         let status = '';
 
         if (now < regStart) {
-            status = 'registration_not_started';
+            status = 'registration not started';
         } else if (now >= regStart && now <= regEnd) {
             if (now < start) {
-                status = 'registration_open';
+                status = 'registration open';
             } else if (now >= start && now <= end) {
                 status = 'live';
             } else if (now > end) {
@@ -74,7 +74,7 @@ function WebinarOverview() {
             }
         } else if (now > regEnd) {
             if (now < start) {
-                status = 'registration_closed';
+                status = 'registration closed';
             } else if (now >= start && now <= end) {
                 status = 'live';
             } else {
@@ -131,7 +131,7 @@ function WebinarOverview() {
                                     {webinarList?.webinarTitle}
                                 </CardTitle>
                                 <p  className="completed-stamp text-base tracking-wide text-left mt-2"   >
-                                    <span className="text-black font-light">Webinar Status</span> : {fetchWebinarStatus(webinarList)}</p>
+                                    <span className="text-black font-light">Webinar Status : </span>{fetchWebinarStatus(webinarList)}</p>
                             </div>
                             <div className="ml-auto ">
                                 {(isUserEnrolledAlready ?
@@ -151,6 +151,8 @@ function WebinarOverview() {
 
 
                 </Card>
+
+
 
 
                 {!userDetail?.number ? <section className="my-4">
@@ -180,6 +182,37 @@ function WebinarOverview() {
                 </section> : <></>}
 
 
+
+                <section className="my-4">
+
+
+                    <Card className=" bg-muted/50 border-none">
+                        <CardHeader>
+
+                            <div className="flex flex-wrap justify-between gap-2 w-full ">
+
+                                <p  className=" text-base tracking-wide text-left mt-2"   >
+                                    <span className="text-black font-medium ">Webinar Date : </span>
+                                    {`${webinarList?.webinar_start_date} ${webinarList?.webinar_start_time}`} <span className="text-black font-medium "> - </span> {`${webinarList?.webinar_end_date} ${webinarList?.webinar_end_time} `}
+                                </p>
+
+                                <p  className=" text-base tracking-wide text-left mt-2"   >
+                                    <span className="text-black font-medium ">Webinar Registration : </span>
+                                    {`${webinarList?.webinar_registration_start_date} ${webinarList?.webinar_registration_start_time}`} <span className="text-black font-medium "> - </span> {`${webinarList?.webinar_registration_end_date} ${webinarList?.webinar_registration_end_time} `}
+                                </p>
+
+
+                            </div>
+
+                        </CardHeader>
+
+
+                    </Card>
+                </section>
+
+
+
+
                 <section className="my-4">
                     <Card className="border-0 bg-muted/50">
                         <CardHeader>
@@ -197,65 +230,7 @@ function WebinarOverview() {
                         </CardContent>
                     </Card>
                 </section>
-                <section className="my-8">
-                    <Card className="border-0 bg-muted/50">
-                        <CardHeader>
-                            <CardTitle className="">
-                                Webinar Structure
-                            </CardTitle>
 
-                        </CardHeader>
-                        <CardContent>
-                            <div className="my-3">
-                                {webinarList?.webinarTopic?.map(a => (
-                                    <Accordion type="single" key={a?.webinarTopicId} collapsible>
-                                        <AccordionItem value="item-1">
-                                            <AccordionTrigger className="flex items-center gap-2  justify-start">
-                                                <Badge>
-                                                    {(() => {
-                                                        const totalMinutes = +a?.webinarTopicDuration || 0;
-                                                        const hours = Math.floor(totalMinutes / 60);
-                                                        const minutes = totalMinutes % 60;
-
-                                                        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-                                                    })()}
-                                                </Badge>
-                                                <span>{a?.webinarTopicTitle}</span>
-                                            </AccordionTrigger>
-                                            <AccordionContent>
-                                                {a?.webinarTopicDescription}
-                                                <div>
-                                                    <ul>
-                                                        {a?.webinarTopicContent?.map(a => (
-                                                            <li className="flex gap-2 items-center my-2"
-                                                                key={a?.webinarTopicContentId}>
-                                                                {userEnrollmentWebinarLog?.filter(b => b.webinarId == WebinarId && b?.webinarTopicContentId == a?.webinarTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0 ?
-                                                                    <Check color="#11a72a"/> : <></>}
-                                                                <Badge>
-                                                                    {(() => {
-                                                                        const totalMinutes = +a?.webinarTopicContentDuration || 0;
-                                                                        const hours = Math.floor(totalMinutes / 60);
-                                                                        const minutes = totalMinutes % 60;
-
-                                                                        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-                                                                    })()}
-                                                                </Badge>
-                                                                <Video/>
-                                                                <span>{a?.webinarTopicContentTitle}</span>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                    </Accordion>
-                                ))}
-
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                </section>
 
 
                 <section className="my-4 flex">
