@@ -184,9 +184,13 @@ function WebinarOverview() {
 
 
                 <section className="my-4">
+                    <div className="flex flex-col md:flex-row gap-4">
+
+                        <img src={webinarList?.webinarImageUrl?.[0]} className="h-72"/>
 
 
-                    <Card className=" bg-muted/50 border-none">
+
+                        <Card className=" bg-muted/50 border-none">
                         <CardHeader>
 
                             <div className="flex flex-wrap justify-between gap-2 w-full ">
@@ -204,13 +208,69 @@ function WebinarOverview() {
 
                             </div>
 
+                            <div className="flex flex-wrap  gap-4 w-full ">
+                                {webinarList?.webinarMode  ?
+
+                                <p  className=" text-base tracking-wide text-left mt-2"   >
+                                    <span className="text-black font-medium ">Webinar Mode : </span>
+                                    {webinarList?.webinarMode}
+                                 </p> : <></>
+                                }
+
+                                {webinarList?.webinarSource  ?
+
+                                    <p  className=" text-base tracking-wide text-left mt-2"   >
+                                    <span className="text-black font-medium ">Webinar Via : </span>
+                                    {webinarList?.webinarSource}
+                                 </p>:<></>
+                                }
+
+                                {webinarList?.webinarLanguage  ?
+
+                                    <p  className=" text-base tracking-wide text-left mt-2"   >
+                                    <span className="text-black font-medium ">Webinar Language : </span>
+                                    {webinarList?.webinarLanguage}
+                                </p> :<></> }
+
+                                {webinarList?.webinarDuration  ?
+
+                                    <p  className=" text-base tracking-wide text-left mt-2"   >
+                                    <span className="text-black font-medium ">Webinar Duration : </span>
+                                    {`${Math.floor(+(webinarList?.webinarDuration) / 60)}hr ${+(webinarList?.webinarDuration) % 60}min`}
+                                </p>:<></>
+                                }
+
+                                {webinarList?.webinarPresenter?.length > 0 ?
+                                    <p  className=" text-base tracking-wide text-left mt-2"   >
+                                        <span className="text-black font-medium ">Webinar Presenter : </span>
+                                        {webinarList?.webinarPresenter?.map(i => i)  }
+                                    </p>:<></>
+                                }
+
+
+                                <p  className=" text-base tracking-wide text-left mt-2"   >
+                                    <span className="text-black font-medium ">Webinar Cost : </span>
+                                    {webinarList?.webinarCost == 0 ? 'FREE' : `Rs.${webinarList?.webinarCost}/-`}
+                                </p>
+
+
+                            </div>
+
+                            <div className="flex flex-wrap justify-between gap-2 w-full ">
+                                <p  className=" text-base tracking-wide text-left mt-2"   >
+                                    <span className="text-black font-medium ">Webinar Location : </span>
+                                    {webinarList?.webinarHostLocation  }
+                                </p>
+                            </div>
+
                         </CardHeader>
 
 
-                    </Card>
+                    </Card>  </div>
                 </section>
+                <section className="my-4">
 
-
+                </section>
 
 
                 <section className="my-4">

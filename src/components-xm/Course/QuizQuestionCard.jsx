@@ -26,6 +26,21 @@ export default function QuizQuestionCard({ question, onAnswerChange }) {
                         Note: {question.quizQuestionNote}
                     </p>
                 )}
+                <div className="flex gap-3">
+                    {question.quizQuestionPosPoint && (
+                        <p className="text-sm text-muted-foreground mb-4 text-blue-700">
+                            Correct Marks: + {question.quizQuestionPosPoint}
+                        </p>
+                    )}
+
+                    {question.quizQuestionNegPoint && (
+                        <p className="text-sm text-muted-foreground mb-4 text-red-600">
+                            Wrong Marks: - {question.quizQuestionNegPoint}
+                        </p>
+                    )}
+                </div>
+
+
                 <div className="space-y-3">
                     {question.quizQuestionOption.map((option) => (
                         <div key={option} className="flex items-center gap-2 p-2 rounded-md border">

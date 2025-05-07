@@ -4,12 +4,14 @@ export default function QuizResultReview({ result, questionMap }) {
 
     useEffect(() => {
         console.log(result);
+        console.log(questionMap);
+
     }, [ ]);
 
     return (
         <div className="space-y-6">
-             <h2 className="text-2xl font-bold">Quiz Result</h2>
-            <p className="text-lg">You scored <strong>{result?.quizResultPoint}</strong> points.</p>
+             <h2 className="text-2xl font-bold">Result</h2>
+            <p className="text-lg">You scored <strong>{result?.quizResultPoint}</strong> out of <strong>{result?.totalPoints }</strong>.</p>
 
             {result?.quizResultSnapshot?.map((q, index) => {
                 const question = questionMap[q.quizQuestionId]; // you need a map of questions

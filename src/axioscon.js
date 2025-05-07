@@ -42,7 +42,7 @@ axiosConn.interceptors.response.use(
 
                 }else {
                     refreshTokenCount = 0;
-                    window.location = "/signin";
+                    window.location = "/signin"
                 }
             }
 
@@ -58,14 +58,14 @@ axiosConn.interceptors.response.use(
                     return axiosConn(error.config);
                 } catch (refreshError) {
                     console.error("Token refresh failed. Redirecting to login.");
-                    window.location = "/signin";
+                    window.location = "/signin"
                     return Promise.reject(refreshError);
                 }
 
 
         }
         if(error.response && error.response.status === 401){
-            window.location = "/signin";
+            window.location = "/signin"
         }
 
         return Promise.reject(error);
