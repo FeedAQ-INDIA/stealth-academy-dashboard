@@ -42,7 +42,7 @@ axiosConn.interceptors.response.use(
 
                 }else {
                     refreshTokenCount = 0;
-                    window.location = "/signin"
+                    window.location = "/signin"+getRedirectUri();
                 }
             }
 
@@ -58,18 +58,27 @@ axiosConn.interceptors.response.use(
                     return axiosConn(error.config);
                 } catch (refreshError) {
                     console.error("Token refresh failed. Redirecting to login.");
-                    window.location = "/signin"
+                    window.location = "/signin"+getRedirectUri()
                     return Promise.reject(refreshError);
                 }
 
 
         }
         if(error.response && error.response.status === 401){
-            window.location = "/signin"
+            window.location = "/signin"+getRedirectUri();
         }
 
         return Promise.reject(error);
     }
 );
+
+
+const getRedirectUri = () => {
+    if(window.location.pathname === "/signin") {
+        return "";
+    }else{
+        return "?redirect="+window.location.href;
+    }
+}
 
 export default axiosConn;

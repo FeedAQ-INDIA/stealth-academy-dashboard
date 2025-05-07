@@ -1,7 +1,7 @@
 import {Button} from "@/components/ui/button";
 import {Loader2} from "lucide-react";
 import React from "react";
-import {Link} from "react-router-dom";
+import {Link, useSearchParams} from "react-router-dom";
 import {
     Card,
     CardContent,
@@ -23,6 +23,8 @@ import "./SignInPage.css"
 
 function SignInPage() {
 
+    const [searchParams] = useSearchParams();
+    const redirectUri = searchParams.get("redirect"); // e.g., ?userId=123
 
 
     return (
@@ -72,7 +74,7 @@ function SignInPage() {
 
                         <div className="mt-8 space-y-4">
                             {/* Google Login */}
-                            <Link   to={import.meta.env.VITE_API_URL + "/auth/google"}>
+                            <Link   to={import.meta.env.VITE_API_URL + "/auth/google"+"?redirect="+redirectUri}>
                                 <Button
                                     className="flex items-center w-full gap-3  my-2 "
                                     variant="outline"
