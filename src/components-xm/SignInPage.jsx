@@ -24,7 +24,7 @@ import "./SignInPage.css"
 function SignInPage() {
 
     const [searchParams] = useSearchParams();
-    const redirectUri = searchParams.get("redirect"); // e.g., ?userId=123
+    const redirectUri = searchParams.get("redirectUri") || null; // e.g., ?userId=123
 
 
     return (
@@ -74,7 +74,7 @@ function SignInPage() {
 
                         <div className="mt-8 space-y-4">
                             {/* Google Login */}
-                            <Link   to={import.meta.env.VITE_API_URL + "/auth/google"+"?redirect="+redirectUri}>
+                            <Link   to={`${import.meta.env.VITE_API_URL}/auth/google${redirectUri? '?redirectUri='+redirectUri : ''}`}>
                                 <Button
                                     className="flex items-center w-full gap-3  my-2 "
                                     variant="outline"
@@ -108,7 +108,7 @@ function SignInPage() {
                             </Link>
 
                             {/* Microsoft Login */}
-                            <Link    to={import.meta.env.VITE_API_URL + "/auth/microsoft"}>
+                            <Link   to={`${import.meta.env.VITE_API_URL}/auth/microsoft${redirectUri? '?redirectUri='+redirectUri : ''}`}>
                                 <Button
                                     className="flex items-center w-full gap-3  my-2"
                                     variant="outline"

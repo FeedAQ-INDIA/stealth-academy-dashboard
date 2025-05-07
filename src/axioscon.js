@@ -77,7 +77,7 @@ const getRedirectUri = () => {
     if(window.location.pathname === "/signin") {
         return "";
     }else{
-        return "?redirect="+window.location.href;
+        return "?redirectUri="+window.location.href;
     }
 }
 
