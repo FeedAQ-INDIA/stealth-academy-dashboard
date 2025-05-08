@@ -1,24 +1,18 @@
-import {Clock, Search, Terminal,} from "lucide-react";
-
-import {Badge} from "@/components/ui/badge";
+import {Search,} from "lucide-react";
 import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardFooter, CardHeader, CardTitle,} from "@/components/ui/card";
+import {Card, CardContent, CardHeader, CardTitle,} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
-import {Progress} from "@/components/ui/progress";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar"
 import {Link, useNavigate} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import axiosConn from "@/axioscon.js";
 import {useAuthStore} from "@/zustland/store.js";
 import {toast} from "@/components/hooks/use-toast.js";
-import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
-import {FeaturedCourse} from "@/components-xm/FeaturedCourse.jsx";
-
-
+import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet.jsx";
 
 
 export function Dashboard() {
-    const {userDetail,  userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore()
+    const {userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore()
     const navigate = useNavigate()
 
     const [totalCount, setTotalCount] = useState(0);
@@ -41,7 +35,7 @@ export function Dashboard() {
 
     const fetchCourses = () => {
         axiosConn
-            .post(import.meta.env.VITE_API_URL+"/searchCourse", apiQuery)
+            .post(import.meta.env.VITE_API_URL + "/searchCourse", apiQuery)
             .then((res) => {
                 console.log(res.data);
                 setCourseList(res.data.data?.results?.[0]);
@@ -57,7 +51,7 @@ export function Dashboard() {
 
     const disroll = (courseId) => {
         axiosConn
-            .post(import.meta.env.VITE_API_URL+"/disroll", {
+            .post(import.meta.env.VITE_API_URL + "/disroll", {
                 courseId: courseId
             })
             .then((res) => {
@@ -66,7 +60,7 @@ export function Dashboard() {
                     title: 'Disrollment is successfull'
                 });
                 fetchCourses()
-             })
+            })
             .catch((err) => {
                 console.log(err);
                 toast({
@@ -108,13 +102,50 @@ export function Dashboard() {
                 <CardContent>
                     <div className="my-2">
                         <div className="flex gap-2 w-full md:w-3/4 lg:w-1/2 mx-auto items-center">
-                            <Input type="text" value={exploreCourseText} onChange={(e)=> setExploreCourseText(e.target.value)} placeholder="What do you want to learn today ?"/>
-                            <Button type="submit" onClick={()=> navigate('/explore?search='+exploreCourseText)}><Search/></Button>
+                            <Input type="text" value={exploreCourseText}
+                                   onChange={(e) => setExploreCourseText(e.target.value)}
+                                   placeholder="What do you want to learn today ?"/>
+                            <Button type="submit"
+                                    onClick={() => navigate('/explore?search=' + exploreCourseText)}><Search/></Button>
                         </div>
                     </div>
                 </CardContent>
             </Card>
 
+            <section className="my-6 grid grid-cols-1 ">
+                <Card className="border-0 bg-muted/50  py-6  ">
+                    <CardHeader className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                        <CardTitle className="text-lg sm:text-2xl font-semibold">
+                            Power Up Your Preparation with our curated <strong className="font-bold">Mock
+                            Interview</strong> by Industry Experts
+                        </CardTitle>
+                        <div className="sm:ml-auto">
+                            {/*<Sheet>*/}
+                            {/*    <SheetTrigger asChild>*/}
+                            {/*        /!*<Link to={`/workspace/${WorkspaceId}/products?tab=products`}>*!/*/}
+                            {/*        <Button*/}
+                            {/*            className="h-8 gap-1 "*/}
+                            {/*        >Schedule Interview</Button>*/}
+                            {/*        /!*</Link>*!/*/}
+                            {/*    </SheetTrigger>*/}
+                            {/*    <SheetContent>*/}
+                            {/*        <SheetHeader>*/}
+                            {/*            <SheetTitle>Schedule Interview</SheetTitle>*/}
+                            {/*        </SheetHeader>*/}
+                            {/*     </SheetContent>*/}
+                            {/*</Sheet>*/}
+
+                            <Link to={`/mock-interview`}>
+                            <Button
+                                className="h-8 gap-1 "
+                            >View Detail</Button>
+                            </Link>
+                         </div>
+                    </CardHeader>
+
+
+                </Card>
+            </section>
 
 
         </div>

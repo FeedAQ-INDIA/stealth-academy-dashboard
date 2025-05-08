@@ -23,6 +23,7 @@ import CourseDocThirdParty from "@/components-xm/Course/CourseDocThirdParty.jsx"
 import CourseQuiz from "@/components-xm/Course/CourseQuiz.jsx";
 import {WebinarDetail} from "@/components-xm/Webinar/WebinarDetail.jsx";
 import WebinarOverview from "@/components-xm/Webinar/WebinarOverview.jsx";
+import {MockInterview} from "@/components-xm/MockInterview.jsx";
 
 
  
@@ -109,6 +110,10 @@ const router = createBrowserRouter([
             {
                 path: "/my-learning-path",
                 element: <MyLearningPath/>,
+            },
+            {
+                path: "/mock-interview",
+                element: <MockInterview/>,
             },
         ]
     },
