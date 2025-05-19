@@ -1,4 +1,4 @@
-import {Clock, Terminal,} from "lucide-react";
+import {ChevronLeft, ChevronRight, Clock, ExternalLink, Terminal,} from "lucide-react";
 
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
@@ -12,6 +12,18 @@ import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
 import {CourseCard} from "@/components-xm/Modules/CourseCard.jsx";
 import {WebinarCard} from "@/components-xm/Modules/WebinarCard.jsx";
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableFooter,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import {Pagination, PaginationContent, PaginationItem,} from "@/components/ui/pagination.jsx";
+
 
 
 export function MyLearningPath() {
@@ -84,6 +96,38 @@ export function MyLearningPath() {
                 setTotalCount1(res.data.data.totalCount);
                 setOffset1(res.data.data.offset);
                 setLimit1(res.data.data.limit);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+
+    const [totalCount2, setTotalCount2] = useState(0);
+    const [limit2, setLimit2] = useState(10);
+    const [offset2, setOffset2] = useState(0);
+    const [mockInterviewHistoryList, setMockInterviewHistoryList] = useState([]);
+
+    const [apiQuery2, setApiQuery2] = useState({
+        limit: limit2, offset: offset2, getThisData: {
+            datasource: "InterviewReq", attributes: [], where: {userId: userDetail?.userId},
+
+        },
+    });
+
+    useEffect(() => {
+        fetchMockInterviewHistory();
+    }, [apiQuery2]);
+
+    const fetchMockInterviewHistory = () => {
+        axiosConn
+            .post(import.meta.env.VITE_API_URL + "/searchCourse", apiQuery2)
+            .then((res) => {
+                console.log(res.data);
+                setMockInterviewHistoryList(res.data.data?.results);
+                setTotalCount2(res.data.data.totalCount);
+                setOffset2(res.data.data.offset);
+                setLimit2(res.data.data.limit);
             })
             .catch((err) => {
                 console.log(err);
@@ -189,6 +233,132 @@ export function MyLearningPath() {
                                         <Link to='/explore?type=WEBINAR'>
                                             <Button className="mt-2 flex-1" size={'sm'}>Start your journey
                                                 today</Button>
+                                        </Link>
+
+                                    </div>
+                                </div>
+
+                            </Alert>}
+                    </div>
+                </CardContent>
+
+
+            </Card>
+
+
+            <Card className="border-0 bg-muted/50  my-6">
+                <CardHeader>
+                    <CardTitle className="flex gap-2">
+                        Mock Interview History
+                    </CardTitle>
+
+
+                </CardHeader>
+                <CardContent>
+                    <div className="my-2">
+                        {mockInterviewHistoryList?.length > 0 ?
+
+                            <div className=" my-6 items-center">
+                                {/*{courseList1?.webinars?.map(a => (*/}
+
+                                {/*    <WebinarCard userEnrolledCourseIdList={userEnrolledCourseIdList} a={a}/>*/}
+                                {/*))}*/}
+
+                                <Table>
+                                     <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="w-[100px]">ID</TableHead>
+                                            <TableHead>Interview Date</TableHead>
+                                            <TableHead>Interview Time</TableHead>
+                                            <TableHead>Duration</TableHead>
+                                            <TableHead>Cost</TableHead>
+
+                                            <TableHead className="text-right">Status</TableHead>
+                                            <TableHead className="text-right"></TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {mockInterviewHistoryList?.map(a => (
+                                            <TableRow key={a.interviewReqId}>
+                                                <TableCell className="font-medium">{a.interviewReqId}</TableCell>
+                                                <TableCell>  {a.interviewReqDate ? new Date(a.interviewReqDate).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}
+                                                </TableCell>
+                                                <TableCell>{a.interviewReqTime}</TableCell>
+                                                <TableCell>{a.interviewReqDuration} min</TableCell>
+                                                <TableCell>{a.interviewReqCost == 0 || !a.interviewReqCost? "FREE" : ""}</TableCell>
+
+                                                <TableCell className="text-right">{a.interviewReqStatus}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button size="sm" variant="outline"><ExternalLink /></Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                    <TableFooter>
+                                        <TableRow>
+                                            <TableCell colSpan={7} className="py-3">
+                                                <div className="flex flex-row items-center">
+                                                    <div className="text-xs text-muted-foreground">
+                                                        {offset2 + 1} to {Math.min(offset2 + limit2, totalCount2)} of {totalCount2} row(s) selected.
+                                                    </div>
+                                                    <Pagination className="ml-auto mr-0 w-auto">
+                                                        <PaginationContent>
+                                                            <PaginationItem>
+                                                                <Button
+                                                                    size="icon"
+                                                                    variant="outline"
+                                                                    className="h-6 w-6"
+                                                                    onClick={() => {
+                                                                        setOffset(Math.max(offset - limit, 0));
+                                                                        setApiQuery((prevQuery) => ({
+                                                                            ...prevQuery,
+                                                                            offset: Math.max(offset2 - limit2, 0),
+                                                                        }));
+                                                                    }}
+                                                                >
+                                                                    <ChevronLeft className="h-3.5 w-3.5" />
+                                                                    <span className="sr-only">Previous Order</span>
+                                                                </Button>
+                                                            </PaginationItem>
+                                                            <PaginationItem>
+                                                                <Button
+                                                                    size="icon"
+                                                                    variant="outline"
+                                                                    className="h-6 w-6"
+                                                                    onClick={() => {
+                                                                        setOffset(offset2 + limit2 < totalCount2 ? offset2 + limit2 : offset2);
+                                                                        setApiQuery((prevQuery) => ({
+                                                                            ...prevQuery,
+                                                                            offset: offset2 + limit2 < totalCount2 ? offset2 + limit2 : offset2,
+                                                                        }));
+                                                                    }}
+                                                                >
+                                                                    <ChevronRight className="h-3.5 w-3.5" />
+                                                                    <span className="sr-only">Next Order</span>
+                                                                </Button>
+                                                            </PaginationItem>
+                                                        </PaginationContent>
+                                                    </Pagination>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableFooter>
+                                </Table>
+                            </div>
+                            :
+                            <Alert> <Terminal className="h-4 w-4"/>
+                                <div className="flex flex-row md:flex-row flex-wrap gap-2 items-center">
+                                    <div>
+                                        <AlertTitle>No Mock Interview History Found</AlertTitle>
+                                        <AlertDescription>
+                                            <p>You are not enrolled in any mock interview</p>
+
+                                        </AlertDescription>
+                                    </div>
+
+                                    <div className="md:ml-auto">
+                                        <Link to='/mock-interview'>
+                                            <Button className="mt-2 flex-1" size={'sm'}>Schedule Now</Button>
                                         </Link>
 
                                     </div>

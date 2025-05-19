@@ -54,3 +54,7 @@ export const useLoadingBarStore = create((set) => ({
             loadingStates: { ...prev.loadingStates, [component]: state },
         })),
 }));
+
+export const useProtectedURIStore = create((set) => ({
+    publicUri : ['sign-in', 'mock-interview'],
+}));

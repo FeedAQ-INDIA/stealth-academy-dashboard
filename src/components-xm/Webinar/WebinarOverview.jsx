@@ -91,6 +91,13 @@ function WebinarOverview() {
 
     const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
+    useEffect(() => {
+        console.log(webinarList?.webinarTitle?.trim())
+        console.log(deleteConfirmation?.trim())
+        console.log("Is delete confirmed", webinarList?.webinarTitle?.trim() == deleteConfirmation?.trim())
+    }, [deleteConfirmation]);
+
+
     return (
         <>
             <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">

@@ -11,20 +11,29 @@ import axiosConn from "@/axioscon.js";
 import {toast} from "@/components/hooks/use-toast.js";
 import React, {useState} from "react";
 
-const createMockInterviewSchema = z.object({
-    date: z.string().refine(val => !isNaN(Date.parse(val)), {
-        message: "Invalid date",
-    }),
-    time: z.string(),
-    duration: z.number(),
-    resumeLink: z.string().url({ message: "Invalid resume URL" }),
-    attachmentLink: z.string().optional(),
-    note: z.string().optional(),
-});
 
 export function CreateMockInterview() {
     const {userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore();
     const [exploreCourseText, setExploreCourseText] = useState("");
+
+
+    const createMockInterviewSchema = z.object({
+        date: z.string().refine(val => {
+            const parsedDate = Date.parse(val);
+            return !isNaN(parsedDate) && new Date(parsedDate) > new Date();
+        }, {
+            message: "Date must be a valid future date",
+        }),
+        time: z.string().refine(val => /^([01]\d|2[0-3]):([0-5]\d)$/.test(val), {
+            message: "Time must be in HH:mm format",
+        }),
+        duration: z.number().positive({ message: "Duration must be a positive number" }),
+        resumeLink: z.string().url({ message: "Invalid resume URL" }),
+        attachmentLink: z.string().url({ message: "Invalid attachment URL" }).optional(),
+        note: z.string().optional(),
+    });
+
+
 
     const createMockInterviewForm = useForm({
         resolver: zodResolver(createMockInterviewSchema),
@@ -44,6 +53,7 @@ export function CreateMockInterview() {
         axiosConn.post('/raiseInterviewRequest', data)
             .then(res => {
                 toast({ title: res.data?.data?.message });
+                createMockInterviewForm.reset();
             })
             .catch(err => {
                 toast({ title: "Failed to schedule mock interview." });

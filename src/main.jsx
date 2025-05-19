@@ -122,14 +122,6 @@ const router = createBrowserRouter([
 ]);
 
 
-// try {
-//     if (window.location.pathname != "/signin") {
-//         await refreshToken();
-//     }
-// } catch (err) {
-//     console.log(err);
-// }
-
 async function runTokenRefresh() {
     if (window.location.pathname !== "/signin") {
         await refreshToken().catch((err) => {

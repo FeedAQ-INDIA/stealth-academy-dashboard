@@ -91,7 +91,7 @@ export function MockInterview() {
 
                                 <CardContent>
                                   <p>
-                                      At Feedaq Academy, our Mock Interview Service is designed to simulate real-world interview scenarios. Whether you're preparing for a technical role in software engineering, a business analyst position, or a fresher interview, we’ve got you covered.
+                                      At FeedAQ Academy, our Mock Interview Service is designed to simulate real-world interview scenarios. Whether you're preparing for a technical role in software engineering, a business analyst position, or a fresher interview, we’ve got you covered.
 
                                   </p>
                                 <div className="mt-4">
@@ -146,7 +146,7 @@ export function MockInterview() {
                                                 >Schedule Interview</Button>
                                                 {/*</Link>*/}
                                             </SheetTrigger>
-                                            <SheetContent>
+                                            <SheetContent  className="w-full">
                                                 <SheetHeader>
                                                     <SheetTitle>Schedule Interview</SheetTitle>
                                                 </SheetHeader>

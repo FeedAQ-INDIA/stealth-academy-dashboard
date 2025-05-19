@@ -25,6 +25,9 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
                     <Badge variant="outline">{a?.courseType}</Badge>
                     {a?.courseSource ? <Badge variant="outline">{a?.courseSource}</Badge> : <></>}
                     {a?.courseLevel ? <Badge variant="outline">{a?.courseLevel}</Badge> : <></>}
+                    {a?.courseMode ? <Badge variant="outline">{a?.courseMode}</Badge> : <></>}
+                    {a?.deliveryMode ? <Badge variant="outline">{a?.deliveryMode}</Badge> : <></>}
+
                  </div>
 
                 {/* Title with responsive spacing */}
