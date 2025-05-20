@@ -1,8 +1,9 @@
 import {Outlet, useLocation, useNavigate} from "react-router-dom";
 import Header from "./components-xm/Header/Header.jsx";
 import {useEffect} from "react";
-import {useAuthStore} from "@/zustland/store.js";
+import {useAuthStore, useProtectedURIStore} from "@/zustland/store.js";
 import "./App.css"
+import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
 
 
 function App() {
@@ -11,7 +12,7 @@ function App() {
 
 
     const {fetchUserDetail, loading: loadingStore, userDetail, fetchUserEnrolledCourseIdList} = useAuthStore();
-
+    const {publicUri} = useProtectedURIStore();
 
     useEffect(() => {
           fetchUserDetail(); // Fetch user details and let Zustand update the state
@@ -40,7 +41,7 @@ function App() {
 
     return (
         <>
-            <Header/>
+            {publicUri.includes(window.location.pathname) ? <></> :<Header/>}
             <div className="overflow-y-auto h-[calc(100svh-4em)]">
                 <Outlet/>
             </div>

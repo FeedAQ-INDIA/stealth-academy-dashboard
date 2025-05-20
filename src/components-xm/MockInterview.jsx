@@ -10,6 +10,7 @@ import {useAuthStore} from "@/zustland/store.js";
 import {toast} from "@/components/hooks/use-toast.js";
 import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet.jsx";
 import {CreateMockInterview} from "@/components-xm/CreateMockInterview.jsx";
+import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
 
 
 export function MockInterview() {
@@ -26,7 +27,8 @@ export function MockInterview() {
 
 
     return (
-        <div className="p-6">
+   <>   <PublicHeader/>
+        <div className="p-6 overflow-y-auto h-screen">
 
 
             <Card className="border-0 bg-muted/50 bg-[#ffdd00]   py-6">
@@ -199,6 +201,6 @@ export function MockInterview() {
             </section>
 
 
-        </div>
-    );
+        </div></>
+);
 }

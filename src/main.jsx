@@ -24,22 +24,29 @@ import CourseQuiz from "@/components-xm/Course/CourseQuiz.jsx";
 import {WebinarDetail} from "@/components-xm/Webinar/WebinarDetail.jsx";
 import WebinarOverview from "@/components-xm/Webinar/WebinarOverview.jsx";
 import {MockInterview} from "@/components-xm/MockInterview.jsx";
+import { useAuthStore, useProtectedURIStore } from "@/zustland/store";
 
 
  
 
 const router = createBrowserRouter([
-    {
-        path: "/signin",
-        element: <SignInPage/>,
-    },
 
+
+
+    {
+        path: "/mock-interview",
+        element: <MockInterview/>,
+    },
 
     {
         path: "/",
         element: <App/>,
         errorElement: <ErrorPage/>,
         children: [
+            {
+                path: "/signin",
+                element: <SignInPage/>,
+            },
             {
                 path: "/dashboard",
                 element: <Dashboard/>,
@@ -111,19 +118,17 @@ const router = createBrowserRouter([
                 path: "/my-learning-path",
                 element: <MyLearningPath/>,
             },
-            {
-                path: "/mock-interview",
-                element: <MockInterview/>,
-            },
+
         ]
     },
 
 
 ]);
 
+const {publicUri}= useProtectedURIStore.getState();
 
 async function runTokenRefresh() {
-    if (window.location.pathname !== "/signin") {
+    if (!publicUri.includes(window.location.pathname) || window.location.pathname == '/signin') {
         await refreshToken().catch((err) => {
             console.error("Refresh token logic failed:", err.message);
             // Optionally redirect or show login page
@@ -133,7 +138,7 @@ async function runTokenRefresh() {
 
 
 (async function initApp() {
-    if (window.location.pathname !== "/signin") {
+    if (!publicUri.includes(window.location.pathname) || window.location.pathname == '/signin') {
         try {
             await runTokenRefresh();
         } catch (err) {

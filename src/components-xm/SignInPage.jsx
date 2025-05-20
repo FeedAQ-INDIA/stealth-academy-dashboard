@@ -1,6 +1,6 @@
 import {Button} from "@/components/ui/button";
 import {Loader2} from "lucide-react";
-import React from "react";
+import React, {useEffect} from "react";
 import {Link, useSearchParams} from "react-router-dom";
 import {
     Card,
@@ -20,13 +20,21 @@ import {
     AlertTitle,
 } from "@/components/ui/alert"
 import "./SignInPage.css"
+import {useAuthStore} from "@/zustland/store.js";
 
 function SignInPage() {
 
     const [searchParams] = useSearchParams();
     const redirectUri = searchParams.get("redirectUri") || null; // e.g., ?userId=123
 
+    const {fetchUserDetail, loading: loadingStore, userDetail, fetchUserEnrolledCourseIdList} = useAuthStore();
 
+    useEffect(()=>{
+        console.log("userDetail :: ", userDetail)
+        if(userDetail){
+            window.location.href = '/dashboard';
+        }
+    }, [userDetail])
     return (
         <div
             className="min-h-screen w-full flex items-center justify-center bg-cover bg-center px-4  "

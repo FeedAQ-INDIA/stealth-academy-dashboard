@@ -1,12 +1,13 @@
 import axios from "axios";
 import { refreshToken } from "./utils/refreshTokenUtils";
-import { useAuthStore } from "@/zustland/store"; // ✅ Ensure the correct import path
+import { useAuthStore, useProtectedURIStore } from "@/zustland/store"; // ✅ Ensure the correct import path
 
 const axiosConn = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
 });
 
 let refreshTokenCount = 0;
+const {publicUri}= useProtectedURIStore.getState();
 
 // Request interceptor
 axiosConn.interceptors.request.use(
@@ -30,7 +31,8 @@ axiosConn.interceptors.response.use(
         return response;
     },
     async function (error) {
-        if (window.location.pathname === "/signin") {
+        if (publicUri.includes(window.location.pathname)  && window.location.pathname == "/signin") {
+
             return Promise.reject(error);
         }
 
@@ -74,7 +76,7 @@ axiosConn.interceptors.response.use(
 
 
 const getRedirectUri = () => {
-    if(window.location.pathname === "/signin") {
+    if(publicUri.includes(window.location.pathname)) {
         return "";
     }else{
         return "?redirectUri="+window.location.href;
