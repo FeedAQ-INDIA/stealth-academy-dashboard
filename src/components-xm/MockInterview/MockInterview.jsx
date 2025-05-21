@@ -3,7 +3,7 @@ import {Button} from "@/components/ui/button.jsx";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card.jsx";
 import {Input} from "@/components/ui/input.jsx";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx"
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import axiosConn from "@/axioscon.js";
 import {useAuthStore} from "@/zustland/store.js";
@@ -28,7 +28,7 @@ export function MockInterview() {
 
     return (
    <>   <PublicHeader/>
-        <div className="p-6 overflow-y-auto h-screen">
+        <div className="p-3 md:p-6 overflow-y-auto h-[calc(100svh-4em)]">
 
 
             <Card className="border-0 bg-muted/50 bg-[#ffdd00]   py-6">
@@ -74,20 +74,7 @@ export function MockInterview() {
                                     </CardTitle>
 
                                     <div className="sm:ml-auto">
-                                        {/*<Sheet>*/}
-                                        {/*    <SheetTrigger asChild>*/}
-                                        {/*        /!*<Link to={`/workspace/${WorkspaceId}/products?tab=products`}>*!/*/}
-                                        {/*        <Button*/}
-                                        {/*            className="h-8 gap-1 "*/}
-                                        {/*        >Schedule Interview</Button>*/}
-                                        {/*        /!*</Link>*!/*/}
-                                        {/*    </SheetTrigger>*/}
-                                        {/*    <SheetContent>*/}
-                                        {/*        <SheetHeader>*/}
-                                        {/*            <SheetTitle>Schedule Interview</SheetTitle>*/}
-                                        {/*        </SheetHeader>*/}
-                                        {/*    </SheetContent>*/}
-                                        {/*</Sheet>*/}
+
                                     </div>
                                 </CardHeader>
 
@@ -97,24 +84,11 @@ export function MockInterview() {
 
                                   </p>
                                 <div className="mt-4">
-                                    <Sheet>
-                                        <SheetTrigger asChild>
-                                            {/*<Link to={`/workspace/${WorkspaceId}/products?tab=products`}>*/}
-                                            <Button
-                                                className="h-8 gap-1 "
-                                            >Schedule Interview</Button>
-                                            {/*</Link>*/}
-                                        </SheetTrigger>
-                                        <SheetContent className="">
-                                            <SheetHeader>
-                                                <SheetTitle>Schedule Interview</SheetTitle>
-                                            </SheetHeader>
-                                            <div className=" ">
-                                                <CreateMockInterview/>
-                                            </div>
-                                        </SheetContent>
-
-                                    </Sheet>
+                                    <Link to={`/schedule-mock-interview`}>
+                                        <Button
+                                            className=" gap-1 "
+                                        >Schedule Interview</Button>
+                                    </Link>
                                 </div>
                                 </CardContent>
                             </div>
@@ -140,24 +114,11 @@ export function MockInterview() {
                                         How it works ?
                                     </CardTitle>
                                     <div className="sm:ml-auto">
-                                        <Sheet>
-                                            <SheetTrigger asChild>
-                                                {/*<Link to={`/workspace/${WorkspaceId}/products?tab=products`}>*/}
-                                                <Button
-                                                    className=" gap-1 "
-                                                >Schedule Interview</Button>
-                                                {/*</Link>*/}
-                                            </SheetTrigger>
-                                            <SheetContent  className="w-full">
-                                                <SheetHeader>
-                                                    <SheetTitle>Schedule Interview</SheetTitle>
-                                                </SheetHeader>
-                                                <div className=" ">
-                                                    <CreateMockInterview/>
-                                                </div>
-
-                                            </SheetContent>
-                                        </Sheet>
+                                        <Link to={`/schedule-mock-interview`}>
+                                        <Button
+                                            className=" gap-1 "
+                                        >Schedule Interview</Button>
+                                        </Link>
                                     </div>
                                 </CardHeader>
 

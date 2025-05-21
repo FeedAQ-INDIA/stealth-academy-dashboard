@@ -81,7 +81,7 @@ function MyAccount() {
                 </div>
             </header>
 
-            <div className="p-6">
+            <div className="p-3 md:p-6">
                 <Card className="border-0 bg-[#ffdd00]">
                     <CardHeader>
                         <div className="flex flex-sm justify-items-center gap-4 items-center">

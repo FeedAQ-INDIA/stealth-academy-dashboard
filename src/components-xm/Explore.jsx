@@ -214,7 +214,7 @@ export function Explore() {
 
 
     return (
-        <div className="p-6">
+        <div className="p-3 md:p-6">
             <div className=" items-center justify-items-center">
                 <Card className="border-0 w-full bg-muted/50  py-6 ">
                     <CardHeader>

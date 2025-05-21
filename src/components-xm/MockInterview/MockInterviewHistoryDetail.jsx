@@ -21,7 +21,12 @@ import {
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.jsx";
 import {Badge} from "@/components/ui/badge.jsx";
-
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger
+} from "@/components/ui/accordion";
 
 export default function MockInterviewHistoryDetail() {
 
@@ -30,14 +35,39 @@ export default function MockInterviewHistoryDetail() {
 
     const {userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore()
     const navigate = useNavigate()
+ 
+
 
     const [totalCount, setTotalCount] = useState(0);
     const [limit, setLimit] = useState(10);
     const [offset, setOffset] = useState(0);
-    const [courseList, setCourseList] = useState(null);
+    const [mockInterviewHistoryData, setMockInterviewHistoryData] = useState([]);
 
+    const [apiQuery, setApiQuery] = useState({
+        limit: limit, offset: offset, getThisData: {
+            datasource: "InterviewReq", attributes: [], where: {userId: userDetail?.userId,
+                interviewReqId: MockInterviewId},
+        },
+    });
 
-    const [exploreCourseText, setExploreCourseText] = useState("");
+    useEffect(() => {
+        fetchMockInterviewHistory();
+    }, [apiQuery]);
+
+    const fetchMockInterviewHistory = () => {
+        axiosConn
+            .post(import.meta.env.VITE_API_URL + "/searchCourse", apiQuery)
+            .then((res) => {
+                console.log(res.data);
+                setMockInterviewHistoryData(res.data.data?.results?.[0]);
+                setTotalCount(res.data.data.totalCount);
+                setOffset(res.data.data.offset);
+                setLimit(res.data.data.limit);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
 
     return (
@@ -47,11 +77,11 @@ export default function MockInterviewHistoryDetail() {
                 <BreadcrumbList>
 
                     <BreadcrumbItem>
-                        <BreadcrumbPage className="truncate max-w-[30ch]">Mock Interview History </BreadcrumbPage>
+                        <BreadcrumbPage className="truncate max-w-[30ch]">Mock Interview History  </BreadcrumbPage>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator/>
                     <BreadcrumbItem>
-                        <BreadcrumbPage className="truncate max-w-[30ch]"  >{MockInterviewId}</BreadcrumbPage>
+                        <BreadcrumbPage className="truncate max-w-[30ch]"  >Interview Id #{MockInterviewId}</BreadcrumbPage>
                     </BreadcrumbItem>
 
                 </BreadcrumbList>
@@ -62,9 +92,9 @@ export default function MockInterviewHistoryDetail() {
         </header>
 
 
-            <div className="p-6   h-screen">
+            <div className="p-3 md:p-6">
 
-                <section className="my-6 grid grid-cols-1 ">
+                <section className=" grid grid-cols-1 ">
 
                 <Card className="  bg-muted/50 border-none">
                     <CardHeader>
@@ -72,7 +102,7 @@ export default function MockInterviewHistoryDetail() {
                         <div className="flex flex-wrap gap-2 w-full mb-3 items-center">
                             <div className=" ">
                                 <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold">
-                                   #nkcf
+                                   Mock Interview History Detail
                                 </CardTitle>
                             </div>
                             <div className="ml-auto ">
@@ -86,6 +116,138 @@ export default function MockInterviewHistoryDetail() {
                 </Card>
                 </section>
 
+
+                {mockInterviewHistoryData && (
+                    <Card className=" bg-muted/50 border-none mt-4 p-4 ">
+                        <CardHeader>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-between gap-4 w-full ">
+
+                            <p className="text-base tracking-wide text-left mt-2">
+                                <span className="text-black font-medium">Interview ID: </span>
+                                {mockInterviewHistoryData.interviewReqId}
+                            </p>
+
+
+                            <p className="text-base tracking-wide text-left mt-2">
+                                <span className="text-black font-medium">Interview Date: </span>
+                                {mockInterviewHistoryData.interviewReqDate}
+                            </p>
+                            <p className="text-base tracking-wide text-left mt-2">
+                                <span className="text-black font-medium"> Interview Time: </span>
+                                {mockInterviewHistoryData.interviewReqTime}
+                            </p>
+
+                            <p className="text-base tracking-wide text-left mt-2">
+                                <span className="text-black font-medium">Duration (mins): </span>
+                                {mockInterviewHistoryData.interviewReqDuration}
+                            </p>
+                            <p className="text-base tracking-wide text-left mt-2">
+                                <span className="text-black font-medium">Cost: </span>
+                               {mockInterviewHistoryData.interviewReqCost? `Rs.${mockInterviewHistoryData.interviewReqCost}/-` : 'FREE'}
+                            </p>
+
+                            <p className="text-base tracking-wide text-left mt-2">
+                                <span className="text-black font-medium">Status: </span>
+                                {mockInterviewHistoryData.interviewReqStatus}
+                            </p>
+                            {mockInterviewHistoryData.interviewReqStatus === 'CANCELLED' && (
+                                <p className="text-base tracking-wide text-left mt-2">
+                                    <span className="text-black font-medium">Cancel Reason: </span>
+                                    {mockInterviewHistoryData.interviewReqCancelReason || "N/A"}
+                                </p>
+                            )}
+
+                            <p className="text-base tracking-wide text-left mt-2">
+                                <span className="text-black font-medium">Mode: </span>
+                                {mockInterviewHistoryData.interviewReqMode}
+                            </p>
+                            <p className="text-base tracking-wide text-left mt-2">
+                                <span className="text-black font-medium">Interview Medium: </span>
+                                {mockInterviewHistoryData.interviewReqMedium}
+                            </p>
+                                <p className="text-base tracking-wide text-left mt-2 md:col-span-2  lg:col-span-3">
+                                    <span className="text-black font-medium">CV: </span>
+                                     <a href={mockInterviewHistoryData.interviewReqCV} target="_blank" className="text-blue-600 underline ml-1">
+                                        {mockInterviewHistoryData.interviewReqCV}
+                                    </a>
+                                </p>
+                            <p className="text-base tracking-wide text-left mt-2 md:col-span-2  lg:col-span-3">
+                                <span className="text-black font-medium">Join URL: </span>
+                                <a href={mockInterviewHistoryData.interviewReqUrl} target="_blank" className="text-blue-600 underline ml-1">
+                                    {mockInterviewHistoryData.interviewReqUrl}
+                                </a>
+                            </p>
+
+                            <p className="text-base tracking-wide text-left mt-2 md:col-span-2  lg:col-span-3">
+                                <span className="text-black font-medium">Tags: </span>
+                                {mockInterviewHistoryData.interviewReqTags?.length > 0
+                                    ? mockInterviewHistoryData.interviewReqTags.join(", ")
+                                    : "None"}
+                            </p>
+
+                            <p className="text-base tracking-wide text-left mt-2 md:col-span-2 lg:col-span-3">
+                                <span className="text-black font-medium">Note: </span>
+                                <span className="whitespace-pre-wrap">{mockInterviewHistoryData.interviewReqNote || "N/A"}</span>
+                            </p>
+
+
+
+                                {mockInterviewHistoryData.interviewReqAttach && <p className="text-base tracking-wide text-left mt-2 md:col-span-2  lg:col-span-3">
+                                <span className="text-black font-medium">Attachments: </span>
+                                 {JSON.stringify(mockInterviewHistoryData.interviewReqAttach, null, 2)}
+
+                            </p>}
+
+                                {mockInterviewHistoryData.courseId && <p className="text-base tracking-wide text-left mt-2">
+                                    <span className="text-black font-medium">Course ID: </span>
+                                    {mockInterviewHistoryData.courseId}
+                                </p>}
+
+                                {mockInterviewHistoryData.courseTopicId &&
+                            <p className="text-base tracking-wide text-left mt-2">
+                                <span className="text-black font-medium">Course Topic ID: </span>
+                                {mockInterviewHistoryData.courseTopicId}
+                            </p>}
+
+
+                            </div>
+                            <div className="flex flex-wrap justify-between gap-4  ">
+                                <p className="text-base tracking-wide text-left mt-2">
+                                    <span className="text-black font-medium">Created Date: </span>
+                                    {mockInterviewHistoryData.created_date}
+                                </p>
+                                <p className="text-base tracking-wide text-left mt-2">
+                                    <span className="text-black font-medium">Created Time: </span>
+                                    {mockInterviewHistoryData.created_time}
+                                </p>
+
+                                <p className="text-base tracking-wide text-left mt-2">
+                                    <span className="text-black font-medium">Updated Date: </span>
+                                    {mockInterviewHistoryData.updated_date}
+                                </p>
+                                <p className="text-base tracking-wide text-left mt-2">
+                                    <span className="text-black font-medium">Updated Time: </span>
+                                    {mockInterviewHistoryData.updated_time}
+                                </p>
+
+                            </div>
+
+                        </CardHeader>
+                    </Card>
+                )}
+
+                <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="item-1"  className=" bg-muted/50 border-none mt-4 px-4 rounded-lg">
+                        <AccordionTrigger className="text-2xl">Instructions</AccordionTrigger>
+                        <AccordionContent className="bg-muted/50 p-4">
+                            <div dangerouslySetInnerHTML={{ __html: mockInterviewHistoryData?.interviewInstruct }} >
+
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+
+                </Accordion>
 
 
             </div></>

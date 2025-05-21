@@ -27,7 +27,7 @@ function CourseVideoTutorial() {
                 </div>
             </header>
 
-            <div className="p-6">
+            <div className="p-3 md:p-6">
                 <section>
                     <div className="flex flex-wrap gap-2 w-full mb-3 justify-items-center">
                         <Badge variant="outline">Video</Badge>
