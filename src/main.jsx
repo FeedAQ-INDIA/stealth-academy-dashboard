@@ -23,8 +23,10 @@ import CourseDocThirdParty from "@/components-xm/Course/CourseDocThirdParty.jsx"
 import CourseQuiz from "@/components-xm/Course/CourseQuiz.jsx";
 import {WebinarDetail} from "@/components-xm/Webinar/WebinarDetail.jsx";
 import WebinarOverview from "@/components-xm/Webinar/WebinarOverview.jsx";
-import {MockInterview} from "@/components-xm/MockInterview.jsx";
+import {MockInterview} from "@/components-xm/MockInterview/MockInterview.jsx";
 import { useAuthStore, useProtectedURIStore } from "@/zustland/store";
+import {CreateMockInterview} from "@/components-xm/MockInterview/CreateMockInterview.jsx";
+import MockInterviewHistoryDetail from "@/components-xm/MockInterview/MockInterviewHistoryDetail.jsx";
 
 
  
@@ -46,6 +48,14 @@ const router = createBrowserRouter([
             {
                 path: "/signin",
                 element: <SignInPage/>,
+            },
+            {
+                path: "/schedule-mock-interview",
+                element: <CreateMockInterview/>,
+            },
+            {
+                path: "/mock-interview/:MockInterviewId",
+                element: <MockInterviewHistoryDetail/>,
             },
             {
                 path: "/dashboard",

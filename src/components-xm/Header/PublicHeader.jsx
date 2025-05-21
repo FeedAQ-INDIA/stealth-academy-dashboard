@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { Menu } from "lucide-react"
+import {LogIn, Menu} from "lucide-react"
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
 import NavigationMenuDemo from "./nav-menu.jsx"
 
@@ -42,8 +42,8 @@ export default function PublicHeader( ) {
             {/* Right-side button */}
             <div className="hidden md:flex items-center gap-2 ml-auto">
                 <a href={`/signin`}>
-                    <Button variant="secondary">
-                        SIGN IN
+                    <Button variant="secondary" className="">
+                        <LogIn />  GET STARTED
                     </Button>
                 </a>
             </div>
@@ -59,11 +59,11 @@ export default function PublicHeader( ) {
                     <SheetContent side="right" className="p-4 w-64">
                         <div className="flex flex-col gap-4 mt-4">
                             <NavigationMenuDemo orientation={"vertical"}/>
-                            <Link to={`/signin`}>
+                            <a href={`/signin`}>
                                 <Button variant="secondary">
-                                    Sign In
+                                    <LogIn /> GET STARTED
                                 </Button>
-                            </Link>
+                            </a>
                         </div>
                     </SheetContent>
                 </Sheet>

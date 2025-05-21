@@ -289,7 +289,7 @@ export function MyLearningPath() {
 
                                                 <TableCell className="text-right">{a.interviewReqStatus}</TableCell>
                                                 <TableCell className="text-right">
-                                                    <Button size="sm" variant="outline"><ExternalLink /></Button>
+                                                   <Link to={`/mock-interview/${a.interviewReqId}`}> <Button size="sm" variant="outline"><ExternalLink /></Button></Link>
                                                 </TableCell>
                                             </TableRow>
                                         ))}

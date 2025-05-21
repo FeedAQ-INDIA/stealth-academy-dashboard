@@ -1,15 +1,15 @@
 import {Search,} from "lucide-react";
-import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
-import {Input} from "@/components/ui/input";
-import {Avatar, AvatarFallback} from "@/components/ui/avatar"
+import {Button} from "@/components/ui/button.jsx";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card.jsx";
+import {Input} from "@/components/ui/input.jsx";
+import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx"
 import {useNavigate} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import axiosConn from "@/axioscon.js";
 import {useAuthStore} from "@/zustland/store.js";
 import {toast} from "@/components/hooks/use-toast.js";
 import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet.jsx";
-import {CreateMockInterview} from "@/components-xm/CreateMockInterview.jsx";
+import {CreateMockInterview} from "@/components-xm/MockInterview/CreateMockInterview.jsx";
 import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
 
 
