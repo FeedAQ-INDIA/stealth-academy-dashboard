@@ -27,6 +27,10 @@ import {MockInterview} from "@/components-xm/MockInterview/MockInterview.jsx";
 import { useAuthStore, useProtectedURIStore } from "@/zustland/store";
 import {CreateMockInterview} from "@/components-xm/MockInterview/CreateMockInterview.jsx";
 import MockInterviewHistoryDetail from "@/components-xm/MockInterview/MockInterviewHistoryDetail.jsx";
+import LanguageStudio from "@/components-xm/Lang/LanguageStudio.jsx";
+import HomePage from "@/components-xm/HomePage.jsx";
+import {CreateNextStepCompass} from "@/components-xm/NextStepCompass/CreateNextStepCompass.jsx";
+import {NextStepCompass} from "@/components-xm/NextStepCompass/NextStepCompass.jsx";
 
 
  
@@ -39,15 +43,30 @@ const router = createBrowserRouter([
         path: "/mock-interview",
         element: <MockInterview/>,
     },
+    {
+        path: "/the-language-studio",
+        element: <LanguageStudio/>,
+    },
+    {
+        path: "/next-step-compass",
+        element: <NextStepCompass/>,
+    },
+
 
     {
         path: "/",
         element: <App/>,
         errorElement: <ErrorPage/>,
         children: [
+            { index: true, element: <HomePage /> }, // now "/" goes to HomePage
+
             {
                 path: "/signin",
                 element: <SignInPage/>,
+            },
+            {
+                path: "/schedule-next-step-compass",
+                element: <CreateNextStepCompass/>,
             },
             {
                 path: "/schedule-mock-interview",

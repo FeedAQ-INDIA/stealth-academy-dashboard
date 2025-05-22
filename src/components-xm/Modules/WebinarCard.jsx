@@ -19,32 +19,48 @@ export function WebinarCard({userEnrolledCourseIdList,a }) {
     return (
         <Card className=" border shadow-sm hover:shadow-md cursor-pointer ">
             <CardHeader>
-                {/* Badge row - wraps on smaller screens */}
-                <div className="flex flex-wrap gap-2 w-full mb-3">
-                    <Badge className="animate-blink bg-green-600 text-white">{a?.webinarCost == 0 ? 'FREE' : `Rs.${a?.webinarCost}/-`}</Badge>
-                    <Badge variant="outline">WEBINAR</Badge>
-                    {a?.webinarSource ? <Badge variant="outline">{a?.webinarSource}</Badge> : <></>}
-                    {a?.webinarLevel ? <Badge variant="outline">{a?.webinarLevel}</Badge> : <></>}
-                 </div>
+                {/* Horizontally scrollable webinar badge row with auto-scroll */}
+                <div className="w-full overflow-hidden">
+                    <div className="flex w-max gap-2 mb-3 animate-scroll-x whitespace-nowrap">
+                        {/* Duplicate badge row for seamless scrolling */}
+                        {[...Array(2)].map((_, i) => (
+                            <div key={i} className="flex gap-2">
+                                <Badge className="animate-blink bg-green-600 text-white">
+                                    {a?.webinarCost == 0 ? 'FREE' : `Rs.${a?.webinarCost}/-`}
+                                </Badge>
+                                <Badge variant="outline">WEBINAR</Badge>
+                                {a?.webinarSource && <Badge variant="outline">{a?.webinarSource}</Badge>}
+                                {a?.webinarLevel && <Badge variant="outline">{a?.webinarLevel}</Badge>}
+                                {a?.webinarDuration && <Badge variant="outline">
+
+                                <div className="flex gap-1 items-center">
+                                    <Clock size={18}/>
+                                    {`${Math.floor(+(a?.webinarDuration) / 60)}hr ${+(a?.webinarDuration) % 60}min`}
+                                </div></Badge>}
+                            </div>
+                        ))}
+                    </div>
+                </div>
 
                 {/* Title with responsive spacing */}
-                <div className=" ">
-                    <CardTitle className="text-lg sm:text-xl  font-semibold line-clamp-2 ">
+                <div>
+                    <CardTitle className="text-lg sm:text-xl font-semibold line-clamp-2">
                         {a?.webinarTitle}
                     </CardTitle>
                 </div>
             </CardHeader>
+
             <CardContent>
                 <p className=" line-clamp-3">
                     {a?.webinarDescription}
                 </p>
                 {/*<p className="my-2 animate-blink text-blue-800 font-medium"> Registration Started</p>*/}
-                <div className="font-medium  mt-6">
-                    <div className="flex gap-2 items-center">
-                        <Clock size={18}/>
-                        {`${Math.floor(+(a?.webinarDuration) / 60)}hr ${+(a?.webinarDuration) % 60}min`}
-                    </div>
-                </div>
+                {/*<div className="font-medium  mt-6">*/}
+                {/*    <div className="flex gap-2 items-center">*/}
+                {/*        <Clock size={18}/>*/}
+                {/*        {`${Math.floor(+(a?.webinarDuration) / 60)}hr ${+(a?.webinarDuration) % 60}min`}*/}
+                {/*    </div>*/}
+                {/*</div>*/}
 
             </CardContent>
 
@@ -57,7 +73,7 @@ export function WebinarCard({userEnrolledCourseIdList,a }) {
                 {/*    ><GraduationCap />Download Certificate</Button> :<></>}*/}
                 <div  className=" items-center">
                     {userEnrolledCourseIdList?.find(m => m.webinarId == a.webinarId) ?  <div className="  items-center">
-                        <p className="completed-stamp text-base text-black ">Enrolled</p>
+                        {/*<p className="completed-stamp text-base text-black ">Enrolled</p>*/}
                         <p className="completed-stamp text-base">{userEnrolledCourseIdList?.find(m => m.webinarId == a.webinarId)?.enrollmentStatus }</p>
                     </div>
                     : <></>}

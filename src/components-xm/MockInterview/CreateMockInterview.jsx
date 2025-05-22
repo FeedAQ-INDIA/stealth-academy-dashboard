@@ -65,8 +65,8 @@ export function CreateMockInterview() {
         <div className="p-4 flex flex-col gap-4 h-[calc(100svh-4em)] overflow-y-auto">
             <Card className="border-0 bg-muted/50   ">
                 <CardHeader>
-                    <CardTitle className="text-lg sm:text-xl font-semibold">
-                        Schedule a Mock Inteview
+                    <CardTitle className="text-lg sm:text-xl font-semibold  tracking-wider">
+                        SCHEDULE MOCK INTERVIEW VAULT SESSION
                     </CardTitle>
                 </CardHeader>
 

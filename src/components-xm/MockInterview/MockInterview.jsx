@@ -17,13 +17,6 @@ export function MockInterview() {
     const {userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore()
     const navigate = useNavigate()
 
-    const [totalCount, setTotalCount] = useState(0);
-    const [limit, setLimit] = useState(10);
-    const [offset, setOffset] = useState(0);
-    const [courseList, setCourseList] = useState(null);
-
-
-    const [exploreCourseText, setExploreCourseText] = useState("");
 
 
     return (

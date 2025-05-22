@@ -56,5 +56,5 @@ export const useLoadingBarStore = create((set) => ({
 }));
 
 export const useProtectedURIStore = create((set) => ({
-    publicUri : ['/signin', '/mock-interview'],
+    publicUri : ['/signin', '/mock-interview' , '/'],
 }));

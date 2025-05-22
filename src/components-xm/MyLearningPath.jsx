@@ -1,39 +1,26 @@
-import {ChevronLeft, ChevronRight, Clock, ExternalLink, Terminal,} from "lucide-react";
-
-import {Badge} from "@/components/ui/badge";
+import {ChevronLeft, ChevronRight, ExternalLink, Terminal,} from "lucide-react";
 import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardFooter, CardHeader, CardTitle,} from "@/components/ui/card";
+import {Card, CardContent, CardHeader, CardTitle,} from "@/components/ui/card";
 import {useAuthStore} from "@/zustland/store.js";
 import React, {useEffect, useState} from "react";
 import axiosConn from "@/axioscon.js";
-import {toast} from "@/components/hooks/use-toast.js";
 import {Link} from "react-router-dom";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
-import {CourseCard} from "@/components-xm/Modules/CourseCard.jsx";
-import {WebinarCard} from "@/components-xm/Modules/WebinarCard.jsx";
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableFooter,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
+import {Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
 import {Pagination, PaginationContent, PaginationItem,} from "@/components/ui/pagination.jsx";
-
 
 
 export function MyLearningPath() {
 
-    const {userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore()
+    const {userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore();
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     const [totalCount, setTotalCount] = useState(0);
     const [limit, setLimit] = useState(10);
     const [offset, setOffset] = useState(0);
     const [courseList, setCourseList] = useState({});
-
 
 
     const [apiQuery, setApiQuery] = useState({
@@ -102,6 +89,7 @@ export function MyLearningPath() {
             });
     };
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     const [totalCount2, setTotalCount2] = useState(0);
     const [limit2, setLimit2] = useState(10);
@@ -135,8 +123,6 @@ export function MyLearningPath() {
     };
 
 
-
-
     return (
         <div className="p-3 md:p-6">
 
@@ -157,8 +143,8 @@ export function MyLearningPath() {
             <Card className="border-0 bg-muted/50  my-6">
                 <CardHeader>
                     <CardTitle className="flex gap-2">
-                        Enrollment History
-                        </CardTitle>
+                        Course History
+                    </CardTitle>
 
 
                 </CardHeader>
@@ -166,12 +152,100 @@ export function MyLearningPath() {
                     <div className="my-2">
                         {courseList?.courses?.length > 0 ?
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-6 items-center">
-                                {courseList?.courses?.map(a => (
+                            // <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-6 items-center">
+                            //     {courseList?.courses?.map(a => (
+                            //
+                            //         <CourseCard userEnrolledCourseIdList={userEnrolledCourseIdList} a={a}/>
+                            //     ))}
+                            // </div>
 
-                                    <CourseCard userEnrolledCourseIdList={userEnrolledCourseIdList} a={a}/>
-                                ))}
-                            </div>
+
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-[100px]">ID</TableHead>
+                                        <TableHead>Title</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>Cost</TableHead>
+
+                                        <TableHead className="text-right"></TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {courseList?.courses?.map(a => (
+                                        <TableRow key={a.courseId}>
+                                            <TableCell className="font-medium">{a.courseId}</TableCell>
+                                            <TableCell>{a.courseTitle}</TableCell>
+                                            <TableCell>
+                                                {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId) ?
+                                                    <div className="  ">
+                                                        <p className=" text-base">{userEnrolledCourseIdList?.find(m => m.courseId == a.courseId)?.enrollmentStatus}</p>
+                                                    </div>
+                                                    : <></>}</TableCell>
+
+                                            <TableCell>
+                                                {a?.courseCost == 0 || !a.courseCost ? 'FREE' : `Rs.${a?.courseCost}/-`}
+                                            </TableCell>
+
+                                            <TableCell className="text-right">
+                                                <Link
+                                                    to={`/${a?.courseType === "COURSE" ? 'course' : 'webinar'}/${a?.courseId}`}>
+                                                    <Button size="sm" variant="outline"><ExternalLink/></Button></Link>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                                <TableFooter>
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="py-3">
+                                            <div className="flex flex-row items-center">
+                                                <div className="text-xs text-muted-foreground">
+                                                    {offset + 1} to {Math.min(offset + limit, totalCount)} of {totalCount} row(s)
+                                                    selected.
+                                                </div>
+                                                <Pagination className="ml-auto mr-0 w-auto">
+                                                    <PaginationContent>
+                                                        <PaginationItem>
+                                                            <Button
+                                                                size="icon"
+                                                                variant="outline"
+                                                                className="h-6 w-6"
+                                                                onClick={() => {
+                                                                    setOffset(Math.max(offset - limit, 0));
+                                                                    setApiQuery((prevQuery) => ({
+                                                                        ...prevQuery,
+                                                                        offset: Math.max(offset - limit, 0),
+                                                                    }));
+                                                                }}
+                                                            >
+                                                                <ChevronLeft className="h-3.5 w-3.5"/>
+                                                                <span className="sr-only">Previous Order</span>
+                                                            </Button>
+                                                        </PaginationItem>
+                                                        <PaginationItem>
+                                                            <Button
+                                                                size="icon"
+                                                                variant="outline"
+                                                                className="h-6 w-6"
+                                                                onClick={() => {
+                                                                    setOffset(offset + limit < totalCount ? offset + limit : offset);
+                                                                    setApiQuery((prevQuery) => ({
+                                                                        ...prevQuery,
+                                                                        offset: offset + limit < totalCount ? offset + limit : offset,
+                                                                    }));
+                                                                }}
+                                                            >
+                                                                <ChevronRight className="h-3.5 w-3.5"/>
+                                                                <span className="sr-only">Next Order</span>
+                                                            </Button>
+                                                        </PaginationItem>
+                                                    </PaginationContent>
+                                                </Pagination>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                </TableFooter>
+                            </Table>
                             :
                             <Alert> <Terminal className="h-4 w-4"/>
                                 <div className="flex flex-row md:flex-row flex-wrap gap-2 items-center">
@@ -212,12 +286,101 @@ export function MyLearningPath() {
                     <div className="my-2">
                         {courseList1?.webinars?.length > 0 ?
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-6 items-center">
-                                {courseList1?.webinars?.map(a => (
+                            // <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-6 items-center">
+                            //     {/*{courseList1?.webinars?.map(a => (*/}
+                            //
+                            //     {/*    <WebinarCard userEnrolledCourseIdList={userEnrolledCourseIdList} a={a}/>*/}
+                            //     {/*))}*/}
+                            //
+                            //
+                            // </div>
 
-                                    <WebinarCard userEnrolledCourseIdList={userEnrolledCourseIdList} a={a}/>
-                                ))}
-                            </div>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-[100px]">ID</TableHead>
+                                        <TableHead>Title</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>Cost</TableHead>
+
+                                        <TableHead className="text-right"></TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {courseList1?.webinars?.map(a => (
+                                        <TableRow key={a.webinarId}>
+                                            <TableCell className="font-medium">{a.webinarId}</TableCell>
+                                            <TableCell>{a.webinarTitle}</TableCell>
+                                            <TableCell>
+                                                {userEnrolledCourseIdList?.find(m => m.webinarId == a.webinarId) ?
+                                                    <div className="  ">
+                                                        <p className=" text-base">{userEnrolledCourseIdList?.find(m => m.webinarId == a.webinarId)?.enrollmentStatus}</p>
+                                                    </div>
+                                                    : <></>}
+                                            </TableCell>
+
+                                            <TableCell>
+                                                {a?.webinarCost == 0 || !a.webinarCost ? 'FREE' : `Rs.${a?.webinarCost}/-`}
+                                            </TableCell>
+
+                                            <TableCell className="text-right">
+                                                <Link to={`/webinar/${a?.webinarId}`}> <Button size="sm"
+                                                                                               variant="outline"><ExternalLink/></Button></Link>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                                <TableFooter>
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="py-3">
+                                            <div className="flex flex-row items-center">
+                                                <div className="text-xs text-muted-foreground">
+                                                    {offset1 + 1} to {Math.min(offset1 + limit1, totalCount1)} of {totalCount1} row(s)
+                                                    selected.
+                                                </div>
+                                                <Pagination className="ml-auto mr-0 w-auto">
+                                                    <PaginationContent>
+                                                        <PaginationItem>
+                                                            <Button
+                                                                size="icon"
+                                                                variant="outline"
+                                                                className="h-6 w-6"
+                                                                onClick={() => {
+                                                                    setOffset(Math.max(offset1 - limit1, 0));
+                                                                    setApiQuery((prevQuery) => ({
+                                                                        ...prevQuery,
+                                                                        offset: Math.max(offset1 - limit1, 0),
+                                                                    }));
+                                                                }}
+                                                            >
+                                                                <ChevronLeft className="h-3.5 w-3.5"/>
+                                                                <span className="sr-only">Previous Order</span>
+                                                            </Button>
+                                                        </PaginationItem>
+                                                        <PaginationItem>
+                                                            <Button
+                                                                size="icon"
+                                                                variant="outline"
+                                                                className="h-6 w-6"
+                                                                onClick={() => {
+                                                                    setOffset(offset1 + limit1 < totalCount1 ? offset1 + limit1 : offset1);
+                                                                    setApiQuery((prevQuery) => ({
+                                                                        ...prevQuery,
+                                                                        offset: offset1 + limit1 < totalCount1 ? offset1 + limit1 : offset1,
+                                                                    }));
+                                                                }}
+                                                            >
+                                                                <ChevronRight className="h-3.5 w-3.5"/>
+                                                                <span className="sr-only">Next Order</span>
+                                                            </Button>
+                                                        </PaginationItem>
+                                                    </PaginationContent>
+                                                </Pagination>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                </TableFooter>
+                            </Table>
                             :
                             <Alert> <Terminal className="h-4 w-4"/>
                                 <div className="flex flex-row md:flex-row flex-wrap gap-2 items-center">
@@ -265,7 +428,7 @@ export function MyLearningPath() {
                                 {/*))}*/}
 
                                 <Table>
-                                     <TableHeader>
+                                    <TableHeader>
                                         <TableRow>
                                             <TableHead className="w-[100px]">ID</TableHead>
                                             <TableHead>Interview Date</TableHead>
@@ -285,11 +448,12 @@ export function MyLearningPath() {
                                                 </TableCell>
                                                 <TableCell>{a.interviewReqTime}</TableCell>
                                                 <TableCell>{a.interviewReqDuration} min</TableCell>
-                                                <TableCell>{a.interviewReqCost == 0 || !a.interviewReqCost? "FREE" : ""}</TableCell>
+                                                <TableCell>{a.interviewReqCost == 0 || !a.interviewReqCost ? "FREE" : ""}</TableCell>
 
                                                 <TableCell className="text-right">{a.interviewReqStatus}</TableCell>
                                                 <TableCell className="text-right">
-                                                   <Link to={`/mock-interview/${a.interviewReqId}`}> <Button size="sm" variant="outline"><ExternalLink /></Button></Link>
+                                                    <Link to={`/mock-interview/${a.interviewReqId}`}> <Button size="sm"
+                                                                                                              variant="outline"><ExternalLink/></Button></Link>
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -299,7 +463,8 @@ export function MyLearningPath() {
                                             <TableCell colSpan={7} className="py-3">
                                                 <div className="flex flex-row items-center">
                                                     <div className="text-xs text-muted-foreground">
-                                                        {offset2 + 1} to {Math.min(offset2 + limit2, totalCount2)} of {totalCount2} row(s) selected.
+                                                        {offset2 + 1} to {Math.min(offset2 + limit2, totalCount2)} of {totalCount2} row(s)
+                                                        selected.
                                                     </div>
                                                     <Pagination className="ml-auto mr-0 w-auto">
                                                         <PaginationContent>
@@ -309,14 +474,14 @@ export function MyLearningPath() {
                                                                     variant="outline"
                                                                     className="h-6 w-6"
                                                                     onClick={() => {
-                                                                        setOffset(Math.max(offset - limit, 0));
-                                                                        setApiQuery((prevQuery) => ({
+                                                                        setOffset(Math.max(offset2 - limit2, 0));
+                                                                        setApiQuery2((prevQuery) => ({
                                                                             ...prevQuery,
                                                                             offset: Math.max(offset2 - limit2, 0),
                                                                         }));
                                                                     }}
                                                                 >
-                                                                    <ChevronLeft className="h-3.5 w-3.5" />
+                                                                    <ChevronLeft className="h-3.5 w-3.5"/>
                                                                     <span className="sr-only">Previous Order</span>
                                                                 </Button>
                                                             </PaginationItem>
@@ -326,14 +491,14 @@ export function MyLearningPath() {
                                                                     variant="outline"
                                                                     className="h-6 w-6"
                                                                     onClick={() => {
-                                                                        setOffset(offset2 + limit2 < totalCount2 ? offset2 + limit2 : offset2);
-                                                                        setApiQuery((prevQuery) => ({
+                                                                        setOffset2(offset2 + limit2 < totalCount2 ? offset2 + limit2 : offset2);
+                                                                        setApiQuery2((prevQuery) => ({
                                                                             ...prevQuery,
                                                                             offset: offset2 + limit2 < totalCount2 ? offset2 + limit2 : offset2,
                                                                         }));
                                                                     }}
                                                                 >
-                                                                    <ChevronRight className="h-3.5 w-3.5" />
+                                                                    <ChevronRight className="h-3.5 w-3.5"/>
                                                                     <span className="sr-only">Next Order</span>
                                                                 </Button>
                                                             </PaginationItem>
@@ -372,6 +537,6 @@ export function MyLearningPath() {
             </Card>
 
         </div>
-)
+    )
 
 }

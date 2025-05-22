@@ -4,6 +4,7 @@ import {useEffect} from "react";
 import {useAuthStore, useProtectedURIStore} from "@/zustland/store.js";
 import "./App.css"
 import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
+import HomePage from "@/components-xm/HomePage.jsx";
 
 
 function App() {
@@ -19,15 +20,15 @@ function App() {
     }, []); // Runs only once on mount
 
     useEffect(() => {
-        // console.log(userDetail)
-        if ((userDetail === null || userDetail === undefined) && !loadingStore) {
+         if ((userDetail === null || userDetail === undefined) && !loadingStore) {
             console.log('redirecting to signin')
-            window.location = '/signin';
-        }
-        else{
+             if(!publicUri.includes(window.location.pathname)) {
+                 window.location = '/signin';
+             }
+        } else{
             fetchUserEnrolledCourseIdList(userDetail?.userId);
             console.log('App.jsx  :: ', location.pathname)
-            if(location.pathname == '/') {
+             if(location.pathname == '/') {
                 navigate('/dashboard')
             }
         }
@@ -41,11 +42,10 @@ function App() {
 
     return (
         <>
-            {publicUri.includes(window.location.pathname) ? <></> :<Header/>}
-            <div className={`overflow-y-auto ${publicUri.includes(window.location.pathname) ? '' : 'h-[calc(100svh-4em)]' }`}>
-                <Outlet/>
-            </div>
-
+                 {publicUri.includes(window.location.pathname) ? <></> :<Header/>}
+                <div className={`overflow-y-auto ${publicUri.includes(window.location.pathname) ? '' : 'h-[calc(100svh-4em)]' }`}>
+                    <Outlet/>
+                </div>
 
 
         </>

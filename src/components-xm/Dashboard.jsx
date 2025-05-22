@@ -1,6 +1,6 @@
 import {Search,} from "lucide-react";
 import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardHeader, CardTitle,} from "@/components/ui/card";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar"
 import {Link, useNavigate} from "react-router-dom";
@@ -9,7 +9,9 @@ import axiosConn from "@/axioscon.js";
 import {useAuthStore} from "@/zustland/store.js";
 import {toast} from "@/components/hooks/use-toast.js";
 import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet.jsx";
-
+import compass from '../assets/compass.png'
+import mockinterview from '../assets/mock-interview.png'
+import languagestudio from '../assets/language-studio.png'
 
 export function Dashboard() {
     const {userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore()
@@ -47,28 +49,6 @@ export function Dashboard() {
                 console.log(err);
             });
     };
-
-
-    const disroll = (courseId) => {
-        axiosConn
-            .post(import.meta.env.VITE_API_URL + "/disroll", {
-                courseId: courseId
-            })
-            .then((res) => {
-                console.log(res.data);
-                toast({
-                    title: 'Disrollment is successfull'
-                });
-                fetchCourses()
-            })
-            .catch((err) => {
-                console.log(err);
-                toast({
-                    title: 'Error occured while Disrollment'
-                })
-            });
-    }
-
 
     const [exploreCourseText, setExploreCourseText] = useState("");
 
@@ -112,40 +92,105 @@ export function Dashboard() {
                 </CardContent>
             </Card>
 
-            <section className="my-6 grid grid-cols-1 ">
+            <section className="my-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card className="border-0 bg-muted/50  py-6  ">
-                    <CardHeader className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                        <CardTitle className="text-lg sm:text-2xl font-semibold">
-                            Power Up Your Preparation with our curated <strong className="font-bold">Mock
-                            Interview</strong> by Industry Experts
+                    <CardHeader className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+                        <img
+                            src={mockinterview}
+                            alt="Compass"
+                            className="w-16 h-16 md:w-20 md:h-20 object-contain"
+                        />
+                        <div> <CardTitle className="text-lg sm:text-2xl font-semibold  tracking-widest text-cyan-700">
+                            <strong>  MOCK INTERVIEW VAULT</strong>
                         </CardTitle>
-                        <div className="sm:ml-auto">
-                            {/*<Sheet>*/}
-                            {/*    <SheetTrigger asChild>*/}
-                            {/*        /!*<Link to={`/workspace/${WorkspaceId}/products?tab=products`}>*!/*/}
-                            {/*        <Button*/}
-                            {/*            className="h-8 gap-1 "*/}
-                            {/*        >Schedule Interview</Button>*/}
-                            {/*        /!*</Link>*!/*/}
-                            {/*    </SheetTrigger>*/}
-                            {/*    <SheetContent>*/}
-                            {/*        <SheetHeader>*/}
-                            {/*            <SheetTitle>Schedule Interview</SheetTitle>*/}
-                            {/*        </SheetHeader>*/}
-                            {/*     </SheetContent>*/}
-                            {/*</Sheet>*/}
+                            <CardDescription>
+                                <Link to={`/mock-interview`} className="text-blue-700">
+                                    Click Here
+                                </Link> to know More.
+                            </CardDescription>
+                        </div>
 
-                            <Link to={`/mock-interview`}>
+                        <div className="md:ml-auto">
+
+                            <Link to={`/schedule-mock-interview`}>
                             <Button
                                 className="h-8 gap-1 "
-                            >View Detail</Button>
+                            >SCHEDULE NOW</Button>
                             </Link>
                          </div>
                     </CardHeader>
 
 
                 </Card>
+
+                <Card className="border-0 bg-muted/50  py-6  ">
+                    <CardHeader className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+
+
+                        <img
+                            src={languagestudio}
+                            alt="Compass"
+                            className="w-16 h-16 md:w-20 md:h-20 object-contain"
+                        />
+
+                        <div> <CardTitle className="text-lg sm:text-2xl font-semibold tracking-widest text-green-600">
+                            <strong>THE LANGUAGE STUDIO</strong>
+
+                        </CardTitle>
+                            <CardDescription>
+                                <Link to={`/the-language-studio`} className="text-blue-700">
+                                    Click Here
+                                </Link> to know More.
+                            </CardDescription>
+                        </div>
+
+                        <div className="md:ml-auto">
+
+                            {/*<Link to={`/schedule-mock-interview`}>*/}
+                                <Button
+                                    className="h-8 gap-1 bg-[#ffdd00] animate-blink" disabled
+                                >COMING SOON</Button>
+                            {/*</Link>*/}
+                        </div>
+                    </CardHeader>
+
+
+                </Card>
             </section>
+
+
+            <section className="my-6 grid grid-cols-1  gap-6">
+                <Card className="border-0 bg-muted/50 py-4">
+                    <CardHeader className="flex flex-col md:flex-row md:items-center gap-4">
+                        <img
+                            src={compass}
+                            alt="Compass"
+                            className="w-16 h-16 md:w-20 md:h-20 object-contain"
+                        />
+
+                        <div className="flex-1">
+                            <CardTitle className="text-lg sm:text-2xl font-semibold tracking-widest text-yellow-600">
+                                <strong>NEXT STEP COMPASS</strong>
+                            </CardTitle>
+                            <CardDescription>
+                                <Link to={`/mock-interview`} className="text-blue-700">
+                                    Click Here
+                                </Link>{" "}
+                                to know More.
+                            </CardDescription>
+                        </div>
+
+                        <div className="md:ml-auto">
+                            <Link to={`/schedule-next-step-compass`}>
+                                <Button className="h-8 gap-1">EXPLORE</Button>
+                            </Link>
+                        </div>
+                    </CardHeader>
+                </Card>
+
+
+            </section>
+
 
 
         </div>
