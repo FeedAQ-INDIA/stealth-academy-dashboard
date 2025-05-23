@@ -170,10 +170,10 @@ export function Dashboard() {
 
                         <div className="flex-1">
                             <CardTitle className="text-lg sm:text-2xl font-semibold tracking-widest text-yellow-600">
-                                <strong>NEXT STEP COMPASS</strong>
+                                <strong>COUNSELLING COMPASS</strong>
                             </CardTitle>
                             <CardDescription>
-                                <Link to={`/mock-interview`} className="text-blue-700">
+                                <Link to={`/counselling-compass`} className="text-blue-700">
                                     Click Here
                                 </Link>{" "}
                                 to know More.
@@ -181,7 +181,7 @@ export function Dashboard() {
                         </div>
 
                         <div className="md:ml-auto">
-                            <Link to={`/schedule-next-step-compass`}>
+                            <Link to={`/schedule-counselling-compass`}>
                                 <Button className="h-8 gap-1">EXPLORE</Button>
                             </Link>
                         </div>

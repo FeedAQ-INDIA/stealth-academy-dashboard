@@ -18,7 +18,7 @@ export function WebinarCard({userEnrolledCourseIdList,a }) {
 
     return (
         <Card className=" border shadow-sm hover:shadow-md cursor-pointer ">
-            <CardHeader>
+            <CardHeader className="pb-2">
                 {/* Horizontally scrollable webinar badge row with auto-scroll */}
                 <div className="w-full overflow-hidden">
                     <div className="flex w-max gap-2 mb-3 animate-scroll-x whitespace-nowrap">
@@ -42,6 +42,9 @@ export function WebinarCard({userEnrolledCourseIdList,a }) {
                     </div>
                 </div>
 
+                <img src={a?.webinarImageUrl?.[0]} className="w-full h-36 " />
+
+
                 {/* Title with responsive spacing */}
                 <div>
                     <CardTitle className="text-lg sm:text-xl font-semibold line-clamp-2">
@@ -51,16 +54,10 @@ export function WebinarCard({userEnrolledCourseIdList,a }) {
             </CardHeader>
 
             <CardContent>
-                <p className=" line-clamp-3">
+                <p className=" line-clamp-2">
                     {a?.webinarDescription}
                 </p>
-                {/*<p className="my-2 animate-blink text-blue-800 font-medium"> Registration Started</p>*/}
-                {/*<div className="font-medium  mt-6">*/}
-                {/*    <div className="flex gap-2 items-center">*/}
-                {/*        <Clock size={18}/>*/}
-                {/*        {`${Math.floor(+(a?.webinarDuration) / 60)}hr ${+(a?.webinarDuration) % 60}min`}*/}
-                {/*    </div>*/}
-                {/*</div>*/}
+
 
             </CardContent>
 

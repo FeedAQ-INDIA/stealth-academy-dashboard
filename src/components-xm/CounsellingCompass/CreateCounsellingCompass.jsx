@@ -44,7 +44,7 @@ const createMockInterviewSchema = z.object({
     customLanguagePreference: z.string().optional(),
 });
 
-export function CreateNextStepCompass() {
+export function CreateCounsellingCompass() {
     const { userDetail } = useAuthStore();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -68,7 +68,14 @@ export function CreateNextStepCompass() {
     const onSubmit = async (data) => {
         try {
             setIsSubmitting(true);
-            const res = await axiosConn.post("/raiseNextStepCompassRequest", data);
+            const res = await axiosConn.post("/raiseCounsellingRequest", {
+                 counsellingDate  : data.date ,
+                counsellingTime  : data.time,
+                 counsellingLanguage  : (data.languagePreference == 'Other' ? data.customLanguagePreference : data.languagePreference),
+                counsellingBackground :  (data.background == 'Other' ? data.customBackground : data.languagePreference),
+                counsellingTopic : data.counsellingTopic,
+                counsellingNote : data.note,
+             });
             toast({ title: res.data?.data?.message || "Scheduled successfully!" });
             form.reset();
         } catch (err) {
@@ -83,7 +90,7 @@ export function CreateNextStepCompass() {
             <Card className="border-0 bg-muted/50">
                 <CardHeader>
                     <CardTitle className="text-lg sm:text-xl font-semibold tracking-wider">
-                        SCHEDULE NEXT STEP COMPASS SESSION
+                        SCHEDULE COUNSELLING COMPASS SESSION
                     </CardTitle>
                 </CardHeader>
             </Card>
@@ -198,7 +205,7 @@ export function CreateNextStepCompass() {
                                                     <SelectValue placeholder="Select language" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    {["English", "Hindi", "Regional Language (specify below)"].map(option => (
+                                                    {["English", "Hindi", "Other"].map(option => (
                                                         <SelectItem key={option} value={option}>{option}</SelectItem>
                                                     ))}
                                                 </SelectContent>
@@ -209,7 +216,7 @@ export function CreateNextStepCompass() {
                                 )}
                             />
 
-                            {watchLanguagePreference === "Regional Language (specify below)" && (
+                            {watchLanguagePreference === "Other" && (
                                 <FormField
                                     control={form.control}
                                     name="customLanguagePreference"

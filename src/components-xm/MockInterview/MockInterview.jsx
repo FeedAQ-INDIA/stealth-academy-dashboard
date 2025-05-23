@@ -11,6 +11,8 @@ import {toast} from "@/components/hooks/use-toast.js";
 import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet.jsx";
 import {CreateMockInterview} from "@/components-xm/MockInterview/CreateMockInterview.jsx";
 import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
+import compass from "@/assets/compass.png";
+import mockinterview from "@/assets/mock-interview.png";
 
 
 export function MockInterview() {
@@ -23,66 +25,94 @@ export function MockInterview() {
    <>   <PublicHeader/>
         <div className="p-3 md:p-6 overflow-y-auto h-[calc(100svh-4em)]">
 
-
             <Card className="border-0 bg-muted/50 bg-[#ffdd00]   py-6">
-                <CardHeader>
-                    <CardTitle className="text-center">
-                        Ace Your Next Interview with Real-World Mock Interview Sessions
+                <CardHeader className="flex flex-col md:flex-row gap-4 justify-between py-0 items-center ">
+                    <img
+                        src={mockinterview}
+                        alt="Compass"
+                        className="w-16 h-16 md:w-20 md:h-20 object-contain"
+                    />     <div>
+                    <CardTitle className="text-center tracking-widest text-3xl font-bold ">
+                       VAULT THE PRACTICE. ACE THE PERFORMANCE WITH MOCK INTERVIEW.
                     </CardTitle>
                     <CardDescription className="text-center text-black">
-                        Get personalized, live mock interviews by industry experts. Receive feedback, improve your confidence, and land your dream job.
+                        Your personal space to rehearse real-world interviews securely and sharpen your responses.
                     </CardDescription>
+                </div>
+                    <img
+                        src={mockinterview}
+                        alt="Compass"
+                        className="w-16 h-16 md:w-20 md:h-20 object-contain"
+                    />
 
 
                 </CardHeader>
-                {/*<CardContent>*/}
-                    {/*<Sheet>*/}
-                    {/*    <SheetTrigger asChild>*/}
-                    {/*        /!*<Link to={`/workspace/${WorkspaceId}/products?tab=products`}>*!/*/}
-                    {/*        <Button*/}
-                    {/*            className="h-8 gap-1 "*/}
-                    {/*        >Schedule Interview</Button>*/}
-                    {/*        /!*</Link>*!/*/}
-                    {/*    </SheetTrigger>*/}
-                    {/*    <SheetContent>*/}
-                    {/*        <SheetHeader>*/}
-                    {/*            <SheetTitle>Schedule Interview</SheetTitle>*/}
-                    {/*        </SheetHeader>*/}
-                    {/*    </SheetContent>*/}
-                    {/*</Sheet>*/}
-                {/*</CardContent>*/}
+
             </Card>
+
 
 
             <section className="my-6 grid grid-cols-1 ">
                 <Card className="border-0 bg-muted/50  py-3  ">
 
                     <CardContent>
-                        <div className="flex gap-2 flex-col md:flex-row">
-                            <img src={"https://myinterviewpractice.com/images/home_enterprise.png"} className="h-44"/>
+                        <div className="flex gap-2 flex-col md:flex-row items-center">
+                            <img src={"https://next-cdn.codementor.io/images/landing-pages/mock-interview-practices/hero.png"} className="h-44"/>
                             <div>
-                                <CardHeader className="flex flex-col sm:flex-row   gap-2 sm:gap-4">
-                                    <CardTitle className="text-lg sm:text-2xl font-semibold">
-                                        What we offer ?
+                                <CardHeader className="flex flex-col items-center gap-2 sm:gap-6">
+                                    <CardTitle className="tracking-wider text-cyan-600 text-3xl font-bold text-center">
+                                        Why practice mock interviews with our experts?
                                     </CardTitle>
 
-                                    <div className="sm:ml-auto">
-
+                                    <div>
+                                        {/* Optional content */}
                                     </div>
                                 </CardHeader>
 
                                 <CardContent>
-                                  <p>
-                                      At FeedAQ Academy, our Mock Interview Service is designed to simulate real-world interview scenarios. Whether you're preparing for a technical role in software engineering, a business analyst position, or a fresher interview, we’ve got you covered.
+                                  <div className="flex gap-4 justify-items-center">
+                                      <div className="flex flex-col items-center text-center">
+                                          <img
+                                              src="https://next-cdn.codementor.io/images/landing-pages/mock-interview-practices/target.svg"
+                                              className="w-16 h-16 md:w-20 md:h-20 object-contain"
+                                              alt="Mock Interview Target"
+                                          />
+                                          <p className="mt-2 font-bold text-lg">Hands-on experience</p>
+                                          <p className="mt-1  text-lg">
+                                              Learn how to answer interview questions professionally to the hiring panel.
+                                          </p>
+                                      </div>
 
-                                  </p>
-                                <div className="mt-4">
-                                    <Link to={`/schedule-mock-interview`}>
-                                        <Button
-                                            className=" gap-1 "
-                                        >Schedule Interview</Button>
-                                    </Link>
-                                </div>
+                                      <div className="flex flex-col items-center text-center">
+                                          <img
+                                              src="https://next-cdn.codementor.io/images/landing-pages/mock-interview-practices/chat.svg"
+                                              className="w-16 h-16 md:w-20 md:h-20 object-contain"
+                                              alt="Mock Interview Target"
+                                          />
+                                          <p className="mt-2 font-bold  text-lg">Detailed feedback
+                                          </p>
+                                          <p className="mt-1  text-lg">
+                                              Get actionable feedback on what you need to work on to land your next job.
+
+                                          </p>
+                                      </div>
+
+                                      <div className="flex flex-col items-center text-center">
+                                          <img
+                                              src="https://next-cdn.codementor.io/images/landing-pages/mock-interview-practices/star.svg"
+                                              className="w-16 h-16 md:w-20 md:h-20 object-contain"
+                                               alt="Mock Interview Target"
+                                          />
+                                          <p className="mt-2 font-bold  text-lg">Confidence boost
+                                          </p>
+                                          <p className="mt-1  text-lg">
+                                              Gain confidence practicing with coaches who match your learning style.
+
+                                          </p>
+                                      </div>
+
+                                  </div>
+
                                 </CardContent>
                             </div>
 

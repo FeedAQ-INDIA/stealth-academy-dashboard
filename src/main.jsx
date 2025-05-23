@@ -29,8 +29,8 @@ import {CreateMockInterview} from "@/components-xm/MockInterview/CreateMockInter
 import MockInterviewHistoryDetail from "@/components-xm/MockInterview/MockInterviewHistoryDetail.jsx";
 import LanguageStudio from "@/components-xm/Lang/LanguageStudio.jsx";
 import HomePage from "@/components-xm/HomePage.jsx";
-import {CreateNextStepCompass} from "@/components-xm/NextStepCompass/CreateNextStepCompass.jsx";
-import {NextStepCompass} from "@/components-xm/NextStepCompass/NextStepCompass.jsx";
+import {CreateCounsellingCompass} from "@/components-xm/CounsellingCompass/CreateCounsellingCompass.jsx";
+import {CounsellingCompass} from "@/components-xm/CounsellingCompass/CounsellingCompass.jsx";
 
 
  
@@ -48,8 +48,8 @@ const router = createBrowserRouter([
         element: <LanguageStudio/>,
     },
     {
-        path: "/next-step-compass",
-        element: <NextStepCompass/>,
+        path: "/counselling-compass",
+        element: <CounsellingCompass/>,
     },
 
 
@@ -65,8 +65,8 @@ const router = createBrowserRouter([
                 element: <SignInPage/>,
             },
             {
-                path: "/schedule-next-step-compass",
-                element: <CreateNextStepCompass/>,
+                path: "/schedule-counselling-compass",
+                element: <CreateCounsellingCompass/>,
             },
             {
                 path: "/schedule-mock-interview",
