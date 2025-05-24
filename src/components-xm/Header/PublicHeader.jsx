@@ -50,23 +50,28 @@ export default function PublicHeader( ) {
 
             {/* Mobile Hamburger */}
             <div className="flex md:hidden ml-auto">
-                <Sheet>
-                    <SheetTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                            <Menu className="h-5 w-5" />
-                        </Button>
-                    </SheetTrigger>
-                    <SheetContent side="right" className="p-4 w-64">
-                        <div className="flex flex-col gap-4 mt-4">
-                            <NavigationMenuDemo orientation={"vertical"}/>
-                            <a href={`/signin`}>
-                                <Button variant="secondary">
-                                    <LogIn /> GET STARTED
-                                </Button>
-                            </a>
-                        </div>
-                    </SheetContent>
-                </Sheet>
+                <a href={`/signin`}>
+                    <Button variant="secondary">
+                        <LogIn />
+                    </Button>
+                </a>
+                {/*<Sheet>*/}
+                {/*    <SheetTrigger asChild>*/}
+                {/*        <Button variant="ghost" size="icon">*/}
+                {/*            <Menu className="h-5 w-5" />*/}
+                {/*        </Button>*/}
+                {/*    </SheetTrigger>*/}
+                {/*    <SheetContent side="right" className="p-4 w-64">*/}
+                {/*        <div className="flex flex-col gap-4 mt-4">*/}
+                {/*            /!*<NavigationMenuDemo orientation={"vertical"}/>*!/*/}
+                {/*<a href={`/signin`}>*/}
+                {/*    <Button variant="secondary">*/}
+                {/*        <LogIn /> GET STARTED*/}
+                {/*    </Button>*/}
+                {/*</a>*/}
+                {/*        </div>*/}
+                {/*    </SheetContent>*/}
+                {/*</Sheet>*/}
             </div>
         </header>
     )

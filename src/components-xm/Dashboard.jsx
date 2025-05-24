@@ -73,7 +73,7 @@ export function Dashboard() {
 
             <Card className="border-0 bg-muted/50  my-6 py-6">
                 <CardHeader>
-                    <CardTitle className="text-center">
+                    <CardTitle className="text-center tracking-wide">
                         What would you like to learn today ?
                     </CardTitle>
 
@@ -179,7 +179,7 @@ export function Dashboard() {
 
                         <div className="md:ml-auto">
                             <Link to={`/schedule-counselling-compass`}>
-                                <Button className="h-8 gap-1">EXPLORE</Button>
+                                <Button className="h-8 gap-1">SCHEDULE NOW</Button>
                             </Link>
                         </div>
                     </CardHeader>
