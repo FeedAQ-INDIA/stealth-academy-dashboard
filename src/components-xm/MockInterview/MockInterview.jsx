@@ -418,7 +418,7 @@ export function MockInterview() {
                                 className=" h-44 "
                             />
                             <div>
-                                <CardTitle className="text-center tracking-widest text-3xl font-extrabold ">
+                                <CardTitle className="text-center tracking-widest text-3xl font-extrabold text-cyan-600">
                                     Ace your next interview
                                 </CardTitle>
 
