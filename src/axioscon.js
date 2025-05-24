@@ -19,6 +19,7 @@ axiosConn.interceptors.request.use(
           if (accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
+        config.withCredentials = true;
         return config;
     },
     function (error) {
