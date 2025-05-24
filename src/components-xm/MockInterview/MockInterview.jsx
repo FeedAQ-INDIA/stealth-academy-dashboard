@@ -24,13 +24,13 @@ export function MockInterview() {
                             className="w-16 h-16 md:w-20 md:h-20 object-contain"
                         />
                         <div>
-                            <CardTitle className="text-center tracking-widest text-3xl font-bold ">
-                                VAULT THE PRACTICE. ACE THE PERFORMANCE WITH MOCK INTERVIEW.
+                            <CardTitle className="text-center tracking-widest text-2xl md:text-3xl font-bold ">
+                                VAULT THE PRACTICE ! ACE THE PERFORMANCE WITH MOCK INTERVIEW
                             </CardTitle>
-                            <CardDescription className="text-center text-black">
-                                Your personal space to rehearse real-world interviews securely and sharpen your
-                                responses.
-                            </CardDescription>
+                            {/*<CardDescription className="text-center text-black">*/}
+                            {/*    Your personal space to rehearse real-world interviews securely and sharpen your*/}
+                            {/*    responses.*/}
+                            {/*</CardDescription>*/}
                         </div>
                         <img
                             src={mockinterview}

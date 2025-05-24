@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import {LogIn, Menu} from "lucide-react"
+import {LogIn, Menu, Play} from "lucide-react"
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
 import NavigationMenuDemo from "./nav-menu.jsx"
 
@@ -43,7 +43,7 @@ export default function PublicHeader( ) {
             <div className="hidden md:flex items-center gap-2 ml-auto">
                 <a href={`/signin`}>
                     <Button variant="secondary" className="">
-                        <LogIn />  GET STARTED
+                        <Play />  GET STARTED
                     </Button>
                 </a>
             </div>
@@ -52,7 +52,7 @@ export default function PublicHeader( ) {
             <div className="flex md:hidden ml-auto">
                 <a href={`/signin`}>
                     <Button variant="secondary">
-                        <LogIn />
+                        <Play />
                     </Button>
                 </a>
                 {/*<Sheet>*/}

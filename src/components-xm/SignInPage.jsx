@@ -73,10 +73,10 @@ function SignInPage() {
                     </CardHeader>
 
                     <CardContent>
-                        <h2 className="text-2xl sm:text-xl font-semibold text-center">Log in</h2>
+                        <h2 className="text-2xl sm:text-xl font-semibold text-center">Log in / Sign up</h2>
                         <CardDescription className="mt-4 text-center">
-                            <Alert variant="accent">
-                                <AlertTitle>Please Login to Access Your Account</AlertTitle>
+                            <Alert variant="accent" className="rounded-md">
+                                <AlertTitle className="tracking-wide leading-snug	">Please Log in or Sign up to Access Your Account</AlertTitle>
                             </Alert>
                         </CardDescription>
 
