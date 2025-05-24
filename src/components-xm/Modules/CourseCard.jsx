@@ -21,7 +21,7 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
             <CardHeader className="pb-2">
                 {/* Horizontally scrollable badge row with auto-scroll */}
                 <div className="w-full overflow-hidden">
-                    <div className="flex w-max gap-2 mb-3 animate-scroll-x whitespace-nowrap">
+                    <div className="flex w-max gap-2 mb-3 animate-scroll-x-5 whitespace-nowrap">
                         {/* Duplicate the badge set to create a seamless loop */}
                         {[...Array(2)].map((_, i) => (
                             <div key={i} className="flex gap-2">

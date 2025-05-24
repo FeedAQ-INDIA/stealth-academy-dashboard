@@ -21,7 +21,7 @@ export function WebinarCard({userEnrolledCourseIdList,a }) {
             <CardHeader className="pb-2">
                 {/* Horizontally scrollable webinar badge row with auto-scroll */}
                 <div className="w-full overflow-hidden">
-                    <div className="flex w-max gap-2 mb-3 animate-scroll-x whitespace-nowrap">
+                    <div className="flex w-max gap-2 mb-3 animate-scroll-x-5 whitespace-nowrap">
                         {/* Duplicate badge row for seamless scrolling */}
                         {[...Array(2)].map((_, i) => (
                             <div key={i} className="flex gap-2">

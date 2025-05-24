@@ -97,7 +97,8 @@ module.exports = {
                 'accordion-down': 'accordion-down 0.2s ease-out',
                 'accordion-up': 'accordion-up 0.2s ease-out',
                 blink: 'blink 1s infinite',
-                'scroll-x': 'scroll-x 5s linear infinite',
+                'scroll-x-5': 'scroll-x 5s linear infinite',
+                'scroll-x-10': 'scroll-x 10s linear infinite',
 
             }
         }
