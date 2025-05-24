@@ -101,7 +101,7 @@ export default function MockInterviewHistoryDetail() {
 
                         <div className="flex flex-wrap gap-2 w-full mb-3 items-center">
                             <div className=" ">
-                                <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold">
+                                <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold tracking-wide">
                                    Mock Interview History Detail
                                 </CardTitle>
                             </div>

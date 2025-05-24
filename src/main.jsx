@@ -31,6 +31,7 @@ import LanguageStudio from "@/components-xm/Lang/LanguageStudio.jsx";
 import HomePage from "@/components-xm/HomePage.jsx";
 import {CreateCounsellingCompass} from "@/components-xm/CounsellingCompass/CreateCounsellingCompass.jsx";
 import {CounsellingCompass} from "@/components-xm/CounsellingCompass/CounsellingCompass.jsx";
+import CounsellingHistoryDetail from "@/components-xm/CounsellingCompass/CounsellingHistoryDetail.jsx";
 
 
  
@@ -67,6 +68,10 @@ const router = createBrowserRouter([
             {
                 path: "/schedule-counselling-compass",
                 element: <CreateCounsellingCompass/>,
+            },
+            {
+                path: "/counselling-compass/:CounsellingId",
+                element: <CounsellingHistoryDetail/>,
             },
             {
                 path: "/schedule-mock-interview",

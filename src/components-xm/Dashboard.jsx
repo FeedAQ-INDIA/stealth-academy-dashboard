@@ -133,15 +133,12 @@ export function Dashboard() {
                             className="w-16 h-16 md:w-20 md:h-20 object-contain"
                         />
 
-                        <div> <CardTitle className="text-lg sm:text-2xl font-semibold tracking-widest text-green-600">
+                        <div>
+                            <CardTitle className="text-lg sm:text-2xl font-semibold tracking-widest text-green-600">
                             <strong>THE LANGUAGE STUDIO</strong>
 
                         </CardTitle>
-                            <CardDescription>
-                                <Link to={`/the-language-studio`} className="text-blue-700">
-                                    Click Here
-                                </Link> to know More.
-                            </CardDescription>
+
                         </div>
 
                         <div className="md:ml-auto">

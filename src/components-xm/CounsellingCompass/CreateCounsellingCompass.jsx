@@ -72,7 +72,7 @@ export function CreateCounsellingCompass() {
                  counsellingDate  : data.date ,
                 counsellingTime  : data.time,
                  counsellingLanguage  : (data.languagePreference == 'Other' ? data.customLanguagePreference : data.languagePreference),
-                counsellingBackground :  (data.background == 'Other' ? data.customBackground : data.languagePreference),
+                counsellingBackground :  (data.background == 'Other' ? data.customBackground : data.background),
                 counsellingTopic : data.counsellingTopic,
                 counsellingNote : data.note,
              });

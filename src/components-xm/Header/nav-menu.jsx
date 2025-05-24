@@ -42,29 +42,52 @@ function NavigationMenuDemo({orientation}) {
         }
     }
 
-    
 
-    return (<NavigationMenu orientation={orientation}  className="z-20">
-            <NavigationMenuList className={`${orientation === 'vertical' ? ' flex flex-col gap-2 w-full' : 'flex flex-row gap-2'}`}>
-
-                <NavigationMenuItem    >
-                    <Link   to={'/dashboard'}><Button variant={`${location.pathname.includes('dashboard')? 'secondary' : 'ghost' }`}    >DASHBOARD</Button></Link>
+    return (
+        <NavigationMenu orientation={orientation} className="z-20 w-full  ">
+            <NavigationMenuList
+                className={`${
+                    orientation === 'vertical'
+                        ? 'flex flex-col gap-2 w-full bg'
+                        : 'flex flex-row gap-2'
+                }`}
+            >
+                <NavigationMenuItem className={orientation === 'vertical' ? 'w-full ' : ''}>
+                    <Link to="/dashboard" className="w-full">
+                        <Button
+                            className="w-full"
+                            variant={location.pathname.includes('dashboard') ? 'secondary' : 'ghost'}
+                        >
+                            DASHBOARD
+                        </Button>
+                    </Link>
                 </NavigationMenuItem>
 
-                <NavigationMenuItem>
-                    <Link to={'/explore'}><Button  variant={`${location.pathname.includes('explore')? 'secondary' : 'ghost' }`}>EXPLORE</Button></Link>
+                <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : ''}>
+                    <Link to="/explore" className="w-full">
+                        <Button
+                            className="w-full"
+                            variant={location.pathname.includes('explore') ? 'secondary' : 'ghost'}
+                        >
+                            EXPLORE
+                        </Button>
+                    </Link>
                 </NavigationMenuItem>
 
-
-                <NavigationMenuItem>
-                    <Link to={'/my-learning-path'}> <Button variant={`${location.pathname.includes('my-learning-path')? 'secondary' : 'ghost' }`}>MY JOURNEY</Button></Link>
+                <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : ''}>
+                    <Link to="/my-learning-path" className="w-full">
+                        <Button
+                            className="w-full"
+                            variant={location.pathname.includes('my-learning-path') ? 'secondary' : 'ghost'}
+                        >
+                            MY JOURNEY
+                        </Button>
+                    </Link>
                 </NavigationMenuItem>
-
-
             </NavigationMenuList>
+        </NavigationMenu>
+    );
 
-
-        </NavigationMenu>);
 }
 
 

@@ -59,8 +59,8 @@ export default function Header( ) {
                         </Button>
                     </SheetTrigger>
                     <SheetContent side="right" className="p-4 w-64">
-                        <div className="flex flex-col gap-4 mt-4">
-                            <NavigationMenuDemo orientation={"vertical"}/>
+                        <div className="flex flex-col gap-4 mt-4 ">
+                            <NavigationMenuDemo orientation={"vertical"} />
                             <Link to={`/account-settings/profile`}>
                                 <Button variant="secondary" className="w-full">
                                     {userDetail?.nameInitial}
