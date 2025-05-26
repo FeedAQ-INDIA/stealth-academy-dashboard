@@ -74,125 +74,138 @@ export function CreateMockInterview() {
 
 
             </Card>
-            <Card className="border-0 bg-muted/50  py-6 ">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card className="border-0 bg-muted/50  py-6 ">
 
-                <CardContent>
-                    <Form {...createMockInterviewForm}>
-                        <form onSubmit={createMockInterviewForm.handleSubmit(onSubmit)} className="w-full space-y-6 ">
+                    <CardContent>
+                        <Form {...createMockInterviewForm}>
+                            <form onSubmit={createMockInterviewForm.handleSubmit(onSubmit)} className="w-full space-y-6 ">
 
-                            {/* Interview Date */}
-                            <FormField
-                                control={createMockInterviewForm.control}
-                                name="date"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Interview Date</FormLabel>
-                                        <FormControl>
-                                            <Input type="date" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                {/* Interview Date */}
+                                <FormField
+                                    control={createMockInterviewForm.control}
+                                    name="date"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Interview Date</FormLabel>
+                                            <FormControl>
+                                                <Input type="date" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                            {/* Interview Time */}
-                            <FormField
-                                control={createMockInterviewForm.control}
-                                name="time"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Interview Time</FormLabel>
-                                        <FormControl>
-                                            <Input type="time" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                {/* Interview Time */}
+                                <FormField
+                                    control={createMockInterviewForm.control}
+                                    name="time"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Interview Time</FormLabel>
+                                            <FormControl>
+                                                <Input type="time" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                            {/* Interview Duration */}
-                            <FormField
-                                control={createMockInterviewForm.control}
-                                name="duration"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Interview Duration</FormLabel>
-                                        <FormControl>
-                                            <Select
-                                                onValueChange={val => field.onChange(parseInt(val))}
-                                                value={String(field.value)}
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select Interview Duration" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {[5, 10, 15, 20, 25, 30, 45].map(min => (
-                                                        <SelectItem key={min} value={String(min)}>
-                                                            {min} min
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                {/* Interview Duration */}
+                                <FormField
+                                    control={createMockInterviewForm.control}
+                                    name="duration"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Interview Duration</FormLabel>
+                                            <FormControl>
+                                                <Select
+                                                    onValueChange={val => field.onChange(parseInt(val))}
+                                                    value={String(field.value)}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select Interview Duration" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {[5, 10, 15, 20, 25, 30, 45].map(min => (
+                                                            <SelectItem key={min} value={String(min)}>
+                                                                {min} min
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                            {/* Resume Link */}
-                            <FormField
-                                control={createMockInterviewForm.control}
-                                name="resumeLink"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Resume Link</FormLabel>
-                                        <FormControl>
-                                            <Input type="text" placeholder="Enter Resume URL" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                {/* Resume Link */}
+                                <FormField
+                                    control={createMockInterviewForm.control}
+                                    name="resumeLink"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Resume Link</FormLabel>
+                                            <FormControl>
+                                                <Input type="text" placeholder="Enter Resume URL" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                            {/* Attachment Link */}
-                            <FormField
-                                control={createMockInterviewForm.control}
-                                name="attachmentLink"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Attachment Link (optional)</FormLabel>
-                                        <FormControl>
-                                            <Input type="text" placeholder="Enter Attachment URL" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                {/*/!* Attachment Link *!/*/}
+                                {/*<FormField*/}
+                                {/*    control={createMockInterviewForm.control}*/}
+                                {/*    name="attachmentLink"*/}
+                                {/*    render={({ field }) => (*/}
+                                {/*        <FormItem>*/}
+                                {/*            <FormLabel>Attachment Link (optional)</FormLabel>*/}
+                                {/*            <FormControl>*/}
+                                {/*                <Input type="text" placeholder="Enter Attachment URL" {...field} />*/}
+                                {/*            </FormControl>*/}
+                                {/*            <FormMessage />*/}
+                                {/*        </FormItem>*/}
+                                {/*    )}*/}
+                                {/*/>*/}
 
-                            {/* Note */}
-                            <FormField
-                                control={createMockInterviewForm.control}
-                                name="note"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Additional Notes</FormLabel>
-                                        <FormControl>
-                                            <Textarea placeholder="Any notes to the interviewer..." {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-
+                                {/* Note */}
+                                <FormField
+                                    control={createMockInterviewForm.control}
+                                    name="note"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Additional Notes</FormLabel>
+                                            <FormControl>
+                                                <Textarea placeholder="Any notes to the interviewer..." {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
 
-                            <Button type="submit">SCHEDULE</Button>
-                        </form>
-                    </Form>
-                </CardContent>
 
-            </Card>
+
+                                <Button type="submit">SCHEDULE</Button>
+                            </form>
+                        </Form>
+                    </CardContent>
+
+                </Card>
+                <Card className="border-0 bg-muted/50 ">
+
+                    <CardHeader>
+                        <CardTitle className="tracking-wider">Order Summary</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+
+                    </CardContent>
+
+                </Card>
+
+            </div>
 
         </div>
     );
