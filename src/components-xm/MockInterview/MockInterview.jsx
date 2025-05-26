@@ -56,33 +56,33 @@ export function MockInterview() {
 
                 </Card>
 
-                <section className="my-6 w-full flex flex-col md:flex-row gap-6 justify-between py-0 items-center">
-                    <img
-                        src="https://next-cdn.codementor.io/images/landing-pages/mock-interview-practices/hero.png"
-                        alt="Professions"
-                        className="w-84 h-72 object-contain rounded-xl border-0 bg-muted/50 p-4"
-                    />
-                    <Card
-                        className="bg-muted/50 rounded-xl border-0 min-h-72 h-fit w-84 flex flex-col justify-center items-start text-left ">
-                        <CardHeader className="flex flex-col gap-4">
-                            <CardTitle className="tracking-widest text-3xl font-extrabold text-left">
-                                Interview Skills
-                            </CardTitle>
-                            <CardDescription className="text-black text-md">
-                                Interviews can be nerve-wracking, but our mock interview skills program is designed to
-                                transform your approach and boost your confidence. This comprehensive program provides
-                                you with essential techniques, from tackling common interview questions to perfecting
-                                your body language and communication skills. Our personalized strategies will empower
-                                you to make a memorable impression and increase your chances of landing your dream job.
-                            </CardDescription>
-                            <div className="mt-">
-                                <Link to={`/schedule-mock-interview`}>
-                                    <Button className="gap-1">TALK TO OUR EXPERT NOW</Button>
-                                </Link>
-                            </div>
-                        </CardHeader>
-                    </Card>
-                </section>
+                {/*<section className="my-6 w-full flex flex-col md:flex-row gap-6 justify-between py-0 items-center">*/}
+                {/*    <img*/}
+                {/*        src="https://next-cdn.codementor.io/images/landing-pages/mock-interview-practices/hero.png"*/}
+                {/*        alt="Professions"*/}
+                {/*        className="w-84 h-72 object-contain rounded-xl border-0 bg-muted/50 p-4"*/}
+                {/*    />*/}
+                {/*    <Card*/}
+                {/*        className="bg-muted/50 rounded-xl border-0 min-h-72 h-fit w-84 flex flex-col justify-center items-start text-left ">*/}
+                {/*        <CardHeader className="flex flex-col gap-4">*/}
+                {/*            <CardTitle className="tracking-widest text-3xl font-extrabold text-left">*/}
+                {/*                Interview Skills*/}
+                {/*            </CardTitle>*/}
+                {/*            <CardDescription className="text-black text-md">*/}
+                {/*                Interviews can be nerve-wracking, but our mock interview skills program is designed to*/}
+                {/*                transform your approach and boost your confidence. This comprehensive program provides*/}
+                {/*                you with essential techniques, from tackling common interview questions to perfecting*/}
+                {/*                your body language and communication skills. Our personalized strategies will empower*/}
+                {/*                you to make a memorable impression and increase your chances of landing your dream job.*/}
+                {/*            </CardDescription>*/}
+                {/*            <div className="mt-">*/}
+                {/*                <Link to={`/schedule-mock-interview`}>*/}
+                {/*                    <Button className="gap-1">TALK TO OUR EXPERT NOW</Button>*/}
+                {/*                </Link>*/}
+                {/*            </div>*/}
+                {/*        </CardHeader>*/}
+                {/*    </Card>*/}
+                {/*</section>*/}
 
                 <section className="my-6 w-full flex flex-col md:flex-row gap-6 justify-between py-0 items-center">
 
@@ -107,7 +107,7 @@ export function MockInterview() {
                     <img
                         src="https://next-cdn.codementor.io/images/landing-pages/mock-interview-practices/target.svg"
                         alt="Professions"
-                        className="w-84 h-72 object-contain rounded-xl border-0 bg-muted/50 p-4"
+                        className="w-full md:w-84 h-72 object-contain rounded-xl border-0 bg-muted/50 p-4"
                     />
                 </section>
 
@@ -134,49 +134,6 @@ export function MockInterview() {
 
                                     <CardContent>
                                         <div className="grid grid-cols-2 md:grid-cols-3   gap-6 justify-items-center">
-                                            {/*<div className="flex flex-col items-center text-center">*/}
-                                            {/*    <img*/}
-                                            {/*        src="https://next-cdn.codementor.io/images/landing-pages/mock-interview-practices/target.svg"*/}
-                                            {/*        className="w-16 h-16 md:w-20 md:h-20 object-contain"*/}
-                                            {/*        alt="Mock Interview Target"*/}
-                                            {/*    />*/}
-                                            {/*    <p className="mt-2 font-bold text-lg">Hands-on experience</p>*/}
-                                            {/*    <p className="mt-1  text-lg">*/}
-                                            {/*        Learn how to answer interview questions professionally to the hiring*/}
-                                            {/*        panel.*/}
-                                            {/*    </p>*/}
-                                            {/*</div>*/}
-
-                                            {/*<div className="flex flex-col items-center text-center">*/}
-                                            {/*    <img*/}
-                                            {/*        src="https://next-cdn.codementor.io/images/landing-pages/mock-interview-practices/chat.svg"*/}
-                                            {/*        className="w-16 h-16 md:w-20 md:h-20 object-contain"*/}
-                                            {/*        alt="Mock Interview Target"*/}
-                                            {/*    />*/}
-                                            {/*    <p className="mt-2 font-bold  text-lg">Detailed feedback*/}
-                                            {/*    </p>*/}
-                                            {/*    <p className="mt-1  text-lg">*/}
-                                            {/*        Get actionable feedback on what you need to work on to land your*/}
-                                            {/*        next job.*/}
-
-                                            {/*    </p>*/}
-                                            {/*</div>*/}
-
-                                            {/*<div className="flex flex-col items-center text-center">*/}
-                                            {/*    <img*/}
-                                            {/*        src="https://next-cdn.codementor.io/images/landing-pages/mock-interview-practices/star.svg"*/}
-                                            {/*        className="w-16 h-16 md:w-20 md:h-20 object-contain"*/}
-                                            {/*        alt="Mock Interview Target"*/}
-                                            {/*    />*/}
-                                            {/*    <p className="mt-2 font-bold  text-lg">Confidence boost*/}
-                                            {/*    </p>*/}
-                                            {/*    <p className="mt-1  text-lg">*/}
-                                            {/*        Gain confidence practicing with coaches who match your learning*/}
-                                            {/*        style.*/}
-
-                                            {/*    </p>*/}
-                                            {/*</div>*/}
-
 
                                             <div className="flex flex-col items-center text-center">
                                                 <img
@@ -276,13 +233,13 @@ export function MockInterview() {
 
 
                 <section className="my-6 w-full flex flex-col md:flex-row gap-6 justify-between py-0 items-center">
-                    <img
-                        src={professions}
-                        alt="Professions"
-                        className="w-84 h-72  object-cover rounded-xl border-0 bg-muted/50"
-                    />
+                    {/*<img*/}
+                    {/*    src={professions}*/}
+                    {/*    alt="Professions"*/}
+                    {/*    className="w-84 h-72  object-cover rounded-xl border-0 bg-muted/50"*/}
+                    {/*/>*/}
                     <Card
-                        className="bg-muted/50 rounded-xl border-0 min-h-72 h-fit p-4 w-full md:w-3/4 flex flex-col justify-center items-center text-center">
+                        className="bg-muted/50 rounded-xl border-0 min-h-72 h-fit p-4 w-full   flex flex-col justify-center items-center text-center">
                         <CardHeader>
                             <CardTitle className="tracking-wider text-yellow-600 text-3xl font-bold mb-4">
                                 Who Can Benefit from This?
@@ -388,7 +345,8 @@ export function MockInterview() {
 
                     <Card
                         className="bg-muted/50 rounded-xl border-0 min-h-72 h-fit w-84 flex flex-col justify-center items-start text-left ">
-                        <CardHeader  className="flex flex-col gap-4"> <CardTitle className="tracking-widest text-3xl font-extrabold text-left">
+                        <CardHeader  className="flex flex-col gap-4">
+                            <CardTitle   className="tracking-wider text-cyan-600 text-3xl font-bold text-center">
                             Practice Interviews in Safe Virtual Sessions
                         </CardTitle>
                             <CardDescription className="text-black text-md mt-4">
@@ -411,18 +369,18 @@ export function MockInterview() {
                 <section className="my-6 grid grid-cols-1 ">
 
                     <Card className="border-0 bg-muted/50 bg-muted/50   py-6">
-                        <CardHeader className="flex flex-col md:flex-row gap-4 justify-between py-0 items-center ">
+                        <CardHeader className="flex   flex-row gap-4 justify-between py-0 items-center ">
                             <img
                                 src={`https://www.pramp.com/img/use-case/person.svg`}
                                 alt="Compass"
-                                className=" h-44 "
+                                className=" h-44 hidden md:block"
                             />
                             <div>
-                                <CardTitle className="text-center tracking-widest text-3xl font-extrabold text-cyan-600">
+                                <CardTitle className="text-center tracking-widest text-3xl font-extrabold text-yellow-600">
                                     Ace your next interview
                                 </CardTitle>
 
-                                <div className="text-center text-black items-center mt-4">
+                                <div className="text-center text-black items-center mt-8">
                                     <Link to={`/schedule-mock-interview`}>
                                         <Button
                                             className="  gap-1 "
@@ -434,7 +392,7 @@ export function MockInterview() {
                             <img
                                 src={`https://www.pramp.com/img/use-case/person-03.png`}
                                 alt="Compass"
-                                className=" h-44 "
+                                className=" h-44  hidden md:block"
                             />
 
 

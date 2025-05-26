@@ -93,7 +93,7 @@ export function Dashboard() {
             </Card>
 
             <section className="my-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="border-0 bg-muted/50  py-6  ">
+                <Card className="border-0 bg-muted/50    ">
                     <CardHeader className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
                         <img
                             src={mockinterview}
@@ -123,7 +123,7 @@ export function Dashboard() {
 
                 </Card>
 
-                <Card className="border-0 bg-muted/50  py-6  ">
+                <Card className="border-0 bg-muted/50    ">
                     <CardHeader className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
 
 
@@ -157,7 +157,7 @@ export function Dashboard() {
 
 
             <section className="my-6 grid grid-cols-1  gap-6">
-                <Card className="border-0 bg-muted/50 py-4">
+                <Card className="border-0 bg-muted/50 ">
                     <CardHeader className="flex flex-col md:flex-row md:items-center gap-4">
                         <img
                             src={compass}

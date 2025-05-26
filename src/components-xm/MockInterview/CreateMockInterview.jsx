@@ -53,7 +53,9 @@ export function CreateMockInterview() {
 
         axiosConn.post('/raiseInterviewRequest', data)
             .then(res => {
-                toast({ title: res.data?.data?.message });
+                toast({
+                     title:  res.data?.data?.message ,
+                })
                 createMockInterviewForm.reset();
             })
             .catch(err => {

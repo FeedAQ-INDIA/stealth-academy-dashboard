@@ -168,7 +168,7 @@ function NotesModule({userId, courseId, courseTopicId, courseTopicContentId, ref
                                         <div>
                                             <p className=" my-2 text-sm font-normal	 text-muted-foreground">
 
-                                                {a?.created_date} {a?.created_time}
+                                                {a?.v_created_date} {a?.v_created_time}
                                             </p>
 
                                             <p  className="whitespace-pre-wrap break-words">{a.notesText}</p>

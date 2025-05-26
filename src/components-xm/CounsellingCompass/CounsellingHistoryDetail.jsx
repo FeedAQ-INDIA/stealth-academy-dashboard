@@ -192,20 +192,20 @@ export default function CounsellingHistoryDetail() {
                             <div className="flex flex-wrap justify-between gap-4  ">
                                 <p className="text-base tracking-wide text-left mt-2">
                                     <span className="text-black font-medium">Created Date: </span>
-                                    {counsellingHistoryData.created_date}
+                                    {counsellingHistoryData.v_created_date}
                                 </p>
                                 <p className="text-base tracking-wide text-left mt-2">
                                     <span className="text-black font-medium">Created Time: </span>
-                                    {counsellingHistoryData.created_time}
+                                    {counsellingHistoryData.v_created_time}
                                 </p>
 
                                 <p className="text-base tracking-wide text-left mt-2">
                                     <span className="text-black font-medium">Updated Date: </span>
-                                    {counsellingHistoryData.updated_date}
+                                    {counsellingHistoryData.v_updated_date}
                                 </p>
                                 <p className="text-base tracking-wide text-left mt-2">
                                     <span className="text-black font-medium">Updated Time: </span>
-                                    {counsellingHistoryData.updated_time}
+                                    {counsellingHistoryData.v_updated_time}
                                 </p>
 
                             </div>

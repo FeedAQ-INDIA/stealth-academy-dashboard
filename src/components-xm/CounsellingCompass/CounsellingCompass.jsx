@@ -36,7 +36,7 @@ export function CounsellingCompass() {
 
     return (
         <>   <PublicHeader/>
-            <div className="p-3 md:p-6 overflow-y-auto h-[calc(100svh-4em)]">
+            <div className="p-3   overflow-y-auto h-[calc(100svh-4em)]">
 
 
                 <Card className="border-0 bg-muted/50 bg-[#ffdd00]   py-6">
@@ -49,14 +49,12 @@ export function CounsellingCompass() {
                             <CardTitle className="text-center tracking-widest text-3xl font-bold ">
                                 FIND YOUR TRUE NORTH WITH COUNSELLING COMPASS
                             </CardTitle>
-                            <CardDescription className="text-center text-black">
-                                COUNSELLING COMPASS is your personalized career counseling guide — designed to help students and professionals discover, plan, and achieve their true potential with expert guidance.
-                            </CardDescription>
+
                         </div>
                         <img
                             src={compass}
                             alt="Compass"
-                            className="w-16 h-16 md:w-20 md:h-20 object-contain"
+                            className="w-16 h-16 md:w-20 md:h-20 object-contain hidden md:block"
                         />
 
 
@@ -69,14 +67,14 @@ export function CounsellingCompass() {
                     <img
                         src={professions}
                         alt="Professions"
-                        className="w-84 h-72 object-cover rounded-xl border-0 bg-muted/50  "
+                        className=" hidden md:block h-72 object-contain rounded-xl border-0 bg-muted/50  "
                     />
                     <Card className="bg-muted/50 rounded-xl border-0 min-h-72 h-fit p-4 w-84 flex flex-col justify-center items-center text-center px-4">
                         <CardTitle className="tracking-wider text-yellow-600 text-3xl font-bold">
                             Unsure About Your <strong>Short-Term</strong> and <strong>Long-Term</strong> Career Goals?
                         </CardTitle>
                         <CardDescription className="text-black text-md mt-4">
-                            Create a career plan by evaluating your skills. Find suitable courses or certifications to develop your skills from well researched options. Seek guidance from our experts to build your professional network.
+                            COUNSELLING COMPASS is your personalized career counseling guide — designed to help students and professionals discover, plan, and achieve their true potential with expert guidance.
                         </CardDescription>
                         <div className="mt-4">
                             <Link to={`/schedule-counselling-compass`}>

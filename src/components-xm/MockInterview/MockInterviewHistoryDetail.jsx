@@ -215,20 +215,20 @@ export default function MockInterviewHistoryDetail() {
                             <div className="flex flex-wrap justify-between gap-4  ">
                                 <p className="text-base tracking-wide text-left mt-2">
                                     <span className="text-black font-medium">Created Date: </span>
-                                    {mockInterviewHistoryData.created_date}
+                                    {mockInterviewHistoryData.v_created_date}
                                 </p>
                                 <p className="text-base tracking-wide text-left mt-2">
                                     <span className="text-black font-medium">Created Time: </span>
-                                    {mockInterviewHistoryData.created_time}
+                                    {mockInterviewHistoryData.v_created_time}
                                 </p>
 
                                 <p className="text-base tracking-wide text-left mt-2">
                                     <span className="text-black font-medium">Updated Date: </span>
-                                    {mockInterviewHistoryData.updated_date}
+                                    {mockInterviewHistoryData.v_updated_date}
                                 </p>
                                 <p className="text-base tracking-wide text-left mt-2">
                                     <span className="text-black font-medium">Updated Time: </span>
-                                    {mockInterviewHistoryData.updated_time}
+                                    {mockInterviewHistoryData.v_updated_time}
                                 </p>
 
                             </div>
