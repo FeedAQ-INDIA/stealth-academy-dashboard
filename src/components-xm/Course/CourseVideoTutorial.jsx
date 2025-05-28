@@ -203,7 +203,7 @@ function CourseVideoTutorial() {
                 <div className="p-4">
                     <Card className="rounded-none bg-muted/50 border-none">
                         <CardHeader>
-                            <div className="flex flex-wrap gap-2 w-full mb-3 justify-items-center">
+                            <div className="flex flex-wrap gap-2 w-full mb-2 justify-items-center">
                                 <Badge variant="outline">Video</Badge>
                                 <Badge variant="outline">
                                     {(() => {

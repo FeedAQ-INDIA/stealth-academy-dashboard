@@ -114,7 +114,7 @@ function CourseOverview() {
                     <CardHeader>
 
 
-                        <div className="flex flex-wrap gap-2 w-full mb-3">
+                        <div className="flex flex-wrap gap-2 w-full mb-2">
 
                             <Badge className="animate-blink bg-green-600 text-white">{courseList?.courseCost == 0 ? 'FREE' : `Rs.${courseList?.courseCost}/-`}</Badge>
                             <Badge variant="outline">{courseList?.courseType}</Badge>
@@ -123,8 +123,11 @@ function CourseOverview() {
                             </Badge>
                             {courseList?.courseSource ? <Badge variant="outline">{courseList?.courseSource}</Badge> : <></>}
                             {courseList?.courseLevel ? <Badge variant="outline">{courseList?.courseLevel}</Badge> : <></>}
+
+                            {courseList?.courseMode && <Badge variant="outline">{courseList?.courseMode}</Badge>}
+                            {courseList?.deliveryMode && <Badge variant="outline">{courseList?.deliveryMode}</Badge>}
                         </div>
-                        <div className="flex flex-wrap gap-2 w-full mb-3 items-center">
+                        <div className="flex flex-wrap gap-2 w-full   items-center">
                             <div className=" ">
                                 <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold">
                                     {courseList?.courseTitle}

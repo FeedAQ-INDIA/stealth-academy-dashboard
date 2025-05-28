@@ -22,7 +22,7 @@ import {
     Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
 } from "@/components/ui/form.jsx";
 import {
-    Card, CardContent, CardHeader, CardTitle,
+    Card, CardContent, CardFooter, CardHeader, CardTitle,
 } from "@/components/ui/card.jsx";
 
 // Zod schema
@@ -94,11 +94,14 @@ export function CreateCounsellingCompass() {
                     </CardTitle>
                 </CardHeader>
             </Card>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
             <Card className="border-0 bg-muted/50 py-6">
                 <CardContent>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                             {/* Date */}
                             <FormField
@@ -129,8 +132,11 @@ export function CreateCounsellingCompass() {
                                     </FormItem>
                                 )}
                             />
+                    </div>
 
-                            {/* Background */}
+                    <div className=" mt-2">
+
+                    {/* Background */}
                             <FormField
                                 control={form.control}
                                 name="background"
@@ -160,8 +166,11 @@ export function CreateCounsellingCompass() {
                                     </FormItem>
                                 )}
                             />
+                    </div>
+                    <div className=" mt-2">
 
-                            {watchBackground === "Other" && (
+
+                    {watchBackground === "Other" && (
                                 <FormField
                                     control={form.control}
                                     name="customBackground"
@@ -176,8 +185,10 @@ export function CreateCounsellingCompass() {
                                     )}
                                 />
                             )}
+                    </div>
+                    <div className=" mt-2">
 
-                            {/* Counselling Topic */}
+                    {/* Counselling Topic */}
                             <FormField
                                 control={form.control}
                                 name="counsellingTopic"
@@ -191,8 +202,11 @@ export function CreateCounsellingCompass() {
                                     </FormItem>
                                 )}
                             />
+                    </div>
+                    <div className=" mt-2">
 
-                            {/* Language Preference */}
+
+                    {/* Language Preference */}
                             <FormField
                                 control={form.control}
                                 name="languagePreference"
@@ -215,8 +229,10 @@ export function CreateCounsellingCompass() {
                                     </FormItem>
                                 )}
                             />
+                    </div>
+                    <div className=" mt-2">
 
-                            {watchLanguagePreference === "Other" && (
+                    {watchLanguagePreference === "Other" && (
                                 <FormField
                                     control={form.control}
                                     name="customLanguagePreference"
@@ -231,8 +247,11 @@ export function CreateCounsellingCompass() {
                                     )}
                                 />
                             )}
+                    </div>
+                    <div className=" mt-2">
 
-                            {/* Notes */}
+
+                    {/* Notes */}
                             <FormField
                                 control={form.control}
                                 name="note"
@@ -246,15 +265,31 @@ export function CreateCounsellingCompass() {
                                     </FormItem>
                                 )}
                             />
+                    </div>
 
-                            {/* Submit */}
-                            <Button type="submit" disabled={isSubmitting}>
-                                {isSubmitting ? "Scheduling..." : "SCHEDULE"}
-                            </Button>
-                        </form>
-                    </Form>
                 </CardContent>
             </Card>
+                <Card className="border-0 bg-muted/50 ">
+
+                    <CardHeader>
+                        <CardTitle className="tracking-wider">Order Summary</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+
+                    </CardContent>
+                    <CardFooter>
+
+                        <Button type="submit" className="w-full" disabled={isSubmitting}>
+                            {isSubmitting ? "PROCEEDING" : "PROCEED"}
+                        </Button>
+
+                    </CardFooter>
+
+                </Card>
+
+            </div>
+        </form>
+</Form>
         </div>
     );
 }

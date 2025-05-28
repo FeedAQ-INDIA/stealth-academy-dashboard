@@ -204,12 +204,12 @@ function WebinarOverview() {
 
                                 <p  className=" text-base tracking-wide text-left mt-2"   >
                                     <span className="text-black font-medium ">Webinar Date : </span>
-                                    {`${webinarList?.webinar_start_date} ${webinarList?.webinar_start_time}`} <span className="text-black font-medium "> - </span> {`${webinarList?.webinar_end_date} ${webinarList?.webinar_end_time} `}
+                                    {`${webinarList?.v_webinar_start_date} ${webinarList?.v_webinar_start_time}`} <span className="text-black font-medium "> - </span> {`${webinarList?.v_webinar_end_date} ${webinarList?.v_webinar_end_time} `}
                                 </p>
 
                                 <p  className=" text-base tracking-wide text-left mt-2"   >
                                     <span className="text-black font-medium ">Webinar Registration : </span>
-                                    {`${webinarList?.webinar_registration_start_date} ${webinarList?.webinar_registration_start_time}`} <span className="text-black font-medium "> - </span> {`${webinarList?.webinar_registration_end_date} ${webinarList?.webinar_registration_end_time} `}
+                                    {`${webinarList?.v_webinar_registration_start_date} ${webinarList?.v_webinar_registration_start_time}`} <span className="text-black font-medium "> - </span> {`${webinarList?.v_webinar_registration_end_date} ${webinarList?.v_webinar_registration_end_time} `}
                                 </p>
 
 

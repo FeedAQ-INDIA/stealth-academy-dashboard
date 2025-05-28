@@ -32,6 +32,7 @@ import HomePage from "@/components-xm/HomePage.jsx";
 import {CreateCounsellingCompass} from "@/components-xm/CounsellingCompass/CreateCounsellingCompass.jsx";
 import {CounsellingCompass} from "@/components-xm/CounsellingCompass/CounsellingCompass.jsx";
 import CounsellingHistoryDetail from "@/components-xm/CounsellingCompass/CounsellingHistoryDetail.jsx";
+import LiveCourseAttendance from "@/components-xm/Course/LiveCourseAttendance.jsx";
 
 
  
@@ -107,6 +108,10 @@ const router = createBrowserRouter([
                     {
                         path: "/course/:CourseId",
                         element: <CourseOverview/>,
+                    },
+                    {
+                        path: "/course/:CourseId/schedule",
+                        element: <LiveCourseAttendance/>,
                     },
                     {
                         path: "/course/:CourseId/quiz/:CourseQuizId",

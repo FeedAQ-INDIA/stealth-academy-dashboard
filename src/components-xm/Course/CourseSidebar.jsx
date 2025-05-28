@@ -71,6 +71,12 @@ function CourseSidebar({...props}) {
                             isClickable: true,
                             isActive: location.pathname === `/course/${courseList?.courseId}`,
                         },
+                            // {
+                            //     title: "SCHEDULE",
+                            //     url: `/course/${courseList?.courseId}/schedule`,
+                            //     isClickable: true,
+                            //     isActive: location.pathname === `/course/${courseList?.courseId}/schedule`,
+                            // },
                          ].concat(vav),
                     },]
             })
@@ -97,7 +103,7 @@ function CourseSidebar({...props}) {
 
                     {/*</p>*/}
                     <p  className="completed-stamp text-base tracking-wide"   >
-                        <span className="text-black font-light">Course Status</span> : {userEnrollmentObj?.enrollmentStatus}</p>
+                        <span className="text-black font-light">Course Status :</span>  {userEnrollmentObj?.enrollmentStatus}</p>
                     <Link to={'/explore'}>
                         <Button className="w-full flex gap-2 text-muted-foreground" size="sm" variant="ghost"><SquareArrowLeft />Explore more courses</Button>
 

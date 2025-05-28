@@ -10,12 +10,13 @@ import {useAuthStore} from "@/zustland/store.js";
 import axiosConn from "@/axioscon.js";
 import {toast} from "@/components/hooks/use-toast.js";
 import React, {useState} from "react";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card.jsx";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 
 
 export function CreateMockInterview() {
     const {userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore();
     const [exploreCourseText, setExploreCourseText] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
 
     const createMockInterviewSchema = z.object({
@@ -30,7 +31,11 @@ export function CreateMockInterview() {
         }),
         duration: z.number().positive({ message: "Duration must be a positive number" }),
         resumeLink: z.string().url({ message: "Invalid resume URL" }),
-        attachmentLink: z.string().url({ message: "Invalid attachment URL" }).optional(),
+        attachmentLink: z.string()
+            .optional()
+            .refine(val => !val || /^https?:\/\/\S+$/.test(val), {
+                message: "Invalid attachment URL",
+            }),
         note: z.string().optional(),
     });
 
@@ -49,6 +54,7 @@ export function CreateMockInterview() {
     });
 
     function onSubmit(data) {
+        setIsSubmitting(true);
         console.log("Submitting mock interview:", data);
 
         axiosConn.post('/raiseInterviewRequest', data)
@@ -61,6 +67,43 @@ export function CreateMockInterview() {
             .catch(err => {
                 toast({ title: "Failed to schedule mock interview." });
             });
+
+
+        // Step 3: Launch Razorpay Checkout
+        const options = {
+            key: 'rzp_test_1F67LLEd7Qzk1u',
+            amount: 1,
+            currency: 'INR',
+            name: 'FeedAQ Academy',
+            description: 'Test Transaction',
+            order_id: data.orderId,
+            handler: async function (response) {
+                const verifyRes = await axios.post('http://localhost:5000/api/verify', {
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature: response.razorpay_signature,
+                });
+
+                if (verifyRes.data.success) {
+                    alert('Payment successful!');
+                } else {
+                    alert('Payment verification failed');
+                }
+            },
+            prefill: {
+                name: 'bksb',
+                email: 'test@example.com',
+                contact: '9631045873',
+            },
+            theme: {
+                color: '#3399cc',
+            },
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+
+        setIsSubmitting(false);
     }
 
     return (
@@ -74,12 +117,15 @@ export function CreateMockInterview() {
 
 
             </Card>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Form {...createMockInterviewForm}>
+                <form onSubmit={createMockInterviewForm.handleSubmit(onSubmit)} className="w-full space-y-6 ">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card className="border-0 bg-muted/50  py-6 ">
 
                     <CardContent>
-                        <Form {...createMockInterviewForm}>
-                            <form onSubmit={createMockInterviewForm.handleSubmit(onSubmit)} className="w-full space-y-6 ">
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
 
                                 {/* Interview Date */}
                                 <FormField
@@ -110,7 +156,9 @@ export function CreateMockInterview() {
                                         </FormItem>
                                     )}
                                 />
+                </div>
 
+<div className="mt-2">
                                 {/* Interview Duration */}
                                 <FormField
                                     control={createMockInterviewForm.control}
@@ -139,8 +187,10 @@ export function CreateMockInterview() {
                                         </FormItem>
                                     )}
                                 />
+                </div>
+                        <div className="mt-2">
 
-                                {/* Resume Link */}
+                        {/* Resume Link */}
                                 <FormField
                                     control={createMockInterviewForm.control}
                                     name="resumeLink"
@@ -154,23 +204,29 @@ export function CreateMockInterview() {
                                         </FormItem>
                                     )}
                                 />
+                        </div>
 
-                                {/*/!* Attachment Link *!/*/}
-                                {/*<FormField*/}
-                                {/*    control={createMockInterviewForm.control}*/}
-                                {/*    name="attachmentLink"*/}
-                                {/*    render={({ field }) => (*/}
-                                {/*        <FormItem>*/}
-                                {/*            <FormLabel>Attachment Link (optional)</FormLabel>*/}
-                                {/*            <FormControl>*/}
-                                {/*                <Input type="text" placeholder="Enter Attachment URL" {...field} />*/}
-                                {/*            </FormControl>*/}
-                                {/*            <FormMessage />*/}
-                                {/*        </FormItem>*/}
-                                {/*    )}*/}
-                                {/*/>*/}
+                        <div className="mt-2">
 
-                                {/* Note */}
+                        {/*/!* Attachment Link *!/*/}
+                                <FormField
+                                    control={createMockInterviewForm.control}
+                                    name="attachmentLink"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Attachment Link (optional)</FormLabel>
+                                            <FormControl>
+                                                <Input type="text" placeholder="Enter Attachment URL" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                        </div>
+
+                        <div className="mt-2">
+
+                        {/* Note */}
                                 <FormField
                                     control={createMockInterviewForm.control}
                                     name="note"
@@ -184,13 +240,11 @@ export function CreateMockInterview() {
                                         </FormItem>
                                     )}
                                 />
+                        </div>
 
 
 
 
-                                <Button type="submit">SCHEDULE</Button>
-                            </form>
-                        </Form>
                     </CardContent>
 
                 </Card>
@@ -202,11 +256,18 @@ export function CreateMockInterview() {
                     <CardContent>
 
                     </CardContent>
+                    <CardFooter>
+
+                        <Button type="submit" className="w-full" disabled={isSubmitting}>
+                            {isSubmitting ? "PROCEEDING" : "PROCEED"}
+                        </Button>
+                    </CardFooter>
 
                 </Card>
 
             </div>
-
+</form>
+</Form>
         </div>
     );
 }

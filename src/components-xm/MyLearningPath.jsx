@@ -18,7 +18,7 @@ export function MyLearningPath() {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     const [totalCount, setTotalCount] = useState(0);
-    const [limit, setLimit] = useState(10);
+    const [limit, setLimit] = useState(5);
     const [offset, setOffset] = useState(0);
     const [courseList, setCourseList] = useState({});
 
@@ -56,7 +56,7 @@ export function MyLearningPath() {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     const [totalCount1, setTotalCount1] = useState(0);
-    const [limit1, setLimit1] = useState(10);
+    const [limit1, setLimit1] = useState(5);
     const [offset1, setOffset1] = useState(0);
     const [courseList1, setCourseList1] = useState({});
 
@@ -92,7 +92,7 @@ export function MyLearningPath() {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     const [totalCount2, setTotalCount2] = useState(0);
-    const [limit2, setLimit2] = useState(10);
+    const [limit2, setLimit2] = useState(5);
     const [offset2, setOffset2] = useState(0);
     const [mockInterviewHistoryList, setMockInterviewHistoryList] = useState([]);
 
@@ -126,7 +126,7 @@ export function MyLearningPath() {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     const [totalCount3, setTotalCount3] = useState(0);
-    const [limit3, setLimit3] = useState(10);
+    const [limit3, setLimit3] = useState(5);
     const [offset3, setOffset3] = useState(0);
     const [counsellingHistoryList, setCounsellingHistoryList] = useState([]);
 
@@ -201,6 +201,7 @@ export function MyLearningPath() {
                                         <TableHead>Title</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead>Cost</TableHead>
+                                        <TableHead>Enrollment Date</TableHead>
 
                                         <TableHead className="text-right"></TableHead>
                                     </TableRow>
@@ -208,6 +209,7 @@ export function MyLearningPath() {
                                 <TableBody>
                                     {courseList?.map(a => (
                                         <TableRow key={a.courseId}>
+
                                             <TableCell className="font-medium">{a.courseId}</TableCell>
                                             <TableCell>{a.courseTitle}</TableCell>
                                             <TableCell>
@@ -220,6 +222,8 @@ export function MyLearningPath() {
                                             <TableCell>
                                                 {a?.courseCost == 0 || !a.courseCost ? 'FREE' : `Rs.${a?.courseCost}/-`}
                                             </TableCell>
+                                            <TableCell>  {a.v_created_date + ' ' + a.v_created_time}</TableCell>
+
 
                                             <TableCell className="text-right">
                                                 <Link
@@ -336,6 +340,7 @@ export function MyLearningPath() {
                                         <TableHead>Title</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead>Cost</TableHead>
+                                        <TableHead>Enrollment Date</TableHead>
 
                                         <TableHead className="text-right"></TableHead>
                                     </TableRow>
@@ -356,6 +361,7 @@ export function MyLearningPath() {
                                             <TableCell>
                                                 {a?.webinarCost == 0 || !a.webinarCost ? 'FREE' : `Rs.${a?.webinarCost}/-`}
                                             </TableCell>
+                                            <TableCell>{a.v_created_date + ' ' + a.v_created_time}</TableCell>
 
                                             <TableCell className="text-right">
                                                 <Link to={`/webinar/${a?.webinarId}`}> <Button size="sm"
@@ -465,6 +471,7 @@ export function MyLearningPath() {
                                     <TableHeader>
                                         <TableRow>
                                             <TableHead className="w-[100px]">ID</TableHead>
+                                            <TableHead>Requested Date</TableHead>
                                             <TableHead>Interview Date</TableHead>
                                             <TableHead>Interview Time</TableHead>
                                             <TableHead>Duration</TableHead>
@@ -478,6 +485,7 @@ export function MyLearningPath() {
                                         {mockInterviewHistoryList?.map(a => (
                                             <TableRow key={a.interviewReqId}>
                                                 <TableCell className="font-medium">{a.interviewReqId}</TableCell>
+                                                <TableCell>  {a.v_created_date + ' ' + a.v_created_time}</TableCell>
                                                 <TableCell>  {a.interviewReqDate ? new Date(a.interviewReqDate).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}
                                                 </TableCell>
                                                 <TableCell>{a.interviewReqTime}</TableCell>
@@ -494,7 +502,7 @@ export function MyLearningPath() {
                                     </TableBody>
                                     <TableFooter>
                                         <TableRow>
-                                            <TableCell colSpan={7} className="py-3">
+                                            <TableCell colSpan={8} className="py-3">
                                                 <div className="flex flex-row items-center">
                                                     <div className="text-xs text-muted-foreground">
                                                         {offset2 + 1} to {Math.min(offset2 + limit2, totalCount2)} of {totalCount2} row(s)
@@ -588,6 +596,7 @@ export function MyLearningPath() {
                                     <TableHeader>
                                         <TableRow>
                                             <TableHead className="w-[100px]">ID</TableHead>
+                                            <TableHead>Requested Date</TableHead>
                                             <TableHead>Counselling Date</TableHead>
                                             <TableHead>Counselling Time</TableHead>
                                              <TableHead>Cost</TableHead>
@@ -601,6 +610,7 @@ export function MyLearningPath() {
                                         {counsellingHistoryList?.map(a => (
                                             <TableRow key={a.counsellingId}>
                                                 <TableCell className="font-medium">{a.counsellingId}</TableCell>
+                                                <TableCell>  {a.v_created_date + ' ' + a.v_created_time}</TableCell>
                                                 <TableCell>  {a.counsellingDate ? new Date(a.counsellingDate).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}
                                                 </TableCell>
                                                 <TableCell>{a.counsellingTime}</TableCell>
@@ -616,7 +626,7 @@ export function MyLearningPath() {
                                     </TableBody>
                                     <TableFooter>
                                         <TableRow>
-                                            <TableCell colSpan={7} className="py-3">
+                                            <TableCell colSpan={8} className="py-3">
                                                 <div className="flex flex-row items-center">
                                                     <div className="text-xs text-muted-foreground">
                                                         {offset3 + 1} to {Math.min(offset3 + limit3, totalCount3)} of {totalCount3} row(s)
