@@ -71,12 +71,14 @@ function CourseSidebar({...props}) {
                             isClickable: true,
                             isActive: location.pathname === `/course/${courseList?.courseId}`,
                         },
-                            // {
-                            //     title: "SCHEDULE",
-                            //     url: `/course/${courseList?.courseId}/schedule`,
-                            //     isClickable: true,
-                            //     isActive: location.pathname === `/course/${courseList?.courseId}/schedule`,
-                            // },
+                            ...(courseList?.courseMode === "LIVE"
+                                ? [{
+                                    title: "SCHEDULE",
+                                    url: `/course/${courseList?.courseId}/schedule`,
+                                    isClickable: true,
+                                    isActive: location.pathname === `/course/${courseList?.courseId}/schedule`,
+                                }]
+                                : []) ,
                          ].concat(vav),
                     },]
             })

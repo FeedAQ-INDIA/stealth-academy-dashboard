@@ -135,7 +135,12 @@ export function CreateMockInterview() {
                                         <FormItem>
                                             <FormLabel>Interview Date</FormLabel>
                                             <FormControl>
-                                                <Input type="date" {...field} />
+                                                <Input type="date" {...field} className="appearance-none pr-2 pl-3 py-2 border rounded w-full text-gray-700
+             [&::-webkit-calendar-picker-indicator]:absolute
+             [&::-webkit-calendar-picker-indicator]:right-3
+             [&::-webkit-calendar-picker-indicator]:cursor-pointer
+             [&::-webkit-calendar-picker-indicator]:text-transparent
+             relative"/>
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -150,7 +155,12 @@ export function CreateMockInterview() {
                                         <FormItem>
                                             <FormLabel>Interview Time</FormLabel>
                                             <FormControl>
-                                                <Input type="time" {...field} />
+                                                <Input type="time" {...field} className="appearance-none pr-2 pl-3 py-2 border rounded w-full text-gray-700
+             [&::-webkit-calendar-picker-indicator]:absolute
+             [&::-webkit-calendar-picker-indicator]:right-3
+             [&::-webkit-calendar-picker-indicator]:cursor-pointer
+             [&::-webkit-calendar-picker-indicator]:text-transparent
+             relative"/>
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

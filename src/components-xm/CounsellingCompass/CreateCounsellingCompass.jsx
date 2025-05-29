@@ -111,7 +111,12 @@ export function CreateCounsellingCompass() {
                                     <FormItem>
                                         <FormLabel>Session Date</FormLabel>
                                         <FormControl>
-                                            <Input type="date" {...field} />
+                                            <Input type="date" {...field} className="appearance-none pr-2 pl-3 py-2 border rounded w-full text-gray-700
+             [&::-webkit-calendar-picker-indicator]:absolute
+             [&::-webkit-calendar-picker-indicator]:right-3
+             [&::-webkit-calendar-picker-indicator]:cursor-pointer
+             [&::-webkit-calendar-picker-indicator]:text-transparent
+             relative" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -126,7 +131,12 @@ export function CreateCounsellingCompass() {
                                     <FormItem>
                                         <FormLabel>Session Time</FormLabel>
                                         <FormControl>
-                                            <Input type="time" placeholder="e.g. 14:30" {...field} />
+                                            <Input type="time" placeholder="e.g. 14:30" {...field} className="appearance-none pr-2 pl-3 py-2 border rounded w-full text-gray-700
+             [&::-webkit-calendar-picker-indicator]:absolute
+             [&::-webkit-calendar-picker-indicator]:right-3
+             [&::-webkit-calendar-picker-indicator]:cursor-pointer
+             [&::-webkit-calendar-picker-indicator]:text-transparent
+             relative" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
