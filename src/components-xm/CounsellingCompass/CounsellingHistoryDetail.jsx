@@ -94,10 +94,10 @@ export default function CounsellingHistoryDetail() {
                 <Card className="  bg-muted/50 border-none">
                     <CardHeader>
 
-                        <div className="flex flex-wrap gap-2 w-full mb-3 items-center">
+                        <div className="flex flex-wrap gap-2 w-full  items-center">
                             <div className=" ">
                                 <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold tracking-wide">
-                                    Counselling History Detail
+                                    COUNSELLING HISTORY DETAIL
                                 </CardTitle>
                             </div>
                             <div className="ml-auto ">
