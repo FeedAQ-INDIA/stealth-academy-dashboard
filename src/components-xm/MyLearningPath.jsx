@@ -473,8 +473,7 @@ export function MyLearningPath() {
                                             <TableHead className="w-[100px]">ID</TableHead>
                                             <TableHead>Requested Date</TableHead>
                                             <TableHead>Interview Date</TableHead>
-                                            <TableHead>Interview Time</TableHead>
-                                            <TableHead>Duration</TableHead>
+                                             <TableHead>Duration</TableHead>
                                             <TableHead>Cost</TableHead>
 
                                             <TableHead className="text-right">Status</TableHead>
@@ -486,10 +485,9 @@ export function MyLearningPath() {
                                             <TableRow key={a.interviewReqId}>
                                                 <TableCell className="font-medium">{a.interviewReqId}</TableCell>
                                                 <TableCell>  {a.v_created_date + ' ' + a.v_created_time}</TableCell>
-                                                <TableCell>  {a.interviewReqDate ? new Date(a.interviewReqDate).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}
+                                                <TableCell>  {a.interviewReqDate ? new Date(a.interviewReqDate).toLocaleDateString('en-GB').replace(/\//g, '-') +' '+a.interviewReqTime: ''}
                                                 </TableCell>
-                                                <TableCell>{a.interviewReqTime}</TableCell>
-                                                <TableCell>{a.interviewReqDuration} min</TableCell>
+                                                 <TableCell>{a.interviewReqDuration} min</TableCell>
                                                 <TableCell>{a.interviewReqCost == 0 || !a.interviewReqCost ? "FREE" : ""}</TableCell>
 
                                                 <TableCell className="text-right">{a.interviewReqStatus}</TableCell>
@@ -598,8 +596,7 @@ export function MyLearningPath() {
                                             <TableHead className="w-[100px]">ID</TableHead>
                                             <TableHead>Requested Date</TableHead>
                                             <TableHead>Counselling Date</TableHead>
-                                            <TableHead>Counselling Time</TableHead>
-                                             <TableHead>Cost</TableHead>
+                                              <TableHead>Cost</TableHead>
                                             <TableHead  >Mode</TableHead>
 
                                             <TableHead className="text-right">Status</TableHead>
@@ -611,10 +608,9 @@ export function MyLearningPath() {
                                             <TableRow key={a.counsellingId}>
                                                 <TableCell className="font-medium">{a.counsellingId}</TableCell>
                                                 <TableCell>  {a.v_created_date + ' ' + a.v_created_time}</TableCell>
-                                                <TableCell>  {a.counsellingDate ? new Date(a.counsellingDate).toLocaleDateString('en-GB').replace(/\//g, '-') : ''}
+                                                <TableCell>  {a.counsellingDate ? new Date(a.counsellingDate).toLocaleDateString('en-GB').replace(/\//g, '-') +' '+a.counsellingTime: ''}
                                                 </TableCell>
-                                                <TableCell>{a.counsellingTime}</TableCell>
-                                                 <TableCell>{a.counsellingCost == 0 || !a.counsellingCost ? "FREE" : ""}</TableCell>
+                                                  <TableCell>{a.counsellingCost == 0 || !a.counsellingCost ? "FREE" : ""}</TableCell>
 <TableCell>{a?.counsellingMode}</TableCell>
                                                 <TableCell className="text-right">{a.counsellingStatus}</TableCell>
                                                 <TableCell className="text-right">

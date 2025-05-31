@@ -92,6 +92,7 @@ function CourseSchedule() {
             .post(import.meta.env.VITE_API_URL + "/searchCourse", {
                 limit: limit, offset: offset, getThisData: {
                     datasource: "CourseSchedule", attributes: [], where: { courseId: CourseId,
+                        courseBatch : userEnrollmentObj?.enrollmentBatch,
                         scheduledStartDateTime: {
                             "$between": [
                                 new Date(createScheduleForm.getValues("date")),
