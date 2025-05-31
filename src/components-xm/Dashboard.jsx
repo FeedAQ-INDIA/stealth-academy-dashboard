@@ -198,10 +198,7 @@ export function Dashboard() {
                                 <strong>COMPANION CONNECT</strong>
                             </CardTitle>
                             <CardDescription>
-                                <Link to={`/counselling-compass`} className="text-blue-700">
-                                    Click Here
-                                </Link>{" "}
-                                to know More.
+                   
                             </CardDescription>
                         </div>
 

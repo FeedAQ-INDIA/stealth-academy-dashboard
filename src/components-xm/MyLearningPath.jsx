@@ -218,7 +218,7 @@ export function MyLearningPath() {
                 </CardHeader>
             </Card>
 
-       
+
             <Card className="border-0 bg-muted/50 py-4 my-6">
  <CardHeader>
      <Select onValueChange={setHistorySelection} value={historySelection}>
