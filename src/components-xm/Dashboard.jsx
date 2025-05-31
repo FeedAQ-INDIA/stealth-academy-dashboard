@@ -198,7 +198,7 @@ export function Dashboard() {
                                 <strong>COMPANION CONNECT</strong>
                             </CardTitle>
                             <CardDescription>
-                   
+
                             </CardDescription>
                         </div>
 

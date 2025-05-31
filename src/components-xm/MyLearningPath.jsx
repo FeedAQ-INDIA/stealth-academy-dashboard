@@ -263,22 +263,22 @@ export function MyLearningPath() {
                                     {courseList?.map(a => (
                                         <TableRow key={a.courseId}>
 
-                                            <TableCell className="font-medium">{a.courseId}</TableCell>
-                                            <TableCell>{a.courseTitle}</TableCell>
-                                            <TableCell>
+                                            <TableCell  className="whitespace-nowrap font-medium" >{a.courseId}</TableCell>
+                                            <TableCell  className="whitespace-nowrap">{a.courseTitle}</TableCell>
+                                            <TableCell  className="whitespace-nowrap">
                                                 {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId) ?
                                                     <div className="  ">
                                                         <p className=" text-base">{userEnrolledCourseIdList?.find(m => m.courseId == a.courseId)?.enrollmentStatus}</p>
                                                     </div>
                                                     : <></>}</TableCell>
 
-                                            <TableCell>
+                                            <TableCell  className="whitespace-nowrap">
                                                 {a?.courseCost == 0 || !a.courseCost ? 'FREE' : `Rs.${a?.courseCost}/-`}
                                             </TableCell>
-                                            <TableCell>  {a.v_created_date + ' ' + a.v_created_time}</TableCell>
+                                            <TableCell  className="whitespace-nowrap">  {a.v_created_date + ' ' + a.v_created_time}</TableCell>
 
 
-                                            <TableCell className="text-right">
+                                            <TableCell  className="whitespace-nowrap text-right"  >
                                                 <Link
                                                     to={`/${a?.courseType === "COURSE" ? 'course' : 'webinar'}/${a?.courseId}`}>
                                                     <Button size="sm" variant="outline"><ExternalLink/></Button></Link>
@@ -288,7 +288,7 @@ export function MyLearningPath() {
                                 </TableBody>
                                 <TableFooter>
                                     <TableRow>
-                                        <TableCell colSpan={7} className="py-3">
+                                        <TableCell  className="whitespace-nowrap py-3" colSpan={7}  >
                                             <div className="flex flex-row items-center">
                                                 <div className="text-xs text-muted-foreground">
                                                     {offset + 1} to {Math.min(offset + limit, totalCount)} of {totalCount} row(s)
@@ -401,9 +401,9 @@ export function MyLearningPath() {
                                 <TableBody>
                                     {courseList1?.map(a => (
                                         <TableRow key={a.webinarId}>
-                                            <TableCell className="font-medium">{a.webinarId}</TableCell>
-                                            <TableCell>{a.webinarTitle}</TableCell>
-                                            <TableCell>
+                                            <TableCell  className="whitespace-nowrap font-medium" >{a.webinarId}</TableCell>
+                                            <TableCell  className="whitespace-nowrap">{a.webinarTitle}</TableCell>
+                                            <TableCell  className="whitespace-nowrap">
                                                 {userEnrolledCourseIdList?.find(m => m.webinarId == a.webinarId) ?
                                                     <div className="  ">
                                                         <p className=" text-base">{userEnrolledCourseIdList?.find(m => m.webinarId == a.webinarId)?.enrollmentStatus}</p>
@@ -411,12 +411,12 @@ export function MyLearningPath() {
                                                     : <></>}
                                             </TableCell>
 
-                                            <TableCell>
+                                            <TableCell  className="whitespace-nowrap">
                                                 {a?.webinarCost == 0 || !a.webinarCost ? 'FREE' : `Rs.${a?.webinarCost}/-`}
                                             </TableCell>
-                                            <TableCell>{a.v_created_date + ' ' + a.v_created_time}</TableCell>
+                                            <TableCell  className="whitespace-nowrap">{a.v_created_date + ' ' + a.v_created_time}</TableCell>
 
-                                            <TableCell className="text-right">
+                                            <TableCell  className="whitespace-nowrap text-right" >
                                                 <Link to={`/webinar/${a?.webinarId}`}> <Button size="sm"
                                                                                                variant="outline"><ExternalLink/></Button></Link>
                                             </TableCell>
@@ -425,7 +425,7 @@ export function MyLearningPath() {
                                 </TableBody>
                                 <TableFooter>
                                     <TableRow>
-                                        <TableCell colSpan={7} className="py-3">
+                                        <TableCell  className="whitespace-nowrap py-3" colSpan={7}  >
                                             <div className="flex flex-row items-center">
                                                 <div className="text-xs text-muted-foreground">
                                                     {offset1 + 1} to {Math.min(offset1 + limit1, totalCount1)} of {totalCount1} row(s)
@@ -535,15 +535,15 @@ export function MyLearningPath() {
                                     <TableBody>
                                         {mockInterviewHistoryList?.map(a => (
                                             <TableRow key={a.interviewReqId}>
-                                                <TableCell className="font-medium">{a.interviewReqId}</TableCell>
-                                                <TableCell>  {a.v_created_date + ' ' + a.v_created_time}</TableCell>
-                                                <TableCell>  {a.interviewReqDate ? new Date(a.interviewReqDate).toLocaleDateString('en-GB').replace(/\//g, '-') +' '+a.interviewReqTime: ''}
+                                                <TableCell  className="whitespace-nowrap font-medium" >{a.interviewReqId}</TableCell>
+                                                <TableCell  className="whitespace-nowrap">  {a.v_created_date + ' ' + a.v_created_time}</TableCell>
+                                                <TableCell  className="whitespace-nowrap">  {a.interviewReqDate ? new Date(a.interviewReqDate).toLocaleDateString('en-GB').replace(/\//g, '-') +' '+a.interviewReqTime: ''}
                                                 </TableCell>
-                                                 <TableCell>{a.interviewReqDuration} min</TableCell>
-                                                <TableCell>{a.interviewReqCost == 0 || !a.interviewReqCost ? "FREE" : ""}</TableCell>
+                                                 <TableCell  className="whitespace-nowrap">{a.interviewReqDuration} min</TableCell>
+                                                <TableCell  className="whitespace-nowrap">{a.interviewReqCost == 0 || !a.interviewReqCost ? "FREE" : ""}</TableCell>
 
-                                                <TableCell className="text-right">{a.interviewReqStatus}</TableCell>
-                                                <TableCell className="text-right">
+                                                <TableCell  className="whitespace-nowrap text-right"  >{a.interviewReqStatus}</TableCell>
+                                                <TableCell  className="whitespace-nowrap text-right"  >
                                                     <Link to={`/mock-interview/${a.interviewReqId}`}> <Button size="sm"
                                                                                                               variant="outline"><ExternalLink/></Button></Link>
                                                 </TableCell>
@@ -552,7 +552,7 @@ export function MyLearningPath() {
                                     </TableBody>
                                     <TableFooter>
                                         <TableRow>
-                                            <TableCell colSpan={8} className="py-3">
+                                            <TableCell  className="whitespace-nowrap py-3" colSpan={8}  >
                                                 <div className="flex flex-row items-center">
                                                     <div className="text-xs text-muted-foreground">
                                                         {offset2 + 1} to {Math.min(offset2 + limit2, totalCount2)} of {totalCount2} row(s)
@@ -658,14 +658,14 @@ export function MyLearningPath() {
                                     <TableBody>
                                         {counsellingHistoryList?.map(a => (
                                             <TableRow key={a.counsellingId}>
-                                                <TableCell className="font-medium">{a.counsellingId}</TableCell>
-                                                <TableCell>  {a.v_created_date + ' ' + a.v_created_time}</TableCell>
-                                                <TableCell>  {a.counsellingDate ? new Date(a.counsellingDate).toLocaleDateString('en-GB').replace(/\//g, '-') +' '+a.counsellingTime: ''}
+                                                <TableCell  className="whitespace-nowrap font-medium" >{a.counsellingId}</TableCell>
+                                                <TableCell  className="whitespace-nowrap">  {a.v_created_date + ' ' + a.v_created_time}</TableCell>
+                                                <TableCell  className="whitespace-nowrap">  {a.counsellingDate ? new Date(a.counsellingDate).toLocaleDateString('en-GB').replace(/\//g, '-') +' '+a.counsellingTime: ''}
                                                 </TableCell>
-                                                  <TableCell>{a.counsellingCost == 0 || !a.counsellingCost ? "FREE" : ""}</TableCell>
-<TableCell>{a?.counsellingMode}</TableCell>
-                                                <TableCell className="text-right">{a.counsellingStatus}</TableCell>
-                                                <TableCell className="text-right">
+                                                  <TableCell  className="whitespace-nowrap">{a.counsellingCost == 0 || !a.counsellingCost ? "FREE" : ""}</TableCell>
+<TableCell  className="whitespace-nowrap">{a?.counsellingMode}</TableCell>
+                                                <TableCell  className="whitespace-nowrap text-right"  >{a.counsellingStatus}</TableCell>
+                                                <TableCell  className="whitespace-nowrap text-right" >
                                                     <Link to={`/counselling-compass/${a.counsellingId}`}> <Button size="sm"
                                                                                                               variant="outline"><ExternalLink/></Button></Link>
                                                 </TableCell>
@@ -674,7 +674,7 @@ export function MyLearningPath() {
                                     </TableBody>
                                     <TableFooter>
                                         <TableRow>
-                                            <TableCell colSpan={8} className="py-3">
+                                            <TableCell  className="whitespace-nowrap py-3" colSpan={8}  >
                                                 <div className="flex flex-row items-center">
                                                     <div className="text-xs text-muted-foreground">
                                                         {offset3 + 1} to {Math.min(offset3 + limit3, totalCount3)} of {totalCount3} row(s)
@@ -779,17 +779,17 @@ export function MyLearningPath() {
                                     {
                                         scheduledMeetList?.map?.(a => (
                                             <TableRow key={a.courseScheduleId}>
-                                                <TableCell>{a?.scheduledTitle}</TableCell>
-                                                <TableCell>{a?.v_scheduled_start_date + ' '+ a?.v_scheduled_start_time}</TableCell>
-                                                <TableCell>{a?.v_scheduled_end_date + ' '+ a?.v_scheduled_end_time}</TableCell>
-                                                {/*<TableCell>*/}
+                                                <TableCell  className="whitespace-nowrap">{a?.scheduledTitle}</TableCell>
+                                                <TableCell  className="whitespace-nowrap">{a?.v_scheduled_start_date + ' '+ a?.v_scheduled_start_time}</TableCell>
+                                                <TableCell  className="whitespace-nowrap">{a?.v_scheduled_end_date + ' '+ a?.v_scheduled_end_time}</TableCell>
+                                                {/*<TableCell  className="whitespace-nowrap">*/}
                                                 {/*    {`${Math.floor((new Date(a?.scheduledEndDateTime) - new Date(a?.scheduledStartDateTime)) / 3600000)} hr ${Math.floor(((new Date(a?.scheduledEndDateTime) - new Date(a?.scheduledStartDateTime)) % 3600000) / 60000)} min`}*/}
                                                 {/*</TableCell>*/}
-                                                {/*<TableCell>{a?.scheduledDeliveryMode}</TableCell>*/}
-                                                {/*<TableCell>{a?.scheduledDeliveryMedium}</TableCell>*/}
+                                                {/*<TableCell  className="whitespace-nowrap">{a?.scheduledDeliveryMode}</TableCell>*/}
+                                                {/*<TableCell  className="whitespace-nowrap">{a?.scheduledDeliveryMedium}</TableCell>*/}
 
-                                                {/*<TableCell>{a?.scheduledTutor}</TableCell>*/}
-                                                <TableCell className="flex justify-end gap-2">
+                                                {/*<TableCell  className="whitespace-nowrap">{a?.scheduledTutor}</TableCell>*/}
+                                                <TableCell  className="whitespace-nowrap flex justify-end gap-2"  >
                                                     <Sheet>
                                                         <SheetTrigger asChild>
                                                             <Button variant="ghost" size="sm"><CirclePlus/></Button>
@@ -827,7 +827,7 @@ export function MyLearningPath() {
                                 </TableBody>
                                 <TableFooter>
                                     <TableRow>
-                                        <TableCell colSpan={7} className="py-3">
+                                        <TableCell  className="whitespace-nowrap py-3" colSpan={7}  >
                                             <div className="flex flex-row items-center">
                                                 <div className="text-xs text-muted-foreground">
                                                     {offset4 + 1} to {Math.min(offset4 + limit4, totalCount4)} of {totalCount4} row(s)
