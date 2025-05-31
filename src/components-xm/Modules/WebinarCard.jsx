@@ -17,7 +17,7 @@ export function WebinarCard({userEnrolledCourseIdList,a }) {
 
 
     return (
-        <Card className=" border shadow-sm hover:shadow-md cursor-pointer ">
+        <Card className=" border shadow-sm hover:shadow-md cursor-pointer">
             <CardHeader className="pb-2">
                 {/* Horizontally scrollable webinar badge row with auto-scroll */}
                 <div className="w-full overflow-hidden">
@@ -53,7 +53,7 @@ export function WebinarCard({userEnrolledCourseIdList,a }) {
                 </div>
             </CardHeader>
 
-            <CardContent>
+            <CardContent  className="hidden md:block">
                 <p className=" line-clamp-2">
                     {a?.webinarDescription}
                 </p>

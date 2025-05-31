@@ -151,31 +151,6 @@ function CourseOverview() {
 
 
                 </Card>
-                {/*<section>*/}
-                {/*    <CourseCard className="border-0 bg-[#ffdd00]">*/}
-                {/*        <CardHeader>*/}
-                {/*            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-center">*/}
-                {/*                <div className="flex justify-center w-full">*/}
-                {/*                    <div className="aspect-video w-full max-w-2xl shadow-md">*/}
-                {/*                        <iframe*/}
-                {/*                            id="player"*/}
-                {/*                            src="https://www.youtube.com/embed/_WNIvJozdMY/?enablejsapi=1"*/}
-                {/*                            className="w-full h-full"*/}
-                {/*                            frameBorder="0"*/}
-                {/*                            allow="autoplay; encrypted-media; gyroscope; accelerometer"*/}
-                {/*                            allowFullScreen*/}
-                {/*                        ></iframe>*/}
-                {/*                    </div>*/}
-                {/*                </div>*/}
-                {/*                <div>*/}
-                {/*                    <h1 className="text-xl font-medium">What's there in this course ? </h1>*/}
-                {/*                </div>*/}
-                {/*            </div>*/}
-                {/*        </CardHeader>*/}
-                {/*    </CourseCard>*/}
-
-
-                {/*</section>*/}
 
                 {!userDetail?.number ? <section className="my-4">
 
@@ -281,21 +256,21 @@ function CourseOverview() {
 
                 </section>
 
-                <section className="my-4">
-                    <Card className="border-0 bg-muted/50">
-                        <CardHeader>
-                            <CardTitle className="">
-                                Notes
-                            </CardTitle>
+                {/*<section className="my-4">*/}
+                {/*    <Card className="border-0 bg-muted/50">*/}
+                {/*        <CardHeader>*/}
+                {/*            <CardTitle className="">*/}
+                {/*                Notes*/}
+                {/*            </CardTitle>*/}
 
-                        </CardHeader>
-                        <CardContent>
-                            <div>
+                {/*        </CardHeader>*/}
+                {/*        <CardContent>*/}
+                {/*            <div>*/}
 
-                            </div>
-                        </CardContent>
-                    </Card>
-                </section>
+                {/*            </div>*/}
+                {/*        </CardContent>*/}
+                {/*    </Card>*/}
+                {/*</section>*/}
 
                 <section className="my-4 flex">
                     {(userEnrollmentObj?.enrollmentStatus != 'CERTIFIED' &&

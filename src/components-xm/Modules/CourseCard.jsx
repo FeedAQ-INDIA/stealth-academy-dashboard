@@ -55,7 +55,7 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
                 </div>
             </CardHeader>
 
-            <CardContent className="">
+            <CardContent className="hidden md:block">
                 <p className=" line-clamp-2">
                     {a?.courseDescription}
                 </p>

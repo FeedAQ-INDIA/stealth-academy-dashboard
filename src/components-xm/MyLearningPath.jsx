@@ -1,4 +1,4 @@
-import {ChevronLeft, ChevronRight, ExternalLink, Terminal,} from "lucide-react";
+import {ChevronLeft, ChevronRight, CirclePlus, ExternalLink, Terminal,} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent, CardHeader, CardTitle,} from "@/components/ui/card";
 import {useAuthStore} from "@/zustland/store.js";
@@ -9,7 +9,17 @@ import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
 import {Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
 import {Pagination, PaginationContent, PaginationItem,} from "@/components/ui/pagination.jsx";
+import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet.jsx";
 
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 export function MyLearningPath() {
 
@@ -157,6 +167,40 @@ export function MyLearningPath() {
     };
 
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    const [totalCount4, setTotalCount4] = useState(0);
+    const [limit4, setLimit4] = useState(10);
+    const [offset4, setOffset4] = useState(0);
+    const [scheduledMeetList, setScheduledMeetList] = useState([]);
+
+
+    useEffect(() => {
+        fetchScheduledMeetHistory();
+    }, [offset4]);
+
+    const fetchScheduledMeetHistory = () => {
+        axiosConn
+            .post(import.meta.env.VITE_API_URL + "/fetchScheduledCourseMeet",
+                {
+                    page: offset4,
+                    limit: limit4,
+                })
+            .then((res) => {
+                console.log(res.data);
+                setScheduledMeetList(res.data?.data?.results);
+                setTotalCount4(res.data.data.totalCount);
+                setOffset4(res.data.data.offset);
+                setLimit4(res.data.data.limit);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+
+    const [historySelection, setHistorySelection] = useState("");
+
     return (
         <div className="p-3 md:p-6">
 
@@ -174,7 +218,24 @@ export function MyLearningPath() {
                 </CardHeader>
             </Card>
 
+       
             <Card className="border-0 bg-muted/50 py-4 my-6">
+ <CardHeader>
+     <Select onValueChange={setHistorySelection} value={historySelection}>
+         <SelectTrigger className="w-full" >
+             <SelectValue placeholder="Select History Type" />
+         </SelectTrigger>
+         <SelectContent>
+             <SelectGroup>
+                 <SelectItem value="CourseHistory">Course History</SelectItem>
+                 <SelectItem value="WebinarHistory">Webinar History</SelectItem>
+                 <SelectItem value="MockInterviewHistory">Mock Interview History</SelectItem>
+                 <SelectItem value="CounsellingHistory">Counselling History</SelectItem>
+             </SelectGroup>
+         </SelectContent>
+     </Select>
+ </CardHeader>
+            {historySelection == "CourseHistory" ?    <div>
                 <CardHeader>
                     <CardTitle className="flex gap-2 tracking-wide">
                         Course History
@@ -185,14 +246,6 @@ export function MyLearningPath() {
                 <CardContent>
                     <div className="mt-2">
                         {courseList?.length > 0 ?
-
-                            // <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-6 items-center">
-                            //     {courseList?.courses?.map(a => (
-                            //
-                            //         <CourseCard userEnrolledCourseIdList={userEnrolledCourseIdList} a={a}/>
-                            //     ))}
-                            // </div>
-
 
                             <Table>
                                 <TableHeader>
@@ -309,10 +362,10 @@ export function MyLearningPath() {
                 </CardContent>
 
 
-            </Card>
+            </div>
+            : <></>}
 
-
-            <Card className="border-0 bg-muted/50 py-4 my-6">
+            {historySelection == "WebinarHistory" ?    <div>
                 <CardHeader>
                     <CardTitle className="flex gap-2 tracking-wide">
                         Webinar History
@@ -446,10 +499,10 @@ export function MyLearningPath() {
                 </CardContent>
 
 
-            </Card>
+            </div>
+:<></>}
 
-
-            <Card className="border-0 bg-muted/50 py-4 my-6">
+            {historySelection == "MockInterviewHistory" ?     <div >
                 <CardHeader>
                     <CardTitle className="flex gap-2 tracking-wide">
                         Mock Interview History
@@ -463,7 +516,6 @@ export function MyLearningPath() {
 
                             <div className="  items-center">
                                 {/*{courseList1?.webinars?.map(a => (*/}
-
                                 {/*    <WebinarCard userEnrolledCourseIdList={userEnrolledCourseIdList} a={a}/>*/}
                                 {/*))}*/}
 
@@ -574,10 +626,10 @@ export function MyLearningPath() {
                 </CardContent>
 
 
-            </Card>
+            </div>
+:<></>}
 
-
-            <Card className="border-0 bg-muted/50 py-4 my-6">
+                {historySelection == "CounsellingHistory" ?   <div>
                 <CardHeader>
                     <CardTitle className="flex gap-2 tracking-wide">
                         Counselling History
@@ -696,7 +748,146 @@ export function MyLearningPath() {
                 </CardContent>
 
 
+            </div>
+:<></>}
+        </Card>
+
+
+            <Card className="border-0 bg-muted/50 py-4 my-6">
+                <CardHeader>
+                    <CardTitle className="flex gap-2 tracking-wide">
+                        Scheduled Meet
+                    </CardTitle>
+
+
+                </CardHeader>
+                <CardContent>
+                    <div className="mt-2">
+
+                        {scheduledMeetList?.length>0 ?
+
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Title</TableHead>
+                                        <TableHead>Start Time</TableHead>
+                                        <TableHead>End Time</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {
+                                        scheduledMeetList?.map?.(a => (
+                                            <TableRow key={a.courseScheduleId}>
+                                                <TableCell>{a?.scheduledTitle}</TableCell>
+                                                <TableCell>{a?.v_scheduled_start_date + ' '+ a?.v_scheduled_start_time}</TableCell>
+                                                <TableCell>{a?.v_scheduled_end_date + ' '+ a?.v_scheduled_end_time}</TableCell>
+                                                {/*<TableCell>*/}
+                                                {/*    {`${Math.floor((new Date(a?.scheduledEndDateTime) - new Date(a?.scheduledStartDateTime)) / 3600000)} hr ${Math.floor(((new Date(a?.scheduledEndDateTime) - new Date(a?.scheduledStartDateTime)) % 3600000) / 60000)} min`}*/}
+                                                {/*</TableCell>*/}
+                                                {/*<TableCell>{a?.scheduledDeliveryMode}</TableCell>*/}
+                                                {/*<TableCell>{a?.scheduledDeliveryMedium}</TableCell>*/}
+
+                                                {/*<TableCell>{a?.scheduledTutor}</TableCell>*/}
+                                                <TableCell className="flex justify-end gap-2">
+                                                    <Sheet>
+                                                        <SheetTrigger asChild>
+                                                            <Button variant="ghost" size="sm"><CirclePlus/></Button>
+
+                                                        </SheetTrigger>
+                                                        <SheetContent>
+                                                            <SheetHeader>
+                                                                <SheetTitle>{a?.scheduledTitle}</SheetTitle>
+                                                                <SheetDescription>
+                                                                    {a?.scheduledDescription}
+                                                                </SheetDescription>
+                                                                <div className="space-y-4">
+                                                                    <p><span className="font-medium">Start Time : </span>{a?.v_scheduled_start_date + ' '+ a?.v_scheduled_start_time}</p>
+                                                                    <p><span className="font-medium">End Time : </span>{a?.v_scheduled_end_date + ' '+ a?.v_scheduled_end_time}</p>
+                                                                    <p>
+                                                                        <span className="font-medium">Duration : </span>{`${Math.floor((new Date(a?.scheduledEndDateTime) - new Date(a?.scheduledStartDateTime)) / 3600000)} hr ${Math.floor(((new Date(a?.scheduledEndDateTime) - new Date(a?.scheduledStartDateTime)) % 3600000) / 60000)} min`}
+                                                                    </p>
+                                                                    <p><span className="font-medium">Mode : </span>{a?.scheduledDeliveryMode}</p>
+                                                                    <p><span className="font-medium">Medium : </span>{a?.scheduledDeliveryMedium}</p>
+
+                                                                    <p><span className="font-medium">Tutor : </span>{a?.scheduledTutor}</p>
+                                                                    <p><span className="font-medium">Join Link : </span>{a?.scheduledUrl}</p>
+                                                                </div>
+                                                            </SheetHeader>
+                                                        </SheetContent>
+                                                    </Sheet>
+                                                    <Link to={a?.scheduledUrl}>
+                                                        <Button variant="ghost" size="sm">JOIN</Button>
+                                                    </Link>
+                                                </TableCell>
+
+                                            </TableRow>
+                                        ))
+                                    }
+                                </TableBody>
+                                <TableFooter>
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="py-3">
+                                            <div className="flex flex-row items-center">
+                                                <div className="text-xs text-muted-foreground">
+                                                    {offset4 + 1} to {Math.min(offset4 + limit4, totalCount4)} of {totalCount4} row(s)
+                                                    selected.
+                                                </div>
+                                                <Pagination className="ml-auto mr-0 w-auto">
+                                                    <PaginationContent>
+                                                        <PaginationItem>
+                                                            <Button
+                                                                size="icon"
+                                                                variant="outline"
+                                                                className="h-6 w-6"
+                                                                onClick={() => {
+                                                                    setOffset4(Math.max(offset4 - limit4, 0));
+
+                                                                }}
+                                                            >
+                                                                <ChevronLeft className="h-3.5 w-3.5"/>
+                                                                <span className="sr-only">Previous Order</span>
+                                                            </Button>
+                                                        </PaginationItem>
+                                                        <PaginationItem>
+                                                            <Button
+                                                                size="icon"
+                                                                variant="outline"
+                                                                className="h-6 w-6"
+                                                                onClick={() => {
+                                                                    setOffset4(offset4 + limit4 < totalCount4 ? offset4 + limit4 : offset4);
+                                                                }}
+                                                            >
+                                                                <ChevronRight className="h-3.5 w-3.5"/>
+                                                                <span className="sr-only">Next Order</span>
+                                                            </Button>
+                                                        </PaginationItem>
+                                                    </PaginationContent>
+                                                </Pagination>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                </TableFooter>
+                            </Table>
+                            :
+                            <Alert> <Terminal className="h-4 w-4"/>
+                                <div className="flex flex-row md:flex-row flex-wrap gap-2 items-center">
+                                    <div>
+                                        <AlertTitle>No schedule found</AlertTitle>
+
+                                    </div>
+
+                                </div>
+
+                            </Alert>}
+
+                    </div>
+                </CardContent>
+
+
             </Card>
+
+
 
         </div>
     )

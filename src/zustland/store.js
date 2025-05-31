@@ -30,8 +30,8 @@ export const useAuthStore = create((set) => ({
             try {
                 const res = await axiosConn.post(import.meta.env.VITE_API_URL+"/searchCourse",
                     {
-                        limit: 10, offset: 0, getThisData: {
-                            datasource: "UserEnrollment",  attributes: ["courseId","webinarId", "enrollmentStatus"], where : {userId:  userId},
+                        limit: 200, offset: 0, getThisData: {
+                            datasource: "UserEnrollment",  attributes: ["courseId","webinarId", "enrollmentStatus", "enrollmentBatch"], where : {userId:  userId},
                         },
                     });
                 console.log( res.data?.data?.results?.map(a => a.courseId));
