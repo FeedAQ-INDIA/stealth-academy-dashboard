@@ -2,6 +2,8 @@ import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
 import "./HomePage.css"
 import {Button} from "@/components/ui/button.jsx";
 import {useState,useEffect, useRef} from "react";
+import {Card, CardHeader, CardTitle} from "@/components/ui/card.jsx";
+import {Link} from "react-router-dom";
 export default function HomePage() {
 
 
@@ -95,6 +97,29 @@ export default function HomePage() {
 
                 </section>
 
+                <section className="bg-black p-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
+                        <Link to='/browse'><Card className="rounded-sm hover:bg-[#ffdd00] cursor-pointer">
+                            <CardHeader>
+                                <h3 className="text-lg font-medium">Browse Courses</h3>
+                            </CardHeader>
+                        </Card></Link>
+                        <Link to='/mock-interview'><Card className="rounded-sm hover:bg-[#ffdd00] cursor-pointer">
+                            <CardHeader>
+                                <h3 className="text-lg font-medium">Mock Interview Vault</h3>
+                            </CardHeader>
+                        </Card></Link>
+                        <Link to='/counselling-compass'> <Card className="rounded-sm hover:bg-[#ffdd00] cursor-pointer">
+                            <CardHeader>
+                                <h3 className="text-lg font-medium">Couselling Compass</h3>
+                            </CardHeader>
+                        </Card></Link>
+
+                    </div>
+
+
+                </section>
+
                 <section>
                     <div className="container py-16">
                         <h1 className="font-bold text-xl md:text-3xl"> Why Choose FeedAQ Academy?
@@ -124,6 +149,16 @@ export default function HomePage() {
                                 <p className="text-muted-foreground">Highest Placement CTC</p>
                             </div>
                         </div>
+                    </div>
+                </section>
+
+
+                <section className="bg-black">
+                    <div className="py-8 container text-white text-center">
+
+                        <h1>@2025 Copyright - FeedAQ Academy</h1>
+                        <p>Part of FeedAQ Technologies Pvt Ltd</p>
+
                     </div>
                 </section>
             </div>
