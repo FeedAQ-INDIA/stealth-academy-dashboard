@@ -111,7 +111,7 @@ export default function HomePage() {
                         </Card></Link>
                         <Link to='/counselling-compass'> <Card className="rounded-sm hover:bg-[#ffdd00] cursor-pointer">
                             <CardHeader>
-                                <h3 className="text-lg font-medium text-center">Couselling Compass</h3>
+                                <h3 className="text-lg font-medium text-center">Counselling Compass</h3>
                             </CardHeader>
                         </Card></Link>
 
