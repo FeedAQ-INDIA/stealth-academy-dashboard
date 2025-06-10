@@ -4,7 +4,7 @@ import {useEffect} from "react";
 import {useAuthStore, useProtectedURIStore} from "@/zustland/store.js";
 import "./App.css"
 import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
-import HomePage from "@/components-xm/HomePage.jsx";
+import HomePage from "@/components-xm/HomeFiles/HomePage.jsx";
 
 
 function App() {
@@ -15,9 +15,15 @@ function App() {
     const {fetchUserDetail, loading: loadingStore, userDetail, fetchUserEnrolledCourseIdList} = useAuthStore();
     const {publicUri} = useProtectedURIStore();
 
+
     useEffect(() => {
-          fetchUserDetail(); // Fetch user details and let Zustand update the state
-    }, []); // Runs only once on mount
+        if (window.location.pathname !== '/') {
+            fetchUserDetail();
+        }
+    }, []);
+
+
+
 
     useEffect(() => {
          if ((userDetail === null || userDetail === undefined) && !loadingStore) {
@@ -28,12 +34,17 @@ function App() {
         } else{
             fetchUserEnrolledCourseIdList(userDetail?.userId);
             console.log('App.jsx  :: ', location.pathname)
-             if(location.pathname == '/') {
-                navigate('/dashboard')
-            }
+            //  if(location.pathname == '/') {
+            //     navigate('/dashboard')
+            // }
         }
 
     }, [userDetail]); // Redirect only after userDetail updates
+
+
+    if (window.location.pathname === '/') {
+        return <HomePage />;
+    }
 
 
     if (loadingStore) {

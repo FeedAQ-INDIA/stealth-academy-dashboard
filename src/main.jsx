@@ -10,6 +10,7 @@ import ErrorPage from "./components-xm/error-page.jsx";
 
 import {Dashboard} from "@/components-xm/Dashboard.jsx";
 import {Explore} from "@/components-xm/Explore.jsx";
+import {Explore as HomeExplore} from "@/components-xm/HomeFiles/Explore.jsx";
 import {MyLearningPath} from "@/components-xm/MyLearningPath.jsx";
 import {CourseDetail} from "@/components-xm/Course/CourseDetail.jsx";
 import CourseOverview from "@/components-xm/Course/CourseOverview.jsx";
@@ -28,7 +29,7 @@ import { useAuthStore, useProtectedURIStore } from "@/zustland/store";
 import {CreateMockInterview} from "@/components-xm/MockInterview/CreateMockInterview.jsx";
 import MockInterviewHistoryDetail from "@/components-xm/MockInterview/MockInterviewHistoryDetail.jsx";
 import LanguageStudio from "@/components-xm/Lang/LanguageStudio.jsx";
-import HomePage from "@/components-xm/HomePage.jsx";
+import HomePage from "@/components-xm/HomeFiles/HomePage.jsx";
 import {CreateCounsellingCompass} from "@/components-xm/CounsellingCompass/CreateCounsellingCompass.jsx";
 import {CounsellingCompass} from "@/components-xm/CounsellingCompass/CounsellingCompass.jsx";
 import CounsellingHistoryDetail from "@/components-xm/CounsellingCompass/CounsellingHistoryDetail.jsx";
@@ -52,6 +53,11 @@ const router = createBrowserRouter([
     {
         path: "/counselling-compass",
         element: <CounsellingCompass/>,
+    },
+
+    {
+        path: "/browse",
+        element: <HomeExplore/>,
     },
 
 
@@ -178,6 +184,7 @@ async function runTokenRefresh() {
 
 (async function initApp() {
     if (!publicUri.includes(window.location.pathname) || window.location.pathname == '/signin') {
+        console.log("invoking token refresh")
         try {
             await runTokenRefresh();
         } catch (err) {

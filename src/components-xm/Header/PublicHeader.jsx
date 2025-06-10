@@ -13,7 +13,7 @@ export default function PublicHeader( ) {
             {/* Logo */}
             <a
                 className="text-2xl sm:text-3xl font-medium text-black"
-                href="/dashboard"
+                href="/"
                 style={{ fontFamily: "Anta" }}
             >
                 Fee
@@ -37,11 +37,13 @@ export default function PublicHeader( ) {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-4 ml-4">
                 {/*<NavigationMenuDemo />*/}
+                <Link to={'/'}><Button variant="ghost">HOME</Button></Link>
+                <Link to={'/browse'}><Button variant="ghost">EXPLORE</Button></Link>
             </div>
 
             {/* Right-side button */}
             <div className="hidden md:flex items-center gap-2 ml-auto">
-                <a href={`/signin`}>
+                <a href={`/browse`}>
                     <Button variant="secondary" className="">
                         <Play />  GET STARTED
                     </Button>

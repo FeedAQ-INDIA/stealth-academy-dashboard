@@ -170,7 +170,7 @@ export function MyLearningPath() {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     const [totalCount4, setTotalCount4] = useState(0);
-    const [limit4, setLimit4] = useState(10);
+    const [limit4, setLimit4] = useState(5);
     const [offset4, setOffset4] = useState(0);
     const [scheduledMeetList, setScheduledMeetList] = useState([]);
 
@@ -199,7 +199,7 @@ export function MyLearningPath() {
     };
 
 
-    const [historySelection, setHistorySelection] = useState("");
+    const [historySelection, setHistorySelection] = useState("CourseHistory");
 
     return (
         <div className="p-3 md:p-6">
