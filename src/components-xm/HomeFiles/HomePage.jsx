@@ -229,9 +229,7 @@ const TransformationHero = () => {
                     <span className="animate-ping text-white">|</span>
                 </span>
             </p>
-            <p className="font-medium text-black">
-                This isn’t just another course. It’s the start of your professional journey.
-            </p>
+
         </div>
     );
 };
