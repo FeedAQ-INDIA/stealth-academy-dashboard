@@ -98,18 +98,18 @@ export default function HomePage() {
                 </section>
 
                 <section className="bg-black p-8">
-                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
-                        <Link to='/browse'><Card className="rounded-sm hover:bg-[#ffdd00] cursor-pointer">
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 tracking-wide">
+                        <Link to='/browse'><Card className="rounded-sm hover:bg-[#ffdd00] cursor-pointer shadow">
                             <CardHeader>
                                 <h3 className="text-lg font-medium text-center">Browse Courses</h3>
                             </CardHeader>
                         </Card></Link>
-                        <Link to='/mock-interview'><Card className="rounded-sm hover:bg-[#ffdd00] cursor-pointer">
+                        <Link to='/mock-interview'><Card className="rounded-sm hover:bg-[#ffdd00] cursor-pointer shadow">
                             <CardHeader>
                                 <h3 className="text-lg font-medium text-center">Mock Interview Vault</h3>
                             </CardHeader>
                         </Card></Link>
-                        <Link to='/counselling-compass'> <Card className="rounded-sm hover:bg-[#ffdd00] cursor-pointer">
+                        <Link to='/counselling-compass'> <Card className="rounded-sm hover:bg-[#ffdd00] cursor-pointer shadow">
                             <CardHeader>
                                 <h3 className="text-lg font-medium text-center">Counselling Compass</h3>
                             </CardHeader>
