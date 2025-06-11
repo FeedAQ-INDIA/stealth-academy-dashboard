@@ -43,7 +43,7 @@ export default function PublicHeader( ) {
 
             {/* Right-side button */}
             <div className="hidden md:flex items-center gap-2 ml-auto">
-                <a href={`/browse`}>
+                <a href={`/dashboard`}>
                     <Button variant="secondary" className="">
                         <Play />  GET STARTED
                     </Button>

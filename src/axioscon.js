@@ -1,22 +1,35 @@
 import axios from "axios";
 import { refreshToken } from "./utils/refreshTokenUtils";
-import { useAuthStore, useProtectedURIStore } from "@/zustland/store"; // ✅ Ensure the correct import path
+import { useAuthStore, useProtectedURIStore } from "@/zustland/store";
 
 const axiosConn = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     withCredentials: true
 });
 
-let refreshTokenCount = 0;
-const {publicUri}= useProtectedURIStore.getState();
+const { publicUri } = useProtectedURIStore.getState();
+
+// Refresh lock + retry queue
+let isRefreshInProgress = false;
+let refreshSubscribers = [];
+
+// Notify all subscribers with new token
+function onRefreshed() {
+    refreshSubscribers.forEach(callback => callback());
+    refreshSubscribers = [];
+}
+
+// Push failed requests to retry after refresh
+function addSubscriber(callback) {
+    refreshSubscribers.push(callback);
+}
 
 // Request interceptor
 axiosConn.interceptors.request.use(
     function (config) {
-        const { accessToken } = useAuthStore.getState(); // ✅ Correct way to get Zustand state
-        console.log("Access Token:", accessToken);
-
+        const { accessToken } = useAuthStore.getState();
         config.withCredentials = true;
+        config.headers.Authorization = accessToken ? `Bearer ${accessToken}` : "";
         return config;
     },
     function (error) {
@@ -30,40 +43,52 @@ axiosConn.interceptors.response.use(
         return response;
     },
     async function (error) {
-        if (publicUri.includes(window.location.pathname)  && window.location.pathname == "/signin") {
+        const originalRequest = error.config;
 
+        if (publicUri.includes(window.location.pathname) && window.location.pathname === "/signin") {
             return Promise.reject(error);
         }
 
-        if (error.response && (error.response.status === 403 || error.response.status === 401)) {
+        if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
+            originalRequest._retry = true;
 
+            if (!isRefreshInProgress) {
+                isRefreshInProgress = true;
 
-                     console.log("Token expired, refreshing token...");
-                    let {isSuccess  } = await refreshToken();
+                try {
+                    const { isSuccess } = await refreshToken();
+                    if (isSuccess) {
+                        isRefreshInProgress = false;
+                        onRefreshed(); // Notify queued requests
+                        return axiosConn(originalRequest);
+                    } else {
+                        isRefreshInProgress = false;
+                        window.location.href = "/signin" + getRedirectUri();
+                        return Promise.reject(error);
+                    }
+                } catch (err) {
+                    isRefreshInProgress = false;
+                    window.location.href = "/signin" + getRedirectUri();
+                    return Promise.reject(err);
+                }
+            }
 
-                    if(isSuccess)  {
-                        // recall the endpoint
-                    }else{
-                             window.location.href = "/signin" + getRedirectUri();
-                     }
-
-                    return axiosConn(error.config);
-
-
+            // Queue the request until refresh is complete
+            return new Promise((resolve) => {
+                addSubscriber(() => {
+                    resolve(axiosConn(originalRequest));
+                });
+            });
         }
-
 
         return Promise.reject(error);
     }
 );
 
-
-const getRedirectUri = () => {
-    if(publicUri.includes(window.location.pathname)) {
-        return "";
-    }else{
-        return "?redirectUri="+window.location.href;
-    }
+function getRedirectUri() {
+    return publicUri.includes(window.location.pathname)
+        ? ""
+        : "?redirectUri=" + encodeURIComponent(window.location.href);
 }
 
 export default axiosConn;

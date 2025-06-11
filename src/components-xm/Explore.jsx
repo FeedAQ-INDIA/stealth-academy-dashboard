@@ -216,7 +216,7 @@ export function Explore() {
     return (
         <div className="p-3 md:p-6">
             <div className=" items-center justify-items-center">
-                <Card className="border-0 w-full bg-muted/50  py-6 ">
+                <Card className="border-0 w-full bg-[#ffdd00] text-whitem py-6 ">
                     <CardHeader>
                         <CardTitle className="text-center tracking-wide">
                             What would you like to learn today ?
