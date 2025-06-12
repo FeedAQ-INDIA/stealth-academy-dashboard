@@ -34,6 +34,7 @@ import {CreateCounsellingCompass} from "@/components-xm/CounsellingCompass/Creat
 import {CounsellingCompass} from "@/components-xm/CounsellingCompass/CounsellingCompass.jsx";
 import CounsellingHistoryDetail from "@/components-xm/CounsellingCompass/CounsellingHistoryDetail.jsx";
 import CourseSchedule from "@/components-xm/Course/CourseSchedule.jsx";
+import CourseSnapView from "@/components-xm/Course/CourseSnapView.jsx";
 
 
  
@@ -58,6 +59,11 @@ const router = createBrowserRouter([
     {
         path: "/browse",
         element: <HomeExplore/>,
+    },
+
+    {
+        path: "/browse/:CourseId",
+        element: <CourseSnapView/>,
     },
 
 
