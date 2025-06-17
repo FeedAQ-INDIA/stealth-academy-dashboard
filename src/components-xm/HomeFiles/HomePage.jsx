@@ -4,6 +4,19 @@ import {Button} from "@/components/ui/button.jsx";
 import {useState,useEffect, useRef} from "react";
 import {Card, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import {Link} from "react-router-dom";
+import {
+    Sheet,
+    SheetClose,
+    SheetContent,
+    SheetDescription,
+    SheetFooter,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet"
+import {LetsConnectForm} from "@/components-xm/HomeFiles/LetsConnectForm.jsx";
+
+
 export default function HomePage() {
 
 
@@ -25,9 +38,26 @@ export default function HomePage() {
                                     We empower students and professionals with world-class education, mentorship, and
                                     real-world training. </p>
                                 <div className="mt-5 flex gap-2">
-                                    <Button
-                                        className=" border-[#ffdd00] border-2 text-white hover:bg-[#ffdd00] hover:text-black"
-                                        href="#letsconnect">Let's Connect</Button>
+                                    <Sheet>
+                                        <SheetTrigger asChild>
+                                            <Button
+                                                className=" border-[#ffdd00] border-2 text-white hover:bg-[#ffdd00] hover:text-black"
+                                                href="#letsconnect">Let's Connect</Button>
+                                        </SheetTrigger>
+                                        <SheetContent>
+                                            <SheetHeader>
+                                                <SheetTitle className="tracking-wide font-bold text-2xl">Let's Connect</SheetTitle>
+                                                <SheetDescription>
+                                                    This isn’t just another course. It’s the start of your professional journey.
+                                                </SheetDescription>
+                                            </SheetHeader>
+                                            <div className="my-4">
+                                                <LetsConnectForm/>
+                                            </div>
+
+                                        </SheetContent>
+                                    </Sheet>
+
                                 </div>
                             </div>
 

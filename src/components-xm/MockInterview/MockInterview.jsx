@@ -56,33 +56,6 @@ export function MockInterview() {
 
                 </Card>
 
-                {/*<section className="my-6 w-full flex flex-col md:flex-row gap-6 justify-between py-0 items-center">*/}
-                {/*    <img*/}
-                {/*        src="https://next-cdn.codementor.io/images/landing-pages/mock-interview-practices/hero.png"*/}
-                {/*        alt="Professions"*/}
-                {/*        className="w-84 h-72 object-contain rounded-xl border-0 bg-muted/50 p-4"*/}
-                {/*    />*/}
-                {/*    <Card*/}
-                {/*        className="bg-muted/50 rounded-xl border-0 min-h-72 h-fit w-84 flex flex-col justify-center items-start text-left ">*/}
-                {/*        <CardHeader className="flex flex-col gap-4">*/}
-                {/*            <CardTitle className="tracking-widest text-3xl font-extrabold text-left">*/}
-                {/*                Interview Skills*/}
-                {/*            </CardTitle>*/}
-                {/*            <CardDescription className="text-black text-md">*/}
-                {/*                Interviews can be nerve-wracking, but our mock interview skills program is designed to*/}
-                {/*                transform your approach and boost your confidence. This comprehensive program provides*/}
-                {/*                you with essential techniques, from tackling common interview questions to perfecting*/}
-                {/*                your body language and communication skills. Our personalized strategies will empower*/}
-                {/*                you to make a memorable impression and increase your chances of landing your dream job.*/}
-                {/*            </CardDescription>*/}
-                {/*            <div className="mt-">*/}
-                {/*                <Link to={`/schedule-mock-interview`}>*/}
-                {/*                    <Button className="gap-1">TALK TO OUR EXPERT NOW</Button>*/}
-                {/*                </Link>*/}
-                {/*            </div>*/}
-                {/*        </CardHeader>*/}
-                {/*    </Card>*/}
-                {/*</section>*/}
 
                 <section className="my-6 w-full flex flex-col md:flex-row gap-6 justify-between py-0 items-center">
 
