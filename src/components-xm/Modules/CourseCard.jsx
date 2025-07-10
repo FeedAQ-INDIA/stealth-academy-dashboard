@@ -14,6 +14,7 @@ import {toast} from "@/components/hooks/use-toast.js";
 export function CourseCard({userEnrolledCourseIdList,a }) {
     const navigate = useNavigate()
 
+    const {userDetail} = useAuthStore();
 
 
     return (
@@ -76,7 +77,8 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
                     </div>
                     : <></>}
                 </div>
-                <Link to={`/${a?.courseType === "COURSE" ? 'course' : 'webinar' }/${a?.courseId}`} className="  flex-1 "><Button
+                <Link to={`/${userDetail? (a?.courseType === "COURSE" ? 'course' : 'webinar') : 'explore' }/${a?.courseId}`} className="  flex-1 " target={'_self'}>
+                    <Button
                     className="  w-full "><ExternalLink />  EXPLORE</Button>
                 </Link>
             </CardFooter>

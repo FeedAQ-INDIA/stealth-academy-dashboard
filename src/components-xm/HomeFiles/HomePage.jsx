@@ -15,6 +15,7 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet"
 import {LetsConnectForm} from "@/components-xm/HomeFiles/LetsConnectForm.jsx";
+import {Vortex} from "@/components/ui/vortex.jsx";
 
 
 export default function HomePage() {
@@ -90,6 +91,7 @@ export default function HomePage() {
                     <TransformationHero/>
                 </section>
 
+
                 <section>
 
                     <div className="bg-white py-16 ">
@@ -126,6 +128,23 @@ export default function HomePage() {
                     </div>
 
                 </section>
+
+
+                <div className="w-full mx-auto rounded-md  h-[30rem] overflow-hidden">
+                    <Vortex
+                        backgroundColor="black"
+                        className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-full"
+                    >
+                        <h2 className="text-white text-2xl md:text-6xl font-bold text-center">
+                            The hell is this?
+                        </h2>
+                        <p className="text-white text-sm md:text-2xl max-w-xl mt-6 text-center">
+                            This is chemical burn. It&apos;ll hurt more than you&apos;ve ever been
+                            burned and you&apos;ll have a scar.
+                        </p>
+
+                    </Vortex>
+                </div>
 
                 <section className="bg-black p-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 tracking-wide">

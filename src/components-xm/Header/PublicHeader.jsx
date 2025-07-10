@@ -38,7 +38,7 @@ export default function PublicHeader( ) {
             <div className="hidden md:flex items-center gap-4 ml-4">
                 {/*<NavigationMenuDemo />*/}
                 <Link to={'/'}><Button variant="ghost">HOME</Button></Link>
-                <Link to={'/browse'}><Button variant="ghost">EXPLORE</Button></Link>
+                <Link to={'/explore'}><Button variant="ghost">EXPLORE</Button></Link>
             </div>
 
             {/* Right-side button */}

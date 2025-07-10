@@ -11,6 +11,8 @@ import {toast} from "@/components/hooks/use-toast.js";
 import {CourseCard} from "@/components-xm/Modules/CourseCard.jsx";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select"
 import {WebinarCard} from "@/components-xm/Modules/WebinarCard.jsx";
+import Header from "@/components-xm/Header/Header.jsx";
+import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
 
 
 export function Explore() {
@@ -30,8 +32,9 @@ export function Explore() {
         }
     };
 
+    const {userDetail} = useAuthStore();
 
-    const {userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore();
+    // const {userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore();
 
     const [exploreCourseText, setExploreCourseText] = useState(getSearchValueFromURL("search"));
     const [exploreType, setExploreType] = useState(getSearchValueFromURL("type") || "COURSE");
@@ -118,7 +121,7 @@ export function Explore() {
 
     useEffect(() => {
         fetchCourses();
-        console.log("userEnrolledCourseIdList :: ", userEnrolledCourseIdList)
+        // console.log("userEnrolledCourseIdList :: ", userEnrolledCourseIdList)
 
     }, [apiQuery]);
 
@@ -191,29 +194,10 @@ export function Explore() {
     }, [exploreCourseText, exploreType]);
 
 
-    const disroll = (courseId) => {
-        axiosConn
-            .post(import.meta.env.VITE_API_URL + "/disroll", {
-                courseId: courseId
-            })
-            .then((res) => {
-                console.log(res.data);
-                toast({
-                    title: 'Disrollment is successfull'
-                });
-                fetchCourses();
-                fetchUserEnrolledCourseIdList(userDetail.userId)
-            })
-            .catch((err) => {
-                console.log(err);
-                toast({
-                    title: 'Error occured while Disrollment'
-                })
-            });
-    }
-
 
     return (
+        <>
+            {userDetail ? <Header/>:<PublicHeader/>}
         <div className="p-3 md:p-6">
             <div className=" items-center justify-items-center">
                 <Card className="border-0 w-full bg-[#ffdd00] text-whitem py-6 ">
@@ -256,9 +240,9 @@ export function Explore() {
                         className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 my-10 items-center">
                         {courseList?.map((a) =>
                             exploreType === "COURSE" ? (
-                                <CourseCard key={a.id} userEnrolledCourseIdList={userEnrolledCourseIdList} a={a} />
+                                <CourseCard key={a.id} userEnrolledCourseIdList={null} a={a} />
                             ) : (
-                                <WebinarCard key={a.id} userEnrolledCourseIdList={userEnrolledCourseIdList} a={a} />
+                                <WebinarCard key={a.id} userEnrolledCourseIdList={null} a={a} />
                             )
                         )}
                      </div>
@@ -309,5 +293,6 @@ export function Explore() {
                 </Pagination>
             </div> : <></>}
         </div>
+        </>
     );
 }

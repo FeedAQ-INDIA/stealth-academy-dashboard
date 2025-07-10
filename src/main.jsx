@@ -10,8 +10,7 @@ import ErrorPage from "./components-xm/error-page.jsx";
 
 import {Dashboard} from "@/components-xm/Dashboard.jsx";
 import {Explore} from "@/components-xm/Explore.jsx";
-import {Explore as HomeExplore} from "@/components-xm/HomeFiles/Explore.jsx";
-import {MyLearningPath} from "@/components-xm/MyLearningPath.jsx";
+ import {MyLearningPath} from "@/components-xm/MyLearningPath.jsx";
 import {CourseDetail} from "@/components-xm/Course/CourseDetail.jsx";
 import CourseOverview from "@/components-xm/Course/CourseOverview.jsx";
 import CourseVideoTutorial from "@/components-xm/Course/CourseVideoTutorial.jsx";
@@ -34,7 +33,7 @@ import {CreateCounsellingCompass} from "@/components-xm/CounsellingCompass/Creat
 import {CounsellingCompass} from "@/components-xm/CounsellingCompass/CounsellingCompass.jsx";
 import CounsellingHistoryDetail from "@/components-xm/CounsellingCompass/CounsellingHistoryDetail.jsx";
 import CourseSchedule from "@/components-xm/Course/CourseSchedule.jsx";
-import CourseSnapView from "@/components-xm/Course/CourseSnapView.jsx";
+import CourseSnapView from "@/components-xm/HomeFiles/CourseSnapView.jsx";
 
 
  
@@ -56,17 +55,20 @@ const router = createBrowserRouter([
         element: <CounsellingCompass/>,
     },
 
-    {
-        path: "/browse",
-        element: <HomeExplore/>,
-    },
+    // {
+    //     path: "/browse",
+    //     element: <HomeExplore/>,
+    // },
 
     {
-        path: "/browse/:CourseId",
+        path: "/explore/:CourseId",
         element: <CourseSnapView/>,
     },
 
-
+    {
+        path: "/explore",
+        element: <Explore/>,
+    },
     {
         path: "/",
         element: <App/>,
@@ -98,10 +100,7 @@ const router = createBrowserRouter([
                 path: "/dashboard",
                 element: <Dashboard/>,
             },
-            {
-                path: "/explore",
-                element: <Explore/>,
-            },
+
             {
                 path: "/account-settings",
                 element: <AccountDetail/>,
@@ -210,14 +209,3 @@ async function runTokenRefresh() {
      );
 })();
 
-//
-// createRoot(document.getElementById("root")).render(
-//     <StrictMode>
-//         {/*<Provider store={store} >*/}
-//         {" "}
-//         {/* Wrap with Provider */}
-//         <RouterProvider router={router}/>
-//         <Toaster/>
-//         {/*</Provider>*/}
-//     </StrictMode>
-// );
