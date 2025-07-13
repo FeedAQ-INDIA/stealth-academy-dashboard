@@ -117,8 +117,7 @@ function CourseOverview() {
                         <div className="flex flex-wrap gap-2 w-full mb-2">
 
                             <Badge className="animate-blink bg-green-600 text-white">{courseList?.courseCost == 0 ? 'FREE' : `Rs.${courseList?.courseCost}/-`}</Badge>
-                            <Badge variant="outline">{courseList?.courseType}</Badge>
-                            <Badge variant="outline">
+                             <Badge variant="outline">
                                 {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}
                             </Badge>
                             {courseList?.courseSource ? <Badge variant="outline">{courseList?.courseSource}</Badge> : <></>}
@@ -279,7 +278,7 @@ function CourseOverview() {
 
                             <Dialog>
                                 <DialogTrigger asChild>
-                                    <Button className="ml-auto" variant="destructive">{ `LEAVE ${courseList.courseType}`}</Button>
+                                    <Button className="ml-auto" variant="destructive">{ `LEAVE COURSE`}</Button>
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-md">
                                     <DialogHeader>
@@ -313,7 +312,7 @@ function CourseOverview() {
                                                         setDeleteConfirmation('')
                                                     } else {
                                                         toast({
-                                                            title: courseList.courseType === "COURSE"? 'Failed to leave the course' : 'Failed to leave the webinar'
+                                                            title: 'Failed to leave the course'
                                                         })
                                                     }
                                                 }}>

@@ -228,7 +228,6 @@ export function MyLearningPath() {
          <SelectContent>
              <SelectGroup>
                  <SelectItem value="CourseHistory">Course History</SelectItem>
-                 <SelectItem value="WebinarHistory">Webinar History</SelectItem>
                  <SelectItem value="MockInterviewHistory">Mock Interview History</SelectItem>
                  <SelectItem value="CounsellingHistory">Counselling History</SelectItem>
              </SelectGroup>
@@ -253,7 +252,6 @@ export function MyLearningPath() {
                                         <TableHead className="w-[100px]">ID</TableHead>
                                         <TableHead>Title</TableHead>
                                         <TableHead>Status</TableHead>
-                                        <TableHead>Cost</TableHead>
                                         <TableHead>Enrollment Date</TableHead>
 
                                         <TableHead className="text-right"></TableHead>
@@ -272,15 +270,13 @@ export function MyLearningPath() {
                                                     </div>
                                                     : <></>}</TableCell>
 
-                                            <TableCell  className="whitespace-nowrap">
-                                                {a?.courseCost == 0 || !a.courseCost ? 'FREE' : `Rs.${a?.courseCost}/-`}
-                                            </TableCell>
+
                                             <TableCell  className="whitespace-nowrap">  {a.v_created_date + ' ' + a.v_created_time}</TableCell>
 
 
                                             <TableCell  className="whitespace-nowrap text-right"  >
                                                 <Link
-                                                    to={`/${a?.courseType === "COURSE" ? 'course' : 'webinar'}/${a?.courseId}`}>
+                                                    to={`/course/${a?.courseId}`}>
                                                     <Button size="sm" variant="outline"><ExternalLink/></Button></Link>
                                             </TableCell>
                                         </TableRow>
@@ -365,142 +361,7 @@ export function MyLearningPath() {
             </div>
             : <></>}
 
-            {historySelection == "WebinarHistory" ?    <div>
-                <CardHeader>
-                    <CardTitle className="flex gap-2 tracking-wide">
-                        Webinar History
-                    </CardTitle>
 
-
-                </CardHeader>
-                <CardContent>
-                    <div className="mt-2">
-                        {courseList1?.length > 0 ?
-
-                            // <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-6 items-center">
-                            //     {/*{courseList1?.webinars?.map(a => (*/}
-                            //
-                            //     {/*    <WebinarCard userEnrolledCourseIdList={userEnrolledCourseIdList} a={a}/>*/}
-                            //     {/*))}*/}
-                            //
-                            //
-                            // </div>
-
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="w-[100px]">ID</TableHead>
-                                        <TableHead>Title</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Cost</TableHead>
-                                        <TableHead>Enrollment Date</TableHead>
-
-                                        <TableHead className="text-right"></TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {courseList1?.map(a => (
-                                        <TableRow key={a.webinarId}>
-                                            <TableCell  className="whitespace-nowrap font-medium" >{a.webinarId}</TableCell>
-                                            <TableCell  className="whitespace-nowrap">{a.webinarTitle}</TableCell>
-                                            <TableCell  className="whitespace-nowrap">
-                                                {userEnrolledCourseIdList?.find(m => m.webinarId == a.webinarId) ?
-                                                    <div className="  ">
-                                                        <p className=" text-base">{userEnrolledCourseIdList?.find(m => m.webinarId == a.webinarId)?.enrollmentStatus}</p>
-                                                    </div>
-                                                    : <></>}
-                                            </TableCell>
-
-                                            <TableCell  className="whitespace-nowrap">
-                                                {a?.webinarCost == 0 || !a.webinarCost ? 'FREE' : `Rs.${a?.webinarCost}/-`}
-                                            </TableCell>
-                                            <TableCell  className="whitespace-nowrap">{a.v_created_date + ' ' + a.v_created_time}</TableCell>
-
-                                            <TableCell  className="whitespace-nowrap text-right" >
-                                                <Link to={`/webinar/${a?.webinarId}`}> <Button size="sm"
-                                                                                               variant="outline"><ExternalLink/></Button></Link>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                                <TableFooter>
-                                    <TableRow>
-                                        <TableCell  className="whitespace-nowrap py-3" colSpan={7}  >
-                                            <div className="flex flex-row items-center">
-                                                <div className="text-xs text-muted-foreground">
-                                                    {offset1 + 1} to {Math.min(offset1 + limit1, totalCount1)} of {totalCount1} row(s)
-                                                    selected.
-                                                </div>
-                                                <Pagination className="ml-auto mr-0 w-auto">
-                                                    <PaginationContent>
-                                                        <PaginationItem>
-                                                            <Button
-                                                                size="icon"
-                                                                variant="outline"
-                                                                className="h-6 w-6"
-                                                                onClick={() => {
-                                                                    setOffset(Math.max(offset1 - limit1, 0));
-                                                                    setApiQuery((prevQuery) => ({
-                                                                        ...prevQuery,
-                                                                        offset: Math.max(offset1 - limit1, 0),
-                                                                    }));
-                                                                }}
-                                                            >
-                                                                <ChevronLeft className="h-3.5 w-3.5"/>
-                                                                <span className="sr-only">Previous Order</span>
-                                                            </Button>
-                                                        </PaginationItem>
-                                                        <PaginationItem>
-                                                            <Button
-                                                                size="icon"
-                                                                variant="outline"
-                                                                className="h-6 w-6"
-                                                                onClick={() => {
-                                                                    setOffset(offset1 + limit1 < totalCount1 ? offset1 + limit1 : offset1);
-                                                                    setApiQuery((prevQuery) => ({
-                                                                        ...prevQuery,
-                                                                        offset: offset1 + limit1 < totalCount1 ? offset1 + limit1 : offset1,
-                                                                    }));
-                                                                }}
-                                                            >
-                                                                <ChevronRight className="h-3.5 w-3.5"/>
-                                                                <span className="sr-only">Next Order</span>
-                                                            </Button>
-                                                        </PaginationItem>
-                                                    </PaginationContent>
-                                                </Pagination>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                </TableFooter>
-                            </Table>
-                            :
-                            <Alert> <Terminal className="h-4 w-4"/>
-                                <div className="flex flex-row md:flex-row flex-wrap gap-2 items-center">
-                                    <div>
-                                        <AlertTitle>No Enrollment found</AlertTitle>
-                                        <AlertDescription>
-                                            <p>You are not enrolled in any webinar</p>
-
-                                        </AlertDescription>
-                                    </div>
-
-                                    <div className="md:ml-auto">
-                                        <Link to='/explore?type=WEBINAR'>
-                                            <Button className="mt-2 flex-1" size={'sm'}>Start your journey
-                                                today</Button>
-                                        </Link>
-
-                                    </div>
-                                </div>
-
-                            </Alert>}
-                    </div>
-                </CardContent>
-
-
-            </div>
-:<></>}
 
             {historySelection == "MockInterviewHistory" ?     <div >
                 <CardHeader>

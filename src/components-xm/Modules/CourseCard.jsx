@@ -29,8 +29,7 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
                                 <Badge className="animate-blink bg-green-600 text-white">
                                     {a?.courseCost == 0 ? 'FREE' : `Rs.${a?.courseCost}/-`}
                                 </Badge>
-                                <Badge variant="outline">{a?.courseType}</Badge>
-                                {a?.courseSource && <Badge variant="outline">{a?.courseSource}</Badge>}
+                                 {a?.courseSource && <Badge variant="outline">{a?.courseSource}</Badge>}
                                 {a?.courseLevel && <Badge variant="outline">{a?.courseLevel}</Badge>}
                                 {a?.courseMode && <Badge variant="outline">{a?.courseMode}</Badge>}
                                 {a?.deliveryMode && <Badge variant="outline">{a?.deliveryMode}</Badge>}
@@ -51,17 +50,17 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
                 {/* Course Title */}
                 <div>
                     <CardTitle className="text-lg sm:text-xl font-semibold line-clamp-2">
-                        {a?.courseTitle}
+                        {a?.courseTitle?.toUpperCase()}
                     </CardTitle>
                 </div>
             </CardHeader>
 
-            <CardContent className="hidden md:block">
-                <p className=" line-clamp-2">
-                    {a?.courseDescription}
-                </p>
+            {/*<CardContent className="hidden md:block">*/}
+            {/*    <p className=" line-clamp-2">*/}
+            {/*        {a?.courseDescription}*/}
+            {/*    </p>*/}
 
-            </CardContent>
+            {/*</CardContent>*/}
 
             <CardFooter className="flex w-full flex-wrap gap-2 items-center">
                 {/*{userEnrolledCourseIdList?.find(m => m.courseId == a.courseId && (m.enrollmentStatus != 'COMPLETED' && m.enrollmentStatus != 'CERTIFIED')) ?*/}
@@ -77,7 +76,7 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
                     </div>
                     : <></>}
                 </div>
-                <Link to={`/${userDetail? (a?.courseType === "COURSE" ? 'course' : 'webinar') : 'explore' }/${a?.courseId}`} className="  flex-1 " target={'_self'}>
+                <Link to={`/${userDetail?  (userEnrolledCourseIdList?.find(m => m.courseId == a.courseId)?.enrollmentStatus ? 'course' : 'explore' ) : 'explore' }/${a?.courseId}`} className="  flex-1 " target={'_self'}>
                     <Button
                     className="  w-full "><ExternalLink />  EXPLORE</Button>
                 </Link>

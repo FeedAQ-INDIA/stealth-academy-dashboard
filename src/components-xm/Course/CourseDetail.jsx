@@ -37,6 +37,7 @@ export function CourseDetail() {
     const { userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore();
 
     useEffect(() => {
+
         fetchCourses();
         enrollStatus();
     }, [apiQuery]);

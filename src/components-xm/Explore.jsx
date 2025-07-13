@@ -32,24 +32,20 @@ export function Explore() {
         }
     };
 
-    const {userDetail} = useAuthStore();
+    // const {userDetail} = useAuthStore();
 
-    // const {userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore();
+    const {userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore();
 
     const [exploreCourseText, setExploreCourseText] = useState(getSearchValueFromURL("search"));
-    const [exploreType, setExploreType] = useState(getSearchValueFromURL("type") || "COURSE");
+    // const [exploreType, setExploreType] = useState(getSearchValueFromURL("type") || "COURSE");
 
 
-    const [apiQuery, setApiQuery] = useState((getSearchValueFromURL("type") || "COURSE") == "COURSE" ? {
+    const [apiQuery, setApiQuery] = useState({
             limit: limit, offset: offset, getThisData: {
                 datasource: "Course", attributes: [],
             },
-        } :
-        {
-            limit: limit, offset: offset, getThisData: {
-                datasource: "Webinar", attributes: [],
-            },
         });
+
 
     const updateApiQuery = (datasource, keyValueUpdates) => {
         setApiQuery((prevQuery) => {
@@ -121,8 +117,11 @@ export function Explore() {
 
     useEffect(() => {
         fetchCourses();
+        console.log(userDetail?.userId)
         // console.log("userEnrolledCourseIdList :: ", userEnrolledCourseIdList)
-
+        if(userDetail){
+            fetchUserEnrolledCourseIdList(userDetail?.userId)
+        }
     }, [apiQuery]);
 
     const fetchCourses = () => {
@@ -141,8 +140,7 @@ export function Explore() {
     };
 
 
-    const handleSearchChange = (value, type) => {
-        type = type.trim();
+    const handleSearchChange = (value) => {
         const searchValue = value;
         const trimmed = searchValue.trim();
 
@@ -150,15 +148,12 @@ export function Explore() {
         const params = new URLSearchParams(location.search);
         if (trimmed) {
             params.set("search", trimmed);
-            params.set("type", type)
         } else {
             params.delete("search");
-            params.delete("type");
         }
         navigate({pathname: location.pathname, search: params.toString()});
         console.log(apiQuery)
         // Call API with appropriate query
-        if (type == "COURSE") {
             updateApiQuery("Course", {
                 where: {
                     courseTitle: {
@@ -166,39 +161,25 @@ export function Explore() {
                     },
                 },
             });
-        } else {
-            updateApiQuery("Webinar", {
-                where: {
-                    webinarTitle: {
-                        $like: `%${trimmed.toUpperCase() || ""}%`,
-                    },
-                },
-            });
-        }
+
 
     };
 
     useEffect(() => {
-        console.log(exploreType);
-        setApiQuery(exploreType == "COURSE" ? {
+        setApiQuery({
                 limit: limit, offset: offset, getThisData: {
                     datasource: "Course", attributes: [],
                 },
-            } :
-            {
-                limit: limit, offset: offset, getThisData: {
-                    datasource: "Webinar", attributes: [],
-                },
-            });
-        handleSearchChange(exploreCourseText, exploreType)
-    }, [exploreCourseText, exploreType]);
+            } );
+        handleSearchChange(exploreCourseText)
+    }, [exploreCourseText]);
 
 
 
     return (
         <>
             {userDetail ? <Header/>:<PublicHeader/>}
-        <div className="p-3 md:p-6">
+        <div className="p-3 md:p-6  overflow-y-auto h-[calc(100svh-4em)]">
             <div className=" items-center justify-items-center">
                 <Card className="border-0 w-full bg-[#ffdd00] text-whitem py-6 ">
                     <CardHeader>
@@ -217,18 +198,7 @@ export function Explore() {
                                     setExploreCourseText(value);
                                 }}
                                 />
-                                <Select onValueChange={(val) => setExploreType(val)}
-                                        defaultValue={exploreType}>
-                                    <SelectTrigger className="w-fit">
-                                        <SelectValue placeholder="Select Type"/>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectGroup>
-                                            <SelectItem value="COURSE">COURSE</SelectItem>
-                                            <SelectItem value="WEBINAR">WEBINAR</SelectItem>
-                                        </SelectGroup>
-                                    </SelectContent>
-                                </Select>
+
                                 {/*<Button type="submit"><Search/></Button>*/}
                             </div>
                         </div>
@@ -239,10 +209,8 @@ export function Explore() {
                     <div
                         className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 my-10 items-center">
                         {courseList?.map((a) =>
-                            exploreType === "COURSE" ? (
-                                <CourseCard key={a.id} userEnrolledCourseIdList={null} a={a} />
-                            ) : (
-                                <WebinarCard key={a.id} userEnrolledCourseIdList={null} a={a} />
+                         (
+                                <CourseCard key={a.id} userEnrolledCourseIdList={userEnrolledCourseIdList || null} a={a} />
                             )
                         )}
                      </div>
