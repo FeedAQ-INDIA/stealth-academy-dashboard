@@ -118,7 +118,7 @@ export function Explore() {
     useEffect(() => {
         fetchCourses();
         console.log(userDetail?.userId)
-        // console.log("userEnrolledCourseIdList :: ", userEnrolledCourseIdList)
+        // console.log("userEnrolledCourseIdList :: ", userEnrolledCourseIdList);
         if(userDetail){
             fetchUserEnrolledCourseIdList(userDetail?.userId)
         }

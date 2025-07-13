@@ -9,7 +9,7 @@ import {SheetClose, SheetFooter} from "@/components/ui/sheet.jsx";
 import {Button} from "@/components/ui/button.jsx";
 
 
-export function LetsConnectForm() {
+export function LetsConnectForm({courseName, courseId}) {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -20,6 +20,7 @@ export function LetsConnectForm() {
         email: z.string().min(3,{message: "Invalid Email"}),
         countryCode: z.string(),
         phone: z.string().min(10,{message: "Invalid Number"}),
+        course: z.string().optional()
     });
 
 
@@ -30,6 +31,7 @@ export function LetsConnectForm() {
             email: "",
             countryCode: "+91",
             phone: "",
+            course: (courseId? courseId+" : "+courseName : 'Decide on call')
         },
     });
 
@@ -128,7 +130,22 @@ export function LetsConnectForm() {
 
                         </div>
 
+                        <div className="mt-2">
 
+                            <FormField
+                                control={createLetsConnectForm.control}
+                                name="course"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Course Interested*</FormLabel>
+                                        <FormControl>
+                                            <Input type="text" readOnly {...field} />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
                         <SheetFooter className="mt-4">
                             <Button type="submit">Submit</Button>
                             <SheetClose asChild>

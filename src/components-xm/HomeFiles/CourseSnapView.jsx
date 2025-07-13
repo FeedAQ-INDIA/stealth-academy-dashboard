@@ -28,6 +28,8 @@ import axios from "axios";
 import Header from "@/components-xm/Header/Header.jsx";
 import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
 import {Vortex} from "@/components/ui/vortex.jsx";
+import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet.jsx";
+import {LetsConnectForm} from "@/components-xm/HomeFiles/LetsConnectForm.jsx";
 
 
 function CourseSnapView() {
@@ -118,7 +120,29 @@ function CourseSnapView() {
                         {/*    burned and you&apos;ll have a scar.*/}
                         {/*</p>*/}
                         <div className="mt-6 grid ">
-                            <Button className="text-center" size="sm" variant="secondary">ENROLL NOW </Button>
+                            <div className="flex gap-2 ">
+                                <Link to={`/course/${CourseId}`}><Button className="text-center" size="sm" variant="secondary">ENROLL NOW </Button></Link>
+                                <Sheet>
+                                    <SheetTrigger asChild>
+                                        <Button
+                                            className=" border-[#ffdd00] border-2 text-white hover:bg-[#ffdd00] hover:text-black" size="sm"
+                                            href="#letsconnect">Let's Connect</Button>
+                                    </SheetTrigger>
+                                    <SheetContent>
+                                        <SheetHeader>
+                                            <SheetTitle className="tracking-wide font-bold text-2xl">Let's Connect</SheetTitle>
+                                            <SheetDescription>
+                                                This isn’t just another course. It’s the start of your professional journey.
+                                            </SheetDescription>
+                                        </SheetHeader>
+                                        <div className="my-4">
+                                            <LetsConnectForm courseId={CourseId} courseName={courseDetail?.courseTitle}/>
+                                        </div>
+
+                                    </SheetContent>
+                                </Sheet>
+
+                            </div>
                             <p className="text-center text-white"><strong>5126</strong> Learners Enrolled Already</p>
                         </div>
                     </Vortex>
