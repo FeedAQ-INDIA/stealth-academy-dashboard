@@ -99,7 +99,6 @@ function CourseSnapView() {
     }
 
 
-
     return (
         <>
             {userDetail ? <Header/>:<PublicHeader/>}
@@ -121,7 +120,9 @@ function CourseSnapView() {
                         {/*</p>*/}
                         <div className="mt-6 grid ">
                             <div className="flex gap-2 ">
-                                <Link to={`/course/${CourseId}`}><Button className="text-center" size="sm" variant="secondary">ENROLL NOW </Button></Link>
+                                <Link to={`/course/${CourseId}`}>
+                                    <Button className="text-center" size="sm" variant="secondary">ENROLL NOW </Button>
+                                </Link>
                                 <Sheet>
                                     <SheetTrigger asChild>
                                         <Button
@@ -147,7 +148,12 @@ function CourseSnapView() {
                         </div>
                     </Vortex>
                 </div>
-                {courseDetail?.courseKeyFeature && <section className="my-4">
+
+
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 ">
+                    <div className=" lg:col-span-3">
+
+                    {courseDetail?.courseKeyFeature && <section className="my-4">
                     <Card className="rounded-sm  bg-muted/50 border-0">
                         <CardHeader>
                             <CardTitle>Key Feature</CardTitle>
@@ -262,9 +268,18 @@ function CourseSnapView() {
                     </Card>
 
                 </section>
+                    </div>
 
-
-
+                    <div className="hidden lg:block">
+                        <img
+                            src={'https://cdn.vectorstock.com/i/1000v/40/01/vertical-banner-04-vector-29244001.jpg'}
+                            alt="Picture of the author"
+                            width={200}
+                            height={800}
+                            className="w-full h-full rounded-md my-4"
+                        />
+                    </div>
+                </div>
             </div>
 
         </>)

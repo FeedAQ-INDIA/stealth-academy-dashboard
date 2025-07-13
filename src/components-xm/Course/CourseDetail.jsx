@@ -9,6 +9,7 @@ import {useAuthStore} from "@/zustland/store.js";
 import { CourseContext } from "./CourseContext.jsx";
 import {toast} from "@/components/hooks/use-toast.js";
 import {Book, Video} from "lucide-react";
+import axios from "axios";
 
 const HEADER_HEIGHT = "4rem";
 
@@ -84,26 +85,29 @@ export function CourseDetail() {
 
 
 
-    const enroll = () => {
-        axiosConn
-            .post(import.meta.env.VITE_API_URL+"/enroll", {
-                courseId: CourseId
-            })
-            .then((res) => {
-                console.log(res.data);
-                toast({
-                    title: 'Enrollment is successfull'
-                });
-                enrollStatus();
-                fetchUserEnrolledCourseIdList(userDetail.userId)
+    const enroll = async () => {
 
-            })
-            .catch((err) => {
-                console.log(err);
-                toast({
-                    title: 'Error occured while Enrollment'
-                })
-            });
+    await enrollUser();
+
+        // axiosConn
+        //     .post(import.meta.env.VITE_API_URL+"/enroll", {
+        //         courseId: CourseId
+        //     })
+        //     .then((res) => {
+        //         console.log(res.data);
+        //         toast({
+        //             title: 'Enrollment is successfull'
+        //         });
+        //         enrollStatus();
+        //         fetchUserEnrolledCourseIdList(userDetail.userId)
+        //
+        //     })
+        //     .catch((err) => {
+        //         console.log(err);
+        //         toast({
+        //             title: 'Error occured while Enrollment'
+        //         })
+        //     });
     }
 
     const disroll = () => {
@@ -127,6 +131,45 @@ export function CourseDetail() {
                 })
             });
     }
+
+    const enrollUser = async () => {
+        // Step 3: Launch Razorpay Checkout
+
+        const options = {
+            key: 'rzp_test_1F67LLEd7Qzk1u',
+            amount: 1,
+            currency: 'INR',
+            name: 'FeedAQ Academy',
+            description: 'Test Transaction',
+            order_id: null,
+            handler: async function (response) {
+                const verifyRes = await axios.post('http://localhost:5000/api/verify', {
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature: response.razorpay_signature,
+                });
+
+                if (verifyRes.data.success) {
+                    alert('Payment successful!');
+                } else {
+                    alert('Payment verification failed');
+                }
+            },
+            prefill: {
+                name: 'bksb',
+                email: 'test@example.com',
+                contact: '9631045873',
+            },
+            theme: {
+                color: '#3399cc',
+            },
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+
+    }
+
 
     const navigate = useNavigate();
     useEffect(()=>{
