@@ -89,25 +89,25 @@ export function CourseDetail() {
 
     await enrollUser();
 
-        // axiosConn
-        //     .post(import.meta.env.VITE_API_URL+"/enroll", {
-        //         courseId: CourseId
-        //     })
-        //     .then((res) => {
-        //         console.log(res.data);
-        //         toast({
-        //             title: 'Enrollment is successfull'
-        //         });
-        //         enrollStatus();
-        //         fetchUserEnrolledCourseIdList(userDetail.userId)
-        //
-        //     })
-        //     .catch((err) => {
-        //         console.log(err);
-        //         toast({
-        //             title: 'Error occured while Enrollment'
-        //         })
-        //     });
+        axiosConn
+            .post(import.meta.env.VITE_API_URL+"/enroll", {
+                courseId: CourseId
+            })
+            .then((res) => {
+                console.log(res.data);
+                toast({
+                    title: 'Enrollment is successfull'
+                });
+                enrollStatus();
+                fetchUserEnrolledCourseIdList(userDetail.userId)
+
+            })
+            .catch((err) => {
+                console.log(err);
+                toast({
+                    title: 'Error occured while Enrollment'
+                })
+            });
     }
 
     const disroll = () => {

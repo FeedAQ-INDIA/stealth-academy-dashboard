@@ -35,7 +35,7 @@ import {LetsConnectForm} from "@/components-xm/HomeFiles/LetsConnectForm.jsx";
 function CourseSnapView() {
     const {CourseId} = useParams();
     const [courseDetail, setCourseDetail] = useState({});
-    const {userDetail} = useAuthStore();
+    const {userDetail, fetchUserDetail} = useAuthStore();
     const navigate = useNavigate()
 
 
@@ -63,7 +63,9 @@ function CourseSnapView() {
 
     useEffect(() => {
         console.log(userDetail)
-        if(userDetail){enrollStatus();}
+        if(userDetail){
+            enrollStatus();
+        }
     }, []);
 
   const fetchCourses = () => {
@@ -98,6 +100,104 @@ function CourseSnapView() {
             });
     }
 
+    const enrollUserToCourse= async () => {
+        await fetchUserDetail();
+        const updatedUserDetail = useAuthStore.getState().userDetail;
+        if(!updatedUserDetail){
+            navigate("/signin" + getRedirectUri());
+            console.log("/signin" + getRedirectUri())
+        }else{
+            if(courseDetail?.courseCost != 0){
+                await completeEnrollmentPayment();
+            }else{
+                axiosConn
+                    .post(import.meta.env.VITE_API_URL+"/enroll", {
+                        courseId: CourseId
+                    })
+                    .then((res) => {
+                        console.log(res.data);
+                        toast({
+                            title: 'Enrollment is successfull'
+                        });
+                        // enrollStatus();
+                        // fetchUserEnrolledCourseIdList(userDetail.userId)
+                        navigate(`/course/${CourseId}`);
+
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        toast({
+                            title: 'Error occured while Enrollment'
+                        })
+                    });
+            }
+        }
+
+
+
+
+    }
+    function getRedirectUri() {
+        return  "?redirectUri=" + encodeURIComponent(window.location.href);
+    }
+
+    const completeEnrollmentPayment = async () => {
+        // Step 3: Launch Razorpay Checkout
+
+        const options = {
+            key: 'rzp_test_1F67LLEd7Qzk1u',
+            amount: 1,
+            currency: 'INR',
+            name: 'FeedAQ Academy',
+            description: 'Test Transaction',
+            order_id: null,
+            handler: async function (response) {
+                const verifyRes = await axios.post('http://localhost:5000/api/verify', {
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature: response.razorpay_signature,
+                });
+
+                if (verifyRes.data.success) {
+                    toast({title: 'Payment successful!'});
+                    axiosConn
+                        .post(import.meta.env.VITE_API_URL+"/enroll", {
+                            courseId: CourseId
+                        })
+                        .then((res) => {
+                            console.log(res.data);
+                            toast({
+                                title: 'Enrollment is successfull'
+                            });
+                            // enrollStatus();
+                            // fetchUserEnrolledCourseIdList(userDetail.userId)
+                            navigate(`/course/${CourseId}`);
+
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                            toast({
+                                title: 'Error occured while Enrollment'
+                            })
+                        });
+                } else {
+                    toast({title: 'Payment Failed!'});
+                }
+            },
+            prefill: {
+                name: 'bksb',
+                email: 'test@example.com',
+                contact: '9631045873',
+            },
+            theme: {
+                color: '#3399cc',
+            },
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+
+    }
 
     return (
         <>
@@ -120,9 +220,9 @@ function CourseSnapView() {
                         {/*</p>*/}
                         <div className="mt-6 grid ">
                             <div className="flex gap-2 ">
-                                <Link to={`/course/${CourseId}`}>
-                                    <Button className="text-center" size="sm" variant="secondary">ENROLL NOW </Button>
-                                </Link>
+                                {/*<Link to={`/course/${CourseId}`}>*/}
+                                    <Button className=" border-[#ffdd00] border-2 text-white hover:bg-[#ffdd00] hover:text-black" size="sm" onClick={()=>enrollUserToCourse()}>ENROLL NOW </Button>
+                                {/*</Link>*/}
                                 <Sheet>
                                     <SheetTrigger asChild>
                                         <Button

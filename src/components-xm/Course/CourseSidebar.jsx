@@ -144,8 +144,8 @@ function CourseSidebar({...props}) {
                                                             <Link to={subItem?.url}><div className="flex items-center gap-2">
 
                                                                 {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == subItem?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0?
-                                                                    <Avatar className="border shadow-sm">
-                                                                        <AvatarFallback><Check  color="#11a72a" className="flex-shrink-0"/></AvatarFallback>
+                                                                    <Avatar className="border shadow-sm bg-green-500">
+                                                                        <AvatarFallback  className=" bg-green-500"><Check  strokeWidth={3}  color="#ffffff" className="flex-shrink-0"/></AvatarFallback>
                                                                     </Avatar> :  <Avatar  className="border shadow-sm">
                                                                         <AvatarFallback> </AvatarFallback>
                                                                     </Avatar> }

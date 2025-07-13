@@ -1,7 +1,7 @@
 import {Button} from "@/components/ui/button";
 import {Loader2} from "lucide-react";
 import React, {useEffect} from "react";
-import {Link, useSearchParams} from "react-router-dom";
+import {Link, useNavigate, useSearchParams} from "react-router-dom";
 import {
     Card,
     CardContent,
@@ -24,6 +24,7 @@ import {useAuthStore} from "@/zustland/store.js";
 
 function SignInPage() {
 
+    const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const redirectUri = searchParams.get("redirectUri") || null; // e.g., ?userId=123
 
@@ -32,7 +33,14 @@ function SignInPage() {
     useEffect(()=>{
         console.log("userDetail :: ", userDetail)
         if(userDetail){
-            window.location.href = '/dashboard';
+            if(redirectUri){
+                // navigate(redirectUri);
+                window.location.href = redirectUri;
+            }else{
+                // navigate('/dashboard');
+                window.location.href = '/dashboard';
+            }
+
         }
     }, [userDetail])
     return (

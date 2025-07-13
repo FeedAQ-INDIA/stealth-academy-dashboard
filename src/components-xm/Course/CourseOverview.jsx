@@ -116,7 +116,7 @@ function CourseOverview() {
 
                         <div className="flex flex-wrap gap-2 w-full mb-2">
 
-                            <Badge className="animate-blink bg-green-600 text-white">{courseList?.courseCost == 0 ? 'FREE' : `Rs.${courseList?.courseCost}/-`}</Badge>
+                            {/*<Badge className="animate-blink bg-green-600 text-white">{courseList?.courseCost == 0 ? 'FREE' : `Rs.${courseList?.courseCost}/-`}</Badge>*/}
                              <Badge variant="outline">
                                 {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}
                             </Badge>
@@ -272,7 +272,7 @@ function CourseOverview() {
                 {/*</section>*/}
 
                 <section className="my-4 flex">
-                    {(userEnrollmentObj?.enrollmentStatus != 'CERTIFIED' &&
+                    {(courseList?.courseCost == 0 && userEnrollmentObj?.enrollmentStatus != 'CERTIFIED' &&
                         userEnrollmentObj?.enrollmentStatus != 'COMPLETED') ?
                         (isUserEnrolledAlready ?
 

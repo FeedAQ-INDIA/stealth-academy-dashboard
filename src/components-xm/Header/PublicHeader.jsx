@@ -3,9 +3,26 @@ import { Button } from "@/components/ui/button"
 import {LogIn, Menu, Play} from "lucide-react"
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
 import NavigationMenuDemo from "./nav-menu.jsx"
+import {useAuthStore} from "@/zustland/store.js";
+import {useEffect, useState} from "react";
 
 export default function PublicHeader( ) {
 
+    const {userDetail, fetchUserDetail} = useAuthStore();
+
+    const [updatedUserDetail, setUpdatedUserDetail] = useState(userDetail)
+    //
+    // useEffect(() => {
+    //
+    //     const api = async () => {
+    //         await fetchUserDetail();
+    //         setUpdatedUserDetail(useAuthStore.getState().userDetail);
+    //      }
+    //
+    //      if(!userDetail){
+    //           api()
+    //     }
+    // },[])
 
 
     return (
@@ -43,37 +60,30 @@ export default function PublicHeader( ) {
 
             {/* Right-side button */}
             <div className="hidden md:flex items-center gap-2 ml-auto">
-                <a href={`/dashboard`}>
+                {updatedUserDetail ?  <Link to={`/account-settings/profile`}>
+                    <Button variant="secondary">
+                        {updatedUserDetail?.nameInitial}
+                    </Button>
+                </Link> : <a href={`/dashboard`}>
                     <Button variant="secondary" className="">
                         <Play />  GET STARTED
                     </Button>
-                </a>
+                </a> }
+
             </div>
 
             {/* Mobile Hamburger */}
             <div className="flex md:hidden ml-auto">
-                <a href={`/signin`}>
+                {updatedUserDetail ?  <a href={`/signin`}>
                     <Button variant="secondary">
                         <Play />
                     </Button>
-                </a>
-                {/*<Sheet>*/}
-                {/*    <SheetTrigger asChild>*/}
-                {/*        <Button variant="ghost" size="icon">*/}
-                {/*            <Menu className="h-5 w-5" />*/}
-                {/*        </Button>*/}
-                {/*    </SheetTrigger>*/}
-                {/*    <SheetContent side="right" className="p-4 w-64">*/}
-                {/*        <div className="flex flex-col gap-4 mt-4">*/}
-                {/*            /!*<NavigationMenuDemo orientation={"vertical"}/>*!/*/}
-                {/*<a href={`/signin`}>*/}
-                {/*    <Button variant="secondary">*/}
-                {/*        <LogIn /> GET STARTED*/}
-                {/*    </Button>*/}
-                {/*</a>*/}
-                {/*        </div>*/}
-                {/*    </SheetContent>*/}
-                {/*</Sheet>*/}
+                </a> : <a href={`/dashboard`}>
+                    <Button variant="secondary" className="">
+                        <Play />  GET STARTED
+                    </Button>
+                </a> }
+
             </div>
         </header>
     )
