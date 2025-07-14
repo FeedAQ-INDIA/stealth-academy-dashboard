@@ -28,7 +28,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog.jsx"
-import {Card, CardContent, CardHeader} from "@/components/ui/card.jsx";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
 import {Terminal} from "lucide-react";
 import {Link} from "react-router-dom";
@@ -154,7 +154,7 @@ function NotesModule({userId, courseId, courseTopicId, courseTopicContentId, ref
 
             <Card className="my-8 bg-muted/50 rounded-none border-none">
                 <CardHeader>
-                <h1 className="text-lg   font-medium ">Notes</h1>
+                <CardTitle className=" ">Notes</CardTitle>
                 </CardHeader>
                 <CardContent>
                     {notesList.length > 0 ?

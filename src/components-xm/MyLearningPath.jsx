@@ -274,7 +274,7 @@ export function MyLearningPath() {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead className="w-[100px]">ID</TableHead>
+                                        {/*<TableHead className="w-[100px]">ID</TableHead>*/}
                                         <TableHead>Title</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead>Enrollment Date</TableHead>
@@ -286,8 +286,8 @@ export function MyLearningPath() {
                                     {courseList?.map(a => (
                                         <TableRow key={a.courseId}>
 
-                                            <TableCell  className="whitespace-nowrap font-medium" >{a.courseId}</TableCell>
-                                            <TableCell  className="whitespace-nowrap">{a.courseTitle}</TableCell>
+                                            {/*<TableCell  className="whitespace-nowrap font-medium" >{a.courseId}</TableCell>*/}
+                                            <TableCell  className="whitespace-nowrap font-medium">{a.courseTitle?.toUpperCase()}</TableCell>
                                             <TableCell  className="whitespace-nowrap">
                                                 {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId) ?
                                                     <div className="  ">
@@ -665,7 +665,7 @@ export function MyLearningPath() {
                                     {
                                         scheduledMeetList?.map?.(a => (
                                             <TableRow key={a.courseScheduleId}>
-                                                <TableCell  className="whitespace-nowrap">{a?.scheduledTitle}</TableCell>
+                                                <TableCell  className="whitespace-nowrap font-medium">{a?.scheduledTitle?.toUpperCase()}</TableCell>
                                                 <TableCell  className="whitespace-nowrap">{a?.v_scheduled_start_date + ' '+ a?.v_scheduled_start_time}</TableCell>
                                                 <TableCell  className="whitespace-nowrap">{a?.v_scheduled_end_date + ' '+ a?.v_scheduled_end_time}</TableCell>
                                                 {/*<TableCell  className="whitespace-nowrap">*/}
