@@ -2,7 +2,7 @@ import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sid
 import CourseSidebar from "@/components-xm/Course/CourseSidebar.jsx";
 
 import {Outlet, useLocation, useNavigate, useParams} from "react-router-dom";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import axiosConn from "@/axioscon.js";
 import {useAuthStore} from "@/zustland/store.js";
 
@@ -10,6 +10,7 @@ import { CourseContext } from "./CourseContext.jsx";
 import {toast} from "@/components/hooks/use-toast.js";
 import {Book, Video} from "lucide-react";
 import axios from "axios";
+import {LoaderOne} from "@/components/ui/loader.jsx";
 
 const HEADER_HEIGHT = "4rem";
 
@@ -34,6 +35,7 @@ export function CourseDetail() {
             ],
         },
     });
+    const [loading, setLoading] = useState(false); // local loader
 
     const { userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore();
 
@@ -49,15 +51,17 @@ export function CourseDetail() {
     }
 
     const fetchCourses = () => {
-
+        setLoading(true)
         axiosConn
             .post(import.meta.env.VITE_API_URL+"/getCourseDetail", {courseId: CourseId})
             .then((res) => {
                 console.log(res.data);
                 setCourseList(res.data.data);
+                setLoading(false)
             })
             .catch((err) => {
                 console.log(err);
+                setLoading(false)
             });
     };
 
@@ -65,6 +69,7 @@ export function CourseDetail() {
     const [userEnrollmentObj, setUserEnrollmentObj] = useState({});
 
     const enrollStatus = () => {
+        setLoading(true)
         axiosConn
             .post(import.meta.env.VITE_API_URL+"/enrollStatus", {
                 courseId: CourseId
@@ -73,6 +78,7 @@ export function CourseDetail() {
                 console.log(res?.data?.data);
                 setIsUserEnrolledAlready(res?.data?.data?.isUserEnrolled);
                 setUserEnrollmentObj(res?.data?.data?.enrollmentData?.[0]);
+                setLoading(false)
 
             })
             .catch((err) => {
@@ -80,12 +86,14 @@ export function CourseDetail() {
                 toast({
                     title: 'Error occured while Enrollment'
                 })
+                setLoading(false)
             });
     }
 
 
 
     const enroll = async () => {
+        setLoading(true)
 
     await enrollUser();
 
@@ -100,6 +108,7 @@ export function CourseDetail() {
                 });
                 enrollStatus();
                 fetchUserEnrolledCourseIdList(userDetail.userId)
+                setLoading(false)
 
             })
             .catch((err) => {
@@ -107,10 +116,12 @@ export function CourseDetail() {
                 toast({
                     title: 'Error occured while Enrollment'
                 })
+                setLoading(false)
             });
     }
 
     const disroll = () => {
+        setLoading(true)
         axiosConn
             .post(import.meta.env.VITE_API_URL+"/disroll", {
                 courseId: CourseId
@@ -122,6 +133,7 @@ export function CourseDetail() {
                 });
                 enrollStatus();
                 fetchUserEnrolledCourseIdList(userDetail.userId)
+                setLoading(false)
 
             })
             .catch((err) => {
@@ -129,11 +141,13 @@ export function CourseDetail() {
                 toast({
                     title: 'Error occured while Disrollment'
                 })
+                setLoading(false)
             });
     }
 
     const enrollUser = async () => {
         // Step 3: Launch Razorpay Checkout
+        setLoading(true)
 
         const options = {
             key: 'rzp_test_1F67LLEd7Qzk1u',
@@ -167,6 +181,7 @@ export function CourseDetail() {
 
         const rzp = new window.Razorpay(options);
         rzp.open();
+        setLoading(false)
 
     }
 
@@ -184,6 +199,7 @@ export function CourseDetail() {
     const [userEnrollmentCourseLog, setUserEnrollmentCourseLog] = useState(null);
 
     const fetchUserEnrollmentData = () => {
+        setLoading(true)
         axiosConn
             .post(import.meta.env.VITE_API_URL+"/searchCourse", {
                 limit: 10, offset: 0, getThisData: {
@@ -197,14 +213,21 @@ export function CourseDetail() {
             .then((res) => {
                 console.log(res.data);
                 setUserEnrollmentCourseLog(res.data.data?.results);
+                setLoading(false)
             })
             .catch((err) => {
                 console.log(err);
+                setLoading(false)
             });
     }
 
-
-
+    if(loading){
+        return (
+            <div className="flex items-center justify-center h-[100svh] w-full">
+                <LoaderOne />
+            </div>
+        )
+    }
 
     return (<>
         <CourseContext.Provider value={{ courseList, userEnrollmentObj, userEnrollmentCourseLog,fetchUserEnrollmentData, isUserEnrolledAlready, enroll, disroll, enrollStatus , identifyContentTypeIcons}}>

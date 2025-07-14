@@ -1,7 +1,7 @@
 import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
 import "./HomePage.css"
 import {Button} from "@/components/ui/button.jsx";
-import {useState,useEffect, useRef} from "react";
+import React, {useState,useEffect, useRef} from "react";
 import {Card, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import {Link} from "react-router-dom";
 import {
@@ -16,10 +16,47 @@ import {
 } from "@/components/ui/sheet"
 import {LetsConnectForm} from "@/components-xm/HomeFiles/LetsConnectForm.jsx";
 import {Vortex} from "@/components/ui/vortex.jsx";
+import {HoverEffect} from "@/components/ui/card-hover-effect.jsx";
+import { useScroll, useTransform } from "motion/react";
+import {GoogleGeminiEffect} from "@/components/ui/google-gemini-effect.jsx";
 
 
 export default function HomePage() {
 
+    const projects = [
+
+        {
+            title: "IT Experts as Trainers",
+            description:
+                "Learning a technology from a professional with industry expertise solves 60% of your challenges.",
+        },
+        {
+            title: "Fully Hands-on Training",
+            description:
+                "We back every course with practical classes, offering immersive hands-on training.",
+        },
+        {
+            title: "Flexible Timings",
+            description:
+                "With over 100+ trainers, we offer flexible class schedules to suit your needs.",
+        },
+        {
+            title: "Affordable Fees",
+            description:
+                "We offer top-quality training at budget-friendly prices, making tech education accessible.",
+        },
+        {
+            title: "Lab Support",
+            description:
+                "Bring your laptop and we’ll help you set up everything you need to start learning.",
+        },
+        {
+            title: "Interview Preparation",
+            description:
+                "Each course includes interview questions and real-world scenarios to help you succeed.",
+        },
+
+    ];
 
     return (
         <><PublicHeader/>
@@ -131,27 +168,31 @@ export default function HomePage() {
 
 
 
-                <section className="bg-black p-8">
-                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 tracking-wide">
-                        <Link to='/browse'><Card className="rounded-sm hover:bg-[#ffdd00] cursor-pointer shadow">
-                            <CardHeader>
-                                <h3 className="text-lg font-medium text-center">Browse Courses</h3>
-                            </CardHeader>
-                        </Card></Link>
-                        <Link to='/mock-interview'><Card className="rounded-sm hover:bg-[#ffdd00] cursor-pointer shadow">
-                            <CardHeader>
-                                <h3 className="text-lg font-medium text-center">Mock Interview Vault</h3>
-                            </CardHeader>
-                        </Card></Link>
-                        <Link to='/counselling-compass'> <Card className="rounded-sm hover:bg-[#ffdd00] cursor-pointer shadow">
-                            <CardHeader>
-                                <h3 className="text-lg font-medium text-center">Counselling Compass</h3>
-                            </CardHeader>
-                        </Card></Link>
+                <section className=" ">
+                    <div className="w-full mx-auto rounded-md  h-fit py-4 md:py-6 lg:py-10 overflow-hidden">
+                        <Vortex
+                            backgroundColor="black"
+                            className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-full"
+                        >
+                            <h2 className="text-white text-2xl md:text-3xl lg:text-5xl font-bold text-center">
+                                Learning Today For A Better Tomorrow
+                            </h2>
 
+                            {/*</p>*/}
+                            <div className="mt-6 grid ">
+                                <Link to={'/explore'}> <Button  className=" border-[#ffdd00] border-2 text-white hover:bg-[#ffdd00] hover:text-black" size="sm" >EXPLORE</Button></Link>
+
+                             </div>
+                        </Vortex>
                     </div>
 
+                </section>
 
+
+                <section  className="  my-8">
+                    <div className=" mx-auto  ">
+                        <HoverEffect items={projects} />
+                    </div>
                 </section>
 
                 <section>

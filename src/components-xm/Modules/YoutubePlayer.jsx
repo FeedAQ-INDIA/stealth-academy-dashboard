@@ -7,40 +7,44 @@ const YouTubePlayer = ({ videoId, playerId = "player", playerRefresh, saveUserEn
 
     // Initialize the YouTube Player
     useEffect(() => {
-        const initializePlayer = () => {
-            if (!playerRef.current) {
-                playerRef.current = new window.YT.Player(playerId, {
-                    videoId,
-                    events: {
-                        onReady: onPlayerReady,
-                        onStateChange: onPlayerStateChange,
-                    },
-                    playerVars: {
-                        enablejsapi: 1,
-                        modestbranding: 1,
-                        rel: 0,
-                        showinfo: 0,
-                    },
-                });
-            }
-        };
+        if(videoId) {
+            const initializePlayer = () => {
+                if (!playerRef.current) {
+                    playerRef.current = new window.YT.Player(playerId, {
+                        videoId,
+                        events: {
+                            onReady: onPlayerReady,
+                            onStateChange: onPlayerStateChange,
+                        },
+                        playerVars: {
+                            enablejsapi: 1,
+                            modestbranding: 1,
+                            rel: 0,
+                            showinfo: 0,
+                        },
+                    });
+                }
+            };
 
-        if (!window.YT) {
-            const tag = document.createElement("script");
-            tag.src = "https://www.youtube.com/iframe_api";
-            document.body.appendChild(tag);
-            window.onYouTubeIframeAPIReady = initializePlayer;
-        } else if (window.YT && window.YT.Player) {
-            initializePlayer();
+            if (!window.YT) {
+                const tag = document.createElement("script");
+                tag.src = "https://www.youtube.com/iframe_api";
+                document.body.appendChild(tag);
+                window.onYouTubeIframeAPIReady = initializePlayer;
+            } else if (window.YT && window.YT.Player) {
+                initializePlayer();
+            }
+
+            return () => {
+                clearInterval(intervalRef.current);
+                if (playerRef.current?.destroy) {
+                    playerRef.current.destroy();
+                    playerRef.current = null;
+                }
+            };
+        }else{
+            console.log("YouTubePlayer :: VideoId is invalid");
         }
-
-        return () => {
-            clearInterval(intervalRef.current);
-            if (playerRef.current?.destroy) {
-                playerRef.current.destroy();
-                playerRef.current = null;
-            }
-        };
     }, [playerId]);
 
     // Load new video if videoId changes

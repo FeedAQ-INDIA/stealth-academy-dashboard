@@ -20,6 +20,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import {LoaderOne} from "@/components/ui/loader.jsx";
 
 export function MyLearningPath() {
 
@@ -31,6 +32,7 @@ export function MyLearningPath() {
     const [limit, setLimit] = useState(5);
     const [offset, setOffset] = useState(0);
     const [courseList, setCourseList] = useState({});
+    const [loading, setLoading] = useState(false); // local loader
 
 
     const [apiQuery, setApiQuery] = useState({
@@ -49,6 +51,7 @@ export function MyLearningPath() {
     }, [apiQuery]);
 
     const fetchCourses = () => {
+        setLoading(true)
         axiosConn
             .post(import.meta.env.VITE_API_URL + "/searchCourse", apiQuery)
             .then((res) => {
@@ -57,9 +60,13 @@ export function MyLearningPath() {
                 setTotalCount(res.data.data.totalCount);
                 setOffset(res.data.data.offset);
                 setLimit(res.data.data.limit);
+                setLoading(false)
+
             })
             .catch((err) => {
                 console.log(err);
+                setLoading(false)
+
             });
     };
 
@@ -118,6 +125,7 @@ export function MyLearningPath() {
     }, [apiQuery2]);
 
     const fetchMockInterviewHistory = () => {
+        setLoading(true)
         axiosConn
             .post(import.meta.env.VITE_API_URL + "/searchCourse", apiQuery2)
             .then((res) => {
@@ -126,9 +134,11 @@ export function MyLearningPath() {
                 setTotalCount2(res.data.data.totalCount);
                 setOffset2(res.data.data.offset);
                 setLimit2(res.data.data.limit);
+                setLoading(false)
             })
             .catch((err) => {
                 console.log(err);
+                setLoading(false)
             });
     };
 
@@ -152,6 +162,7 @@ export function MyLearningPath() {
     }, [apiQuery3]);
 
     const fetchCounsellingHistory = () => {
+        setLoading(true)
         axiosConn
             .post(import.meta.env.VITE_API_URL + "/searchCourse", apiQuery3)
             .then((res) => {
@@ -160,8 +171,10 @@ export function MyLearningPath() {
                 setTotalCount3(res.data.data.totalCount);
                 setOffset3(res.data.data.offset);
                 setLimit3(res.data.data.limit);
+                setLoading(false)
             })
             .catch((err) => {
+                setLoading(false)
                 console.log(err);
             });
     };
@@ -180,6 +193,7 @@ export function MyLearningPath() {
     }, [offset4]);
 
     const fetchScheduledMeetHistory = () => {
+        setLoading(true)
         axiosConn
             .post(import.meta.env.VITE_API_URL + "/fetchScheduledCourseMeet",
                 {
@@ -192,14 +206,25 @@ export function MyLearningPath() {
                 setTotalCount4(res.data.data.totalCount);
                 setOffset4(res.data.data.offset);
                 setLimit4(res.data.data.limit);
+                setLoading(false)
             })
             .catch((err) => {
                 console.log(err);
+                setLoading(false)
             });
     };
 
 
     const [historySelection, setHistorySelection] = useState("CourseHistory");
+
+
+    if(loading){
+        return (
+            <div className="flex items-center justify-center h-[100svh] w-full">
+                <LoaderOne />
+            </div>
+        )
+    }
 
     return (
         <div className="p-3 md:p-6">
@@ -220,20 +245,20 @@ export function MyLearningPath() {
 
 
             <Card className="border-0 bg-muted/50 py-4 my-6">
- <CardHeader>
-     <Select onValueChange={setHistorySelection} value={historySelection}>
-         <SelectTrigger className="w-full" >
-             <SelectValue placeholder="Select History Type" />
-         </SelectTrigger>
-         <SelectContent>
-             <SelectGroup>
-                 <SelectItem value="CourseHistory">Course History</SelectItem>
-                 <SelectItem value="MockInterviewHistory">Mock Interview History</SelectItem>
-                 <SelectItem value="CounsellingHistory">Counselling History</SelectItem>
-             </SelectGroup>
-         </SelectContent>
-     </Select>
- </CardHeader>
+ {/*<CardHeader>*/}
+     {/*<Select onValueChange={setHistorySelection} value={historySelection}>*/}
+     {/*    <SelectTrigger className="w-full" >*/}
+     {/*        <SelectValue placeholder="Select History Type" />*/}
+     {/*    </SelectTrigger>*/}
+     {/*    <SelectContent>*/}
+     {/*        <SelectGroup>*/}
+     {/*            <SelectItem value="CourseHistory">Course History</SelectItem>*/}
+     {/*            <SelectItem value="MockInterviewHistory">Mock Interview History</SelectItem>*/}
+     {/*            <SelectItem value="CounsellingHistory">Counselling History</SelectItem>*/}
+     {/*        </SelectGroup>*/}
+     {/*    </SelectContent>*/}
+     {/*</Select>*/}
+ {/*</CardHeader>*/}
             {historySelection == "CourseHistory" ?    <div>
                 <CardHeader>
                     <CardTitle className="flex gap-2 tracking-wide">

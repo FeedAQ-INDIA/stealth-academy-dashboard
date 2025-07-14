@@ -13,6 +13,7 @@ import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVal
 import {WebinarCard} from "@/components-xm/Modules/WebinarCard.jsx";
 import Header from "@/components-xm/Header/Header.jsx";
 import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
+import {LoaderOne} from "@/components/ui/loader.jsx";
 
 
 export function Explore() {
@@ -21,7 +22,7 @@ export function Explore() {
     const [limit, setLimit] = useState(10);
     const [offset, setOffset] = useState(0);
     const [courseList, setCourseList] = useState([]);
-
+    const [loading, setLoading] = useState(false); // local loader
 
     const getSearchValueFromURL = (key) => {
         const params = new URLSearchParams(location.search);
@@ -125,6 +126,7 @@ export function Explore() {
     }, [apiQuery]);
 
     const fetchCourses = () => {
+        setLoading(true);
         axiosConn
             .post(import.meta.env.VITE_API_URL + "/searchCourse", apiQuery)
             .then((res) => {
@@ -133,9 +135,11 @@ export function Explore() {
                 setTotalCount(res.data.data.totalCount);
                 setOffset(res.data.data.offset);
                 setLimit(res.data.data.limit);
+                setLoading(false);
             })
             .catch((err) => {
                 console.log(err);
+                setLoading(false);
             });
     };
 
@@ -174,6 +178,14 @@ export function Explore() {
         handleSearchChange(exploreCourseText)
     }, [exploreCourseText]);
 
+
+    if(loading){
+        return (
+            <div className="flex items-center justify-center h-[100svh] w-full">
+                <LoaderOne />
+            </div>
+        )
+    }
 
 
     return (

@@ -93,36 +93,36 @@ export function Dashboard() {
                 </CardContent>
             </Card>
 
-            <section className="my-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="border-0 bg-muted/50    ">
-                    <CardHeader className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                        <img
-                            src={mockinterview}
-                            alt="Compass"
-                            className="w-16 h-16 md:w-20 md:h-20 object-contain"
-                        />
-                        <div> <CardTitle className="text-lg sm:text-2xl font-semibold  tracking-widest text-cyan-700">
-                            <strong>  MOCK INTERVIEW VAULT</strong>
-                        </CardTitle>
-                            <CardDescription>
-                                <Link to={`/mock-interview`} className="text-blue-700">
-                                    Click Here
-                                </Link> to know More.
-                            </CardDescription>
-                        </div>
+            <section className="my-6 grid grid-cols-1  lg:grid-cols-2  gap-6">
+                {/*<Card className="border-0 bg-muted/50    ">*/}
+                {/*    <CardHeader className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">*/}
+                {/*        <img*/}
+                {/*            src={mockinterview}*/}
+                {/*            alt="Compass"*/}
+                {/*            className="w-16 h-16 md:w-20 md:h-20 object-contain"*/}
+                {/*        />*/}
+                {/*        <div> <CardTitle className="text-lg sm:text-2xl font-semibold  tracking-widest text-cyan-700">*/}
+                {/*            <strong>  MOCK INTERVIEW VAULT</strong>*/}
+                {/*        </CardTitle>*/}
+                {/*            <CardDescription>*/}
+                {/*                <Link to={`/mock-interview`} className="text-blue-700">*/}
+                {/*                    Click Here*/}
+                {/*                </Link> to know More.*/}
+                {/*            </CardDescription>*/}
+                {/*        </div>*/}
 
-                        <div className="md:ml-auto">
+                {/*        <div className="md:ml-auto">*/}
 
-                            <Link to={`/schedule-mock-interview`}>
-                            <Button
-                                className="h-8 gap-1 "
-                            >SCHEDULE NOW</Button>
-                            </Link>
-                         </div>
-                    </CardHeader>
+                {/*            <Link to={`/schedule-mock-interview`}>*/}
+                {/*            <Button*/}
+                {/*                className="h-8 gap-1 "*/}
+                {/*            >SCHEDULE NOW</Button>*/}
+                {/*            </Link>*/}
+                {/*         </div>*/}
+                {/*    </CardHeader>*/}
 
 
-                </Card>
+                {/*</Card>*/}
 
                 <Card className="border-0 bg-muted/50    ">
                     <CardHeader className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
@@ -157,62 +157,62 @@ export function Dashboard() {
             </section>
 
 
-            <section className="my-6 grid grid-cols-1  lg:grid-cols-2  gap-6">
-                <Card className="border-0 bg-muted/50 ">
-                    <CardHeader className="flex flex-col md:flex-row md:items-center gap-4">
-                        <img
-                            src={compass}
-                            alt="Compass"
-                            className="w-16 h-16 md:w-20 md:h-20 object-contain"
-                        />
-
-                        <div className="flex-1">
-                            <CardTitle className="text-lg sm:text-2xl font-semibold tracking-widest text-yellow-600">
-                                <strong>COUNSELLING COMPASS</strong>
-                            </CardTitle>
-                            <CardDescription>
-                                <Link to={`/counselling-compass`} className="text-blue-700">
-                                    Click Here
-                                </Link>{" "}
-                                to know More.
-                            </CardDescription>
-                        </div>
-
-                        <div className="md:ml-auto">
-                            <Link to={`/schedule-counselling-compass`}>
-                                <Button className="h-8 gap-1">SCHEDULE NOW</Button>
-                            </Link>
-                        </div>
-                    </CardHeader>
-                </Card>
-                <Card className="border-0 bg-muted/50 ">
-                    <CardHeader className="flex flex-col md:flex-row md:items-center gap-4">
-                        <img
-                            src={companiontalks}
-                            alt="Compass"
-                            className="w-16 h-16 md:w-20 md:h-20 object-contain"
-                        />
-
-                        <div className="flex-1">
-                            <CardTitle className="text-lg sm:text-2xl font-semibold tracking-widest text-red-600">
-                                <strong>COMPANION CONNECT</strong>
-                            </CardTitle>
-                            <CardDescription>
-
-                            </CardDescription>
-                        </div>
-
-                        <div className="md:ml-auto">
-                            {/*<Link to={`/schedule-counselling-compass`}>*/}
-                                <Button
-                                    className="h-8 gap-1 bg-[#ffdd00] animate-blink" disabled
-                                >COMING SOON</Button>
-                        {/*</Link>*/}
-                        </div>
-                    </CardHeader>
-                </Card>
-
-            </section>
+            {/*<section className="my-6 grid grid-cols-1  lg:grid-cols-2  gap-6">*/}
+            {/*    <Card className="border-0 bg-muted/50 ">*/}
+            {/*        <CardHeader className="flex flex-col md:flex-row md:items-center gap-4">*/}
+            {/*            <img*/}
+            {/*                src={compass}*/}
+            {/*                alt="Compass"*/}
+            {/*                className="w-16 h-16 md:w-20 md:h-20 object-contain"*/}
+            {/*            />*/}
+            
+            {/*            <div className="flex-1">*/}
+            {/*                <CardTitle className="text-lg sm:text-2xl font-semibold tracking-widest text-yellow-600">*/}
+            {/*                    <strong>COUNSELLING COMPASS</strong>*/}
+            {/*                </CardTitle>*/}
+            {/*                <CardDescription>*/}
+            {/*                    <Link to={`/counselling-compass`} className="text-blue-700">*/}
+            {/*                        Click Here*/}
+            {/*                    </Link>{" "}*/}
+            {/*                    to know More.*/}
+            {/*                </CardDescription>*/}
+            {/*            </div>*/}
+            
+            {/*            <div className="md:ml-auto">*/}
+            {/*                <Link to={`/schedule-counselling-compass`}>*/}
+            {/*                    <Button className="h-8 gap-1">SCHEDULE NOW</Button>*/}
+            {/*                </Link>*/}
+            {/*            </div>*/}
+            {/*        </CardHeader>*/}
+            {/*    </Card>*/}
+            {/*    <Card className="border-0 bg-muted/50 ">*/}
+            {/*        <CardHeader className="flex flex-col md:flex-row md:items-center gap-4">*/}
+            {/*            <img*/}
+            {/*                src={companiontalks}*/}
+            {/*                alt="Compass"*/}
+            {/*                className="w-16 h-16 md:w-20 md:h-20 object-contain"*/}
+            {/*            />*/}
+            
+            {/*            <div className="flex-1">*/}
+            {/*                <CardTitle className="text-lg sm:text-2xl font-semibold tracking-widest text-red-600">*/}
+            {/*                    <strong>COMPANION CONNECT</strong>*/}
+            {/*                </CardTitle>*/}
+            {/*                <CardDescription>*/}
+            
+            {/*                </CardDescription>*/}
+            {/*            </div>*/}
+            
+            {/*            <div className="md:ml-auto">*/}
+            {/*                /!*<Link to={`/schedule-counselling-compass`}>*!/*/}
+            {/*                    <Button*/}
+            {/*                        className="h-8 gap-1 bg-[#ffdd00] animate-blink" disabled*/}
+            {/*                    >COMING SOON</Button>*/}
+            {/*            /!*</Link>*!/*/}
+            {/*            </div>*/}
+            {/*        </CardHeader>*/}
+            {/*    </Card>*/}
+            
+            {/*</section>*/}
 
 
 

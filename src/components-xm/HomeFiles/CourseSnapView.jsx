@@ -227,7 +227,7 @@ function CourseSnapView() {
                                     <SheetTrigger asChild>
                                         <Button
                                             className=" border-[#ffdd00] border-2 text-white hover:bg-[#ffdd00] hover:text-black" size="sm"
-                                            href="#letsconnect">Let's Connect</Button>
+                                            href="#letsconnect">LET'S CONNECT</Button>
                                     </SheetTrigger>
                                     <SheetContent>
                                         <SheetHeader>
