@@ -179,13 +179,13 @@ export function Explore() {
     }, [exploreCourseText]);
 
 
-    if(loading){
-        return (
-            <div className="flex items-center justify-center h-[100svh] w-full">
-                <LoaderOne />
-            </div>
-        )
-    }
+    // if(loading){
+    //     return (
+    //         <div className="flex items-center justify-center h-[100svh] w-full">
+    //             <LoaderOne />
+    //         </div>
+    //     )
+    // }
 
 
     return (
@@ -218,60 +218,65 @@ export function Explore() {
                 </Card>
 
                 <div className="my-4">
-                    <div
+                    {loading ?      <div className="flex items-center justify-center min-h-[400px] w-full">
+                        <LoaderOne />
+                    </div>: <> <div
                         className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 my-10 items-center">
                         {courseList?.map((a) =>
-                         (
+                            (
                                 <CourseCard key={a.id} userEnrolledCourseIdList={userEnrolledCourseIdList || null} a={a} />
                             )
                         )}
-                     </div>
+                    </div>
+
+                        {courseList.length > 0 ? <div className="flex flex-row items-center">
+                            <div className="text-xs text-muted-foreground">
+                                {offset + 1} to {Math.min(offset + limit, totalCount)} of {totalCount} row(s) selected.
+                            </div>
+                            <Pagination className="ml-auto mr-0 w-auto">
+                                <PaginationContent>
+                                    <PaginationItem>
+                                        <Button
+                                            size="icon"
+                                            variant="outline"
+                                            className="h-6 w-6"
+                                            onClick={() => {
+                                                setOffset(Math.max(offset - limit, 0));
+                                                setApiQuery((prevQuery) => ({
+                                                    ...prevQuery,
+                                                    offset: Math.max(offset - limit, 0),
+                                                }));
+                                            }}
+                                        >
+                                            <ChevronLeft className="h-3.5 w-3.5"/>
+                                            <span className="sr-only">Previous Order</span>
+                                        </Button>
+                                    </PaginationItem>
+                                    <PaginationItem>
+                                        <Button
+                                            size="icon"
+                                            variant="outline"
+                                            className="h-6 w-6"
+                                            onClick={() => {
+                                                setOffset(offset + limit < totalCount ? offset + limit : offset);
+                                                setApiQuery((prevQuery) => ({
+                                                    ...prevQuery,
+                                                    offset: offset + limit < totalCount ? offset + limit : offset,
+                                                }));
+                                            }}
+                                        >
+                                            <ChevronRight className="h-3.5 w-3.5"/>
+                                            <span className="sr-only">Next Order</span>
+                                        </Button>
+                                    </PaginationItem>
+                                </PaginationContent>
+                            </Pagination>
+                        </div> : <></>}
+                    </>}
+
                 </div>
 
             </div>
-            {courseList.length > 0 ? <div className="flex flex-row items-center">
-                <div className="text-xs text-muted-foreground">
-                    {offset + 1} to {Math.min(offset + limit, totalCount)} of {totalCount} row(s) selected.
-                </div>
-                <Pagination className="ml-auto mr-0 w-auto">
-                    <PaginationContent>
-                        <PaginationItem>
-                            <Button
-                                size="icon"
-                                variant="outline"
-                                className="h-6 w-6"
-                                onClick={() => {
-                                    setOffset(Math.max(offset - limit, 0));
-                                    setApiQuery((prevQuery) => ({
-                                        ...prevQuery,
-                                        offset: Math.max(offset - limit, 0),
-                                    }));
-                                }}
-                            >
-                                <ChevronLeft className="h-3.5 w-3.5"/>
-                                <span className="sr-only">Previous Order</span>
-                            </Button>
-                        </PaginationItem>
-                        <PaginationItem>
-                            <Button
-                                size="icon"
-                                variant="outline"
-                                className="h-6 w-6"
-                                onClick={() => {
-                                    setOffset(offset + limit < totalCount ? offset + limit : offset);
-                                    setApiQuery((prevQuery) => ({
-                                        ...prevQuery,
-                                        offset: offset + limit < totalCount ? offset + limit : offset,
-                                    }));
-                                }}
-                            >
-                                <ChevronRight className="h-3.5 w-3.5"/>
-                                <span className="sr-only">Next Order</span>
-                            </Button>
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
-            </div> : <></>}
         </div>
         </>
     );

@@ -656,6 +656,7 @@ export function MyLearningPath() {
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Title</TableHead>
+                                        <TableHead>Course</TableHead>
                                         <TableHead>Start Time</TableHead>
                                         <TableHead>End Time</TableHead>
                                         <TableHead className="text-right">Actions</TableHead>
@@ -666,6 +667,7 @@ export function MyLearningPath() {
                                         scheduledMeetList?.map?.(a => (
                                             <TableRow key={a.courseScheduleId}>
                                                 <TableCell  className="whitespace-nowrap font-medium">{a?.scheduledTitle?.toUpperCase()}</TableCell>
+                                                <TableCell  className="whitespace-nowrap font-medium">{a?.course_title?.toUpperCase()}</TableCell>
                                                 <TableCell  className="whitespace-nowrap">{a?.v_scheduled_start_date + ' '+ a?.v_scheduled_start_time}</TableCell>
                                                 <TableCell  className="whitespace-nowrap">{a?.v_scheduled_end_date + ' '+ a?.v_scheduled_end_time}</TableCell>
                                                 {/*<TableCell  className="whitespace-nowrap">*/}
@@ -683,21 +685,27 @@ export function MyLearningPath() {
                                                         </SheetTrigger>
                                                         <SheetContent>
                                                             <SheetHeader>
-                                                                <SheetTitle>{a?.scheduledTitle}</SheetTitle>
+                                                                <SheetTitle>MEETING DETAIL</SheetTitle>
                                                                 <SheetDescription>
                                                                     {a?.scheduledDescription}
                                                                 </SheetDescription>
                                                                 <div className="space-y-4">
+                                                                    <p><span className="font-medium">Meet Title : </span>{a?.scheduledTitle?.toUpperCase() || 'N/A'}</p>
+                                                                    <p><span className="font-medium">Course : </span>{a?.course_title?.toUpperCase() || 'N/A'}</p>
+                                                                    <p><span className="font-medium">Description : </span>{a?.scheduledDescription || 'N/A'}</p>
+
+                                                                    <p><span className="font-medium">Batch : </span>{a?.courseBatch || 'N/A'}</p>
+
                                                                     <p><span className="font-medium">Start Time : </span>{a?.v_scheduled_start_date + ' '+ a?.v_scheduled_start_time}</p>
                                                                     <p><span className="font-medium">End Time : </span>{a?.v_scheduled_end_date + ' '+ a?.v_scheduled_end_time}</p>
                                                                     <p>
                                                                         <span className="font-medium">Duration : </span>{`${Math.floor((new Date(a?.scheduledEndDateTime) - new Date(a?.scheduledStartDateTime)) / 3600000)} hr ${Math.floor(((new Date(a?.scheduledEndDateTime) - new Date(a?.scheduledStartDateTime)) % 3600000) / 60000)} min`}
                                                                     </p>
-                                                                    <p><span className="font-medium">Mode : </span>{a?.scheduledDeliveryMode}</p>
-                                                                    <p><span className="font-medium">Medium : </span>{a?.scheduledDeliveryMedium}</p>
+                                                                    <p><span className="font-medium">Mode : </span>{a?.scheduledDeliveryMode || 'N/A'}</p>
+                                                                    <p><span className="font-medium">Medium : </span>{a?.scheduledDeliveryMedium || 'N/A'}</p>
 
-                                                                    <p><span className="font-medium">Tutor : </span>{a?.scheduledTutor}</p>
-                                                                    <p><span className="font-medium">Join Link : </span>{a?.scheduledUrl}</p>
+                                                                    <p><span className="font-medium">Tutor : </span>{a?.scheduledTutor || 'N/A'}</p>
+                                                                    <p><span className="font-medium">Join Link : </span>{a?.scheduledUrl || 'N/A'}</p>
                                                                 </div>
                                                             </SheetHeader>
                                                         </SheetContent>
