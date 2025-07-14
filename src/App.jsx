@@ -1,10 +1,11 @@
 import {Outlet, useLocation, useNavigate} from "react-router-dom";
 import Header from "./components-xm/Header/Header.jsx";
-import {useEffect} from "react";
+import React, {useEffect} from "react";
 import {useAuthStore, useProtectedURIStore} from "@/zustland/store.js";
 import "./App.css"
 import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
 import HomePage from "@/components-xm/HomeFiles/HomePage.jsx";
+import {LoaderOne} from "@/components/ui/loader.jsx";
 
 
 function App() {
@@ -47,8 +48,15 @@ function App() {
     }
 
 
-    if (loadingStore) {
-        return <div>Loading...</div>; // Display loading screen until both data are ready
+    // if (loadingStore) {
+    //     return <div>Loading...</div>; // Display loading screen until both data are ready
+    // }
+    if(loadingStore){
+        return (
+            <div className="flex items-center justify-center h-[100svh] w-full">
+                <LoaderOne />
+            </div>
+        )
     }
 
     return (

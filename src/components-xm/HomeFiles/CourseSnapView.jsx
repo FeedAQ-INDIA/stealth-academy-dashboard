@@ -371,6 +371,16 @@ function CourseSnapView() {
                     </div>
 
                     <div className="hidden lg:block">
+                        <Card className=" my-4 rounded-sm border-0 bg-rose-500">
+                            <CardHeader>
+                                <p className="text-white my-0 py-0">Discounted Price</p>
+                                <CardTitle className="my-0 py-0 text-white font-bold text-3xl">{courseDetail?.courseCost > 0 ? `Rs.${courseDetail?.courseCost}/-` : 'FREE' }</CardTitle>
+                                {courseDetail?.courseCost > 0 &&   <CardTitle className="text-white font-semibold text-lg ">MRP - {`Rs.${courseDetail?.courseCost}/-` }</CardTitle>}
+                            </CardHeader>
+                            <CardContent>
+                                <Button className="w-full" variant="outline" onClick={()=>enrollUserToCourse()}>ENROLL NOW</Button>
+                            </CardContent>
+                        </Card>
                         <img
                             src={'https://cdn.vectorstock.com/i/1000v/40/01/vertical-banner-04-vector-29244001.jpg'}
                             alt="Picture of the author"
