@@ -207,20 +207,21 @@ export default function HomePage() {
                             competitive job market.
                         </p>
                         <div className="my-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div className="text-center bg-gray-50 p-6 rounded-md shadow-md">
+
+                            <div className="text-center border-[#ffdd00]  p-6 rounded-md shadow-md">
                                 <p className="text-2xl font-medium text-black">13487 + </p>
                                 <p className="text-muted-foreground">Careers Transformed</p>
                             </div>
-                            <div className="text-center bg-gray-50 p-6 rounded-md shadow-md">
+                            <div className="text-center border-[#ffdd00]  p-6 rounded-md shadow-md">
                                 <p className="text-2xl font-medium text-black">8 </p>
                                 <p className="text-muted-foreground">Corporates Partnered</p>
                             </div>
-                            <div className="text-center bg-gray-50 p-6 rounded-md shadow-md">
+                            <div className="text-center border-[#ffdd00]  p-6 rounded-md shadow-md">
                                 <p className="text-2xl font-medium text-black">17896 + </p>
-                                <p className="text-muted-foreground">Enrollments</p>
+                                <p className="text-muted-foreground">Learners</p>
                             </div>
-                            <div className="text-center bg-gray-50 p-6 rounded-md shadow-md">
-                                <p className="text-2xl font-medium text-black">1.2 Cr </p>
+                            <div className="text-center border-[#ffdd00]  p-6 rounded-md shadow-md">
+                                <p className="text-2xl font-medium text-black">67.3 LPA </p>
                                 <p className="text-muted-foreground">Highest Placement CTC</p>
                             </div>
                         </div>

@@ -36,8 +36,8 @@ export const HoverEffect = ({
                         )}
                     </AnimatePresence>
                     <Card>
-                        <CardTitle className="tracking-wider">{item.title}</CardTitle>
-                        <CardDescription>{item.description}</CardDescription>
+                        <CardTitle className="tracking-wider text-xl my-0 font-semibold">{item.title}</CardTitle>
+                        <CardDescription className=" ">{item.description}</CardDescription>
                     </Card>
                 </a>
             ))}

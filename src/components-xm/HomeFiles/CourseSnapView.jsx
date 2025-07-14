@@ -343,15 +343,7 @@ function CourseSnapView() {
                                                             <li className="flex gap-2 items-center my-2"
                                                                 key={a?.courseTopicContentId}>
 
-                                                                <Badge>
-                                                                    {(() => {
-                                                                        const totalMinutes = +a?.courseTopicContentDuration || 0;
-                                                                        const hours = Math.floor(totalMinutes / 3600);
-                                                                        const minutes = totalMinutes % 60;
 
-                                                                        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-                                                                    })()}
-                                                                </Badge>
                                                                 <Video/>
                                                                 <span>{a?.courseTopicContentTitle}</span>
                                                             </li>
@@ -372,10 +364,13 @@ function CourseSnapView() {
 
                     <div className="hidden lg:block">
                         <Card className=" my-4 rounded-sm border-0 bg-rose-500">
-                            <CardHeader>
-                                <p className="text-white my-0 py-0">Discounted Price</p>
-                                <CardTitle className="my-0 py-0 text-white font-bold text-3xl">{courseDetail?.courseCost > 0 ? `Rs.${courseDetail?.courseCost}/-` : 'FREE' }</CardTitle>
-                                {courseDetail?.courseCost > 0 &&   <CardTitle className="text-white font-semibold text-lg ">MRP - {`Rs.${courseDetail?.courseCost}/-` }</CardTitle>}
+                            <CardHeader className="grid grid-cols-2 gap-2">
+                                <div>
+                                    {/*<p className="text-white my-0 py-0">Price</p>*/}
+                                    {courseDetail?.courseMrpCost && courseDetail?.courseMrpCost > 0 &&   <CardTitle className="my-0 py-0 text-white font-bold text-2xl   text-black line-through ">{`Rs.${courseDetail?.courseMrpCost}/-` }</CardTitle>}
+                                    <CardTitle className="my-0 py-0 text-white font-bold text-3xl">{courseDetail?.courseCost > 0 ? `Rs.${courseDetail?.courseCost}/-` : 'FREE' }</CardTitle>
+                                </div>
+
                             </CardHeader>
                             <CardContent>
                                 <Button className="w-full" variant="outline" onClick={()=>enrollUserToCourse()}>ENROLL NOW</Button>
