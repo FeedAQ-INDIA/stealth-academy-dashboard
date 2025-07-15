@@ -1,127 +1,106 @@
-import {ChevronLeft, ChevronRight,} from "lucide-react";
-import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardHeader, CardTitle,} from "@/components/ui/card";
-import {Input} from "@/components/ui/input";
-import {Pagination, PaginationContent, PaginationItem,} from "@/components/ui/pagination"
-import {useNavigate} from "react-router-dom";
 import React, {useEffect, useState} from "react";
+import {ChevronLeft, ChevronRight, Search} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Pagination, PaginationContent, PaginationItem} from "@/components/ui/pagination";
+import {useNavigate} from "react-router-dom";
 import axiosConn from "@/axioscon.js";
 import {useAuthStore} from "@/zustland/store.js";
-import {toast} from "@/components/hooks/use-toast.js";
 import {CourseCard} from "@/components-xm/Modules/CourseCard.jsx";
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select"
-import {WebinarCard} from "@/components-xm/Modules/WebinarCard.jsx";
 import Header from "@/components-xm/Header/Header.jsx";
 import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
 import {LoaderOne} from "@/components/ui/loader.jsx";
 
-
 export function Explore() {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     const [totalCount, setTotalCount] = useState(0);
-    const [limit, setLimit] = useState(10);
+    const [limit, setLimit] = useState(12);
     const [offset, setOffset] = useState(0);
     const [courseList, setCourseList] = useState([]);
-    const [loading, setLoading] = useState(false); // local loader
+    const [loading, setLoading] = useState(false);
 
     const getSearchValueFromURL = (key) => {
         const params = new URLSearchParams(location.search);
         if (key == 'search') {
-            return params.get(key) || ''; // Default to 'overview' tab
+            return params.get(key) || '';
         } else {
             return params.get(key) || null;
         }
     };
 
-    // const {userDetail} = useAuthStore();
-
     const {userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore();
 
     const [exploreCourseText, setExploreCourseText] = useState(getSearchValueFromURL("search"));
-    // const [exploreType, setExploreType] = useState(getSearchValueFromURL("type") || "COURSE");
-
 
     const [apiQuery, setApiQuery] = useState({
-            limit: limit, offset: offset, getThisData: {
-                datasource: "Course", attributes: [],
-            },
-        });
-
+        limit: limit,
+        offset: offset,
+        getThisData: {
+            datasource: "Course",
+            attributes: [],
+        },
+    });
 
     const updateApiQuery = (datasource, keyValueUpdates) => {
         setApiQuery((prevQuery) => {
             const newQuery = {...prevQuery};
 
-            // Function to handle the merging of where clauses
             const updateWhereClause = (currentWhere, newWhere) => {
-                // Start with a copy of the current where clause
                 const updatedWhere = {...currentWhere};
-
-                // Loop through each key in the new where object
                 for (const [key, value] of Object.entries(newWhere)) {
-                    // Replace the value only if the key exists
                     if (updatedWhere.hasOwnProperty(key)) {
-                        updatedWhere[key] = value; // Replace value if key exists
+                        updatedWhere[key] = value;
                     } else {
-                        // Optionally log or handle the case where the key does not exist
                         updatedWhere[key] = value;
                         console.log(`Key ${key} does not exist, skipping addition.`);
                     }
                 }
-                console.log(updatedWhere);
-                return updatedWhere; // Return the updated where clause
+                return updatedWhere;
             };
 
             const updateNestedIncludes = (includes) => {
                 for (const include of includes) {
                     if (include.datasource === datasource) {
-                        // Update where clause if keyValueUpdates contains `where`
                         if (keyValueUpdates.where) {
                             include.where = updateWhereClause(include.where || {}, keyValueUpdates.where);
                         }
-
-                        // Update other keys directly
                         Object.keys(keyValueUpdates).forEach((key) => {
                             if (key !== "where" && include.hasOwnProperty(key)) {
-                                include[key] = keyValueUpdates[key]; // Replace existing keys
+                                include[key] = keyValueUpdates[key];
                             } else {
                                 include[key] = keyValueUpdates[key];
-                                console.log(`Key ${key} does not exist, skipping replacememnt.`);
+                                console.log(`Key ${key} does not exist, skipping replacement.`);
                             }
                         });
                     }
-
                     if (include.include) {
                         updateNestedIncludes(include.include);
                     }
                 }
             };
 
-            // Update the main datasource if it matches
             if (newQuery.getThisData.datasource === datasource) {
                 if (keyValueUpdates.where) {
                     newQuery.getThisData.where = updateWhereClause(newQuery.getThisData.where || {}, keyValueUpdates.where);
                 } else {
                     newQuery.getThisData = {
-                        ...newQuery.getThisData, ...keyValueUpdates,
+                        ...newQuery.getThisData,
+                        ...keyValueUpdates,
                     };
                 }
-
-                // Update the main query with other key-value pairs
             } else {
                 updateNestedIncludes(newQuery.getThisData.include);
             }
 
-            return newQuery; // Return the updated query
+            return newQuery;
         });
     };
 
     useEffect(() => {
         fetchCourses();
-        console.log(userDetail?.userId)
-        // console.log("userEnrolledCourseIdList :: ", userEnrolledCourseIdList);
-        if(userDetail){
-            fetchUserEnrolledCourseIdList(userDetail?.userId)
+        if (userDetail) {
+            fetchUserEnrolledCourseIdList(userDetail?.userId);
         }
     }, [apiQuery]);
 
@@ -130,7 +109,6 @@ export function Explore() {
         axiosConn
             .post(import.meta.env.VITE_API_URL + "/searchCourse", apiQuery)
             .then((res) => {
-                console.log(res.data);
                 setCourseList(res.data.data?.results);
                 setTotalCount(res.data.data.totalCount);
                 setOffset(res.data.data.offset);
@@ -143,12 +121,10 @@ export function Explore() {
             });
     };
 
-
     const handleSearchChange = (value) => {
         const searchValue = value;
         const trimmed = searchValue.trim();
 
-        // Update the query param in the URL
         const params = new URLSearchParams(location.search);
         if (trimmed) {
             params.set("search", trimmed);
@@ -156,128 +132,157 @@ export function Explore() {
             params.delete("search");
         }
         navigate({pathname: location.pathname, search: params.toString()});
-        console.log(apiQuery)
-        // Call API with appropriate query
-            updateApiQuery("Course", {
-                where: {
-                    courseTitle: {
-                        $like: `%${trimmed.toUpperCase() || ""}%`,
-                    },
+
+        updateApiQuery("Course", {
+            where: {
+                courseTitle: {
+                    $like: `%${trimmed.toUpperCase() || ""}%`,
                 },
-            });
-
-
+            },
+        });
     };
 
     useEffect(() => {
         setApiQuery({
-                limit: limit, offset: offset, getThisData: {
-                    datasource: "Course", attributes: [],
-                },
-            } );
-        handleSearchChange(exploreCourseText)
+            limit: limit,
+            offset: offset,
+            getThisData: {
+                datasource: "Course",
+                attributes: [],
+            },
+        });
+        handleSearchChange(exploreCourseText);
     }, [exploreCourseText]);
 
-
-    // if(loading){
-    //     return (
-    //         <div className="flex items-center justify-center h-[100svh] w-full">
-    //             <LoaderOne />
-    //         </div>
-    //     )
-    // }
-
-
     return (
+
         <>
-            {userDetail ? <Header/>:<PublicHeader/>}
-        <div className="p-3 md:p-6  overflow-y-auto h-[calc(100svh-4em)]">
-            <div className=" items-center justify-items-center">
-                <Card className="border-0 w-full bg-[#ffdd00] text-whitem py-6 ">
-                    <CardHeader>
-                        <CardTitle className="text-center tracking-wide">
-                            What would you like to learn today ?
-                        </CardTitle>
+            {userDetail ? <Header/> : <PublicHeader/>}
+            <div className="p-3 md:p-6  overflow-y-auto h-[calc(100svh-4em)]">
+                <div className=" items-center justify-items-center">
+                    <Card className="border-0 w-full bg-[#ffdd00] text-whitem py-6 ">
+                        <CardHeader>
+                            <CardTitle className="text-center tracking-wide">
+                                What would you like to learn today ?
+                            </CardTitle>
 
 
-                    </CardHeader>
-                    <CardContent>
-                        <div className="my-2">
-                            <div className="flex gap-2 w-full md:w-3/4 lg:w-1/2 mx-auto items-center">
-                                <Input type="text" placeholder="What do you want to learn today ?"
-                                       value={exploreCourseText} onChange={(e) => {
-                                    const value = e.target.value;
-                                    setExploreCourseText(value);
-                                }}
-                                />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="my-2">
+                                <div className="flex gap-2 w-full md:w-3/4 lg:w-1/2 mx-auto items-center">
+                                    <Input type="text" placeholder="What do you want to learn today ?"
+                                           value={exploreCourseText} onChange={(e) => {
+                                        const value = e.target.value;
+                                        setExploreCourseText(value);
+                                    }}
+                                    />
 
-                                {/*<Button type="submit"><Search/></Button>*/}
+                                    {/*<Button type="submit"><Search/></Button>*/}
+                                </div>
                             </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
 
-                <div className="my-4">
-                    {loading ?      <div className="flex items-center justify-center min-h-[400px] w-full">
-                        <LoaderOne />
-                    </div>: <> <div
-                        className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 my-10 items-center">
-                        {courseList?.map((a) =>
-                            (
-                                <CourseCard key={a.id} userEnrolledCourseIdList={userEnrolledCourseIdList || null} a={a} />
-                            )
-                        )}
+                    <div className="my-4">
+                        {loading ? <div className="flex items-center justify-center min-h-[400px] w-full">
+                            <LoaderOne/>
+                        </div> : <>
+                            <div className="flex items-center  ">
+                                <div>
+                                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                                        {exploreCourseText ? `Search Results for "${exploreCourseText}"` : "Popular Courses"}
+                                    </h2>
+                                    <p className="text-gray-600 dark:text-gray-400 mt-1">
+                                        {totalCount > 0 ? `${totalCount} courses found` : "Discover trending courses"}
+                                    </p>
+                                </div>
+
+
+                            </div>
+                            <div
+                                className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 my-10 items-center">
+                                {courseList?.map((a) =>
+                                    (
+                                        <CourseCard key={a.id}
+                                                    userEnrolledCourseIdList={userEnrolledCourseIdList || null} a={a}/>
+                                    )
+                                )}
+                            </div>
+
+
+                            {/* Empty State */}
+                            {courseList.length === 0 && !loading && (
+                                <div className="text-center py-16">
+                                    <div
+                                        className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <Search className="w-8 h-8 text-gray-400"/>
+                                    </div>
+                                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                                        No courses found
+                                    </h3>
+                                    <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+                                        Try adjusting your search terms or browse our popular categories to find the
+                                        perfect course for you.
+                                    </p>
+                                    <Button className="mt-6" onClick={() => setExploreCourseText("")}>
+                                        Browse All Courses
+                                    </Button>
+                                </div>
+                            )}
+
+
+                            {courseList.length > 0 ? <div className="flex flex-row items-center">
+                                <div className="text-xs text-muted-foreground">
+                                    {offset + 1} to {Math.min(offset + limit, totalCount)} of {totalCount} row(s)
+                                    selected.
+                                </div>
+                                <Pagination className="ml-auto mr-0 w-auto">
+                                    <PaginationContent>
+                                        <PaginationItem>
+                                            <Button
+                                                size="icon"
+                                                variant="outline"
+                                                className="h-6 w-6"
+                                                onClick={() => {
+                                                    setOffset(Math.max(offset - limit, 0));
+                                                    setApiQuery((prevQuery) => ({
+                                                        ...prevQuery,
+                                                        offset: Math.max(offset - limit, 0),
+                                                    }));
+                                                }}
+                                            >
+                                                <ChevronLeft className="h-3.5 w-3.5"/>
+                                                <span className="sr-only">Previous Order</span>
+                                            </Button>
+                                        </PaginationItem>
+                                        <PaginationItem>
+                                            <Button
+                                                size="icon"
+                                                variant="outline"
+                                                className="h-6 w-6"
+                                                onClick={() => {
+                                                    setOffset(offset + limit < totalCount ? offset + limit : offset);
+                                                    setApiQuery((prevQuery) => ({
+                                                        ...prevQuery,
+                                                        offset: offset + limit < totalCount ? offset + limit : offset,
+                                                    }));
+                                                }}
+                                            >
+                                                <ChevronRight className="h-3.5 w-3.5"/>
+                                                <span className="sr-only">Next Order</span>
+                                            </Button>
+                                        </PaginationItem>
+                                    </PaginationContent>
+                                </Pagination>
+                            </div> : <></>}
+                        </>}
+
                     </div>
 
-                        {courseList.length > 0 ? <div className="flex flex-row items-center">
-                            <div className="text-xs text-muted-foreground">
-                                {offset + 1} to {Math.min(offset + limit, totalCount)} of {totalCount} row(s) selected.
-                            </div>
-                            <Pagination className="ml-auto mr-0 w-auto">
-                                <PaginationContent>
-                                    <PaginationItem>
-                                        <Button
-                                            size="icon"
-                                            variant="outline"
-                                            className="h-6 w-6"
-                                            onClick={() => {
-                                                setOffset(Math.max(offset - limit, 0));
-                                                setApiQuery((prevQuery) => ({
-                                                    ...prevQuery,
-                                                    offset: Math.max(offset - limit, 0),
-                                                }));
-                                            }}
-                                        >
-                                            <ChevronLeft className="h-3.5 w-3.5"/>
-                                            <span className="sr-only">Previous Order</span>
-                                        </Button>
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <Button
-                                            size="icon"
-                                            variant="outline"
-                                            className="h-6 w-6"
-                                            onClick={() => {
-                                                setOffset(offset + limit < totalCount ? offset + limit : offset);
-                                                setApiQuery((prevQuery) => ({
-                                                    ...prevQuery,
-                                                    offset: offset + limit < totalCount ? offset + limit : offset,
-                                                }));
-                                            }}
-                                        >
-                                            <ChevronRight className="h-3.5 w-3.5"/>
-                                            <span className="sr-only">Next Order</span>
-                                        </Button>
-                                    </PaginationItem>
-                                </PaginationContent>
-                            </Pagination>
-                        </div> : <></>}
-                    </>}
-
                 </div>
-
             </div>
-        </div>
         </>
+
     );
 }

@@ -221,13 +221,13 @@ export function CourseDetail() {
             });
     }
 
-    if(loading){
-        return (
-            <div className="flex items-center justify-center h-[100svh] w-full">
-                <LoaderOne />
-            </div>
-        )
-    }
+    // if(loading){
+    //     return (
+    //         <div className="flex items-center justify-center h-[100svh] w-full">
+    //             <LoaderOne />
+    //         </div>
+    //     )
+    // }
 
     return (<>
         <CourseContext.Provider value={{ courseList, userEnrollmentObj, userEnrollmentCourseLog,fetchUserEnrollmentData, isUserEnrolledAlready, enroll, disroll, enrollStatus , identifyContentTypeIcons}}>

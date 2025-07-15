@@ -3,7 +3,7 @@ import {Separator} from "@/components/ui/separator.jsx";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
 import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
-import {CircleArrowLeft, CircleArrowRight} from "lucide-react";
+import {CircleArrowLeft, CircleArrowRight, Clock, Play, FileText, BookOpen} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
 import {useNavigate, useParams} from "react-router-dom";
 import {useCourse} from "@/components-xm/Course/CourseContext.jsx";
@@ -155,176 +155,181 @@ function CourseVideoTutorial() {
     };
     const [isOpen, setIsOpen] = useState(false);
 
+    const isCompleted = userEnrollmentCourseLog?.filter(b => (b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED'))?.length > 0;
 
     return (
         <>
-            <div className=" ">
-                <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
+            <div className="min-h-screen bg-gray-50/30">
+                {/* Enhanced Header */}
+                <header className="sticky top-0 z-50 flex h-14 shrink-0 items-center gap-2 border-b bg-white/95 backdrop-blur-sm px-4 shadow-sm">
                     <SidebarTrigger className="-ml-1"/>
                     <Separator orientation="vertical" className="mr-2 h-4"/>
                     <Breadcrumb>
                         <BreadcrumbList>
-
-                            {/*<BreadcrumbItem>*/}
-                            {/*    <BreadcrumbPage><Link to={`/explore`}>Course</Link></BreadcrumbPage>*/}
-                            {/*</BreadcrumbItem>*/}
-                            {/*<BreadcrumbSeparator/>*/}
-                            {/*<BreadcrumbItem>*/}
-                            {/*    <BreadcrumbPage className="truncate max-w-[30ch]"*/}
-                            {/*                    title={courseList?.courseTitle}>{courseList?.courseTitle}</BreadcrumbPage>*/}
-                            {/*</BreadcrumbItem>*/}
-                            {/*<BreadcrumbSeparator/>*/}
                             <BreadcrumbItem>
-                                <BreadcrumbPage
-                                    className="truncate max-w-[30ch]">{courseTopicContent?.courseTopicContentTitle}</BreadcrumbPage>
+                                <BreadcrumbPage className="truncate max-w-[40ch] font-medium">
+                                    {courseTopicContent?.courseTopicContentTitle}
+                                </BreadcrumbPage>
                             </BreadcrumbItem>
-
                         </BreadcrumbList>
                     </Breadcrumb>
-                    <div className="ml-auto sm:flex-initial">
-                        <div className="flex gap-2 ">
-                            <Button className="w-fit" size="sm" disabled={prevContent == null}
-                                    onClick={() => navigateToNextModule(prevContent)}><CircleArrowLeft/></Button>
-                            <Button className="w-fit" size="sm" disabled={nextContent == null}
-                                    onClick={() => navigateToNextModule(nextContent)}><CircleArrowRight/></Button>
-                        </div>
+
+                    {/* Enhanced Navigation */}
+                    <div className="ml-auto flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={prevContent == null}
+                            onClick={() => navigateToNextModule(prevContent)}
+                            className="flex items-center gap-2"
+                        >
+                            <CircleArrowLeft className="h-4 w-4"/>
+                            <span className="hidden sm:inline">Previous</span>
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={nextContent == null}
+                            onClick={() => navigateToNextModule(nextContent)}
+                            className="flex items-center gap-2"
+                        >
+                            <span className="hidden sm:inline">Next</span>
+                            <CircleArrowRight className="h-4 w-4"/>
+                        </Button>
                     </div>
                 </header>
-                {/*<CourseCard className="rounded-none border-none">*/}
-                {/*    <CardHeader className="flex items-centergap-2 w-full p-2">*/}
-                {/*        <div className="flex gap-2 justify-between ">*/}
-                {/*            <Button className="w-fit" size="sm" disabled={prevContent == null} onClick={()=>navigateToNextModule(prevContent)}>Previous</Button>*/}
-                {/*            <Button className="w-fit" size="sm" disabled={nextContent == null} onClick={()=>navigateToNextModule(nextContent)}>Next</Button>*/}
-                {/*        </div>*/}
-                {/*    </CardHeader>*/}
-                {/*</CourseCard>*/}
 
-
-                <div className="p-4">
-                    <Card className="rounded-none bg-muted/50 border-none">
-                        <CardHeader>
-                            <div className="flex flex-wrap gap-2 w-full mb-2 justify-items-center">
-                                <Badge variant="outline">Video</Badge>
-                                <Badge variant="outline">
+                <div className=" mx-auto p-4 lg:p-6 space-y-6">
+                    {/* Enhanced Video Header Card */}
+                    <Card className="border-0 shadow-sm bg-gradient-to-r from-blue-50 to-indigo-50">
+                        <CardHeader className="pb-4">
+                            <div className="flex flex-wrap items-center gap-2 mb-3">
+                                <Badge variant="secondary" className="flex items-center gap-1">
+                                    <Play className="h-3 w-3"/>
+                                    Video
+                                </Badge>
+                                <Badge variant="outline" className="flex items-center gap-1">
+                                    <Clock className="h-3 w-3"/>
                                     {(() => {
                                         const totalMinutes = +courseTopicContent?.courseTopicContentDuration || 0;
                                         const hours = Math.floor(totalMinutes / 60);
                                         const minutes = totalMinutes % 60;
-
                                         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
                                     })()}
                                 </Badge>
-
                             </div>
-                            <div className=" flex flex-col md:flex-row md:items-center gap-2 ">
-                                <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold ">
-                                    {courseTopicContent?.courseTopicContentTitle}
-                                </CardTitle>
 
-                                <div className="md:ml-auto">
-                                    {/*{userEnrollmentCourseLog?.filter(b => (b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED'))?.length > 0   ?*/}
-                                    {/*    <h3 className="flex gap-1 "><Check color="#11a72a"/><span*/}
-                                    {/*        className="text-blue-800 font-medium">Completed</span></h3>: <Button className="w-fit" size="sm" onClick={() => saveUserEnrollmentData()}>Mark as*/}
-                                    {/*        Complete</Button>*/}
-                                    {/*}*/}
+                            <div className="flex flex-col md:flex-row md:items-center gap-4">
+                                <div className="flex-1">
+                                    <CardTitle className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">
+                                        {courseTopicContent?.courseTopicContentTitle}
+                                    </CardTitle>
+                                </div>
 
-                                    {userEnrollmentCourseLog?.filter(b => (b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED'))?.length > 0 ?
-                                        <span className="completed-stamp">Completed</span>
-
-                                        : <Button className="w-fit" size="sm" onClick={() => saveUserEnrollmentData()}>Mark
-                                            as
-                                            Complete</Button>
-                                    }
-                                    {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0 ?
-                                        <p className='text-right cursor-pointer hover:text-blue-800 hover:underline  hover:underline-offset-4 italic'
-                                           onClick={() => deleteUserEnrollmentData()}>Undo</p> : <></>
-                                    }                        </div>
-
+                                {/* Enhanced Completion Status */}
+                                <div className="flex flex-col items-start md:items-end gap-2">
+                                    {isCompleted ? (
+                                        <div className="flex flex-col items-start md:items-end gap-1">
+                                            <span className="completed-stamp text-sm font-medium">
+                                                ✓ Completed
+                                            </span>
+                                            <button
+                                                onClick={deleteUserEnrollmentData}
+                                                className="text-xs text-muted-foreground hover:text-blue-600 hover:underline cursor-pointer transition-colors"
+                                            >
+                                                Undo completion
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <Button
+                                            onClick={saveUserEnrollmentData}
+                                            className="bg-green-600 hover:bg-green-700 text-white"
+                                            size="sm"
+                                        >
+                                            Mark as Complete
+                                        </Button>
+                                    )}
+                                </div>
                             </div>
                         </CardHeader>
                     </Card>
 
+                    {/* Enhanced Main Content Grid */}
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                        {/* Video Section */}
+                        <div className="lg:col-span-3 space-y-6">
+                            <Card className="border-0 shadow-md overflow-hidden">
+                                <div className="aspect-video bg-black rounded-lg overflow-hidden">
+                                    <YouTubePlayer
+                                        saveUserEnrollmentData={saveUserEnrollmentData}
+                                        playerRefresh={playerRefresh}
+                                        videoId={courseVideoDetail?.courseVideoUrl}
+                                        playerId={`player-${courseVideoDetail?.courseVideoId}`}
+                                    />
+                                </div>
+                            </Card>
 
-                    <section className="my-4 ">
-                        <Card className="  shadow-none border-none rounded-none  ">
-                            <div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    {/* Video container */}
-                                    <div className="w-full md:col-span-2">
-                                        <div className="w-full aspect-video">
-                                            {/*<iframe*/}
-                                            {/*    id={`${courseVideoDetail.courseVideoId}`}*/}
-                                            {/*    src={`https://www.youtube.com/embed/${courseVideoDetail?.courseVideoUrl}?enablejsapi=1`}*/}
-                                            {/*    className="w-full h-full shadow-md"*/}
-                                            {/*    frameBorder="0"*/}
-                                            {/*    allow="autoplay; encrypted-media"*/}
-                                            {/*    allowFullScreen*/}
-                                            {/*></iframe>*/}
-                                            <YouTubePlayer saveUserEnrollmentData={saveUserEnrollmentData}
-                                                           playerRefresh={playerRefresh}
-                                                           videoId={courseVideoDetail?.courseVideoUrl}
-                                                           playerId={`player-${courseVideoDetail?.courseVideoId}`}/>
-
-
+                            {/* Video Description */}
+                            <Card className="border-0 shadow-sm">
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="flex items-center gap-2 text-lg">
+                                        <BookOpen className="h-5 w-5 text-blue-600"/>
+                                        Overview
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="prose prose-sm max-w-none">
+                                        <div className="whitespace-pre-wrap break-words text-gray-700 leading-relaxed">
+                                            {courseVideoDetail?.courseVideoDescription || "No description available for this video."}
                                         </div>
                                     </div>
+                                </CardContent>
+                            </Card>
+                        </div>
 
-                                    {/* Notes container */}
-                                    <div className="w-full flex flex-col ">
-                                        <Label className="mb-4">Create Notes</Label>
-                                        <div className="w-full flex flex-col h-full">
-                                            <CreateNotesModule handleNotesSave={handleNotesSave}
-                                                               courseId={courseList.courseId}
-                                                               courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}
-                                                               courseTopicId={courseVideoDetail.courseTopicId}/>
-                                        </div>
+                        {/* Notes Sidebar */}
+                        <div className="lg:col-span-1 space-y-6">
+                            <Card className="border-0 shadow-sm">
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="flex items-center gap-2 text-lg">
+                                        <FileText className="h-5 w-5 text-green-600"/>
+                                        Create Notes
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="p-4 pt-0">
+                                    <CreateNotesModule
+                                        handleNotesSave={handleNotesSave}
+                                        courseId={courseList.courseId}
+                                        courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}
+                                        courseTopicId={courseVideoDetail.courseTopicId}
+                                    />
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
 
-                                    </div>
-                                </div>
-
-                            </div>
-                        </Card>
-
-
-                    </section>
-
-                    <section className=" ">
-
-                    </section>
-
-
-
-                    <section className="my-4 ">
-                        <Card className="rounded-none bg-muted/50 border-none">
-                            <CardHeader className="px-4">
-                                <CardTitle>Overview</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="whitespace-pre-wrap break-words">
-                                    {courseVideoDetail?.courseVideoDescription}
-                                </div>
-                            </CardContent>
-
-
-                        </Card>
-                    </section>
-
-                    <section className="my-4 ">
-                        <NotesModule refreshTrigger={triggerNotesRefresh} courseId={courseList.courseId}
-                                     userId={userDetail.userId}
-                                     courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}
-                                     courseTopicId={courseVideoDetail.courseTopicId}/>
-                    </section>
-
-
+                    {/* Enhanced Notes Section */}
+                    <Card className="border-0 shadow-sm">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="flex items-center gap-2 text-lg">
+                                <FileText className="h-5 w-5 text-purple-600"/>
+                                Your Notes
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-4 pt-0">
+                            <NotesModule
+                                refreshTrigger={triggerNotesRefresh}
+                                courseId={courseList.courseId}
+                                userId={userDetail.userId}
+                                courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}
+                                courseTopicId={courseVideoDetail.courseTopicId}
+                            />
+                        </CardContent>
+                    </Card>
                 </div>
-
-
             </div>
-
-        </>)
-
+        </>
+    );
 }
-
 
 export default CourseVideoTutorial;
