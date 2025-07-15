@@ -240,39 +240,41 @@ export function MyLearningPath() {
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
             <div className="p-4 md:p-8   mx-auto">
                 {/* Welcome Header */}
-                <Card className="border-0 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white shadow-2xl mb-8 overflow-hidden relative">
+                <Card className="rounded-sm border-0 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white shadow-2xl mb-8 overflow-hidden relative">
                     <div className="absolute inset-0 bg-black/10"></div>
                     <CardHeader className="relative z-10 pb-8">
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-                            <div className="flex items-center gap-6">
-                                <div className="relative">
-                                    <Avatar className="w-20 h-20 border-4 border-white/20 shadow-xl">
-                                        <AvatarFallback className="text-2xl bg-white/20 text-white font-bold">
+                        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full lg:w-auto">
+                                <div className="relative flex-shrink-0">
+                                    <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-white/20 shadow-xl">
+                                        <AvatarFallback className="text-xl sm:text-2xl bg-white/20 text-white font-bold">
                                             {userDetail?.nameInitial}
                                         </AvatarFallback>
                                     </Avatar>
-                                    <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-green-400 rounded-full border-2 border-white"></div>
+                                    <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-5 h-5 sm:w-6 sm:h-6 bg-green-400 rounded-full border-2 border-white"></div>
                                 </div>
-                                <div>
-                                    <h1 className="text-3xl font-bold mb-2">Welcome back, {userDetail?.derivedUserName}!</h1>
-                                    <p className="text-blue-100 text-lg flex items-center gap-2">
-                                        <User className="w-4 h-4" />
-                                        Member since {userDetail?.created_date}
+                                <div className="flex-1 min-w-0">
+                                    <h1 className="text-2xl sm:text-3xl font-bold mb-2 leading-tight">
+                                        Welcome back, {userDetail?.derivedUserName}!
+                                    </h1>
+                                    <p className="text-blue-100 text-base sm:text-lg flex items-center gap-2 flex-wrap">
+                                        <User className="w-4 h-4 flex-shrink-0" />
+                                        <span className="break-words">Member since {userDetail?.created_date}</span>
                                     </p>
                                 </div>
                             </div>
-                            <div className="flex flex-col sm:flex-row gap-3">
-                                <Link to="/explore?type=COURSE">
-                                    <Button variant="secondary" className="bg-white/20 hover:bg-white/30 border-white/30 text-white backdrop-blur-sm">
-                                        <BookOpen className="w-4 h-4 mr-2" />
-                                        Explore Courses
-                                    </Button>
-                                </Link>
+                            <div className="flex flex-col xs:flex-row gap-3 w-full lg:w-auto">
+                                <Link to={'/explore'}>   <Button
+                                    variant="secondary"
+                                    className="bg-white/20 hover:bg-white/30 border-white/30 text-white backdrop-blur-sm w-full xs:w-auto justify-center xs:justify-start"
+                                >
+                                    <BookOpen className="w-4 h-4 mr-2 flex-shrink-0" />
+                                    <span className="whitespace-nowrap">Explore Courses</span>
+                                </Button> </Link>
                             </div>
                         </div>
                     </CardHeader>
                 </Card>
-
                 {/* Course History Section */}
                 {historySelection == "CourseHistory" && (
                     <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl mb-8">
