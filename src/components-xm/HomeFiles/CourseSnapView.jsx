@@ -220,6 +220,9 @@ function CourseSnapView() {
                     <div className="w-full mx-auto rounded-md h-fit py-8 md:py-12 lg:py-16 overflow-hidden">
                         <Vortex
                             backgroundColor="black"
+                            rangeY={800}
+                            particleCount={500}
+                            baseHue={120}
                             className="flex items-center flex-col justify-center px-4 md:px-10 py-8 w-full h-full"
                         >
                             <div className="max-w-4xl mx-auto text-center w-full">
@@ -287,7 +290,7 @@ function CourseSnapView() {
                                                 LET'S CONNECT
                                             </Button>
                                         </SheetTrigger>
-                                        <SheetContent className="w-full sm:max-w-[540px]">
+                                        <SheetContent className=" ">
                                             <SheetHeader>
                                                 <SheetTitle className="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                                                     Let's Connect

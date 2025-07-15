@@ -22,9 +22,9 @@ import {Separator} from "@/components/ui/separator.jsx";
 
 function NavigationMenuDemo({orientation}) {
     const navigate = useNavigate();
-     const [wsSearchDialogOpen, setWsSearchDialogOpen] = useState(false);
+    const [wsSearchDialogOpen, setWsSearchDialogOpen] = useState(false);
 
-     const location = useLocation();
+    const location = useLocation();
 
     const handleNavigate = (url) => {
         console.log(url)
@@ -44,18 +44,18 @@ function NavigationMenuDemo({orientation}) {
 
 
     return (
-        <NavigationMenu orientation={orientation} className="z-20 w-full  ">
+        <NavigationMenu orientation={orientation} className="z-20 w-full">
             <NavigationMenuList
                 className={`${
                     orientation === 'vertical'
                         ? 'flex flex-col gap-2 w-full bg'
-                        : 'flex flex-row gap-2'
+                        : 'flex flex-col sm:flex-row gap-2 w-full'
                 }`}
             >
-                <NavigationMenuItem className={orientation === 'vertical' ? 'w-full ' : ''}>
-                    <Link to="/dashboard" className="w-full">
+                <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : 'flex-1 sm:flex-none'}>
+                    <Link to="/dashboard" className="w-full block">
                         <Button
-                            className="w-full"
+                            className="w-full justify-center"
                             variant={location.pathname.includes('dashboard') ? 'secondary' : 'ghost'}
                         >
                             DASHBOARD
@@ -63,10 +63,10 @@ function NavigationMenuDemo({orientation}) {
                     </Link>
                 </NavigationMenuItem>
 
-                <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : ''}>
-                    <Link to="/explore" className="w-full">
+                <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : 'flex-1 sm:flex-none'}>
+                    <Link to="/explore" className="w-full block">
                         <Button
-                            className="w-full"
+                            className="w-full justify-center"
                             variant={location.pathname.includes('explore') ? 'secondary' : 'ghost'}
                         >
                             EXPLORE
@@ -74,10 +74,10 @@ function NavigationMenuDemo({orientation}) {
                     </Link>
                 </NavigationMenuItem>
 
-                <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : ''}>
-                    <Link to="/my-learning-path" className="w-full">
+                <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : 'flex-1 sm:flex-none'}>
+                    <Link to="/my-learning-path" className="w-full block">
                         <Button
-                            className="w-full"
+                            className="w-full justify-center"
                             variant={location.pathname.includes('my-learning-path') ? 'secondary' : 'ghost'}
                         >
                             MY JOURNEY
@@ -93,18 +93,18 @@ function NavigationMenuDemo({orientation}) {
 
 const ListItem = ({className, title, children, ...props}) => {
     return (<li>
-            <NavigationMenuLink asChild>
-                <a
-                    className={cn("block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground", className)}
-                    {...props}
-                >
-                    <div className="text-sm font-medium leading-none">{title}</div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                        {children}
-                    </p>
-                </a>
-            </NavigationMenuLink>
-        </li>);
+        <NavigationMenuLink asChild>
+            <a
+                className={cn("block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground", className)}
+                {...props}
+            >
+                <div className="text-sm font-medium leading-none">{title}</div>
+                <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                    {children}
+                </p>
+            </a>
+        </NavigationMenuLink>
+    </li>);
 }
 
 export default NavigationMenuDemo;

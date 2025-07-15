@@ -160,7 +160,7 @@ export function Explore() {
             {userDetail ? <Header/> : <PublicHeader/>}
             <div className="p-3 md:p-6  overflow-y-auto h-[calc(100svh-4em)]">
                 <div className=" items-center justify-items-center">
-                    <Card className="border-0 w-full bg-[#ffdd00] text-whitem py-6 ">
+                    <Card className="w-full rounded-sm  border-0 bg-gradient-to-r from-[#ffdd00] via-black-600 to-black text-white shadow-2xl mb-8  py-6">
                         <CardHeader>
                             <CardTitle className="text-center tracking-wide">
                                 What would you like to learn today ?
@@ -170,7 +170,7 @@ export function Explore() {
                         </CardHeader>
                         <CardContent>
                             <div className="my-2">
-                                <div className="flex gap-2 w-full md:w-3/4 lg:w-1/2 mx-auto items-center">
+                                <div className="flex gap-2 w-full md:w-3/4 lg:w-1/2 mx-auto items-center text-black">
                                     <Input type="text" placeholder="What do you want to learn today ?"
                                            value={exploreCourseText} onChange={(e) => {
                                         const value = e.target.value;

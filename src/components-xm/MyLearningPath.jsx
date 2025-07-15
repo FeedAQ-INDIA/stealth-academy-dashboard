@@ -520,7 +520,7 @@ export function MyLearningPath() {
                                                             </SheetContent>
                                                         </Sheet>
                                                         <Link to={a?.scheduledUrl}>
-                                                            <Button className="bg-green-600 hover:bg-green-700 text-white shadow-lg">
+                                                            <Button  size="sm" className="bg-green-600 hover:bg-green-700 text-white shadow-lg">
                                                                 <Play className="w-4 h-4 mr-2" />
                                                                 JOIN
                                                             </Button>

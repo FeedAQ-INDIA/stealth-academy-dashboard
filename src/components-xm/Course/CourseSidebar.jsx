@@ -104,9 +104,17 @@ function CourseSidebar({...props}) {
                     {/*         COURSE STATUS - {userEnrollmentObj?.enrollmentStatus  || ''}*/}
 
                     {/*</p>*/}
-                    <p  className="completed-stamp text-base tracking-wide"   >
-                        <span className="text-black font-light">Course Status :</span>  {userEnrollmentObj?.enrollmentStatus}</p>
-                    <Link to={'/explore'}>
+                    {/*<p  className="completed-stamp text-base tracking-wide"   >*/}
+                    {/*    <span className="text-black font-light">Course Status :</span>  {userEnrollmentObj?.enrollmentStatus}</p>*/}
+                              <div className="items-center w-full">
+                                <div className="mx-auto w-fit flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 border border-blue-200">
+                                    <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
+                                    <p className="text-sm font-semibold text-gray-700">
+                                        {userEnrollmentObj?.enrollmentStatus}
+                                    </p>
+                                </div>
+                            </div>
+                     <Link to={'/explore'}>
                         <Button className="w-full flex gap-2 text-muted-foreground" size="sm" variant="ghost"><SquareArrowLeft />Explore more courses</Button>
 
                     </Link>

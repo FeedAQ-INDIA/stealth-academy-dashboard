@@ -124,8 +124,7 @@ function CourseOverview() {
                     <BreadcrumbList>
                         <BreadcrumbItem>
                             <BreadcrumbPage className="truncate max-w-[30ch] flex items-center gap-2">
-                                <BookOpen className="h-4 w-4"/>
-                                Overview
+                                 Overview
                             </BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>

@@ -92,7 +92,7 @@ export function Dashboard() {
                 </CardHeader>
             </Card>
 
-            <Card className="border-0 bg-muted/50  my-6 py-6">
+            <Card className="rounded-sm  border-0 bg-gradient-to-r from-[#ffdd00] via-black-600 to-black text-white shadow-2xl mb-8 overflow-hidden relative">
                 <CardHeader>
                     <CardTitle className="text-center tracking-wide">
                         What would you like to learn today ?
