@@ -7,10 +7,10 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb.jsx";
-import {Card, CardHeader, CardTitle} from "@/components/ui/card.jsx";
+import {Card, CardHeader, CardTitle, CardContent} from "@/components/ui/card.jsx";
 import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
-import {Check, CircleArrowLeft, CircleArrowRight} from "lucide-react";
+import {Check, CircleArrowLeft, CircleArrowRight, Clock, FileText, CheckCircle2, Undo2} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {useCourse} from "@/components-xm/Course/CourseContext.jsx";
@@ -54,11 +54,7 @@ function CourseWritten() {
             });
     }
 
-
-
-
     const saveUserEnrollmentData = () => {
-
         axiosConn
             .post(import.meta.env.VITE_API_URL + "/saveUserEnrollmentData", {
                 userEnrollmentId: userEnrollmentObj?.userEnrollmentId,
@@ -83,7 +79,6 @@ function CourseWritten() {
     }
 
     const deleteUserEnrollmentData = () => {
-
         axiosConn
             .post(import.meta.env.VITE_API_URL + "/deleteUserEnrollmentData", {
                 userEnrollmentId: userEnrollmentObj?.userEnrollmentId,
@@ -137,121 +132,161 @@ function CourseWritten() {
         }
     }
 
-
     const [triggerNotesRefresh, setTriggerNotesRefresh] = useState(false);
 
     const handleNotesSave = () => {
         setTriggerNotesRefresh(prev => !prev);
     };
 
+    const isCompleted = userEnrollmentCourseLog?.filter(b => (b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED'))?.length > 0;
+
+    const formatDuration = (totalMinutes) => {
+        const minutes = +totalMinutes || 0;
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+    };
 
     return (
         <>
-            <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
+            {/* Enhanced Header */}
+            <header className="sticky top-0 z-50 flex h-14 shrink-0 items-center gap-2 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 px-4 shadow-sm">
                 <SidebarTrigger className="-ml-1"/>
                 <Separator orientation="vertical" className="mr-2 h-4"/>
                 <Breadcrumb>
                     <BreadcrumbList>
-
-                        {/*<BreadcrumbItem>*/}
-                        {/*    <BreadcrumbPage><Link to={`/explore`}>Course</Link></BreadcrumbPage>*/}
-                        {/*</BreadcrumbItem>*/}
-                        {/*<BreadcrumbSeparator/>*/}
-                        {/*<BreadcrumbItem>*/}
-                        {/*    <BreadcrumbPage className="truncate max-w-[30ch]"*/}
-                        {/*                    title={courseList?.courseTitle}>{courseList?.courseTitle}</BreadcrumbPage>*/}
-                        {/*</BreadcrumbItem>*/}
-                        {/*<BreadcrumbSeparator/>*/}
                         <BreadcrumbItem>
                             <BreadcrumbPage
-                                className="truncate max-w-[30ch]">{courseTopicContent?.courseTopicContentTitle}</BreadcrumbPage>
+                                className="truncate max-w-[30ch] font-medium text-muted-foreground">
+                                {courseTopicContent?.courseTopicContentTitle}
+                            </BreadcrumbPage>
                         </BreadcrumbItem>
-
                     </BreadcrumbList>
                 </Breadcrumb>
                 <div className="ml-auto sm:flex-initial">
-                    <div className="flex gap-2 ">
-                        <Button className="w-fit" size="sm" disabled={prevContent == null}
-                                onClick={() => navigateToNextModule(prevContent)}><CircleArrowLeft/></Button>
-                        <Button className="w-fit" size="sm" disabled={nextContent == null}
-                                onClick={() => navigateToNextModule(nextContent)}><CircleArrowRight/></Button>
+                    <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={prevContent == null}
+                            onClick={() => navigateToNextModule(prevContent)}
+                            className="hover:bg-muted/50 transition-colors"
+                        >
+                            <CircleArrowLeft className="h-4 w-4"/>
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={nextContent == null}
+                            onClick={() => navigateToNextModule(nextContent)}
+                            className="hover:bg-muted/50 transition-colors"
+                        >
+                            <CircleArrowRight className="h-4 w-4"/>
+                        </Button>
                     </div>
                 </div>
             </header>
 
-
-            <div className="p-4">
-
-
-                <Card className="rounded-none bg-muted/50 border-none">
-                    <CardHeader>
-                        <div className="flex flex-wrap gap-2 w-full mb-3 justify-items-center">
-                            <Badge variant="outline">Doc</Badge>
-                            <Badge variant="outline">
-                                {(() => {
-                                    const totalMinutes = +courseTopicContent?.courseTopicContentDuration || 0;
-                                    const hours = Math.floor(totalMinutes / 60);
-                                    const minutes = totalMinutes % 60;
-
-                                    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-                                })()}
-                            </Badge>
-                        </div>
-                        <div className=" flex  items-center gap-2 ">
-                            <CardTitle className="text-lg sm:text-xl md:text-2xl font-semibold ">
-                                {courseTopicContent?.courseTopicContentTitle}
-                            </CardTitle>
-                            <div className="ml-auto">
-                                {userEnrollmentCourseLog?.filter(b => (b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED'))?.length > 0 ?
-                                    <span className="completed-stamp">Completed</span>
-
-                                    : <Button className="w-fit" size="sm" onClick={() => saveUserEnrollmentData()}>Mark
-                                        as
-                                        Complete</Button>
-                                }
-                                {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0 ?
-                                    <p className='text-right cursor-pointer hover:text-blue-800 hover:underline  hover:underline-offset-4 italic'
-                                       onClick={() => deleteUserEnrollmentData()}>Undo</p> : <></>
-                                }
+            {/* Enhanced Content */}
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/20">
+                <div className="  mx-auto p-6 space-y-8">
+                    {/* Enhanced Header Card */}
+                    <Card className="border-0 shadow-lg bg-white/70 backdrop-blur-sm">
+                        <CardHeader className="pb-6">
+                            <div className="flex flex-wrap gap-3 mb-4">
+                                <Badge variant="secondary" className="bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
+                                    <FileText className="h-3 w-3 mr-1"/>
+                                    Document
+                                </Badge>
+                                <Badge variant="outline" className="bg-white/80">
+                                    <Clock className="h-3 w-3 mr-1"/>
+                                    {formatDuration(courseTopicContent?.courseTopicContentDuration)}
+                                </Badge>
                             </div>
 
-                        </div>
-                    </CardHeader>
+                            <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1">
+                                    <CardTitle className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-2">
+                                        {courseTopicContent?.courseTopicContentTitle}
+                                    </CardTitle>
+                                </div>
 
-                </Card>
+                                <div className="flex flex-col items-end gap-2">
+                                    {isCompleted ? (
+                                        <div className="flex items-center gap-2">
+                                            <Badge variant="default" className="bg-green-500 hover:bg-green-600 text-white">
+                                                <CheckCircle2 className="h-3 w-3 mr-1"/>
+                                                Completed
+                                            </Badge>
+                                        </div>
+                                    ) : (
+                                        <Button
+                                            onClick={() => saveUserEnrollmentData()}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-200"
+                                        >
+                                            <Check className="h-4 w-4 mr-2"/>
+                                            Mark as Complete
+                                        </Button>
+                                    )}
 
-
-                <section className="my-4 ">
-
-                    <div className=" ">
-                        <div className="whitespace-pre-wrap break-words">
-                            {courseVideoDetail?.courseWrittenHtmlContent}                        </div>
-
-
-                    </div>
-
-
-                </section>
-                 <section className="mt-8">
-                    <Card className="rounded-none bg-muted/50">
-                        <CardHeader>
-                            <h1 className="text-lg   font-medium mb-2">Create Notes</h1>
-                            <CreateNotesModule handleNotesSave={handleNotesSave} courseId={courseList.courseId}
-                                               courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.courseTopicContentId}
-                                               courseTopicId={courseVideoDetail.courseTopicId}/>
+                                    {isCompleted && (
+                                        <button
+                                            onClick={() => deleteUserEnrollmentData()}
+                                            className="text-sm text-muted-foreground hover:text-blue-600 hover:underline underline-offset-4 italic transition-colors duration-200 flex items-center gap-1"
+                                        >
+                                            <Undo2 className="h-3 w-3"/>
+                                            Undo
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
                         </CardHeader>
                     </Card>
 
-                </section>
-            
-                <NotesModule refreshTrigger={triggerNotesRefresh}  courseId={courseList.courseId} userDetail={userDetail.userId}
-                             courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.courseTopicContentId}
-                             courseTopicId={courseVideoDetail.courseTopicId}/>
+                    {/* Enhanced Content Section */}
+                    <Card className="border-0 shadow-lg bg-white/70 backdrop-blur-sm">
+                        <CardContent className="p-8">
+                            <div className="prose prose-lg max-w-none">
+                                <div
+                                    className="whitespace-pre-wrap break-words text-gray-800 leading-relaxed"
+                                    dangerouslySetInnerHTML={{ __html: courseVideoDetail?.courseWrittenHtmlContent }}
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Enhanced Notes Creation Section */}
+                    <Card className="border-0 shadow-lg bg-white/70 backdrop-blur-sm">
+                        <CardHeader className="pb-4">
+                            <CardTitle className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                                <FileText className="h-5 w-5 text-blue-600"/>
+                                Create Notes
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                            <CreateNotesModule
+                                handleNotesSave={handleNotesSave}
+                                courseId={courseList.courseId}
+                                courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.courseTopicContentId}
+                                courseTopicId={courseVideoDetail.courseTopicId}
+                            />
+                        </CardContent>
+                    </Card>
+
+                    {/* Enhanced Notes Module */}
+                    <div className="bg-white/50 backdrop-blur-sm rounded-lg shadow-lg p-1">
+                        <NotesModule
+                            refreshTrigger={triggerNotesRefresh}
+                            courseId={courseList.courseId}
+                            userDetail={userDetail.userId}
+                            courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.courseTopicContentId}
+                            courseTopicId={courseVideoDetail.courseTopicId}
+                        />
+                    </div>
+                </div>
             </div>
-
-        </>)
-
+        </>
+    );
 }
-
 
 export default CourseWritten;
