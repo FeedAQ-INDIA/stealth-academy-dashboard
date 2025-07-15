@@ -255,7 +255,7 @@ export function MyLearningPath() {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <h1 className="text-2xl sm:text-3xl font-bold mb-2 leading-tight">
-                                        Welcome back, {userDetail?.derivedUserName}!
+                                        Welcome , {userDetail?.derivedUserName}!
                                     </h1>
                                     <p className="text-blue-100 text-base sm:text-lg flex items-center gap-2 flex-wrap">
                                         <User className="w-4 h-4 flex-shrink-0" />
