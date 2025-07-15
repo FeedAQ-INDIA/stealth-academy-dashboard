@@ -1,4 +1,4 @@
-import {ChevronLeft, ChevronRight, CirclePlus, ExternalLink, Terminal,} from "lucide-react";
+import {ChevronLeft, ChevronRight, CirclePlus, ExternalLink, Terminal, BookOpen, Calendar, Users, Clock, MapPin, User, Play} from "lucide-react"
 import {Button} from "@/components/ui/button";
 import {Card, CardContent, CardHeader, CardTitle,} from "@/components/ui/card";
 import {useAuthStore} from "@/zustland/store.js";
@@ -10,6 +10,7 @@ import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
 import {Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
 import {Pagination, PaginationContent, PaginationItem,} from "@/components/ui/pagination.jsx";
 import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet.jsx";
+import {Badge} from "@/components/ui/badge";
 
 import {
     Select,
@@ -217,573 +218,373 @@ export function MyLearningPath() {
 
     const [historySelection, setHistorySelection] = useState("CourseHistory");
 
+    const getStatusBadge = (status) => {
+        const variants = {
+            'ENROLLED': 'bg-blue-100 text-blue-800 border-blue-200',
+            'COMPLETED': 'bg-green-100 text-green-800 border-green-200',
+            'IN_PROGRESS': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+            'PENDING': 'bg-gray-100 text-gray-800 border-gray-200',
+        };
+        return variants[status] || 'bg-gray-100 text-gray-800 border-gray-200';
+    };
 
     if(loading){
         return (
-            <div className="flex items-center justify-center h-[100svh] w-full">
+            <div className="flex items-center justify-center h-[100svh] w-full bg-gradient-to-br from-slate-50 to-gray-100">
                 <LoaderOne />
             </div>
         )
     }
 
     return (
-        <div className="p-3 md:p-6">
-
-            <Card className="border-0 bg-[#ffdd00]">
-                <CardHeader>
-                    <div className="flex flex-sm justify-items-center gap-4 items-center">
-                        <Avatar className="w-12 h-12">
-                            <AvatarFallback className="text-xl">{userDetail?.nameInitial}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                            <h1 className="text-xl font-medium">Welcome {userDetail?.derivedUserName}</h1>
-                            <p>Member since {userDetail?.created_date}</p>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+            <div className="p-4 md:p-8   mx-auto">
+                {/* Welcome Header */}
+                <Card className="border-0 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white shadow-2xl mb-8 overflow-hidden relative">
+                    <div className="absolute inset-0 bg-black/10"></div>
+                    <CardHeader className="relative z-10 pb-8">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+                            <div className="flex items-center gap-6">
+                                <div className="relative">
+                                    <Avatar className="w-20 h-20 border-4 border-white/20 shadow-xl">
+                                        <AvatarFallback className="text-2xl bg-white/20 text-white font-bold">
+                                            {userDetail?.nameInitial}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-green-400 rounded-full border-2 border-white"></div>
+                                </div>
+                                <div>
+                                    <h1 className="text-3xl font-bold mb-2">Welcome back, {userDetail?.derivedUserName}!</h1>
+                                    <p className="text-blue-100 text-lg flex items-center gap-2">
+                                        <User className="w-4 h-4" />
+                                        Member since {userDetail?.created_date}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row gap-3">
+                                <Link to="/explore?type=COURSE">
+                                    <Button variant="secondary" className="bg-white/20 hover:bg-white/30 border-white/30 text-white backdrop-blur-sm">
+                                        <BookOpen className="w-4 h-4 mr-2" />
+                                        Explore Courses
+                                    </Button>
+                                </Link>
+                            </div>
                         </div>
-                    </div>
-                </CardHeader>
-            </Card>
+                    </CardHeader>
+                </Card>
 
-
-            <Card className="border-0 bg-muted/50 py-4 my-6">
- {/*<CardHeader>*/}
-     {/*<Select onValueChange={setHistorySelection} value={historySelection}>*/}
-     {/*    <SelectTrigger className="w-full" >*/}
-     {/*        <SelectValue placeholder="Select History Type" />*/}
-     {/*    </SelectTrigger>*/}
-     {/*    <SelectContent>*/}
-     {/*        <SelectGroup>*/}
-     {/*            <SelectItem value="CourseHistory">Course History</SelectItem>*/}
-     {/*            <SelectItem value="MockInterviewHistory">Mock Interview History</SelectItem>*/}
-     {/*            <SelectItem value="CounsellingHistory">Counselling History</SelectItem>*/}
-     {/*        </SelectGroup>*/}
-     {/*    </SelectContent>*/}
-     {/*</Select>*/}
- {/*</CardHeader>*/}
-            {historySelection == "CourseHistory" ?    <div>
-                <CardHeader>
-                    <CardTitle className="flex gap-2 tracking-wide">
-                        Course History
-                    </CardTitle>
-
-
-                </CardHeader>
-                <CardContent>
-                    <div className="mt-2">
-                        {courseList?.length > 0 ?
-
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        {/*<TableHead className="w-[100px]">ID</TableHead>*/}
-                                        <TableHead>Title</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Enrollment Date</TableHead>
-
-                                        <TableHead className="text-right"></TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {courseList?.map(a => (
-                                        <TableRow key={a.courseId}>
-
-                                            {/*<TableCell  className="whitespace-nowrap font-medium" >{a.courseId}</TableCell>*/}
-                                            <TableCell  className="whitespace-nowrap font-medium">{a.courseTitle?.toUpperCase()}</TableCell>
-                                            <TableCell  className="whitespace-nowrap">
-                                                {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId) ?
-                                                    <div className="  ">
-                                                        <p className=" text-base">{userEnrolledCourseIdList?.find(m => m.courseId == a.courseId)?.enrollmentStatus}</p>
+                {/* Course History Section */}
+                {historySelection == "CourseHistory" && (
+                    <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl mb-8">
+                        <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+                            <CardTitle className="flex items-center gap-3 text-2xl font-bold text-gray-800">
+                                <BookOpen className="w-6 h-6 text-blue-600" />
+                                Course History
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                            {courseList?.length > 0 ? (
+                                <div className="overflow-hidden rounded-lg border border-gray-200">
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow className="bg-gray-50/80">
+                                                <TableHead className="font-semibold text-gray-700">Course Title</TableHead>
+                                                <TableHead className="font-semibold text-gray-700">Status</TableHead>
+                                                <TableHead className="font-semibold text-gray-700">Enrollment Date</TableHead>
+                                                <TableHead className="text-right font-semibold text-gray-700">Actions</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {courseList?.map(a => (
+                                                <TableRow key={a.courseId} className="hover:bg-blue-50/50 transition-colors">
+                                                    <TableCell className="font-medium text-gray-900">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                                            {a.courseTitle?.toUpperCase()}
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId) ? (
+                                                            <Badge className={getStatusBadge(userEnrolledCourseIdList?.find(m => m.courseId == a.courseId)?.enrollmentStatus)}>
+                                                                {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId)?.enrollmentStatus}
+                                                            </Badge>
+                                                        ) : null}
+                                                    </TableCell>
+                                                    <TableCell className="text-gray-600">
+                                                        <div className="flex items-center gap-2">
+                                                            <Calendar className="w-4 h-4" />
+                                                            {a.v_created_date + ' ' + a.v_created_time}
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        <Link to={`/course/${a?.courseId}`}>
+                                                            <Button size="sm" variant="outline" className="hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-colors">
+                                                                <ExternalLink className="w-4 h-4 mr-2" />
+                                                                View Course
+                                                            </Button>
+                                                        </Link>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                        <TableFooter>
+                                            <TableRow>
+                                                <TableCell colSpan={4} className="py-4 bg-gray-50/50">
+                                                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                                        <div className="text-sm text-gray-600">
+                                                            Showing {offset + 1} to {Math.min(offset + limit, totalCount)} of {totalCount} courses
+                                                        </div>
+                                                        <Pagination className="w-auto">
+                                                            <PaginationContent>
+                                                                <PaginationItem>
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="outline"
+                                                                        disabled={offset === 0}
+                                                                        onClick={() => {
+                                                                            setOffset(Math.max(offset - limit, 0));
+                                                                            setApiQuery((prevQuery) => ({
+                                                                                ...prevQuery,
+                                                                                offset: Math.max(offset - limit, 0),
+                                                                            }));
+                                                                        }}
+                                                                    >
+                                                                        <ChevronLeft className="h-4 w-4 mr-1" />
+                                                                        Previous
+                                                                    </Button>
+                                                                </PaginationItem>
+                                                                <PaginationItem>
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="outline"
+                                                                        disabled={offset + limit >= totalCount}
+                                                                        onClick={() => {
+                                                                            setOffset(offset + limit < totalCount ? offset + limit : offset);
+                                                                            setApiQuery((prevQuery) => ({
+                                                                                ...prevQuery,
+                                                                                offset: offset + limit < totalCount ? offset + limit : offset,
+                                                                            }));
+                                                                        }}
+                                                                    >
+                                                                        Next
+                                                                        <ChevronRight className="h-4 w-4 ml-1" />
+                                                                    </Button>
+                                                                </PaginationItem>
+                                                            </PaginationContent>
+                                                        </Pagination>
                                                     </div>
-                                                    : <></>}</TableCell>
-
-
-                                            <TableCell  className="whitespace-nowrap">  {a.v_created_date + ' ' + a.v_created_time}</TableCell>
-
-
-                                            <TableCell  className="whitespace-nowrap text-right"  >
-                                                <Link
-                                                    to={`/course/${a?.courseId}`}>
-                                                    <Button size="sm" variant="outline"><ExternalLink/></Button></Link>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                                <TableFooter>
-                                    <TableRow>
-                                        <TableCell  className="whitespace-nowrap py-3" colSpan={7}  >
-                                            <div className="flex flex-row items-center">
-                                                <div className="text-xs text-muted-foreground">
-                                                    {offset + 1} to {Math.min(offset + limit, totalCount)} of {totalCount} row(s)
-                                                    selected.
-                                                </div>
-                                                <Pagination className="ml-auto mr-0 w-auto">
-                                                    <PaginationContent>
-                                                        <PaginationItem>
-                                                            <Button
-                                                                size="icon"
-                                                                variant="outline"
-                                                                className="h-6 w-6"
-                                                                onClick={() => {
-                                                                    setOffset(Math.max(offset - limit, 0));
-                                                                    setApiQuery((prevQuery) => ({
-                                                                        ...prevQuery,
-                                                                        offset: Math.max(offset - limit, 0),
-                                                                    }));
-                                                                }}
-                                                            >
-                                                                <ChevronLeft className="h-3.5 w-3.5"/>
-                                                                <span className="sr-only">Previous Order</span>
-                                                            </Button>
-                                                        </PaginationItem>
-                                                        <PaginationItem>
-                                                            <Button
-                                                                size="icon"
-                                                                variant="outline"
-                                                                className="h-6 w-6"
-                                                                onClick={() => {
-                                                                    setOffset(offset + limit < totalCount ? offset + limit : offset);
-                                                                    setApiQuery((prevQuery) => ({
-                                                                        ...prevQuery,
-                                                                        offset: offset + limit < totalCount ? offset + limit : offset,
-                                                                    }));
-                                                                }}
-                                                            >
-                                                                <ChevronRight className="h-3.5 w-3.5"/>
-                                                                <span className="sr-only">Next Order</span>
-                                                            </Button>
-                                                        </PaginationItem>
-                                                    </PaginationContent>
-                                                </Pagination>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                </TableFooter>
-                            </Table>
-                            :
-                            <Alert> <Terminal className="h-4 w-4"/>
-                                <div className="flex flex-row md:flex-row flex-wrap gap-2 items-center">
-                                    <div>
-                                        <AlertTitle>No Enrollment found</AlertTitle>
-                                        <AlertDescription>
-                                            <p>You are not enrolled in any course</p>
-
-                                        </AlertDescription>
-                                    </div>
-
-                                    <div className="md:ml-auto">
+                                                </TableCell>
+                                            </TableRow>
+                                        </TableFooter>
+                                    </Table>
+                                </div>
+                            ) : (
+                                <Alert className="border-blue-200 bg-blue-50/50">
+                                    <BookOpen className="h-5 w-5 text-blue-600" />
+                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                        <div>
+                                            <AlertTitle className="text-blue-800 font-semibold">No Courses Found</AlertTitle>
+                                            <AlertDescription className="text-blue-700">
+                                                You haven't enrolled in any courses yet. Start your learning journey today!
+                                            </AlertDescription>
+                                        </div>
                                         <Link to='/explore?type=COURSE'>
-                                            <Button className="mt-2 flex-1" size={'sm'}>Start your journey
-                                                today</Button>
+                                            <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg">
+                                                <BookOpen className="w-4 h-4 mr-2" />
+                                                Browse Courses
+                                            </Button>
                                         </Link>
-
                                     </div>
-                                </div>
+                                </Alert>
+                            )}
+                        </CardContent>
+                    </Card>
+                )}
 
-                            </Alert>}
-                    </div>
-                </CardContent>
-
-
-            </div>
-            : <></>}
-
-
-
-            {historySelection == "MockInterviewHistory" ?     <div >
-                <CardHeader>
-                    <CardTitle className="flex gap-2 tracking-wide">
-                        Mock Interview History
-                    </CardTitle>
-
-
-                </CardHeader>
-                <CardContent>
-                    <div className="mt-2">
-                        {mockInterviewHistoryList?.length > 0 ?
-
-                            <div className="  items-center">
-                                {/*{courseList1?.webinars?.map(a => (*/}
-                                {/*    <WebinarCard userEnrolledCourseIdList={userEnrolledCourseIdList} a={a}/>*/}
-                                {/*))}*/}
-
+                {/* Scheduled Meetings Section */}
+                <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl">
+                    <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b">
+                        <CardTitle className="flex items-center gap-3 text-2xl font-bold text-gray-800">
+                            <Calendar className="w-6 h-6 text-green-600" />
+                            Scheduled Meetings
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                        {scheduledMeetList?.length > 0 ? (
+                            <div className="overflow-hidden rounded-lg border border-gray-200">
                                 <Table>
                                     <TableHeader>
-                                        <TableRow>
-                                            <TableHead className="w-[100px]">ID</TableHead>
-                                            <TableHead>Requested Date</TableHead>
-                                            <TableHead>Interview Date</TableHead>
-                                             <TableHead>Duration</TableHead>
-                                            <TableHead>Cost</TableHead>
-
-                                            <TableHead className="text-right">Status</TableHead>
-                                            <TableHead className="text-right"></TableHead>
+                                        <TableRow className="bg-gray-50/80">
+                                            <TableHead className="font-semibold text-gray-700">Meeting Title</TableHead>
+                                            <TableHead className="font-semibold text-gray-700">Course</TableHead>
+                                            <TableHead className="font-semibold text-gray-700">Start Time</TableHead>
+                                            <TableHead className="font-semibold text-gray-700">End Time</TableHead>
+                                            <TableHead className="text-right font-semibold text-gray-700">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {mockInterviewHistoryList?.map(a => (
-                                            <TableRow key={a.interviewReqId}>
-                                                <TableCell  className="whitespace-nowrap font-medium" >{a.interviewReqId}</TableCell>
-                                                <TableCell  className="whitespace-nowrap">  {a.v_created_date + ' ' + a.v_created_time}</TableCell>
-                                                <TableCell  className="whitespace-nowrap">  {a.interviewReqDate ? new Date(a.interviewReqDate).toLocaleDateString('en-GB').replace(/\//g, '-') +' '+a.interviewReqTime: ''}
-                                                </TableCell>
-                                                 <TableCell  className="whitespace-nowrap">{a.interviewReqDuration} min</TableCell>
-                                                <TableCell  className="whitespace-nowrap">{a.interviewReqCost == 0 || !a.interviewReqCost ? "FREE" : ""}</TableCell>
-
-                                                <TableCell  className="whitespace-nowrap text-right"  >{a.interviewReqStatus}</TableCell>
-                                                <TableCell  className="whitespace-nowrap text-right"  >
-                                                    <Link to={`/mock-interview/${a.interviewReqId}`}> <Button size="sm"
-                                                                                                              variant="outline"><ExternalLink/></Button></Link>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                    <TableFooter>
-                                        <TableRow>
-                                            <TableCell  className="whitespace-nowrap py-3" colSpan={8}  >
-                                                <div className="flex flex-row items-center">
-                                                    <div className="text-xs text-muted-foreground">
-                                                        {offset2 + 1} to {Math.min(offset2 + limit2, totalCount2)} of {totalCount2} row(s)
-                                                        selected.
+                                        {scheduledMeetList?.map?.(a => (
+                                            <TableRow key={a.courseScheduleId} className="hover:bg-green-50/50 transition-colors">
+                                                <TableCell className="font-medium text-gray-900">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                                                        {a?.scheduledTitle?.toUpperCase()}
                                                     </div>
-                                                    <Pagination className="ml-auto mr-0 w-auto">
-                                                        <PaginationContent>
-                                                            <PaginationItem>
-                                                                <Button
-                                                                    size="icon"
-                                                                    variant="outline"
-                                                                    className="h-6 w-6"
-                                                                    onClick={() => {
-                                                                        setOffset2(Math.max(offset2 - limit2, 0));
-                                                                        setApiQuery2((prevQuery) => ({
-                                                                            ...prevQuery,
-                                                                            offset: Math.max(offset2 - limit2, 0),
-                                                                        }));
-                                                                    }}
-                                                                >
-                                                                    <ChevronLeft className="h-3.5 w-3.5"/>
-                                                                    <span className="sr-only">Previous Order</span>
-                                                                </Button>
-                                                            </PaginationItem>
-                                                            <PaginationItem>
-                                                                <Button
-                                                                    size="icon"
-                                                                    variant="outline"
-                                                                    className="h-6 w-6"
-                                                                    onClick={() => {
-                                                                        setOffset2(offset2 + limit2 < totalCount2 ? offset2 + limit2 : offset2);
-                                                                        setApiQuery2((prevQuery) => ({
-                                                                            ...prevQuery,
-                                                                            offset: offset2 + limit2 < totalCount2 ? offset2 + limit2 : offset2,
-                                                                        }));
-                                                                    }}
-                                                                >
-                                                                    <ChevronRight className="h-3.5 w-3.5"/>
-                                                                    <span className="sr-only">Next Order</span>
-                                                                </Button>
-                                                            </PaginationItem>
-                                                        </PaginationContent>
-                                                    </Pagination>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableFooter>
-                                </Table>
-                            </div>
-                            :
-                            <Alert> <Terminal className="h-4 w-4"/>
-                                <div className="flex flex-row md:flex-row flex-wrap gap-2 items-center">
-                                    <div>
-                                        <AlertTitle>No Mock Interview History Found</AlertTitle>
-                                        <AlertDescription>
-                                            <p>You are not enrolled in any mock interview</p>
-
-                                        </AlertDescription>
-                                    </div>
-
-                                    <div className="md:ml-auto">
-                                        <Link to='/mock-interview'>
-                                            <Button className="mt-2 flex-1" size={'sm'}>Schedule Now</Button>
-                                        </Link>
-
-                                    </div>
-                                </div>
-
-                            </Alert>}
-                    </div>
-                </CardContent>
-
-
-            </div>
-:<></>}
-
-                {historySelection == "CounsellingHistory" ?   <div>
-                <CardHeader>
-                    <CardTitle className="flex gap-2 tracking-wide">
-                        Counselling History
-                    </CardTitle>
-
-
-                </CardHeader>
-                <CardContent>
-                    <div className="mt-2">
-                        {counsellingHistoryList?.length > 0 ?
-
-                            <div className="   items-center">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead className="w-[100px]">ID</TableHead>
-                                            <TableHead>Requested Date</TableHead>
-                                            <TableHead>Counselling Date</TableHead>
-                                              <TableHead>Cost</TableHead>
-                                            <TableHead  >Mode</TableHead>
-
-                                            <TableHead className="text-right">Status</TableHead>
-                                            <TableHead className="text-right"></TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {counsellingHistoryList?.map(a => (
-                                            <TableRow key={a.counsellingId}>
-                                                <TableCell  className="whitespace-nowrap font-medium" >{a.counsellingId}</TableCell>
-                                                <TableCell  className="whitespace-nowrap">  {a.v_created_date + ' ' + a.v_created_time}</TableCell>
-                                                <TableCell  className="whitespace-nowrap">  {a.counsellingDate ? new Date(a.counsellingDate).toLocaleDateString('en-GB').replace(/\//g, '-') +' '+a.counsellingTime: ''}
                                                 </TableCell>
-                                                  <TableCell  className="whitespace-nowrap">{a.counsellingCost == 0 || !a.counsellingCost ? "FREE" : ""}</TableCell>
-<TableCell  className="whitespace-nowrap">{a?.counsellingMode}</TableCell>
-                                                <TableCell  className="whitespace-nowrap text-right"  >{a.counsellingStatus}</TableCell>
-                                                <TableCell  className="whitespace-nowrap text-right" >
-                                                    <Link to={`/counselling-compass/${a.counsellingId}`}> <Button size="sm"
-                                                                                                              variant="outline"><ExternalLink/></Button></Link>
+                                                <TableCell className="text-gray-600">
+                                                    <Badge variant="outline" className="border-green-200 text-green-700">
+                                                        {a?.course_title?.toUpperCase()}
+                                                    </Badge>
                                                 </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                    <TableFooter>
-                                        <TableRow>
-                                            <TableCell  className="whitespace-nowrap py-3" colSpan={8}  >
-                                                <div className="flex flex-row items-center">
-                                                    <div className="text-xs text-muted-foreground">
-                                                        {offset3 + 1} to {Math.min(offset3 + limit3, totalCount3)} of {totalCount3} row(s)
-                                                        selected.
+                                                <TableCell className="text-gray-600">
+                                                    <div className="flex items-center gap-2">
+                                                        <Clock className="w-4 h-4" />
+                                                        {a?.v_scheduled_start_date + ' ' + a?.v_scheduled_start_time}
                                                     </div>
-                                                    <Pagination className="ml-auto mr-0 w-auto">
-                                                        <PaginationContent>
-                                                            <PaginationItem>
-                                                                <Button
-                                                                    size="icon"
-                                                                    variant="outline"
-                                                                    className="h-6 w-6"
-                                                                    onClick={() => {
-                                                                        setOffset3(Math.max(offset3 - limit3, 0));
-                                                                        setApiQuery3((prevQuery) => ({
-                                                                            ...prevQuery,
-                                                                            offset: Math.max(offset3 - limit3, 0),
-                                                                        }));
-                                                                    }}
-                                                                >
-                                                                    <ChevronLeft className="h-3.5 w-3.5"/>
-                                                                    <span className="sr-only">Previous Order</span>
+                                                </TableCell>
+                                                <TableCell className="text-gray-600">
+                                                    <div className="flex items-center gap-2">
+                                                        <Clock className="w-4 h-4" />
+                                                        {a?.v_scheduled_end_date + ' ' + a?.v_scheduled_end_time}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex justify-end gap-2">
+                                                        <Sheet>
+                                                            <SheetTrigger asChild>
+                                                                <Button variant="outline" size="sm" className="hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700">
+                                                                    <CirclePlus className="w-4 h-4 mr-1" />
+                                                                    Details
                                                                 </Button>
-                                                            </PaginationItem>
-                                                            <PaginationItem>
-                                                                <Button
-                                                                    size="icon"
-                                                                    variant="outline"
-                                                                    className="h-6 w-6"
-                                                                    onClick={() => {
-                                                                        setOffset3(offset3 + limit3 < totalCount3 ? offset3 + limit3 : offset3);
-                                                                        setApiQuery3((prevQuery) => ({
-                                                                            ...prevQuery,
-                                                                            offset: offset3 + limit3 < totalCount3 ? offset3 + limit3 : offset3,
-                                                                        }));
-                                                                    }}
-                                                                >
-                                                                    <ChevronRight className="h-3.5 w-3.5"/>
-                                                                    <span className="sr-only">Next Order</span>
-                                                                </Button>
-                                                            </PaginationItem>
-                                                        </PaginationContent>
-                                                    </Pagination>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableFooter>
-                                </Table>
-                            </div>
-                            :
-                            <Alert> <Terminal className="h-4 w-4"/>
-                                <div className="flex flex-row md:flex-row flex-wrap gap-2 items-center">
-                                    <div>
-                                        <AlertTitle>No Mock Interview History Found</AlertTitle>
-                                        <AlertDescription>
-                                            <p>You are not enrolled in any mock interview</p>
-
-                                        </AlertDescription>
-                                    </div>
-
-                                    <div className="md:ml-auto">
-                                        <Link to='/mock-interview'>
-                                            <Button className="mt-2 flex-1" size={'sm'}>Schedule Now</Button>
-                                        </Link>
-
-                                    </div>
-                                </div>
-
-                            </Alert>}
-                    </div>
-                </CardContent>
-
-
-            </div>
-:<></>}
-        </Card>
-
-
-            <Card className="border-0 bg-muted/50 py-4 my-6">
-                <CardHeader>
-                    <CardTitle className="flex gap-2 tracking-wide">
-                        Scheduled Meet
-                    </CardTitle>
-
-
-                </CardHeader>
-                <CardContent>
-                    <div className="mt-2">
-
-                        {scheduledMeetList?.length>0 ?
-
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Title</TableHead>
-                                        <TableHead>Course</TableHead>
-                                        <TableHead>Start Time</TableHead>
-                                        <TableHead>End Time</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {
-                                        scheduledMeetList?.map?.(a => (
-                                            <TableRow key={a.courseScheduleId}>
-                                                <TableCell  className="whitespace-nowrap font-medium">{a?.scheduledTitle?.toUpperCase()}</TableCell>
-                                                <TableCell  className="whitespace-nowrap font-medium">{a?.course_title?.toUpperCase()}</TableCell>
-                                                <TableCell  className="whitespace-nowrap">{a?.v_scheduled_start_date + ' '+ a?.v_scheduled_start_time}</TableCell>
-                                                <TableCell  className="whitespace-nowrap">{a?.v_scheduled_end_date + ' '+ a?.v_scheduled_end_time}</TableCell>
-                                                {/*<TableCell  className="whitespace-nowrap">*/}
-                                                {/*    {`${Math.floor((new Date(a?.scheduledEndDateTime) - new Date(a?.scheduledStartDateTime)) / 3600000)} hr ${Math.floor(((new Date(a?.scheduledEndDateTime) - new Date(a?.scheduledStartDateTime)) % 3600000) / 60000)} min`}*/}
-                                                {/*</TableCell>*/}
-                                                {/*<TableCell  className="whitespace-nowrap">{a?.scheduledDeliveryMode}</TableCell>*/}
-                                                {/*<TableCell  className="whitespace-nowrap">{a?.scheduledDeliveryMedium}</TableCell>*/}
-
-                                                {/*<TableCell  className="whitespace-nowrap">{a?.scheduledTutor}</TableCell>*/}
-                                                <TableCell  className="whitespace-nowrap flex justify-end gap-2"  >
-                                                    <Sheet>
-                                                        <SheetTrigger asChild>
-                                                            <Button variant="ghost" size="sm"><CirclePlus/></Button>
-
-                                                        </SheetTrigger>
-                                                        <SheetContent>
-                                                            <SheetHeader>
-                                                                <SheetTitle>MEETING DETAIL</SheetTitle>
-                                                                <SheetDescription>
-                                                                    {a?.scheduledDescription}
-                                                                </SheetDescription>
-                                                                <div className="space-y-4">
-                                                                    <p><span className="font-medium">Meet Title : </span>{a?.scheduledTitle?.toUpperCase() || 'N/A'}</p>
-                                                                    <p><span className="font-medium">Course : </span>{a?.course_title?.toUpperCase() || 'N/A'}</p>
-                                                                    <p><span className="font-medium">Description : </span>{a?.scheduledDescription || 'N/A'}</p>
-
-                                                                    <p><span className="font-medium">Batch : </span>{a?.courseBatch || 'N/A'}</p>
-
-                                                                    <p><span className="font-medium">Start Time : </span>{a?.v_scheduled_start_date + ' '+ a?.v_scheduled_start_time}</p>
-                                                                    <p><span className="font-medium">End Time : </span>{a?.v_scheduled_end_date + ' '+ a?.v_scheduled_end_time}</p>
-                                                                    <p>
-                                                                        <span className="font-medium">Duration : </span>{`${Math.floor((new Date(a?.scheduledEndDateTime) - new Date(a?.scheduledStartDateTime)) / 3600000)} hr ${Math.floor(((new Date(a?.scheduledEndDateTime) - new Date(a?.scheduledStartDateTime)) % 3600000) / 60000)} min`}
-                                                                    </p>
-                                                                    <p><span className="font-medium">Mode : </span>{a?.scheduledDeliveryMode || 'N/A'}</p>
-                                                                    <p><span className="font-medium">Medium : </span>{a?.scheduledDeliveryMedium || 'N/A'}</p>
-
-                                                                    <p><span className="font-medium">Tutor : </span>{a?.scheduledTutor || 'N/A'}</p>
-                                                                    <p><span className="font-medium">Join Link : </span>{a?.scheduledUrl || 'N/A'}</p>
+                                                            </SheetTrigger>
+                                                            <SheetContent className="w-full sm:max-w-lg">
+                                                                <SheetHeader className="mb-6">
+                                                                    <SheetTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                                                                        <Calendar className="w-5 h-5 text-blue-600" />
+                                                                        Meeting Details
+                                                                    </SheetTitle>
+                                                                    <SheetDescription className="text-gray-600 text-base">
+                                                                        {a?.scheduledDescription}
+                                                                    </SheetDescription>
+                                                                </SheetHeader>
+                                                                <div className="space-y-6">
+                                                                    <div className="grid grid-cols-1 gap-4">
+                                                                        <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                                                                            <Calendar className="w-5 h-5 text-blue-600 mt-0.5" />
+                                                                            <div>
+                                                                                <span className="font-medium text-gray-700">Meeting Title</span>
+                                                                                <p className="text-gray-900">{a?.scheduledTitle?.toUpperCase() || 'N/A'}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                                                                            <BookOpen className="w-5 h-5 text-green-600 mt-0.5" />
+                                                                            <div>
+                                                                                <span className="font-medium text-gray-700">Course</span>
+                                                                                <p className="text-gray-900">{a?.course_title?.toUpperCase() || 'N/A'}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                                                                            <Users className="w-5 h-5 text-purple-600 mt-0.5" />
+                                                                            <div>
+                                                                                <span className="font-medium text-gray-700">Batch</span>
+                                                                                <p className="text-gray-900">{a?.courseBatch || 'N/A'}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                                                                            <Clock className="w-5 h-5 text-orange-600 mt-0.5" />
+                                                                            <div>
+                                                                                <span className="font-medium text-gray-700">Duration</span>
+                                                                                <p className="text-gray-900">
+                                                                                    {`${Math.floor((new Date(a?.scheduledEndDateTime) - new Date(a?.scheduledStartDateTime)) / 3600000)} hr ${Math.floor(((new Date(a?.scheduledEndDateTime) - new Date(a?.scheduledStartDateTime)) % 3600000) / 60000)} min`}
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                                                                            <MapPin className="w-5 h-5 text-red-600 mt-0.5" />
+                                                                            <div>
+                                                                                <span className="font-medium text-gray-700">Mode</span>
+                                                                                <p className="text-gray-900">{a?.scheduledDeliveryMode || 'N/A'}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                                                                            <User className="w-5 h-5 text-indigo-600 mt-0.5" />
+                                                                            <div>
+                                                                                <span className="font-medium text-gray-700">Tutor</span>
+                                                                                <p className="text-gray-900">{a?.scheduledTutor || 'N/A'}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                            </SheetHeader>
-                                                        </SheetContent>
-                                                    </Sheet>
-                                                    <Link to={a?.scheduledUrl}>
-                                                        <Button variant="ghost" size="sm">JOIN</Button>
-                                                    </Link>
+                                                            </SheetContent>
+                                                        </Sheet>
+                                                        <Link to={a?.scheduledUrl}>
+                                                            <Button className="bg-green-600 hover:bg-green-700 text-white shadow-lg">
+                                                                <Play className="w-4 h-4 mr-2" />
+                                                                JOIN
+                                                            </Button>
+                                                        </Link>
+                                                    </div>
                                                 </TableCell>
-
                                             </TableRow>
-                                        ))
-                                    }
-                                </TableBody>
-                                <TableFooter>
-                                    <TableRow>
-                                        <TableCell  className="whitespace-nowrap py-3" colSpan={7}  >
-                                            <div className="flex flex-row items-center">
-                                                <div className="text-xs text-muted-foreground">
-                                                    {offset4 + 1} to {Math.min(offset4 + limit4, totalCount4)} of {totalCount4} row(s)
-                                                    selected.
+                                        ))}
+                                    </TableBody>
+                                    <TableFooter>
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="py-4 bg-gray-50/50">
+                                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                                    <div className="text-sm text-gray-600">
+                                                        Showing {offset4 + 1} to {Math.min(offset4 + limit4, totalCount4)} of {totalCount4} meetings
+                                                    </div>
+                                                    <Pagination className="w-auto">
+                                                        <PaginationContent>
+                                                            <PaginationItem>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="outline"
+                                                                    disabled={offset4 === 0}
+                                                                    onClick={() => {
+                                                                        setOffset4(Math.max(offset4 - limit4, 0));
+                                                                    }}
+                                                                >
+                                                                    <ChevronLeft className="h-4 w-4 mr-1" />
+                                                                    Previous
+                                                                </Button>
+                                                            </PaginationItem>
+                                                            <PaginationItem>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="outline"
+                                                                    disabled={offset4 + limit4 >= totalCount4}
+                                                                    onClick={() => {
+                                                                        setOffset4(offset4 + limit4 < totalCount4 ? offset4 + limit4 : offset4);
+                                                                    }}
+                                                                >
+                                                                    Next
+                                                                    <ChevronRight className="h-4 w-4 ml-1" />
+                                                                </Button>
+                                                            </PaginationItem>
+                                                        </PaginationContent>
+                                                    </Pagination>
                                                 </div>
-                                                <Pagination className="ml-auto mr-0 w-auto">
-                                                    <PaginationContent>
-                                                        <PaginationItem>
-                                                            <Button
-                                                                size="icon"
-                                                                variant="outline"
-                                                                className="h-6 w-6"
-                                                                onClick={() => {
-                                                                    setOffset4(Math.max(offset4 - limit4, 0));
-
-                                                                }}
-                                                            >
-                                                                <ChevronLeft className="h-3.5 w-3.5"/>
-                                                                <span className="sr-only">Previous Order</span>
-                                                            </Button>
-                                                        </PaginationItem>
-                                                        <PaginationItem>
-                                                            <Button
-                                                                size="icon"
-                                                                variant="outline"
-                                                                className="h-6 w-6"
-                                                                onClick={() => {
-                                                                    setOffset4(offset4 + limit4 < totalCount4 ? offset4 + limit4 : offset4);
-                                                                }}
-                                                            >
-                                                                <ChevronRight className="h-3.5 w-3.5"/>
-                                                                <span className="sr-only">Next Order</span>
-                                                            </Button>
-                                                        </PaginationItem>
-                                                    </PaginationContent>
-                                                </Pagination>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                </TableFooter>
-                            </Table>
-                            :
-                            <Alert> <Terminal className="h-4 w-4"/>
-                                <div className="flex flex-row md:flex-row flex-wrap gap-2 items-center">
-                                    <div>
-                                        <AlertTitle>No schedule found</AlertTitle>
-
-                                    </div>
-
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableFooter>
+                                </Table>
+                            </div>
+                        ) : (
+                            <Alert className="border-green-200 bg-green-50/50">
+                                <Calendar className="h-5 w-5 text-green-600" />
+                                <div>
+                                    <AlertTitle className="text-green-800 font-semibold">No Scheduled Meetings</AlertTitle>
+                                    <AlertDescription className="text-green-700">
+                                        You don't have any scheduled meetings at the moment.
+                                    </AlertDescription>
                                 </div>
-
-                            </Alert>}
-
-                    </div>
-                </CardContent>
-
-
-            </Card>
-
-
-
+                            </Alert>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
         </div>
-    )
-
+    );
 }
