@@ -113,7 +113,7 @@ export default function HomePage() {
                                         <SheetTrigger asChild>
                                             <Button
                                                 className=" border-[#ffdd00] border-2 text-white hover:bg-[#ffdd00] hover:text-black"
-                                                href="#letsconnect">Let's Connect</Button>
+                                                href="#letsconnect">LET'S CONNECT</Button>
                                         </SheetTrigger>
                                         <SheetContent>
                                             <SheetHeader>
@@ -128,6 +128,7 @@ export default function HomePage() {
 
                                         </SheetContent>
                                     </Sheet>
+                                    <Link to={'/explore'}> <Button  className=" border-[#ffdd00] border-2 text-white hover:bg-[#ffdd00] hover:text-black" >EXPLORE</Button></Link>
 
                                 </div>
                             </div>
