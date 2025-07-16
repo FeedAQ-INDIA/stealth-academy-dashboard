@@ -229,51 +229,50 @@ export function Explore() {
                                 </div>
                             )}
 
-
-                            {courseList.length > 0 ? <div className="flex flex-row items-center">
-                                <div className="text-xs text-muted-foreground">
-                                    {offset + 1} to {Math.min(offset + limit, totalCount)} of {totalCount} row(s)
-                                    selected.
+                            {courseList.length > 0 ?            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                    <div className="text-sm text-gray-600">
+                                        Showing {offset + 1} to {Math.min(offset + limit, totalCount)} of {totalCount} courses
+                                    </div>
+                                    <Pagination className="mr-0 ml-auto w-auto">
+                                        <PaginationContent>
+                                            <PaginationItem>
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    disabled={offset === 0}
+                                                    onClick={() => {
+                                                        setOffset(Math.max(offset - limit, 0));
+                                                        setApiQuery((prevQuery) => ({
+                                                            ...prevQuery,
+                                                            offset: Math.max(offset - limit, 0),
+                                                        }));
+                                                    }}
+                                                >
+                                                    <ChevronLeft className="h-4 w-4 mr-1" />
+                                                    Previous
+                                                </Button>
+                                            </PaginationItem>
+                                            <PaginationItem>
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    disabled={offset + limit >= totalCount}
+                                                    onClick={() => {
+                                                        setOffset(offset + limit < totalCount ? offset + limit : offset);
+                                                        setApiQuery((prevQuery) => ({
+                                                            ...prevQuery,
+                                                            offset: offset + limit < totalCount ? offset + limit : offset,
+                                                        }));
+                                                    }}
+                                                >
+                                                    Next
+                                                    <ChevronRight className="h-4 w-4 ml-1" />
+                                                </Button>
+                                            </PaginationItem>
+                                        </PaginationContent>
+                                    </Pagination>
                                 </div>
-                                <Pagination className="ml-auto mr-0 w-auto">
-                                    <PaginationContent>
-                                        <PaginationItem>
-                                            <Button
-                                                size="icon"
-                                                variant="outline"
-                                                className="h-6 w-6"
-                                                onClick={() => {
-                                                    setOffset(Math.max(offset - limit, 0));
-                                                    setApiQuery((prevQuery) => ({
-                                                        ...prevQuery,
-                                                        offset: Math.max(offset - limit, 0),
-                                                    }));
-                                                }}
-                                            >
-                                                <ChevronLeft className="h-3.5 w-3.5"/>
-                                                <span className="sr-only">Previous Order</span>
-                                            </Button>
-                                        </PaginationItem>
-                                        <PaginationItem>
-                                            <Button
-                                                size="icon"
-                                                variant="outline"
-                                                className="h-6 w-6"
-                                                onClick={() => {
-                                                    setOffset(offset + limit < totalCount ? offset + limit : offset);
-                                                    setApiQuery((prevQuery) => ({
-                                                        ...prevQuery,
-                                                        offset: offset + limit < totalCount ? offset + limit : offset,
-                                                    }));
-                                                }}
-                                            >
-                                                <ChevronRight className="h-3.5 w-3.5"/>
-                                                <span className="sr-only">Next Order</span>
-                                            </Button>
-                                        </PaginationItem>
-                                    </PaginationContent>
-                                </Pagination>
-                            </div> : <></>}
+                                : <></>}
                         </>}
 
                     </div>

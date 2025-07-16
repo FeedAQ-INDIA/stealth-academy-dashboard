@@ -336,7 +336,7 @@ export function MyLearningPath() {
                                                         <div className="text-sm text-gray-600">
                                                             Showing {offset + 1} to {Math.min(offset + limit, totalCount)} of {totalCount} courses
                                                         </div>
-                                                        <Pagination className="w-auto">
+                                                        <Pagination className="mr-0 ml-auto w-auto">
                                                             <PaginationContent>
                                                                 <PaginationItem>
                                                                     <Button
@@ -537,7 +537,7 @@ export function MyLearningPath() {
                                                     <div className="text-sm text-gray-600">
                                                         Showing {offset4 + 1} to {Math.min(offset4 + limit4, totalCount4)} of {totalCount4} meetings
                                                     </div>
-                                                    <Pagination className="w-auto">
+                                                    <Pagination className="mr-0 ml-auto w-auto">
                                                         <PaginationContent>
                                                             <PaginationItem>
                                                                 <Button
