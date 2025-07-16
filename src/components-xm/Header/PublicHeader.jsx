@@ -65,7 +65,7 @@ export default function PublicHeader( ) {
                         {updatedUserDetail?.nameInitial}
                     </Button>
                 </Link> : <a href={`/dashboard`}>
-                    <Button variant="secondary" className="">
+                    <Button variant="secondary" className="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-black-700 hover:to-black-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] ">
                         <Play />  GET STARTED
                     </Button>
                 </a> }
@@ -79,8 +79,8 @@ export default function PublicHeader( ) {
                         <Play />
                     </Button>
                 </a> : <a href={`/dashboard`}>
-                    <Button variant="secondary" className="">
-                        <Play />  GET STARTED
+                    <Button variant="secondary" className="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-black-700 hover:to-black-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] ">
+                        <Play />
                     </Button>
                 </a> }
 

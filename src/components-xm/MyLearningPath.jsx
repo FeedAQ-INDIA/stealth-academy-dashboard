@@ -240,7 +240,7 @@ export function MyLearningPath() {
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
             <div className="p-4 md:p-8   mx-auto">
                 {/* Welcome Header */}
-                <Card className="rounded-sm border-0 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white shadow-2xl mb-8 overflow-hidden relative">
+                <Card className="rounded-sm border-0  bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-700 text-white shadow-2xl mb-8 overflow-hidden relative">
                     <div className="absolute inset-0 bg-black/10"></div>
                     <CardHeader className="relative z-10 pb-8">
                         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">

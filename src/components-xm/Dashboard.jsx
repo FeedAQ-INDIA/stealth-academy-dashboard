@@ -56,7 +56,7 @@ export function Dashboard() {
 
     return (
         <div className="p-3 md:p-6">
-            <Card className="rounded-sm  border-0 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white shadow-2xl mb-8 overflow-hidden relative">
+            <Card className="rounded-sm  border-0 bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-700 text-white shadow-2xl mb-8 overflow-hidden relative">
                 <div className="absolute inset-0 bg-black/10"></div>
                 <CardHeader className="relative z-10 pb-8">
                     <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
@@ -92,7 +92,7 @@ export function Dashboard() {
                 </CardHeader>
             </Card>
 
-            <Card className="rounded-sm  border-0 bg-gradient-to-r from-[#ffdd00] via-black-600 to-black text-white shadow-2xl mb-8 overflow-hidden relative">
+            <Card className="rounded-sm  border-0   py-8 shadow-2xl mb-8 overflow-hidden relative">
                 <CardHeader>
                     <CardTitle className="text-center tracking-wide">
                         What would you like to learn today ?

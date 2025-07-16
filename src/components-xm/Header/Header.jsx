@@ -4,6 +4,8 @@ import { Menu } from "lucide-react"
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
 import NavigationMenuDemo from "./nav-menu.jsx"
 import {useAuthStore} from "@/zustland/store.js";
+import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
+import React from "react";
 
 export default function Header( ) {
 
@@ -44,9 +46,14 @@ export default function Header( ) {
             {/* Right-side button */}
             <div className="hidden md:flex items-center gap-2 ml-auto">
                 <Link to={`/account-settings/profile`}>
-                    <Button variant="secondary">
+                    {/*<Button variant="secondary">*/}
+                    {/*    {userDetail?.nameInitial}*/}
+                    {/*</Button> */}
+                    <Avatar className="w-12 h-12   bg-gradient-to-r  from-yellow-300 via-orange-400 to-yellow-700 hover:from-yellow-600 hover:via-orange-800 hover:to-yellow-900 shadow-sm hover:shadow-xl">
+                    <AvatarFallback className="text-lg sm:text-lg bg-gradient-to-r    text-white font-bold">
                         {userDetail?.nameInitial}
-                    </Button>
+                    </AvatarFallback>
+                </Avatar>
                 </Link>
             </div>
 

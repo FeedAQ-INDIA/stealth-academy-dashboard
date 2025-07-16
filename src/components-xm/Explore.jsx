@@ -160,7 +160,7 @@ export function Explore() {
             {userDetail ? <Header/> : <PublicHeader/>}
             <div className="p-3 md:p-6  overflow-y-auto h-[calc(100svh-4em)]">
                 <div className=" items-center justify-items-center">
-                    <Card className="w-full rounded-sm  border-0 bg-gradient-to-r from-[#ffdd00] via-black-600 to-black text-white shadow-2xl mb-8  py-6">
+                    <Card className="w-full rounded-sm border-0 bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-700 text-white shadow-2xl mb-8 py-6">
                         <CardHeader>
                             <CardTitle className="text-center tracking-wide">
                                 What would you like to learn today ?
@@ -191,10 +191,10 @@ export function Explore() {
                             <div className="flex items-center  ">
                                 <div>
                                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                                        {exploreCourseText ? `Search Results for "${exploreCourseText}"` : "Popular Courses"}
+                                        {exploreCourseText ? `Search Results for "${exploreCourseText}"` : ""}
                                     </h2>
                                     <p className="text-gray-600 dark:text-gray-400 mt-1">
-                                        {totalCount > 0 ? `${totalCount} courses found` : "Discover trending courses"}
+                                        {totalCount > 0 ? `${totalCount} courses found` : ""}
                                     </p>
                                 </div>
 
@@ -225,9 +225,7 @@ export function Explore() {
                                         Try adjusting your search terms or browse our popular categories to find the
                                         perfect course for you.
                                     </p>
-                                    <Button className="mt-6" onClick={() => setExploreCourseText("")}>
-                                        Browse All Courses
-                                    </Button>
+                            
                                 </div>
                             )}
 

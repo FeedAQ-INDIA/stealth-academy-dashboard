@@ -45,8 +45,8 @@ function SignInPage() {
     }, [userDetail])
     return (
         <div
-            className="min-h-screen w-full flex items-center justify-center bg-cover bg-center px-4  "
-            style={{ background: 'linear-gradient(135deg, #FFFF49, #EDD72A)'}}
+            className="min-h-screen w-full flex items-center justify-center bg-cover bg-center px-4  bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-700  "
+
 
         >
 

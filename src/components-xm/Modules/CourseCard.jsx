@@ -17,9 +17,9 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
     const {userDetail} = useAuthStore();
 
     return (
-        <Card className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-white to-gray-50/50 hover:from-white hover:to-blue-50/30 hover:-translate-y-1 cursor-pointer">
+        <Card className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-white to-yellow-50/50 hover:from-white hover:to-yellow-700/30 hover:-translate-y-1 cursor-pointer">
             {/* Background gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-blue-500/5 group-hover:to-blue-500/10 transition-all duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-yellow-300/5 group-hover:to-yellow-700/10 transition-all duration-300" />
 
             <CardHeader className="pb-3 relative z-10">
                 {/* Enhanced scrollable badge row */}
@@ -47,7 +47,7 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
                 </div>
 
                 {/* Enhanced image with overlay effects */}
-                <div className="relative overflow-hidden rounded-xl group/image mb-4">
+                <div className="relative overflow-hidden rounded-xl group/image mb-2">
                     <img
                         src={a?.courseImageUrl?.[0]}
                         className="w-full h-48 object-cover transition-transform duration-500 group-hover/image:scale-105"
@@ -58,7 +58,7 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
                     {/* Floating enrollment status badge */}
                     {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId) && (
                         <div className="absolute top-3 right-3">
-                            <Badge className="bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg backdrop-blur-sm border-0 font-semibold">
+                            <Badge className="bg-gradient-to-r from-yellow-700 to-black-600 text-white shadow-lg backdrop-blur-sm border-0 font-semibold">
                                 {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId)?.enrollmentStatus}
                             </Badge>
                         </div>
@@ -87,14 +87,14 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
                         </div>
                     ) : null}
                 </div>
-<br/>
+{/*<br/>*/}
                 {/* Enhanced explore button */}
                 <Link
                     to={`/${userDetail ? (userEnrolledCourseIdList?.find(m => m.courseId == a.courseId)?.enrollmentStatus ? 'course' : 'explore') : 'explore'}/${a?.courseId}`}
                     className="flex-1"
                     target={'_self'}
                 >
-                    <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] font-semibold py-3 rounded-xl group/button">
+                    <Button className="w-full bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-black-700 hover:to-black-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] font-semibold  rounded-sm group/button">
                         <ExternalLink className="mr-2 h-5 w-5 transition-transform group-hover/button:rotate-12" />
                         EXPLORE COURSE
                     </Button>

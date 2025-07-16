@@ -92,7 +92,7 @@ export default function HomePage() {
             <div className="p-0 md:p-3 overflow-y-auto h-[calc(100svh-4em)]">
 
 
-                <section className="bg-black">
+                <section className="bg-gradient-to-r from-orange-800 via-black to-black">
                     <div className="min-h-[30svh] p-8 h-full  ">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center w-full text-white h-full">
 
@@ -258,11 +258,11 @@ export default function HomePage() {
                                         <div key={index} className=" ">
                                             <div className="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow   h-full">
                                                 <div className="flex items-center mb-4">
-                                                    <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                                                    <div className="w-12 h-12 bg-gradient-to-r from-yellow-600 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
                                                         {index+1}
                                                     </div>
                                                     {/*{index < projects.length - 1 && (*/}
-                                                    {/*    <div className="hidden lg:block absolute top-12 left-16 w-full h-0.5 bg-gradient-to-r from-purple-600 to-pink-600"></div>*/}
+                                                    {/*    <div className="hidden lg:block absolute top-12 left-16 w-full h-0.5 bg-gradient-to-r from-yellow-600 to-orange-600"></div>*/}
                                                     {/*)}*/}
                                                 </div>
                                                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{step.title}</h3>
@@ -303,7 +303,7 @@ export default function HomePage() {
                                 const Icon = stat.icon;
                                 return (
                                     <div key={index} className="text-center group">
-                                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full mb-4 group-hover:scale-110 transition-transform">
+                                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-yellow-600 to-orange-600 rounded-full mb-4 group-hover:scale-110 transition-transform">
                                             <Icon className="w-8 h-8 text-white" />
                                         </div>
                                         <div className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
