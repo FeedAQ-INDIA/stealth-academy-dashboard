@@ -289,43 +289,39 @@ function CourseVideoTutorial() {
 
                         {/* Notes Sidebar */}
                         <div className="lg:col-span-1 space-y-6">
-                            <Card className="border-0 shadow-sm">
-                                <CardHeader className="pb-3">
-                                    <CardTitle className="flex items-center gap-2 text-lg">
-                                        <FileText className="h-5 w-5 text-green-600"/>
-                                        Create Notes
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="p-4 pt-0">
-                                    <CreateNotesModule
-                                        handleNotesSave={handleNotesSave}
-                                        courseId={courseList.courseId}
-                                        courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}
-                                        courseTopicId={courseVideoDetail.courseTopicId}
-                                    />
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </div>
-
-                    {/* Enhanced Notes Section */}
-                    <Card className="border-0 shadow-sm">
-                        <CardHeader className="pb-3">
-                            <CardTitle className="flex items-center gap-2 text-lg">
-                                <FileText className="h-5 w-5 text-purple-600"/>
-                                Your Notes
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-4 pt-0">
-                            <NotesModule
-                                refreshTrigger={triggerNotesRefresh}
+                            <CreateNotesModule
+                                handleNotesSave={handleNotesSave}
                                 courseId={courseList.courseId}
-                                userId={userDetail.userId}
                                 courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}
                                 courseTopicId={courseVideoDetail.courseTopicId}
                             />
-                        </CardContent>
-                    </Card>
+                            {/*<Card className="border-0 shadow-sm">*/}
+                            {/*    <CardHeader className="pb-3">*/}
+                            {/*        <CardTitle className="flex items-center gap-2 text-lg">*/}
+                            {/*            <FileText className="h-5 w-5 text-green-600"/>*/}
+                            {/*            Create Notes*/}
+                            {/*        </CardTitle>*/}
+                            {/*    </CardHeader>*/}
+                            {/*    <CardContent className="p-4 pt-0">*/}
+                            {/*        <CreateNotesModule*/}
+                            {/*            handleNotesSave={handleNotesSave}*/}
+                            {/*            courseId={courseList.courseId}*/}
+                            {/*            courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}*/}
+                            {/*            courseTopicId={courseVideoDetail.courseTopicId}*/}
+                            {/*        />*/}
+                            {/*    </CardContent>*/}
+                            {/*</Card>*/}
+                        </div>
+                    </div>
+
+
+                    <NotesModule
+                        refreshTrigger={triggerNotesRefresh}
+                        courseId={courseList.courseId}
+                        userId={userDetail.userId}
+                        courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}
+                        courseTopicId={courseVideoDetail.courseTopicId}
+                    />
                 </div>
             </div>
         </>

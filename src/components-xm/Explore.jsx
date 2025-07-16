@@ -225,7 +225,7 @@ export function Explore() {
                                         Try adjusting your search terms or browse our popular categories to find the
                                         perfect course for you.
                                     </p>
-                            
+
                                 </div>
                             )}
 
