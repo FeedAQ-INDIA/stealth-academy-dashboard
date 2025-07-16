@@ -92,7 +92,7 @@ export default function HomePage() {
             <div className="p-0 md:p-3 overflow-y-auto h-[calc(100svh-4em)]">
 
 
-                <section className="bg-gradient-to-r from-orange-800 via-black to-black">
+                <section className="bg-gradient-to-r from-orange-800 via-black to-black rounded-sm">
                     <div className="min-h-[30svh] p-8 h-full  ">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center w-full text-white h-full">
 
@@ -202,7 +202,7 @@ export default function HomePage() {
 
 
                 <section className=" ">
-                    <div className="w-full mx-auto rounded-md  h-fit py-4 md:py-6 lg:py-10 overflow-hidden">
+                    <div className="w-full mx-auto rounded-sm  h-fit py-4 md:py-6 lg:py-10 overflow-hidden">
                         <Vortex
                             backgroundColor="black"
                             className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-full"
@@ -276,8 +276,8 @@ export default function HomePage() {
                     </div>
                 </section>
 
-                <section className="py-12 bg-black">
-                    <div className="  mx-auto px-4">
+                <section className="py-12 bg-black rounded-sm ">
+                    <div className=" mx-auto px-4">
                         <h2 className="text-4xl font-bold text-white mb-6 text-center">Our Offerings</h2>
                          <HoverEffect items={projects} />
                     </div>
@@ -315,7 +315,7 @@ export default function HomePage() {
                     </div>
                 </section>
 
-                <section className="bg-black">
+                <section className="bg-black rounded-sm ">
                     <div className="py-8 container text-white text-center">
 
                         <h1>@2025 Copyright - FeedAQ Academy</h1>
