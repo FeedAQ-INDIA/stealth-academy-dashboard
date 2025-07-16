@@ -125,7 +125,7 @@ function CreateNotesModule({courseId, courseTopicId, courseTopicContentId, handl
                     )}
 
                     {/* Action Buttons */}
-                    <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100">
+                    <div className="flex flex-wrap w-full gap-3 mt-4 pt-4 border-t border-gray-100">
                         <Button
                             className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-200 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
                             variant="outline"
