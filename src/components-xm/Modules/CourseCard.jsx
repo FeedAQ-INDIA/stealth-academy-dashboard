@@ -23,7 +23,7 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
 
             <CardHeader className="pb-3 relative z-10">
                 {/* Enhanced scrollable badge row */}
-                <div className="w-full overflow-hidden mb-4 rounded-lg bg-gradient-to-r from-gray-50 to-gray-100 p-2">
+                <div className="w-full overflow-hidden mb-2 rounded-lg bg-gradient-to-r from-gray-50 to-gray-100 p-2">
                     <div className="flex w-max gap-2 animate-scroll-x-5 whitespace-nowrap">
                         {/* Duplicate the badge set to create a seamless loop */}
                         {[...Array(2)].map((_, i) => (
@@ -50,7 +50,7 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
                 <div className="relative overflow-hidden rounded-xl group/image mb-2">
                     <img
                         src={a?.courseImageUrl?.[0]}
-                        className="w-full h-48 object-cover transition-transform duration-500 group-hover/image:scale-105"
+                        className="w-full h-40 object-cover transition-transform duration-500 group-hover/image:scale-105"
                         alt={a?.courseTitle}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover/image:opacity-100 transition-opacity duration-300" />

@@ -203,17 +203,16 @@ export default function HomePage() {
 
 
                 <section className=" ">
-                    <div className="w-full mx-auto rounded-sm  h-fit py-4 md:py-6 lg:py-10 overflow-hidden">
-                        <Vortex
-                            backgroundColor="black"
-                            className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-full"
+                    <div className="w-full mx-auto rounded-sm  h-fit py-4 md:py-6 lg:py-10 overflow-hidden bg-black rounded-sm">
+                        <div
+                             className="flex items-center flex-col justify-center px-2 md:px-10 py-8 w-full h-full "
                         >
                             <h2 className="text-white text-2xl md:text-3xl lg:text-5xl font-bold text-center">
                                 Learning Today For A Better Tomorrow
                             </h2>
 
                             {/*</p>*/}
-                            <div className="mt-6 flex gap-4 ">
+                            <div className="mt-8 flex gap-4 ">
                                 <Link to={'/explore'}> <Button  className=" border-[#ffdd00] border-2 text-white hover:bg-[#ffdd00] hover:text-black" >EXPLORE</Button></Link>
                                 <Sheet>
                                     <SheetTrigger asChild>
@@ -236,7 +235,7 @@ export default function HomePage() {
                                 </Sheet>
 
                              </div>
-                        </Vortex>
+                        </div>
                     </div>
 
                 </section>
@@ -277,7 +276,7 @@ export default function HomePage() {
                     </div>
                 </section>
 
-                <section className="py-12 bg-black rounded-sm ">
+                <section className="py-12 bg-gradient-to-r from-orange-800 via-black to-black  rounded-sm ">
                     <div className=" mx-auto px-4">
                         <h2 className="text-4xl font-bold text-white mb-6 text-center">Our Offerings</h2>
                          <HoverEffect items={projects} />
@@ -403,10 +402,10 @@ const HoverEffect = ({ items }) => (
         {items?.map((item, index) => (
             <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 shadow-lg">
                 <CardContent className="p-6">
-                    <div className="mb-4 p-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg w-fit">
-                        <div className="w-6 h-6 bg-white rounded opacity-80"></div>
+                    <div className="mb-4 p-3 bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-700  rounded-lg w-fit">
+                        <div className="w-6 h-6 bg-white rounded opacity-80 text-center font-bold">{index+1}</div>
                     </div>
-                    <h3 className="text-lg font-semibold mb-2 group-hover:text-purple-600 transition-colors">
+                    <h3 className="text-lg font-semibold mb-2 group-hover:text-yellow-700 transition-colors">
                         {item.title}
                     </h3>
                     <p className="text-gray-600 text-sm leading-relaxed">

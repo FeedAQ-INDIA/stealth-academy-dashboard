@@ -5,6 +5,16 @@ import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
 import NavigationMenuDemo from "./nav-menu.jsx"
 import {useAuthStore} from "@/zustland/store.js";
 import {useEffect, useState} from "react";
+import {
+    NavigationMenu,
+    NavigationMenuContent,
+    NavigationMenuItem,
+    NavigationMenuLink,
+    NavigationMenuList,
+    NavigationMenuTrigger,
+    navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu"
+
 
 export default function PublicHeader( ) {
 
@@ -54,9 +64,49 @@ export default function PublicHeader( ) {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-4 ml-4">
                 {/*<NavigationMenuDemo />*/}
-                <Link to={'/'}><Button variant="ghost">HOME</Button></Link>
-                <Link to={'/explore'}><Button variant="ghost">EXPLORE</Button></Link>
-            </div>
+                <Link to={'/'}><Button variant={window.location.pathname=='/' ? 'secondary' : 'ghost'} >HOME</Button></Link>
+                <Link to={'/explore'}><Button variant="ghost" variant={location.pathname.includes('explore') ? 'secondary' : 'ghost'}>EXPLORE</Button></Link>
+
+                {/*<NavigationMenu viewport={false}>*/}
+                {/*    <NavigationMenuList className="flex flex-col sm:flex-row gap-2 w-full">*/}
+                {/*        <NavigationMenuItem>*/}
+                {/*            <NavigationMenuTrigger>List</NavigationMenuTrigger>*/}
+                {/*            <NavigationMenuContent>*/}
+                {/*                <ul className="grid w-fit gap-2 p-4">*/}
+                {/*                    <li className=" ">*/}
+                {/*                        <NavigationMenuLink asChild>*/}
+                {/*                            <Link href="#"         className="block rounded-md px-3 py-2 hover:bg-gray-100 hover:text-gray-900 transition-colors"*/}
+                {/*                            >*/}
+                {/*                                <div className="font-medium">Components</div>*/}
+
+                {/*                            </Link>*/}
+                {/*                        </NavigationMenuLink>*/}
+                {/*                    </li>*/}
+                {/*                    <li>*/}
+                {/*                        <NavigationMenuLink asChild>*/}
+                {/*                            <Link href="#"         className="block rounded-md px-3 py-2 hover:bg-gray-100 hover:text-gray-900 transition-colors"*/}
+                {/*                            >*/}
+                {/*                                <div className="font-medium">Documentation</div>*/}
+
+                {/*                            </Link>*/}
+                {/*                        </NavigationMenuLink>*/}
+                {/*                    </li>*/}
+                {/*                    <li>*/}
+                {/*                        <NavigationMenuLink asChild>*/}
+                {/*                            <Link href="#"         className="block rounded-md px-3 py-2 hover:bg-gray-100 hover:text-gray-900 transition-colors"*/}
+                {/*                            >*/}
+                {/*                                <div className="font-medium">Blog</div>*/}
+
+                {/*                            </Link>*/}
+                {/*                        </NavigationMenuLink>*/}
+                {/*                    </li>*/}
+                {/*                </ul>*/}
+                {/*            </NavigationMenuContent>*/}
+                {/*        </NavigationMenuItem>*/}
+                {/*    </NavigationMenuList>*/}
+                {/*</NavigationMenu>*/}
+
+                  </div>
 
             {/* Right-side button */}
             <div className="hidden md:flex items-center gap-2 ml-auto">

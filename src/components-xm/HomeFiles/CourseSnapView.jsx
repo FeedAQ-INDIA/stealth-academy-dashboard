@@ -135,56 +135,45 @@ function CourseSnapView() {
     }
 
     const completeEnrollmentPayment = async () => {
-        const options = {
-            key: 'rzp_test_1F67LLEd7Qzk1u',
-            amount: 1,
-            currency: 'INR',
-            name: 'FeedAQ Academy',
-            description: 'Test Transaction',
-            order_id: null,
-            handler: async function (response) {
-                const verifyRes = await axios.post('http://localhost:5000/api/verify', {
-                    razorpay_order_id: response.razorpay_order_id,
-                    razorpay_payment_id: response.razorpay_payment_id,
-                    razorpay_signature: response.razorpay_signature,
-                });
+        const isLoaded = await loadRazorpay();
+        if (!isLoaded) {
+            alert("Razorpay SDK failed to load");
+            return;
+        }
 
-                if (verifyRes.data.success) {
-                    toast({title: 'Payment successful!'});
-                    axiosConn
-                        .post(import.meta.env.VITE_API_URL+"/enroll", {
-                            courseId: CourseId
-                        })
-                        .then((res) => {
-                            console.log(res.data);
-                            toast({
-                                title: 'Enrollment is successfull'
-                            });
-                            navigate(`/course/${CourseId}`);
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                            toast({
-                                title: 'Error occured while Enrollment'
-                            })
-                        });
-                } else {
-                    toast({title: 'Payment Failed!'});
-                }
+        const result = await fetch("http://localhost:5000/api/create-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount: 500 }) // ₹5.00
+        });
+
+        const data = await result.json();
+
+        const options = {
+            key: "rzp_test_1F67LLEd7Qzk1u", // Replace with your key_id
+            amount: data.amount,
+            currency: data.currency,
+            order_id: data.id,
+            name: "FeedAQ Academy",
+            description: "Course Payment",
+            handler: function (response) {
+                alert("Payment successful: " + response.razorpay_payment_id);
+                // You can verify payment with backend here
             },
             prefill: {
-                name: 'bksb',
-                email: 'test@example.com',
-                contact: '9631045873',
+                name: "John Doe",
+                email: "john@example.com",
+                contact: "9999999999"
             },
             theme: {
-                color: '#3399cc',
-            },
+                color: "#528FF0"
+            }
         };
 
         const rzp = new window.Razorpay(options);
         rzp.open();
-    }
+    };
+
 
     // Calculate total course duration
     const getTotalDuration = () => {
@@ -209,6 +198,18 @@ function CourseSnapView() {
             return total + (topic.courseTopicContent?.length || 0);
         }, 0);
     };
+
+
+    const loadRazorpay = () => {
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
+    };
+
 
     return (
         <>
