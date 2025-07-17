@@ -87,7 +87,7 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
                 {/*</div>*/}
 {/*<br/>*/}
                 {/* Enhanced explore button */}
-                {a?.courseIsLocked ==  false ?   <Button
+                {a?.courseIsLocked  ?   <Button
                     className="w-full bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] font-semibold rounded-sm group/button cursor-not-allowed opacity-80"
                     disabled
                 >
