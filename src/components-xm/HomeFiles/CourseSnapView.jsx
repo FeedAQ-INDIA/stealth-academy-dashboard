@@ -217,14 +217,10 @@ function CourseSnapView() {
 
             <div className="overflow-y-auto overflow-x-hidden h-[calc(100svh-4em)] w-full">
                 {/* Hero Section with Vortex */}
-                <div className="relative w-full">
-                    <div className="w-full mx-auto rounded-md h-fit py-8 md:py-12 lg:py-16 overflow-hidden">
-                        <Vortex
-                            backgroundColor="black"
-                            rangeY={800}
-                            particleCount={500}
-                            baseHue={120}
-                            className="flex items-center flex-col justify-center px-4 md:px-10 py-8 w-full h-full"
+                <div className="relative w-full p-4">
+                    <div className="w-full mx-auto rounded-md h-fit py-8 md:py-12 lg:py-16 overflow-hidden  bg-gradient-to-r from-orange-800 via-black to-black">
+                        <div
+                            className="flex items-center flex-col justify-center px-4 md:px-10   w-full h-full"
                         >
                             <div className="max-w-4xl mx-auto text-center w-full">
                                 <Badge className="mb-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0">
@@ -307,7 +303,7 @@ function CourseSnapView() {
                                     </Sheet>
                                 </div>
                             </div>
-                        </Vortex>
+                        </div>
                     </div>
                 </div>
 

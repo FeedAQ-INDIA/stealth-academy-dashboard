@@ -38,7 +38,8 @@ export function Explore() {
         offset: offset,
         getThisData: {
             datasource: "Course",
-            attributes: [],
+            order: [["courseIsLocked", "DESC"]],
+             attributes: [],
         },
     });
 
@@ -148,6 +149,7 @@ export function Explore() {
             offset: offset,
             getThisData: {
                 datasource: "Course",
+                order: [["courseIsLocked", "DESC"]],
                 attributes: [],
             },
         });
