@@ -22,25 +22,19 @@ function CourseVideoTutorial() {
     const {userDetail} = useAuthStore();
     const {CourseId, CourseVideoId} = useParams();
     const {
-        userEnrollmentLog,
-        userEnrollmentCourseLog,
-        userEnrollmentObj,
-        fetchUserEnrollmentData,
-        isUserEnrolledAlready,
-        courseList,
-        enroll,
-        disroll,
-        enrollStatus
-    } = useCourse();
+         userEnrollmentCourseLog,
+         fetchUserEnrollmentData,
+         courseList,
+     } = useCourse();
 
     const [courseVideoDetail, setCourseVideoDetail] = useState({});
-    const [courseTopicContent, setCourseTopicContent] = useState({});
+    const [courseContent, setCourseContent] = useState({});
     const navigate = useNavigate();
     useEffect(() => {
         if (courseList && CourseVideoId) {
             fetchCourseVideo();
         }
-    }, [courseList, userEnrollmentObj, CourseVideoId]);
+    }, [courseList, CourseVideoId]);
     const [playerRefresh, setPlayerRefresh] = useState(false);
 
     const fetchCourseVideo = () => {
@@ -52,9 +46,9 @@ function CourseVideoTutorial() {
             })
             .then((res) => {
                 console.log(res.data);
-                const video = res.data.data?.results?.[0]
+                const video = res.data?.data?.results?.[0]
                 setCourseVideoDetail(video);
-                setCourseTopicContent(courseList?.courseTopic?.find(a => a.courseTopicId == video.courseTopicId)?.courseTopicContent?.find(a => a.contentId == video.courseVideoId && a.courseTopicContentType == 'CourseVideo'))
+                setCourseContent(courseList?.courseContent?.find(a => a.courseContentId == video.courseContentId)?.courseContent?.find(a => a.courseContentId == video.courseVideoId && a.courseContentType == 'CourseVideo'))
                 setPlayerRefresh(!playerRefresh)
             })
             .catch((err) => {
@@ -66,10 +60,9 @@ function CourseVideoTutorial() {
 
         axiosConn
             .post(import.meta.env.VITE_API_URL + "/saveUserEnrollmentData", {
-                userEnrollmentId: userEnrollmentObj?.userEnrollmentId,
+                userActivityId: userEnrollmentObj?.userEnrollmentId,
                 courseId: courseList.courseId,
-                courseTopicContentId: courseTopicContent.courseTopicContentId,
-                courseTopicId: courseVideoDetail.courseTopicId,
+                 courseContentId: courseVideoDetail.courseContentId,
                 enrollmentStatus: 'COMPLETED'
             })
             .then((res) => {
@@ -78,7 +71,6 @@ function CourseVideoTutorial() {
                     title: "status is updated"
                 });
                 fetchUserEnrollmentData();
-                enrollStatus()
             })
             .catch((err) => {
                 console.log(err);
@@ -93,10 +85,9 @@ function CourseVideoTutorial() {
 
         axiosConn
             .post(import.meta.env.VITE_API_URL + "/deleteUserEnrollmentData", {
-                userEnrollmentId: userEnrollmentObj?.userEnrollmentId,
+                userActivityId: userEnrollmentObj?.userEnrollmentId,
                 courseId: courseList.courseId,
-                courseTopicContentId: courseTopicContent.courseTopicContentId,
-                courseTopicId: courseVideoDetail.courseTopicId
+                courseContentId: courseVideoDetail.courseContentId
             })
             .then((res) => {
                 console.log(res.data);
@@ -121,30 +112,30 @@ function CourseVideoTutorial() {
 
 
     useEffect(() => {
-        const allContents = courseList?.courseTopic?.flatMap(topic =>
-            topic?.courseTopicContent?.map(content => ({
+        const allContents = courseList?.courseContent?.flatMap(topic =>
+            topic?.courseContent?.map(content => ({
                 ...content,
-                courseTopicTitle: topic.courseTopicTitle // optional, helpful for display
+                courseContentTitle: topic.courseContentTitle // optional, helpful for display
             })) || []
         );
 
         const currentIndex = allContents.findIndex(
-            content => content.courseTopicContentId === courseTopicContent?.courseTopicContentId
+            content => content.courseContentId === courseList?.courseContent?.courseContentId
         );
 
         setPrevContent(currentIndex > 0 ? allContents[currentIndex - 1] : null);
         setNextContent(currentIndex < allContents.length - 1 ? allContents[currentIndex + 1] : null);
 
-    }, [courseList, courseTopicContent]);
+    }, [courseList, courseContent]);
 
     const navigateToNextModule = (context) => {
         console.log(context);
-        if (context.courseTopicContentType == 'CourseVideo') {
-            navigate(`/course/${context?.courseId}/video/${context?.contentId}`);
-        } else if (context.courseTopicContentType == 'CourseWritten') {
-            navigate(`/course/${context?.courseId}/doc/${context?.contentId}`);
-        } else if (context.courseTopicContentType == 'CourseQuiz') {
-            navigate(`/course/${context?.courseId}/quiz/${context?.contentId}`);
+        if (context.courseContentType == 'CourseVideo') {
+            navigate(`/course/${context?.courseId}/video/${context?.courseContentId}`);
+        } else if (context.courseContentType == 'CourseWritten') {
+            navigate(`/course/${context?.courseId}/doc/${context?.courseContentId}`);
+        } else if (context.courseContentType == 'CourseQuiz') {
+            navigate(`/course/${context?.courseId}/quiz/${context?.courseContentId}`);
         }
     }
 
@@ -155,7 +146,7 @@ function CourseVideoTutorial() {
     };
     const [isOpen, setIsOpen] = useState(false);
 
-    const isCompleted = userEnrollmentCourseLog?.filter(b => (b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED'))?.length > 0;
+    const isCompleted = userEnrollmentCourseLog?.filter(b => (b.courseId == CourseId && b?.courseContentId == courseContent?.courseContentId && b.enrollmentStatus == 'COMPLETED'))?.length > 0;
 
     return (
         <>
@@ -168,7 +159,7 @@ function CourseVideoTutorial() {
                         <BreadcrumbList>
                             <BreadcrumbItem>
                                 <BreadcrumbPage className="truncate max-w-[40ch] font-medium">
-                                    {courseTopicContent?.courseTopicContentTitle}
+                                    {courseContent?.courseContentTitle}
                                 </BreadcrumbPage>
                             </BreadcrumbItem>
                         </BreadcrumbList>
@@ -211,7 +202,7 @@ function CourseVideoTutorial() {
                                 <Badge variant="outline" className="flex items-center gap-1">
                                     <Clock className="h-3 w-3"/>
                                     {(() => {
-                                        const totalMinutes = +courseTopicContent?.courseTopicContentDuration || 0;
+                                        const totalMinutes = +courseContent?.courseContentDuration || 0;
                                         const hours = Math.floor(totalMinutes / 60);
                                         const minutes = totalMinutes % 60;
                                         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
@@ -222,7 +213,7 @@ function CourseVideoTutorial() {
                             <div className="flex flex-col md:flex-row md:items-center gap-4">
                                 <div className="flex-1">
                                     <CardTitle className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">
-                                        {courseTopicContent?.courseTopicContentTitle}
+                                        {courseVideoDetail?.courseVideoTitle}
                                     </CardTitle>
                                 </div>
 
@@ -263,7 +254,7 @@ function CourseVideoTutorial() {
                                     <YouTubePlayer
                                         saveUserEnrollmentData={saveUserEnrollmentData}
                                         playerRefresh={playerRefresh}
-                                        videoId={courseVideoDetail?.courseVideoUrl}
+                                        videoUrl={courseVideoDetail?.courseVideoUrl}
                                         playerId={`player-${courseVideoDetail?.courseVideoId}`}
                                     />
                                 </div>
@@ -292,25 +283,10 @@ function CourseVideoTutorial() {
                             <CreateNotesModule
                                 handleNotesSave={handleNotesSave}
                                 courseId={courseList.courseId}
-                                courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}
-                                courseTopicId={courseVideoDetail.courseTopicId}
+                                courseTopicContentId={courseList?.courseContent?.find(a => a.courseContentId == courseVideoDetail.courseContentId)?.courseContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseContentType == 'CourseVideo')?.courseContentId}
+                                courseTopicId={courseVideoDetail.courseContentId}
                             />
-                            {/*<Card className="border-0 shadow-sm">*/}
-                            {/*    <CardHeader className="pb-3">*/}
-                            {/*        <CardTitle className="flex items-center gap-2 text-lg">*/}
-                            {/*            <FileText className="h-5 w-5 text-green-600"/>*/}
-                            {/*            Create Notes*/}
-                            {/*        </CardTitle>*/}
-                            {/*    </CardHeader>*/}
-                            {/*    <CardContent className="p-4 pt-0">*/}
-                            {/*        <CreateNotesModule*/}
-                            {/*            handleNotesSave={handleNotesSave}*/}
-                            {/*            courseId={courseList.courseId}*/}
-                            {/*            courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}*/}
-                            {/*            courseTopicId={courseVideoDetail.courseTopicId}*/}
-                            {/*        />*/}
-                            {/*    </CardContent>*/}
-                            {/*</Card>*/}
+
                         </div>
                     </div>
 
@@ -319,8 +295,8 @@ function CourseVideoTutorial() {
                         refreshTrigger={triggerNotesRefresh}
                         courseId={courseList.courseId}
                         userId={userDetail.userId}
-                        courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseTopicContentType == 'CourseVideo')?.courseTopicContentId}
-                        courseTopicId={courseVideoDetail.courseTopicId}
+                        courseTopicContentId={courseList?.courseContent?.find(a => a.courseContentId == courseVideoDetail.courseContentId)?.courseContent?.find(a => a.contentId == courseVideoDetail.courseVideoId && a.courseContentType == 'CourseVideo')?.courseContentId}
+                        courseTopicId={courseVideoDetail.courseContentId}
                     />
                 </div>
             </div>

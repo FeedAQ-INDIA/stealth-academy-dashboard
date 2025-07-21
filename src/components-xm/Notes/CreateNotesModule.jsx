@@ -10,7 +10,7 @@ import {Form, FormControl, FormField, FormItem, FormMessage} from "@/components/
 import {toast} from "@/components/hooks/use-toast.js";
 import {Save, RotateCcw, FileText, Loader2} from "lucide-react";
 
-function CreateNotesModule({courseId, courseTopicId, courseTopicContentId, handleNotesSave}) {
+function CreateNotesModule({courseId, courseContentId, handleNotesSave}) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [wordCount, setWordCount] = useState(0);
     const [charCount, setCharCount] = useState(0);
@@ -44,9 +44,8 @@ function CreateNotesModule({courseId, courseTopicId, courseTopicContentId, handl
             const response = await axiosConn.post(
                 import.meta.env.VITE_API_URL + "/saveNote",
                 {
-                    courseTopicId,
-                    courseId,
-                    courseTopicContentId,
+                     courseId,
+                    courseContentId,
                     notesText: data.notesText,
                 }
             );

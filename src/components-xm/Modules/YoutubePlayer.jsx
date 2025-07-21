@@ -1,9 +1,20 @@
-import { useEffect, useRef } from "react";
+import {useEffect, useRef, useState} from "react";
 
-const YouTubePlayer = ({ videoId, playerId = "player", playerRefresh, saveUserEnrollmentData }) => {
+const YouTubePlayer = ({ videoUrl, playerId = "player", playerRefresh, saveUserEnrollmentData }) => {
     const playerRef = useRef(null);
     const intervalRef = useRef(null);
     const watchedRef = useRef(false);
+
+    const [videoId, setVideoId] = useState(null);
+
+    useEffect(()=>{
+        try {
+            const parsedUrl = new URL(videoUrl);
+            setVideoId(parsedUrl.searchParams.get("v"));
+        } catch (err) {
+            console.log(err)
+        }
+    },[videoUrl])
 
     // Initialize the YouTube Player
     useEffect(() => {

@@ -29,7 +29,7 @@ export function Explore() {
         }
     };
 
-    const {userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore();
+    const {userDetail} = useAuthStore();
 
     const [exploreCourseText, setExploreCourseText] = useState(getSearchValueFromURL("search"));
 
@@ -100,9 +100,6 @@ export function Explore() {
 
     useEffect(() => {
         fetchCourses();
-        if (userDetail) {
-            fetchUserEnrolledCourseIdList(userDetail?.userId);
-        }
     }, [apiQuery]);
 
     const fetchCourses = () => {
@@ -206,8 +203,7 @@ export function Explore() {
                                 className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 my-4 items-center">
                                 {courseList?.map((a) =>
                                     (
-                                        <CourseCard key={a.id}
-                                                    userEnrolledCourseIdList={userEnrolledCourseIdList || null} a={a}/>
+                                        <CourseCard key={a.id} a={a}/>
                                     )
                                 )}
                             </div>

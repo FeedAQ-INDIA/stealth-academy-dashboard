@@ -5,7 +5,6 @@ export const useAuthStore = create((set) => ({
     accessToken: null,
     userDetail: null,
     loading:true,
-    userEnrolledCourseIdList: [],
     setAccessToken: (accessToken) => {
         set((state) => ({accessToken:  accessToken}));
         console.log("zustland useAuthStore.setAccessToken ",  accessToken);
@@ -24,25 +23,6 @@ export const useAuthStore = create((set) => ({
             set({ loading: false });  // Set loading to false even on error
         }
     },
-    fetchUserEnrolledCourseIdList: async (userId) => {
-        console.log("User :: ", userId)
-        if(userId){
-            try {
-                const res = await axiosConn.post(import.meta.env.VITE_API_URL+"/searchCourse",
-                    {
-                        limit: 200, offset: 0, getThisData: {
-                            datasource: "UserEnrollment",  attributes: ["courseId","webinarId", "enrollmentStatus", "enrollmentBatch"], where : {userId:  userId},
-                        },
-                    });
-                console.log( res.data?.data?.results?.map(a => a.courseId));
-                set({ userEnrolledCourseIdList: res.data?.data?.results, loading: false });  // Set loading to false after fetch
-            } catch (error) {
-                console.error("Error fetching user details:", error);
-                set({ loading: false });  // Set loading to false even on error
-            }
-        }
-    },
-
 }))
 
 
@@ -56,5 +36,5 @@ export const useLoadingBarStore = create((set) => ({
 }));
 
 export const useProtectedURIStore = create((set) => ({
-    publicUri : ['/signin', '/mock-interview' , '/', '/counselling-compass', '/the-language-studio', '/explore'],
+    publicUri : ['/signin', '/explore'],
 }));

@@ -238,7 +238,7 @@ export function MyLearningPath() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-            <div className="p-4 md:p-8   mx-auto">
+            <div className="p-4 md:p-6  mx-auto">
                 {/* Welcome Header */}
                 <Card className="rounded-sm border-0  bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-700 text-white shadow-2xl mb-8 overflow-hidden relative">
                     <div className="absolute inset-0 bg-black/10"></div>

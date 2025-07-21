@@ -13,7 +13,7 @@ function App() {
     const location = useLocation();
 
 
-    const {fetchUserDetail, loading: loadingStore, userDetail, fetchUserEnrolledCourseIdList} = useAuthStore();
+    const {fetchUserDetail, loading: loadingStore, userDetail} = useAuthStore();
     const {publicUri} = useProtectedURIStore();
 
 
@@ -33,11 +33,7 @@ function App() {
                  window.location = '/signin';
              }
         } else{
-            fetchUserEnrolledCourseIdList(userDetail?.userId);
-            console.log('App.jsx  :: ', location.pathname)
-            //  if(location.pathname == '/') {
-            //     navigate('/dashboard')
-            // }
+
         }
 
     }, [userDetail]); // Redirect only after userDetail updates

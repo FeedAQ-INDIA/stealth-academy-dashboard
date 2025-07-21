@@ -28,13 +28,8 @@ import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
 function CourseOverview() {
     const {CourseId} = useParams();
     const {
-        userEnrollmentObj,
-        userEnrollmentCourseLog,
-        isUserEnrolledAlready,
         courseList,
-        enroll,
-        disroll,
-        enrollStatus
+        userEnrollmentCourseLog
     } = useCourse();
     const {userDetail} = useAuthStore();
 
@@ -46,13 +41,7 @@ function CourseOverview() {
     const [isLoading, setIsLoading] = useState(true);
     const [expandedTopics, setExpandedTopics] = useState(new Set());
 
-    useEffect(() => {
-        if (isUserEnrolledAlready) {
-            setOpen(true);
-        } else {
-            setOpen(false);
-        }
-    }, [isUserEnrolledAlready]);
+
 
     useEffect(() => {
         fetchNotes();
@@ -114,13 +103,11 @@ function CourseOverview() {
     return (
         <>
             <header className="sticky top-0 z-50 flex h-14 shrink-0 items-center gap-2 border-b bg-white/80 backdrop-blur-md px-4 transition-all duration-300">
-                {isUserEnrolledAlready ? (
-                    <div className="animate-fade-in flex items-center gap-2">
+                     <div className="animate-fade-in flex items-center gap-2">
                         <SidebarTrigger className="-ml-1 hover:bg-gray-100 rounded-md transition-colors"/>
                         <Separator orientation="vertical" className="mr-2 h-4"/>
                     </div>
-                ) : null}
-                <Breadcrumb>
+                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem>
                             <BreadcrumbPage className="truncate max-w-[30ch] flex items-center gap-2">
@@ -130,25 +117,20 @@ function CourseOverview() {
                     </BreadcrumbList>
                 </Breadcrumb>
                 <div className="ml-auto sm:flex-initial">
-                    {isUserEnrolledAlready && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <div className="flex items-center gap-1">
                                 <Award className="h-4 w-4"/>
                                 <span>{progress}% Complete</span>
                             </div>
                         </div>
-                    )}
-                </div>
+                 </div>
             </header>
 
-            <div className="p-4 animate-fade-in">
-                {/* Hero Section */}
-                <Card className="rounded-sm bg-gradient-to-br from-blue-50 to-indigo-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+            <div className=" p-4 lg:p-6 animate-fade-in">
+                 <Card className="rounded-sm bg-gradient-to-br from-blue-50 to-indigo-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
                     <CardHeader className="pb-4">
                         <div className="flex flex-wrap gap-2 w-full mb-4">
-                            <Badge className="animate-pulse bg-green-600 text-white hover:bg-green-700 transition-colors">
-                                {courseList?.courseCost == 0 ? 'FREE' : `₹${courseList?.courseCost}`}
-                            </Badge>
+
                             <Badge variant="outline" className="hover:bg-gray-100 transition-colors flex items-center gap-1">
                                 <Clock className="h-3 w-3"/>
                                 {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}
@@ -181,8 +163,7 @@ function CourseOverview() {
                                 <CardTitle className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-2 leading-tight">
                                     {courseList?.courseTitle}
                                 </CardTitle>
-                                {isUserEnrolledAlready && (
-                                    <div className="flex items-center gap-2 mt-4">
+                                     <div className="flex items-center gap-2 mt-4">
                                         <div className="w-full bg-gray-200 rounded-full h-2">
                                             <div
                                                 className="bg-green-600 h-2 rounded-full transition-all duration-500 ease-out"
@@ -191,12 +172,10 @@ function CourseOverview() {
                                         </div>
                                         <span className="text-sm text-gray-600 min-w-fit">{progress}%</span>
                                     </div>
-                                )}
-                            </div>
+                             </div>
 
                             <div className="flex flex-col items-center gap-2">
-                                {isUserEnrolledAlready ? (
-                                    <div className="text-center">
+                                     <div className="text-center">
                                         <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full font-semibold text-sm animate-bounce">
                                             <Check className="h-4 w-4"/>
                                             ENROLLED
@@ -205,16 +184,7 @@ function CourseOverview() {
                                             View Order
                                         </p>
                                     </div>
-                                ) : (
-                                    <Button
-                                        onClick={() => enroll()}
-                                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center gap-2"
-                                        size="lg"
-                                    >
-                                        <PlayCircle className="h-5 w-5"/>
-                                        ENROLL NOW
-                                    </Button>
-                                )}
+
                             </div>
                         </div>
                     </CardHeader>
@@ -277,35 +247,35 @@ function CourseOverview() {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                {courseList?.courseTopic?.map((topic, index) => (
-                                    <div key={topic?.courseTopicId} className="animate-fade-in" style={{animationDelay: `${index * 100}ms`}}>
+                                {courseList?.courseContent?.map((topic, index) => (
+                                    <div key={topic?.courseContentId} className="animate-fade-in" style={{animationDelay: `${index * 100}ms`}}>
                                         <Accordion type="single" collapsible>
                                             <AccordionItem value="item-1" className="border border-gray-200 rounded-lg overflow-hidden hover:border-blue-300 transition-colors">
                                                 <AccordionTrigger className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors [&>svg]:h-5 [&>svg]:w-5">
                                                     <div className="flex items-center gap-3 flex-1">
                                                         <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
                                                             {(() => {
-                                                                const totalMinutes = +topic?.courseTopicDuration || 0;
+                                                                const totalMinutes = +topic?.courseContentDuration || 0;
                                                                 const hours = Math.floor(totalMinutes / 60);
                                                                 const minutes = totalMinutes % 60;
                                                                 return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
                                                             })()}
                                                         </Badge>
-                                                        <span className="font-semibold text-gray-800">{topic?.courseTopicTitle}</span>
+                                                        <span className="font-semibold text-gray-800">{topic?.courseContentTitle}</span>
                                                     </div>
                                                 </AccordionTrigger>
                                                 <AccordionContent className="px-4 py-3 bg-gray-50">
-                                                    <p className="text-gray-700 mb-4">{topic?.courseTopicDescription}</p>
+                                                    <p className="text-gray-700 mb-4">{topic?.courseContentDescription}</p>
                                                     <div className="space-y-2">
-                                                        {topic?.courseTopicContent?.map((content, contentIndex) => (
+                                                        {topic?.courseContent?.map((content, contentIndex) => (
                                                             <div
-                                                                key={content?.courseTopicContentId}
+                                                                key={content?.courseContentId}
                                                                 className="flex items-center gap-3 p-3 bg-white rounded-lg border hover:border-blue-200 transition-all duration-200 hover:shadow-sm group"
                                                             >
                                                                 <div className="flex items-center gap-2">
                                                                     {userEnrollmentCourseLog?.filter(log =>
                                                                         log.courseId == CourseId &&
-                                                                        log?.courseTopicContentId == content?.courseTopicContentId &&
+                                                                        log?.courseContentId == content?.courseContentId &&
                                                                         log.enrollmentStatus == 'COMPLETED'
                                                                     )?.length > 0 ? (
                                                                         <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center animate-pulse">
@@ -320,7 +290,7 @@ function CourseOverview() {
 
                                                                 <Badge variant="outline" className="text-xs">
                                                                     {(() => {
-                                                                        const totalMinutes = +content?.courseTopicContentDuration || 0;
+                                                                        const totalMinutes = +content?.courseContentDuration || 0;
                                                                         const hours = Math.floor(totalMinutes / 60);
                                                                         const minutes = totalMinutes % 60;
                                                                         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
@@ -329,7 +299,7 @@ function CourseOverview() {
 
                                                                 <Video className="h-4 w-4 text-gray-500"/>
                                                                 <span className="text-gray-700 font-medium group-hover:text-blue-600 transition-colors">
-                                                                    {content?.courseTopicContentTitle}
+                                                                    {content?.courseContentTitle}
                                                                 </span>
 
                                                                 <ChevronRight className="h-4 w-4 text-gray-400 ml-auto group-hover:text-blue-600 transition-colors"/>
@@ -346,69 +316,7 @@ function CourseOverview() {
                     </Card>
                 </section>
 
-                {/* Leave Course Section */}
-                <section className="my-8 flex justify-end">
-                    {(courseList?.courseCost == 0 &&
-                        userEnrollmentObj?.enrollmentStatus != 'CERTIFIED' &&
-                        userEnrollmentObj?.enrollmentStatus != 'COMPLETED') ? (
-                        isUserEnrolledAlready ? (
-                            <Dialog>
-                                <DialogTrigger asChild>
-                                    <Button
-                                        variant="destructive"
-                                        className="hover:bg-red-600 transition-colors rounded-full px-6"
-                                    >
-                                        LEAVE COURSE
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="sm:max-w-md rounded-xl">
-                                    <DialogHeader>
-                                        <DialogTitle className="text-xl font-bold text-gray-800">
-                                            Are You Sure You Want To Leave The Course?
-                                        </DialogTitle>
-                                        <DialogDescription className="text-gray-600">
-                                            Type in <span className="font-semibold text-red-600 italic">"{courseList?.courseTitle}"</span> in the input field below and click confirm to leave the course.
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                    <div className="flex items-center space-y-2">
-                                        <Input
-                                            placeholder="Type course title to confirm..."
-                                            value={deleteConfirmation}
-                                            onChange={(e) => setDeleteConfirmation(e.target.value?.trim())}
-                                            className="rounded-lg"
-                                        />
-                                    </div>
-                                    <DialogFooter className="sm:justify-start gap-2">
-                                        <DialogClose asChild>
-                                            <Button type="button" variant="secondary" className="rounded-full">
-                                                Cancel
-                                            </Button>
-                                        </DialogClose>
-                                        {courseList?.courseCost == 0 && (
-                                            <Button
-                                                variant="destructive"
-                                                disabled={courseList?.courseTitle?.trim() !== deleteConfirmation?.trim()}
-                                                onClick={() => {
-                                                    if (courseList?.courseTitle.trim() === deleteConfirmation?.trim()) {
-                                                        disroll();
-                                                        setDeleteConfirmation('');
-                                                    } else {
-                                                        toast({
-                                                            title: 'Failed to leave the course'
-                                                        });
-                                                    }
-                                                }}
-                                                className="rounded-full"
-                                            >
-                                                Confirm Leave
-                                            </Button>
-                                        )}
-                                    </DialogFooter>
-                                </DialogContent>
-                            </Dialog>
-                        ) : null
-                    ) : null}
-                </section>
+
             </div>
 
             <style jsx>{`

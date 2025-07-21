@@ -45,14 +45,10 @@ function SignInPage() {
     }, [userDetail])
     return (
         <div
-            className="min-h-screen w-full flex items-center justify-center bg-cover bg-center px-4  bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-700  "
-
-
+            className="min-h-screen w-full flex items-center justify-center bg-cover bg-center px-4  bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-700"
         >
 
-
             <div className="  w-full max-w-md sm:max-w-lg md:max-w-xl p-4">
-
 
                 <Card className="w-full p-4 sm:p-8 rounded-sm shadow-lg  border-none md:border ">
                     <CardHeader>

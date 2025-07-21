@@ -30,11 +30,10 @@ import {
 } from "@/components/ui/alert-dialog.jsx"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
-import {Terminal, Edit3, Trash2, Clock, FileText, Sparkles, MessageCircle, Calendar} from "lucide-react";
-import {Link} from "react-router-dom";
+import { Edit3, Trash2, Clock, FileText, Sparkles, MessageCircle, Calendar} from "lucide-react";
 
 
-function NotesModule({userId, courseId, courseTopicId, courseTopicContentId, refreshTrigger}) {
+function NotesModule({userId, courseId, courseContentId, refreshTrigger}) {
 
     const {isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus} = useCourse();
 
@@ -61,17 +60,17 @@ function NotesModule({userId, courseId, courseTopicId, courseTopicContentId, ref
     const [notesList, setNotesList] = useState([]);
 
     useEffect(() => {
-        console.log(courseId, courseTopicId, courseTopicContentId)
-        if (courseTopicContentId) {
+        console.log(courseId, courseContentId)
+        if (courseContentId) {
             fetchNotesModule();
         }
-    }, [courseTopicContentId, refreshTrigger]);
+    }, [courseContentId, refreshTrigger]);
 
     const fetchNotesModule = () => {
         axiosConn
             .post(import.meta.env.VITE_API_URL+"/searchCourse", {
                 limit: 10, offset: 0, getThisData: {
-                    datasource: "Notes", attributes: [], where: {courseTopicContentId: courseTopicContentId, userId:userId},
+                    datasource: "Notes", attributes: [], where: {courseContentId: courseContentId, userId:userId},
                 },
             })
             .then((res) => {
@@ -86,9 +85,8 @@ function NotesModule({userId, courseId, courseTopicId, courseTopicContentId, ref
     function onSubmit(data) {
         axiosConn
             .post(import.meta.env.VITE_API_URL+"/saveNote", {
-                courseTopicId,
                 courseId,
-                courseTopicContentId,
+                courseContentId,
                 notesText : data.notesText,
             })
             .then((res) => {
@@ -127,9 +125,8 @@ function NotesModule({userId, courseId, courseTopicId, courseTopicContentId, ref
         axiosConn
             .post(import.meta.env.VITE_API_URL+"/saveNote", {
                 notesId:data.id,
-                courseTopicId,
                 courseId,
-                courseTopicContentId,
+                courseContentId,
                 notesText : data.notesText,
             })
             .then((res) => {

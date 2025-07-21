@@ -11,7 +11,7 @@ import axiosConn from "@/axioscon.js";
 import {useAuthStore} from "@/zustland/store.js";
 import {toast} from "@/components/hooks/use-toast.js";
 
-export function CourseCard({userEnrolledCourseIdList,a }) {
+export function CourseCard({a }) {
     const navigate = useNavigate()
 
     const {userDetail} = useAuthStore();
@@ -47,21 +47,19 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
                 {/* Enhanced image with overlay effects */}
                 <div className="relative overflow-hidden rounded-xl group/image mb-2">
                     <img
-                        src={a?.courseImageUrl?.[0]}
+                        src={a?.courseImageUrl}
                         className="w-full h-40 object-cover transition-transform duration-500 group-hover/image:scale-105"
                         alt={a?.courseTitle}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover/image:opacity-100 transition-opacity duration-300" />
 
-                    {/* Floating enrollment status badge */}
-                    {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId) && (
+
                         <div className="absolute top-3 right-3">
                             <Badge className="bg-gradient-to-r from-yellow-700 to-black-600 text-white shadow-lg backdrop-blur-sm border-0 font-semibold">
-                                {userEnrolledCourseIdList?.find(m => m.courseId == a.courseId)?.enrollmentStatus}
+                                {a?.enrollmentStatus}
                             </Badge>
                         </div>
-                    )}
-                </div>
+                 </div>
 
                 {/* Enhanced Course Title */}
                 <div>
@@ -94,7 +92,7 @@ export function CourseCard({userEnrolledCourseIdList,a }) {
                     <Lock className="mr-2 h-5 w-5 transition-transform group-hover/button:rotate-12" />
                     COMING SOON
                 </Button>:   <Link
-                    to={`/${userDetail ? (userEnrolledCourseIdList?.find(m => m.courseId == a.courseId)?.enrollmentStatus ? 'course' : 'explore') : 'explore'}/${a?.courseId}`}
+                    to={`/${userDetail ?  'course'   : 'explore'}/${a?.courseId}`}
                     className="flex-1"
                     target={'_self'}
                 >
