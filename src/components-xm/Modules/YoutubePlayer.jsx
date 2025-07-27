@@ -9,8 +9,10 @@ const YouTubePlayer = ({ videoUrl, playerId = "player", playerRefresh, saveUserE
 
     useEffect(()=>{
         try {
-            const parsedUrl = new URL(videoUrl);
-            setVideoId(parsedUrl.searchParams.get("v"));
+            if(videoUrl){
+                const parsedUrl = new URL(videoUrl);
+                setVideoId(parsedUrl?.searchParams?.get("v"));
+            }
         } catch (err) {
             console.log(err)
         }
