@@ -383,7 +383,7 @@ function CourseVideoTutorial() {
                     onUndoComplete={handleUndoComplete}
                 />
 
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                     <div className="lg:col-span-3 space-y-6">
                         <Card className="border-0 shadow-md overflow-hidden">
                             <div className="aspect-video bg-black rounded-lg overflow-hidden">
@@ -399,7 +399,7 @@ function CourseVideoTutorial() {
                         <VideoDescription description={courseVideoDetail?.courseVideoDescription} />
                     </div>
 
-                    <div className="lg:col-span-1 space-y-6">
+                    <div className="lg:col-span-2 space-y-6">
                         {notesProps.courseId && (
                             <CreateNotesModule
                                 handleNotesSave={handleNotesSave}
