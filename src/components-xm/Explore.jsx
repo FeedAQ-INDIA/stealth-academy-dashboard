@@ -210,7 +210,7 @@ export function Explore() {
 
 
                             {/* Empty State */}
-                            {courseList.length === 0 && !loading && (
+                            {courseList?.length === 0 && !loading && (
                                 <div className="text-center py-16">
                                     <div
                                         className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
