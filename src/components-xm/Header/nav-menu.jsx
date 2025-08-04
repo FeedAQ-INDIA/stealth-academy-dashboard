@@ -46,7 +46,7 @@ function NavigationMenuDemo({orientation}) {
     return (
         <NavigationMenu orientation={orientation} className="z-20 w-full">
             <NavigationMenuList
-                className={`${
+                className={` ${
                     orientation === 'vertical'
                         ? 'flex flex-col gap-2 w-full bg'
                         : 'flex flex-col sm:flex-row gap-2 w-full'
@@ -69,7 +69,18 @@ function NavigationMenuDemo({orientation}) {
                             className="w-full justify-center"
                             variant={location.pathname.includes('explore') ? 'secondary' : 'ghost'}
                         >
-                            EXPLORE
+                            CONTENT LIBRARY
+                        </Button>
+                    </Link>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : 'flex-1 sm:flex-none'}>
+                    <Link to="/explore" className="w-full block">
+                        <Button
+                            className="w-full justify-center"
+                            variant={location.pathname.includes('explore') ? 'secondary' : 'ghost'}
+                        >
+                            LIVE LEARNING
                         </Button>
                     </Link>
                 </NavigationMenuItem>
