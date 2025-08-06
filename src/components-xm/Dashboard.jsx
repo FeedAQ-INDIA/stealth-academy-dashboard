@@ -92,26 +92,26 @@ export function Dashboard() {
                 </CardHeader>
             </Card>
 
-            <Card className="rounded-sm  border-0   py-8 shadow-2xl mb-8 overflow-hidden relative">
-                <CardHeader>
-                    <CardTitle className="text-center tracking-wide">
-                        What would you like to learn today ?
-                    </CardTitle>
-
-
-                </CardHeader>
-                <CardContent>
-                    <div className="my-2">
-                        <div className="flex gap-2 w-full md:w-3/4 lg:w-1/2 mx-auto items-center">
-                            <Input type="text" value={exploreCourseText}
-                                   onChange={(e) => setExploreCourseText(e.target.value)}
-                                   placeholder="What do you want to learn today ?"/>
-                            <Button type="submit"
-                                    onClick={() => navigate('/explore?search=' + exploreCourseText)}><Search/></Button>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+            {/*<Card className="rounded-sm  border-0   py-8 shadow-2xl mb-8 overflow-hidden relative">*/}
+            {/*    <CardHeader>*/}
+            {/*        <CardTitle className="text-center tracking-wide">*/}
+            {/*            What would you like to learn today ?*/}
+            {/*        </CardTitle>*/}
+            
+            
+            {/*    </CardHeader>*/}
+            {/*    <CardContent>*/}
+            {/*        <div className="my-2">*/}
+            {/*            <div className="flex gap-2 w-full md:w-3/4 lg:w-1/2 mx-auto items-center">*/}
+            {/*                <Input type="text" value={exploreCourseText}*/}
+            {/*                       onChange={(e) => setExploreCourseText(e.target.value)}*/}
+            {/*                       placeholder="What do you want to learn today ?"/>*/}
+            {/*                <Button type="submit"*/}
+            {/*                        onClick={() => navigate('/explore?search=' + exploreCourseText)}><Search/></Button>*/}
+            {/*            </div>*/}
+            {/*        </div>*/}
+            {/*    </CardContent>*/}
+            {/*</Card>*/}
 
             <section className="my-6 grid grid-cols-1  lg:grid-cols-2  gap-6">
                 {/*<Card className="border-0 bg-muted/50    ">*/}

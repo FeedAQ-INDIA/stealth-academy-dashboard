@@ -186,18 +186,18 @@ const VideoHeader = React.memo(({
                                     onMarkComplete,
                                     onUndoComplete
                                 }) => (
-    <Card className="border-0 shadow-sm bg-gradient-to-r from-blue-50 to-indigo-50">
-        <CardHeader className="pb-4">
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-                <Badge variant="secondary" className="flex items-center gap-1">
-                    <Play className="h-3 w-3" />
-                    Video
-                </Badge>
-                <Badge variant="outline" className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {formatDuration(courseContent?.courseContentDuration)}
-                </Badge>
-            </div>
+    <Card className="border-0  bg-gradient-to-r from-blue-50 to-indigo-50 rounded-sm  shadow-md  overflow-hidden relative">
+        <CardHeader className=" ">
+            {/*<div className="flex flex-wrap items-center gap-2 mb-3">*/}
+            {/*    <Badge variant="secondary" className="flex items-center gap-1">*/}
+            {/*        <Play className="h-3 w-3" />*/}
+            {/*        Video*/}
+            {/*    </Badge>*/}
+            {/*    <Badge variant="outline" className="flex items-center gap-1">*/}
+            {/*        <Clock className="h-3 w-3" />*/}
+            {/*        {formatDuration(courseContent?.courseContentDuration)}*/}
+            {/*    </Badge>*/}
+            {/*</div>*/}
 
             <div className="flex flex-col md:flex-row md:items-center gap-4">
                 <div className="flex-1">
@@ -279,7 +279,7 @@ const NavigationHeader = React.memo(({
 ));
 
 const VideoDescription = React.memo(({ description }) => (
-    <Card className="border-0 shadow-sm">
+    <Card className="border-0  rounded-sm  shadow-md  overflow-hidden relative">
         <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg">
                 <BookOpen className="h-5 w-5 text-blue-600" />
@@ -312,6 +312,15 @@ function CourseVideoTutorial() {
         fetchUserEnrollmentData
     );
     const { prevContent, nextContent, navigateToContent } = useNavigation(courseList, CourseVideoId);
+
+
+    // useEffect(() => {
+    //     if(courseVideoDetail){
+    //         loadYoutubePlayerComponent(courseVideoDetail);
+    //     }
+    // }, [courseVideoDetail]);
+
+
 
     // Memoized values
     const isCompleted = useMemo(() => {
@@ -365,6 +374,8 @@ function CourseVideoTutorial() {
         );
     }
 
+
+
     return (
         <div className="min-h-screen bg-gray-50/30">
             <NavigationHeader
@@ -374,7 +385,7 @@ function CourseVideoTutorial() {
                 onNavigate={navigateToContent}
             />
 
-            <div className="mx-auto p-4 lg:p-6 space-y-6">
+            <div className="mx-auto p-4  space-y-4">
                 <VideoHeader
                     courseContent={courseContent}
                     courseVideoDetail={courseVideoDetail}
@@ -384,7 +395,7 @@ function CourseVideoTutorial() {
                 />
 
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                    <div className="lg:col-span-3 space-y-6">
+                    <div className="lg:col-span-3 space-y-4">
                         <Card className="border-0 shadow-md overflow-hidden">
                             <div className="aspect-video bg-black rounded-lg overflow-hidden">
                                 <YouTubePlayer
@@ -399,7 +410,7 @@ function CourseVideoTutorial() {
                         <VideoDescription description={courseVideoDetail?.courseVideoDescription} />
                     </div>
 
-                    <div className="lg:col-span-2 space-y-6">
+                    <div className="lg:col-span-2 space-y-4">
                         {notesProps.courseId && (
                             <CreateNotesModule
                                 handleNotesSave={handleNotesSave}
@@ -408,18 +419,28 @@ function CourseVideoTutorial() {
                                 courseTopicId={notesProps.courseTopicId}
                             />
                         )}
+
+                        {notesProps.courseId && notesProps.userId && (
+                            <NotesModule
+                                refreshTrigger={triggerNotesRefresh}
+                                courseId={notesProps.courseId}
+                                userId={notesProps.userId}
+                                courseTopicContentId={notesProps.courseTopicContentId}
+                                courseTopicId={notesProps.courseTopicId}
+                            />
+                        )}
                     </div>
                 </div>
 
-                {notesProps.courseId && notesProps.userId && (
-                    <NotesModule
-                        refreshTrigger={triggerNotesRefresh}
-                        courseId={notesProps.courseId}
-                        userId={notesProps.userId}
-                        courseTopicContentId={notesProps.courseTopicContentId}
-                        courseTopicId={notesProps.courseTopicId}
-                    />
-                )}
+                {/*{notesProps.courseId && notesProps.userId && (*/}
+                {/*    <NotesModule*/}
+                {/*        refreshTrigger={triggerNotesRefresh}*/}
+                {/*        courseId={notesProps.courseId}*/}
+                {/*        userId={notesProps.userId}*/}
+                {/*        courseTopicContentId={notesProps.courseTopicContentId}*/}
+                {/*        courseTopicId={notesProps.courseTopicId}*/}
+                {/*    />*/}
+                {/*)}*/}
             </div>
         </div>
     );

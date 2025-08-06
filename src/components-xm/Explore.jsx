@@ -38,7 +38,6 @@ export function Explore() {
         offset: offset,
         getThisData: {
             datasource: "Course",
-            order: [["courseIsLocked", "ASC"]],
              attributes: [],
         },
     });
@@ -146,7 +145,7 @@ export function Explore() {
             offset: offset,
             getThisData: {
                 datasource: "Course",
-                order: [["courseIsLocked", "ASC"]],
+                // order: [["courseIsLocked", "ASC"]],
                 attributes: [],
             },
         });
@@ -227,7 +226,8 @@ export function Explore() {
                                 </div>
                             )}
 
-                            {courseList.length > 0 ?            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                            {courseList.length > 0 ?
+                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                                     <div className="text-sm text-gray-600">
                                         Showing {offset + 1} to {Math.min(offset + limit, totalCount)} of {totalCount} courses
                                     </div>

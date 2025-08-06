@@ -13,7 +13,7 @@ import {
     SidebarMenuSubItem,
 } from "@/components/ui/sidebar.jsx";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { Check, SquareArrowLeft } from "lucide-react";
+import {Check, MonitorPlay, SquareArrowLeft} from "lucide-react";
 import { Separator } from "@/components/ui/separator.jsx";
 import { useCourse } from "@/components-xm/Course/CourseContext.jsx";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar.jsx";
@@ -119,14 +119,16 @@ function CourseSidebar() {
                                                                 log.courseContentId == item?.courseContentId &&
                                                                 log.enrollmentStatus === "COMPLETED"
                                                         ) ? (
-                                                            <Avatar className="border shadow-sm bg-green-500">
+                                                            <Avatar className="border shadow-md bg-green-500">
                                                                 <AvatarFallback className="bg-green-500">
                                                                     <Check strokeWidth={3} color="#ffffff" />
                                                                 </AvatarFallback>
                                                             </Avatar>
                                                         ) : (
-                                                            <Avatar className="border shadow-sm">
-                                                                <AvatarFallback></AvatarFallback>
+                                                            <Avatar className="border shadow-md">
+                                                                <AvatarFallback>
+                                                                    <MonitorPlay size={18} />
+                                                                </AvatarFallback>
                                                             </Avatar>
                                                         )}
                                                         <div>{item?.title}</div>
