@@ -201,7 +201,7 @@ const VideoHeader = React.memo(({
 
             <div className="flex flex-col md:flex-row md:items-center gap-4">
                 <div className="flex-1">
-                    <CardTitle className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">
+                    <CardTitle className="text-xl md:text-2xl font-bold text-gray-900 leading-tight line-clamp-1">
                         {courseVideoDetail?.courseVideoTitle || 'Loading...'}
                     </CardTitle>
                 </div>
@@ -234,7 +234,7 @@ const VideoHeader = React.memo(({
     </Card>
 ));
 
-const NavigationHeader = React.memo(({
+const NavigationHeader = React.memo(({courseVideoDetail,
                                          courseContent,
                                          prevContent,
                                          nextContent,
@@ -247,7 +247,7 @@ const NavigationHeader = React.memo(({
             <BreadcrumbList>
                 <BreadcrumbItem>
                     <BreadcrumbPage className="truncate max-w-[40ch] font-medium">
-                        {courseContent?.courseContentTitle || 'Loading...'}
+                        {courseVideoDetail?.courseVideoTitle  || 'Loading...'}
                     </BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
@@ -379,6 +379,7 @@ function CourseVideoTutorial() {
     return (
         <div className="min-h-screen bg-gray-50/30">
             <NavigationHeader
+            courseVideoDetail={courseVideoDetail}s
                 courseContent={courseContent}
                 prevContent={prevContent}
                 nextContent={nextContent}
