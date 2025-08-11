@@ -74,7 +74,7 @@ function NavigationMenuDemo({orientation}) {
                     </Link>
                 </NavigationMenuItem>
 
-                <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : 'flex-1 sm:flex-none'}>
+                {/* <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : 'flex-1 sm:flex-none'}>
                     <Link to="/explore" className="w-full block">
                         <Button
                             className="w-full justify-center"
@@ -83,7 +83,7 @@ function NavigationMenuDemo({orientation}) {
                             LIVE LEARNING
                         </Button>
                     </Link>
-                </NavigationMenuItem>
+                </NavigationMenuItem> */}
 
                 <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : 'flex-1 sm:flex-none'}>
                     <Link to="/my-learning-path" className="w-full block">

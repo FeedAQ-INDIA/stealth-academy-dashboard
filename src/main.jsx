@@ -15,24 +15,13 @@ import {CourseDetail} from "@/components-xm/Course/CourseDetail.jsx";
 import CourseOverview from "@/components-xm/Course/CourseOverview.jsx";
 import CourseVideoTutorial from "@/components-xm/Course/CourseVideoTutorial.jsx";
 import {AccountDetail} from "@/components-xm/AccountSettings/AccountDetail.jsx";
-import CourseComprehensionReading from "@/components-xm/Course/CourseComprehensionReading.jsx";
-import CourseListenAndRead from "@/components-xm/Course/CourseListenAndRead.jsx";
-import MyAccount from "@/components-xm/AccountSettings/MyAccount.jsx";
+ import MyAccount from "@/components-xm/AccountSettings/MyAccount.jsx";
 import CourseWritten from "@/components-xm/Course/CourseWritten.jsx";
 import CourseDocThirdParty from "@/components-xm/Course/CourseDocThirdParty.jsx";
 import CourseQuiz from "@/components-xm/Course/CourseQuiz.jsx";
-import {WebinarDetail} from "@/components-xm/Webinar/WebinarDetail.jsx";
-import WebinarOverview from "@/components-xm/Webinar/WebinarOverview.jsx";
-import {MockInterview} from "@/components-xm/MockInterview/MockInterview.jsx";
-import { useAuthStore, useProtectedURIStore } from "@/zustland/store";
-import {CreateMockInterview} from "@/components-xm/MockInterview/CreateMockInterview.jsx";
-import MockInterviewHistoryDetail from "@/components-xm/MockInterview/MockInterviewHistoryDetail.jsx";
-import LanguageStudio from "@/components-xm/Lang/LanguageStudio.jsx";
-import HomePage from "@/components-xm/HomeFiles/HomePage.jsx";
-import {CreateCounsellingCompass} from "@/components-xm/CounsellingCompass/CreateCounsellingCompass.jsx";
-import {CounsellingCompass} from "@/components-xm/CounsellingCompass/CounsellingCompass.jsx";
-import CounsellingHistoryDetail from "@/components-xm/CounsellingCompass/CounsellingHistoryDetail.jsx";
-import CourseSchedule from "@/components-xm/Course/CourseSchedule.jsx";
+  import { useAuthStore, useProtectedURIStore } from "@/zustland/store";
+   import HomePage from "@/components-xm/HomeFiles/HomePage.jsx";
+ import CourseSchedule from "@/components-xm/Course/CourseSchedule.jsx";
 import CourseSnapView from "@/components-xm/HomeFiles/CourseSnapView.jsx";
 
 
@@ -40,20 +29,7 @@ import CourseSnapView from "@/components-xm/HomeFiles/CourseSnapView.jsx";
 
 const router = createBrowserRouter([
 
-
-
-    {
-        path: "/mock-interview",
-        element: <MockInterview/>,
-    },
-    {
-        path: "/the-language-studio",
-        element: <LanguageStudio/>,
-    },
-    {
-        path: "/counselling-compass",
-        element: <CounsellingCompass/>,
-    },
+ 
 
     // {
     //     path: "/browse",
@@ -80,22 +56,7 @@ const router = createBrowserRouter([
                 path: "/signin",
                 element: <SignInPage/>,
             },
-            {
-                path: "/schedule-counselling-compass",
-                element: <CreateCounsellingCompass/>,
-            },
-            {
-                path: "/counselling-compass/:CounsellingId",
-                element: <CounsellingHistoryDetail/>,
-            },
-            {
-                path: "/schedule-mock-interview",
-                element: <CreateMockInterview/>,
-            },
-            {
-                path: "/mock-interview/:MockInterviewId",
-                element: <MockInterviewHistoryDetail/>,
-            },
+ 
             {
                 path: "/dashboard",
                 element: <Dashboard/>,
@@ -140,29 +101,11 @@ const router = createBrowserRouter([
                         path: "/course/:CourseId/pdf/:CourseDocId",
                         element: <CourseDocThirdParty/>,
                     },
-                    {
-                        path: "/course/:CourseId/comprehension-reading/:ComprehensionReadingId",
-                        element: <CourseComprehensionReading/>,
-                    },
-
-
-                    {
-                        path: "/course/:CourseId/listen-and-read/:ListenAndReadId",
-                        element: <CourseListenAndRead/>,
-                    },
+           
                 ]
              },
 
-            {
-                path: "/webinar",
-                element: <WebinarDetail/>,
-                children:[
-                    {
-                        path: "/webinar/:WebinarId",
-                        element: <WebinarOverview/>,
-                    },
-                ]
-            },
+    
 
             {
                 path: "/my-learning-path",

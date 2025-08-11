@@ -49,8 +49,8 @@ export default function Header( ) {
                     {/*<Button variant="secondary">*/}
                     {/*    {userDetail?.nameInitial}*/}
                     {/*</Button> */}
-                    <Avatar className="w-12 h-12   bg-gradient-to-r  from-yellow-300 via-orange-400 to-yellow-700 hover:from-yellow-600 hover:via-orange-800 hover:to-yellow-900 shadow-sm hover:shadow-xl">
-                    <AvatarFallback className="text-lg sm:text-lg bg-gradient-to-r    text-white font-bold">
+                    <Avatar className="w-12 h-12   bg-orange-400   shadow-sm hover:shadow-xl">
+                    <AvatarFallback className="text-lg sm:text-lg bg-orange-400  text-white font-bold">
                         {userDetail?.nameInitial}
                     </AvatarFallback>
                 </Avatar>
