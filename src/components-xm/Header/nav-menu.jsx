@@ -48,22 +48,22 @@ function NavigationMenuDemo({orientation}) {
             <NavigationMenuList
                 className={` ${
                     orientation === 'vertical'
-                        ? 'flex flex-col gap-2 w-full bg'
-                        : 'flex flex-col sm:flex-row gap-2 w-full'
+                        ? 'flex flex-col gap-1 w-full bg'
+                        : 'flex flex-col sm:flex-row gap-1 w-full'
                 }`}
             >
                 <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : 'flex-1 sm:flex-none'}>
-                    <Link to="/dashboard" className="w-full block">
+                    <Link to="/dashboard" className="w-full block ">
                         <Button
-                            className="w-full justify-center"
+                            className="w-full justify-center  px-2"
                             variant={location.pathname.includes('dashboard') ? 'secondary' : 'ghost'}
                         >
                             DASHBOARD
                         </Button>
                     </Link>
                 </NavigationMenuItem>
-
-                <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : 'flex-1 sm:flex-none'}>
+ 
+               <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : 'flex-1 sm:flex-none'}>
                     <Link to="/explore" className="w-full block">
                         <Button
                             className="w-full justify-center"
@@ -85,16 +85,28 @@ function NavigationMenuDemo({orientation}) {
                     </Link>
                 </NavigationMenuItem> */}
 
-                <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : 'flex-1 sm:flex-none'}>
+ <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : 'flex-1 sm:flex-none'}>
                     <Link to="/my-learning-path" className="w-full block">
                         <Button
-                            className="w-full justify-center"
+                            className="w-full justify-center  px-2"
                             variant={location.pathname.includes('my-learning-path') ? 'secondary' : 'ghost'}
                         >
                             MY JOURNEY
                         </Button>
                     </Link>
                 </NavigationMenuItem>
+               <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : 'flex-1 sm:flex-none'}>
+                    <Link to="/bring-your-own-course" className="w-full block">
+                        <Button
+                            className="w-full justify-center px-2"
+                            variant={location.pathname.includes('bring-your-own-course') ? 'secondary' : 'ghost'}
+                        >
+                            CRAFT YOUR COURSE
+                        </Button>
+                    </Link>
+                </NavigationMenuItem>
+
+               
             </NavigationMenuList>
         </NavigationMenu>
     );

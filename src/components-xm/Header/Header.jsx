@@ -5,12 +5,16 @@ import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
 import NavigationMenuDemo from "./nav-menu.jsx"
 import {useAuthStore} from "@/zustland/store.js";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
-import React from "react";
+import React, { useEffect } from "react";
 
 export default function Header( ) {
 
     const {userDetail} = useAuthStore()
 
+
+    useEffect(() => {
+        console.log("Header compoenent mounted",userDetail);
+    },[])
 
     return (
         <header className="flex h-16 items-center justify-between bg-white px-4 shadow-md border-b">
@@ -20,22 +24,7 @@ export default function Header( ) {
                 href="/dashboard"
                 style={{ fontFamily: "Anta" }}
             >
-                Fee
-                <span className="text-[#ffdd00]">d</span>AQ{" "}
-                <span
-                    className="font-normal"
-                    style={{
-                        fontFamily: [
-                            "Lucida Sans",
-                            "Lucida Sans Regular",
-                            "Lucida Grande",
-                            "Lucida Sans Unicode",
-                            "Geneva",
-                        ],
-                    }}
-                >
-          Academy
-        </span>
+                STEALTH
             </a>
 
             {/* Desktop Navigation */}

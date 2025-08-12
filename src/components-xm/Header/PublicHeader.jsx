@@ -43,23 +43,8 @@ export default function PublicHeader( ) {
                 href="/"
                 style={{ fontFamily: "Anta" }}
             >
-                Fee
-                <span className="text-[#ffdd00]">d</span>AQ{" "}
-                <span
-                    className="font-normal"
-                    style={{
-                        fontFamily: [
-                            "Lucida Sans",
-                            "Lucida Sans Regular",
-                            "Lucida Grande",
-                            "Lucida Sans Unicode",
-                            "Geneva",
-                        ],
-                    }}
-                >
-          Academy
-        </span>
-            </a>
+                STEALTH
+             </a>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-2 ml-4">

@@ -88,10 +88,11 @@ const useEnrollmentActions = (courseList, courseVideoDetail, fetchUserEnrollment
         if (!courseList?.courseId || !courseVideoDetail?.courseContentId) return;
 
         try {
-            await axiosConn.post(`${API_BASE_URL}/saveUserEnrollmentData`, {
-                courseId: courseList.courseId,
-                courseContentId: courseVideoDetail.courseContentId,
-                enrollmentStatus: ENROLLMENT_STATUS.COMPLETED
+            await axiosConn.post(`${API_BASE_URL}/saveUserCourseContentProgress`, {
+  
+          courseId : courseList.courseId,
+        courseContentId : courseVideoDetail.courseContentId,
+        logStatus : ENROLLMENT_STATUS.COMPLETED
             });
 
             toast({ title: "Progress saved successfully" });
@@ -287,7 +288,7 @@ const VideoDescription = React.memo(({ description }) => (
             </CardTitle>
         </CardHeader>
         <CardContent>
-            <div className="prose prose-sm max-w-none">
+            <div className="prose prose-sm max-w-none max-h-[80svh] overflow-y-auto">
                 <div className="whitespace-pre-wrap break-words text-gray-700 leading-relaxed">
                     {description || "No description available for this video."}
                 </div>
@@ -338,15 +339,12 @@ function CourseVideoTutorial() {
     const notesProps = useMemo(() => {
         const contentData = courseList?.courseContent
             ?.find(a => a.courseContentId === courseVideoDetail.courseContentId)
-            ?.courseContent
-            ?.find(a => a.contentId === courseVideoDetail.courseVideoId && a.courseContentType === CONTENT_TYPES.COURSE_VIDEO);
-
+        console.log("Content Data", contentData)
         return {
             courseId: courseList?.courseId,
             userId: userDetail?.userId,
-            courseTopicContentId: contentData?.courseContentId,
-            courseTopicId: courseVideoDetail?.courseContentId
-        };
+            courseContentId: contentData?.courseContentId,
+         };
     }, [courseList, courseVideoDetail, userDetail]);
 
     // Callbacks
@@ -408,7 +406,7 @@ function CourseVideoTutorial() {
                             </div>
                         </Card>
 
-                        <VideoDescription description={courseVideoDetail?.courseVideoDescription} />
+                        <VideoDescription description={courseVideoDetail?.courseVideoDescription}  />
                     </div>
 
                     <div className="lg:col-span-2 space-y-4">
@@ -416,8 +414,7 @@ function CourseVideoTutorial() {
                             <CreateNotesModule
                                 handleNotesSave={handleNotesSave}
                                 courseId={notesProps.courseId}
-                                courseTopicContentId={notesProps.courseTopicContentId}
-                                courseTopicId={notesProps.courseTopicId}
+                                courseContentId={notesProps.courseContentId}
                             />
                         )}
 
@@ -426,8 +423,7 @@ function CourseVideoTutorial() {
                                 refreshTrigger={triggerNotesRefresh}
                                 courseId={notesProps.courseId}
                                 userId={notesProps.userId}
-                                courseTopicContentId={notesProps.courseTopicContentId}
-                                courseTopicId={notesProps.courseTopicId}
+                                courseContentId={notesProps.courseContentId}
                             />
                         )}
                     </div>

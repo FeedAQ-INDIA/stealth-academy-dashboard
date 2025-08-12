@@ -19,16 +19,16 @@ function CreateNotesModule({courseId, courseContentId, handleNotesSave}) {
     const {isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus} = useCourse();
 
     const createNotesSchema = z.object({
-        notesText: z.string()
+        noteContent: z.string()
             .min(3, "Notes must be at least 3 characters long"),
     });
 
     const createNotesForm = useForm({
         resolver: zodResolver(createNotesSchema),
-        defaultValues: {notesText: ""},
+        defaultValues: {noteContent: ""},
     });
 
-    const watchedNotesText = createNotesForm.watch("notesText");
+    const watchedNotesText = createNotesForm.watch("noteContent");
 
     // Update counters and unsaved changes state
     useEffect(() => {
@@ -46,7 +46,7 @@ function CreateNotesModule({courseId, courseContentId, handleNotesSave}) {
                 {
                      courseId,
                     courseContentId,
-                    notesText: data.notesText,
+                    noteContent: data.noteContent,
                 }
             );
 
@@ -98,7 +98,7 @@ function CreateNotesModule({courseId, courseContentId, handleNotesSave}) {
                     <div className="flex-1 min-h-[200px]">
                         <FormField
                             control={createNotesForm.control}
-                            name="notesText"
+                            name="noteContent"
                             render={({field}) => (
                                 <FormItem className="flex-1 w-full h-full">
                                     <FormControl>

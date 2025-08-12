@@ -17,7 +17,7 @@ export const useAuthStore = create((set) => ({
         try {
             const res = await axiosConn.post(import.meta.env.VITE_API_URL+"/getUser",
                 { });
-            set({ userDetail: res.data.data, loading: false });  // Set loading to false after fetch
+            set({ userDetail: res.data?.data?.data, loading: false });  // Set loading to false after fetch
         } catch (error) {
             console.error("Error fetching user details:", error);
             set({ loading: false });  // Set loading to false even on error

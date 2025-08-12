@@ -38,23 +38,23 @@ function NotesModule({userId, courseId, courseContentId, refreshTrigger}) {
     const {isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus} = useCourse();
 
     const createNotesSchema = z.object({
-        notesText: z.string()
+        noteContent: z.string()
             .min(3, "Notes cannot be empty"),
 
     });
     const createNotesForm = useForm({
         resolver: zodResolver(createNotesSchema),
-        defaultValues: {notesText: ""},
+        defaultValues: {noteContent: ""},
     });
 
     const editNotesSchema = z.object({
         id: z.number(),
-        notesText: z.string().min(3, "Notes cannot be empty"),
+        noteContent: z.string().min(3, "Notes cannot be empty"),
     });
 
     const editNotesForm = useForm({
         resolver: zodResolver(editNotesSchema),
-        defaultValues: {id: 0, notesText: ""},
+        defaultValues: {id: 0, noteContent: ""},
     });
 
     const [notesList, setNotesList] = useState([]);
@@ -87,7 +87,7 @@ function NotesModule({userId, courseId, courseContentId, refreshTrigger}) {
             .post(import.meta.env.VITE_API_URL+"/saveNote", {
                 courseId,
                 courseContentId,
-                notesText : data.notesText,
+                noteContent : data.noteContent,
             })
             .then((res) => {
                 console.log(res.data);
@@ -127,7 +127,7 @@ function NotesModule({userId, courseId, courseContentId, refreshTrigger}) {
                 notesId:data.id,
                 courseId,
                 courseContentId,
-                notesText : data.notesText,
+                noteContent : data.noteContent,
             })
             .then((res) => {
                 console.log(res);
@@ -162,7 +162,7 @@ function NotesModule({userId, courseId, courseContentId, refreshTrigger}) {
                         )}
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="p-6">
+                {/* <CardContent className="p-6">
                     {notesList.length > 0 ? (
                         <div className="space-y-4">
                             {notesList.map((a, index) => (
@@ -174,8 +174,7 @@ function NotesModule({userId, courseId, courseContentId, refreshTrigger}) {
                                         animation: 'slideInUp 0.5s ease-out forwards'
                                     }}
                                 >
-                                    {/* Note Header */}
-                                    <div className="flex items-center justify-between mb-3">
+                                     <div className="flex items-center justify-between mb-3">
                                         <div className="flex items-center gap-2 text-sm text-gray-500">
                                             <Calendar className="h-4 w-4 text-violet-500" />
                                             <span className="font-medium">{a?.v_created_date}</span>
@@ -189,24 +188,22 @@ function NotesModule({userId, courseId, courseContentId, refreshTrigger}) {
                                         </div>
                                     </div>
 
-                                    {/* Note Content */}
-                                    <div className="mb-4">
+                                     <div className="mb-4">
                                         <div className="relative">
                                             <div className="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-violet-500 to-purple-500 rounded-full"></div>
                                             <p className="ml-4 text-gray-700 leading-relaxed whitespace-pre-wrap break-words text-base">
-                                                {a.notesText}
+                                                {a.noteContent}
                                             </p>
                                         </div>
                                     </div>
 
-                                    {/* Action Buttons */}
-                                    <div className="flex gap-3 pt-3 border-t border-gray-100">
+                                     <div className="flex gap-3 pt-3 border-t border-gray-100">
                                         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
                                             <DialogTrigger asChild>
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    onClick={() => {editNotesForm.reset({id: a?.notesId, notesText: a?.notesText})}}
+                                                    onClick={() => {editNotesForm.reset({id: a?.notesId, noteContent: a?.noteContent})}}
                                                     className="flex items-center gap-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-colors duration-200"
                                                 >
                                                     <Edit3 className="h-4 w-4" />
@@ -232,7 +229,7 @@ function NotesModule({userId, courseId, courseContentId, refreshTrigger}) {
                                                         <div>
                                                             <FormField
                                                                 control={editNotesForm.control}
-                                                                name="notesText"
+                                                                name="noteContent"
                                                                 render={({field}) => (
                                                                     <FormItem>
                                                                         <FormControl>
@@ -326,9 +323,171 @@ function NotesModule({userId, courseId, courseContentId, refreshTrigger}) {
                             </div>
                         </Alert>
                     )}
-                </CardContent>
+                </CardContent> */}
             </Card>
+            {notesList.length > 0 ? (
+                        <div className="space-y-4">
+                            {notesList.map((a, index) => (
+                                <div
+                                    key={a.notesId}
+                                    className="group relative bg-white/80 backdrop-blur-sm border border-gray-200/60 rounded-xl p-3 hover:border-violet-300/60 hover:shadow-lg hover:shadow-violet-100/20 transition-all duration-300 transform hover:-translate-y-1"
+                                    style={{
+                                        animationDelay: `${index * 100}ms`,
+                                        animation: 'slideInUp 0.5s ease-out forwards'
+                                    }}
+                                >
+                                    {/* Note Header */}
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                                            <Calendar className="h-4 w-4 text-violet-500" />
+                                            <span className="font-medium">{a?.v_created_date}</span>
+                                            <Clock className="h-4 w-4 text-violet-500 ml-2" />
+                                            <span>{a?.v_created_time}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                            <div className="h-2 w-2 bg-violet-400 rounded-full animate-pulse"></div>
+                                            <div className="h-2 w-2 bg-purple-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                                            <div className="h-2 w-2 bg-indigo-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                                        </div>
+                                    </div>
 
+                                    {/* Note Content */}
+                                    <div className="mb-3">
+                                        <div className="relative">
+                                            <div className="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-violet-500 to-purple-500 rounded-full"></div>
+                                            <p className="ml-4 text-gray-700 leading-relaxed whitespace-pre-wrap break-words text-base">
+                                                {a.noteContent}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    <div className="flex gap-3 pt-3 border-t border-gray-100">
+                                        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+                                            <DialogTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => {editNotesForm.reset({id: a?.notesId, noteContent: a?.noteContent})}}
+                                                    className="flex items-center gap-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-colors duration-200"
+                                                >
+                                                    <Edit3 className="h-4 w-4" />
+                                                    <span className="font-medium">Edit</span>
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+                                                <DialogHeader>
+                                                    <DialogTitle className="flex items-center gap-2 text-xl text-blue-800">
+                                                        <Edit3 className="h-5 w-5 text-blue-600" />
+                                                        Edit Your Note
+                                                    </DialogTitle>
+                                                    <DialogDescription className="text-blue-600/70">
+                                                        Make changes to your note below. Click save when you're done.
+                                                    </DialogDescription>
+                                                </DialogHeader>
+
+                                                <Form {...editNotesForm}>
+                                                    <form
+                                                        onSubmit={editNotesForm.handleSubmit(onCommentUpdate)}
+                                                        className="w-full space-y-6"
+                                                    >
+                                                        <div>
+                                                            <FormField
+                                                                control={editNotesForm.control}
+                                                                name="noteContent"
+                                                                render={({field}) => (
+                                                                    <FormItem>
+                                                                        <FormControl>
+                                                                            <Textarea
+                                                                                placeholder="Type your note here..."
+                                                                                className="min-h-[120px] resize-none border-blue-200 focus:border-blue-400 focus:ring-blue-400/20"
+                                                                                {...field}
+                                                                            />
+                                                                        </FormControl>
+                                                                        <FormMessage/>
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                        </div>
+
+                                                        <DialogFooter className="gap-2">
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                onClick={() => editNotesForm.reset()}
+                                                                className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                                                            >
+                                                                Reset
+                                                            </Button>
+                                                            <DialogClose asChild>
+                                                                <Button type="button" variant="outline" className="border-gray-300">
+                                                                    Cancel
+                                                                </Button>
+                                                            </DialogClose>
+                                                            <Button
+                                                                type="submit"
+                                                                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                                                            >
+                                                                Save Changes
+                                                            </Button>
+                                                        </DialogFooter>
+                                                    </form>
+                                                </Form>
+                                            </DialogContent>
+                                        </Dialog>
+
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors duration-200"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                    <span className="font-medium">Delete</span>
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent className="bg-gradient-to-br from-red-50 to-pink-50 border-red-200">
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle className="flex items-center gap-2 text-red-800">
+                                                        <Trash2 className="h-5 w-5 text-red-600" />
+                                                        Delete Note
+                                                    </AlertDialogTitle>
+                                                    <AlertDialogDescription className="text-red-700/80">
+                                                        This action cannot be undone. This will permanently delete your note from our servers.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel className="border-gray-300">Cancel</AlertDialogCancel>
+                                                    <AlertDialogAction
+                                                        onClick={() => deleteComment(a?.notesId)}
+                                                        className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700"
+                                                    >
+                                                        Delete Forever
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <Alert className="my-4 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200/60 shadow-lg">
+                            <div className="flex items-center gap-3">
+                                <div className="relative">
+                                    <MessageCircle className="h-5 w-5 text-amber-600" />
+                                    <div className="absolute -top-1 -right-1 h-3 w-3 bg-amber-400 rounded-full animate-bounce"></div>
+                                </div>
+                                <div>
+                                    <AlertTitle className="text-amber-800 font-semibold">No Notes Yet</AlertTitle>
+                                    <AlertDescription className="text-amber-700/80">
+                                        Start taking notes to capture your thoughts and key insights from this content.
+                                    </AlertDescription>
+                                </div>
+                            </div>
+                        </Alert>
+                    )}
             <style jsx>{`
                 @keyframes slideInUp {
                     from {
