@@ -24,7 +24,7 @@ function CourseWritten() {
     const { userDetail } = useAuthStore();
 
     const {CourseId, CourseDocId} = useParams();
-    const {userEnrollmentObj, userCourseContentProgress, fetchUserCourseContentProgress, isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus} = useCourse();
+    const {userCourseEnrollment, userCourseContentProgress, fetchUserCourseContentProgress, fetchUserCourseEnrollment, courseList} = useCourse();
 
     const [courseVideoDetail, setCourseVideoDetail] = useState({});
     const [courseTopicContent, setCourseTopicContent] = useState({});
@@ -34,7 +34,7 @@ function CourseWritten() {
         if (courseList && CourseDocId) {
             fetchCourseVideo();
         }
-    }, [courseList, userEnrollmentObj, CourseDocId]);
+    }, [courseList, userCourseEnrollment, CourseDocId]);
 
     const fetchCourseVideo = () => {
         axiosConn
@@ -45,9 +45,13 @@ function CourseWritten() {
             })
             .then((res) => {
                 console.log(res.data);
-                const video = res.data.data?.results?.[0]
-                setCourseVideoDetail(video);
-                setCourseTopicContent(courseList?.courseTopic?.find(a => a.courseTopicId == video.courseTopicId)?.courseTopicContent?.find(a => a.contentId == video.courseWrittenId && a.courseTopicContentType == 'CourseWritten'))
+                const written = res.data.data?.results?.[0]
+                setCourseVideoDetail(written);
+                
+                // Find the content from the new courseContent structure
+                const content = courseList?.courseContent
+                    ?.find(a => a.courseContentId === written.courseContentId);
+                setCourseTopicContent(content || {});
             })
             .catch((err) => {
                 console.log(err);
@@ -55,80 +59,103 @@ function CourseWritten() {
     }
 
     const saveUserEnrollmentData = () => {
+        if (!courseList?.courseId || !courseVideoDetail?.courseContentId) return;
+
         axiosConn
-            .post(import.meta.env.VITE_API_URL + "/saveUserEnrollmentData", {
-                userEnrollmentId: userEnrollmentObj?.userEnrollmentId,
+            .post(import.meta.env.VITE_API_URL + "/saveUserCourseContentProgress", {
                 courseId: courseList.courseId,
-                courseTopicContentId: courseTopicContent.courseTopicContentId,
-                courseTopicId: courseVideoDetail.courseTopicId,
-                enrollmentStatus: 'COMPLETED'
+                courseContentId: courseVideoDetail.courseContentId,
+                logStatus: 'COMPLETED'
             })
             .then((res) => {
                 console.log(res.data);
                 toast({
-                    title: "status is updated"
+                    title: "Progress saved!",
+                    description: "Content marked as completed successfully."
                 });
-                fetchUserCourseContentProgress(); enrollStatus()
+                fetchUserCourseContentProgress(userDetail.userId);
+                fetchUserCourseEnrollment(userDetail.userId);
             })
             .catch((err) => {
                 console.log(err);
                 toast({
-                    title: "status updation failed"
+                    title: "Error",
+                    description: "Failed to update progress. Please try again.",
+                    variant: "destructive"
                 })
             });
     }
 
     const deleteUserEnrollmentData = () => {
+        if (!courseList?.courseId || !courseVideoDetail?.courseContentId) return;
+
         axiosConn
-            .post(import.meta.env.VITE_API_URL + "/deleteUserEnrollmentData", {
-                userEnrollmentId: userEnrollmentObj?.userEnrollmentId,
+            .post(import.meta.env.VITE_API_URL + "/deleteUserCourseContentProgress", {
                 courseId: courseList.courseId,
-                courseTopicContentId: courseTopicContent.courseTopicContentId,
-                courseTopicId: courseVideoDetail.courseTopicId
+                courseContentId: courseVideoDetail.courseContentId
             })
             .then((res) => {
                 console.log(res.data);
                 toast({
-                    title: "status is updated"
+                    title: "Progress updated",
+                    description: "Content completion status removed."
                 });
-                fetchUserCourseContentProgress(); enrollStatus()
+                fetchUserCourseContentProgress(userDetail.userId);
+                fetchUserCourseEnrollment(userDetail.userId);
             })
             .catch((err) => {
                 console.log(err);
                 toast({
-                    title: "status updation failed"
+                    title: "Error",
+                    description: "Failed to update progress. Please try again.",
+                    variant: "destructive"
                 })
             });
     }
 
-    const [prevContent, setPrevContent] = useState({}); ;
-    const [nextContent, setNextContent] = useState({}); ;
+    const [prevContent, setPrevContent] = useState(null);
+    const [nextContent, setNextContent] = useState(null);
 
     useEffect(() => {
-        const allContents = courseList?.courseTopic?.flatMap(topic =>
-            topic?.courseTopicContent?.map(content => ({
-                ...content,
-                courseTopicTitle: topic.courseTopicTitle // optional, helpful for display
-            })) || []
+        if (!courseList?.courseContent || !courseVideoDetail?.courseContentId) {
+            setPrevContent(null);
+            setNextContent(null);
+            return;
+        }
+
+        // Find current content index by matching the courseContentId from the written content details
+        const currentIndex = courseList.courseContent.findIndex(
+            content => content.courseContentId === courseVideoDetail.courseContentId
         );
 
-        const currentIndex = allContents.findIndex(
-            content => content.courseTopicContentId === courseTopicContent?.courseTopicContentId
-        );
+        if (currentIndex === -1) {
+            setPrevContent(null);
+            setNextContent(null);
+            return;
+        }
 
-        setPrevContent(currentIndex > 0 ? allContents[currentIndex - 1] : null);
-        setNextContent(currentIndex < allContents.length - 1 ? allContents[currentIndex + 1] : null);
+        setPrevContent(currentIndex > 0 ? courseList.courseContent[currentIndex - 1] : null);
+        setNextContent(currentIndex < courseList.courseContent.length - 1 ? courseList.courseContent[currentIndex + 1] : null);
 
-    }, [courseList, courseTopicContent]);
+    }, [courseList, courseVideoDetail?.courseContentId]);
 
-    const navigateToNextModule = (context) => {
-        console.log(context);
-        if (context.courseTopicContentType == 'CourseVideo') {
-            navigate(`/course/${context?.courseId}/video/${context?.contentId}`);
-        } else if (context.courseTopicContentType == 'CourseWritten') {
-            navigate(`/course/${context?.courseId}/doc/${context?.contentId}`);
-        } else if (context.courseTopicContentType == 'CourseQuiz') {
-            navigate(`/course/${context?.courseId}/quiz/${context?.contentId}`);
+    const navigateToNextModule = (content) => {
+        if (!content) return;
+
+        console.log('Navigating to content:', content);
+        console.log('Course list:', courseList);
+
+        const routes = {
+            'CourseVideo': `/course/${courseList?.courseId}/video/${content.courseContentId}`,
+            'CourseWritten': `/course/${courseList?.courseId}/doc/${content.courseContentId}`,
+            'CourseQuiz': `/course/${courseList?.courseId}/quiz/${content.courseContentId}`
+        };
+
+        const route = routes[content.courseContentType];
+        console.log('Generated route:', route);
+        
+        if (route) {
+            navigate(route);
         }
     }
 
@@ -138,7 +165,11 @@ function CourseWritten() {
         setTriggerNotesRefresh(prev => !prev);
     };
 
-    const isCompleted = userCourseContentProgress?.filter(b => (b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED'))?.length > 0;
+    const isCompleted = userCourseContentProgress?.some(
+        log => log.courseId == CourseId && 
+               log.courseContentId === courseVideoDetail?.courseContentId && 
+               log.progressStatus === 'COMPLETED'
+    );
 
     const formatDuration = (totalMinutes) => {
         const minutes = +totalMinutes || 0;
@@ -146,6 +177,37 @@ function CourseWritten() {
         const mins = minutes % 60;
         return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
     };
+
+    // Check enrollment access
+    const isUserEnrolled = userCourseEnrollment && userCourseEnrollment.length > 0;
+    const enrollmentStatus = userCourseEnrollment?.[0]?.enrollmentStatus;
+    const hasContentAccess = isUserEnrolled && ['ENROLLED', 'IN_PROGRESS', 'COMPLETED', 'CERTIFIED'].includes(enrollmentStatus);
+
+    // If not enrolled, show access denied
+    if (!hasContentAccess) {
+        return (
+            <div className="min-h-screen bg-gray-50/30 flex items-center justify-center">
+                <div className="text-center max-w-md">
+                    <div className="mb-4">
+                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <FileText className="w-8 h-8 text-red-600" />
+                        </div>
+                        <h2 className="text-xl font-semibold text-gray-900 mb-2">Content Locked</h2>
+                        <p className="text-gray-600">
+                            You need to be enrolled in this course to access this content.
+                        </p>
+                    </div>
+                    <Button 
+                        onClick={() => window.history.back()} 
+                        variant="outline"
+                        className="mt-4"
+                    >
+                        Go Back
+                    </Button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <>
@@ -158,7 +220,7 @@ function CourseWritten() {
                         <BreadcrumbItem>
                             <BreadcrumbPage
                                 className="truncate max-w-[30ch] font-medium text-muted-foreground">
-                                {courseTopicContent?.courseTopicContentTitle}
+                                {courseVideoDetail?.courseWrittenTitle || 'Loading...'}
                             </BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
@@ -200,14 +262,14 @@ function CourseWritten() {
                                 </Badge>
                                 <Badge variant="outline" className="bg-white/80">
                                     <Clock className="h-3 w-3 mr-1"/>
-                                    {formatDuration(courseTopicContent?.courseTopicContentDuration)}
+                                    {formatDuration(courseTopicContent?.courseContentDuration)}
                                 </Badge>
                             </div>
 
                             <div className="flex items-start justify-between gap-4">
                                 <div className="flex-1">
                                     <CardTitle className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-2">
-                                        {courseTopicContent?.courseTopicContentTitle}
+                                        {courseVideoDetail?.courseWrittenTitle || 'Loading...'}
                                     </CardTitle>
                                 </div>
 
@@ -267,8 +329,7 @@ function CourseWritten() {
                             <CreateNotesModule
                                 handleNotesSave={handleNotesSave}
                                 courseId={courseList.courseId}
-                                courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.courseTopicContentId}
-                                courseTopicId={courseVideoDetail.courseTopicId}
+                                courseContentId={courseVideoDetail?.courseContentId}
                             />
                         </CardContent>
                     </Card>
@@ -278,9 +339,8 @@ function CourseWritten() {
                         <NotesModule
                             refreshTrigger={triggerNotesRefresh}
                             courseId={courseList.courseId}
-                            userDetail={userDetail.userId}
-                            courseTopicContentId={courseList?.courseTopic?.find(a => a.courseTopicId == courseVideoDetail.courseTopicId)?.courseTopicContent?.find(a => a.contentId == courseVideoDetail.courseWrittenId && a.courseTopicContentType == 'CourseWritten')?.courseTopicContentId}
-                            courseTopicId={courseVideoDetail.courseTopicId}
+                            userId={userDetail.userId}
+                            courseContentId={courseVideoDetail?.courseContentId}
                         />
                     </div>
                 </div>

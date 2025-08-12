@@ -4,7 +4,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar.jsx";
 import { Separator } from "@/components/ui/separator.jsx";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb.jsx";
 import { Badge } from "@/components/ui/badge.jsx";
-import { CircleArrowLeft, CircleArrowRight, Clock, Play, BookOpen } from "lucide-react";
+import { CircleArrowLeft, CircleArrowRight, Clock, Play, BookOpen, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button.jsx";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.jsx";
 import { useCourse } from "@/components-xm/Course/CourseContext.jsx";
@@ -129,40 +129,67 @@ const useEnrollmentActions = (courseList, courseVideoDetail, fetchUserCourseCont
     return { saveUserEnrollmentData, deleteUserEnrollmentData };
 };
 
-const useNavigation = (courseList, CourseVideoId) => {
+const useNavigation = (courseList, courseVideoDetail) => {
     const navigate = useNavigate();
 
     const { prevContent, nextContent } = useMemo(() => {
-        if (!courseList?.courseContent || !CourseVideoId) {
+        if (!courseList?.courseContent || !courseVideoDetail?.courseContentId) {
+            console.log('Navigation disabled - missing data:', {
+                hasCourseContent: !!courseList?.courseContent,
+                hasVideoDetail: !!courseVideoDetail?.courseContentId,
+                courseContent: courseList?.courseContent,
+                videoDetail: courseVideoDetail
+            });
             return { prevContent: null, nextContent: null };
         }
 
+        console.log('Course content array:', courseList.courseContent);
+        console.log('Looking for courseContentId:', courseVideoDetail.courseContentId);
+
+        // Find current content index by matching the courseContentId from the video details
         const currentIndex = courseList.courseContent.findIndex(
-            content => content.courseContentId === CourseVideoId
+            content => content.courseContentId === courseVideoDetail.courseContentId
         );
 
+        console.log('Current index found:', currentIndex);
+
+        if (currentIndex === -1) {
+            console.log('Content not found in course content array');
+            return { prevContent: null, nextContent: null };
+        }
+
+        const prev = currentIndex > 0 ? courseList.courseContent[currentIndex - 1] : null;
+        const next = currentIndex < courseList.courseContent.length - 1 
+            ? courseList.courseContent[currentIndex + 1] 
+            : null;
+
+        console.log('Navigation calculated:', { prev, next, currentIndex, totalItems: courseList.courseContent.length });
+
         return {
-            prevContent: currentIndex > 0 ? courseList.courseContent[currentIndex - 1] : null,
-            nextContent: currentIndex < courseList.courseContent.length - 1
-                ? courseList.courseContent[currentIndex + 1]
-                : null
+            prevContent: prev,
+            nextContent: next
         };
-    }, [courseList, CourseVideoId]);
+    }, [courseList, courseVideoDetail?.courseContentId]);
 
     const navigateToContent = useCallback((content) => {
         if (!content) return;
 
+        console.log('Navigating to content:', content);
+        console.log('Course list:', courseList);
+
         const routes = {
-            [CONTENT_TYPES.COURSE_VIDEO]: `/course/${content.courseId}/video/${content.courseContentId}`,
-            [CONTENT_TYPES.COURSE_WRITTEN]: `/course/${content.courseId}/doc/${content.courseContentId}`,
-            [CONTENT_TYPES.COURSE_QUIZ]: `/course/${content.courseId}/quiz/${content.courseContentId}`
+            [CONTENT_TYPES.COURSE_VIDEO]: `/course/${courseList?.courseId}/video/${content.courseContentId}`,
+            [CONTENT_TYPES.COURSE_WRITTEN]: `/course/${courseList?.courseId}/doc/${content.courseContentId}`,
+            [CONTENT_TYPES.COURSE_QUIZ]: `/course/${courseList?.courseId}/quiz/${content.courseContentId}`
         };
 
         const route = routes[content.courseContentType];
+        console.log('Generated route:', route);
+        
         if (route) {
             navigate(route);
         }
-    }, [navigate]);
+    }, [navigate, courseList?.courseId]);
 
     return {
         prevContent,
@@ -301,7 +328,7 @@ const VideoDescription = React.memo(({ description }) => (
 function CourseVideoTutorial() {
     const { userDetail } = useAuthStore();
     const { CourseId, CourseVideoId } = useParams();
-    const { userCourseContentProgress, fetchUserCourseContentProgress, courseList } = useCourse();
+    const { userCourseContentProgress, userCourseEnrollment, fetchUserCourseContentProgress, fetchUserCourseEnrollment, courseList } = useCourse();
 
     const [triggerNotesRefresh, setTriggerNotesRefresh] = useState(false);
 
@@ -313,7 +340,7 @@ function CourseVideoTutorial() {
         fetchUserCourseContentProgress,
         userDetail
     );
-    const { prevContent, nextContent, navigateToContent } = useNavigation(courseList, CourseVideoId);
+    const { prevContent, nextContent, navigateToContent } = useNavigation(courseList, courseVideoDetail);
 
 
     // useEffect(() => {
@@ -392,6 +419,37 @@ function CourseVideoTutorial() {
     const handleUndoComplete = useCallback(() => {
         deleteUserEnrollmentData();
     }, [deleteUserEnrollmentData]);
+
+    // Check enrollment access
+    const isUserEnrolled = userCourseEnrollment && userCourseEnrollment.length > 0;
+    const enrollmentStatus = userCourseEnrollment?.[0]?.enrollmentStatus;
+    const hasContentAccess = isUserEnrolled && ['ENROLLED', 'IN_PROGRESS', 'COMPLETED', 'CERTIFIED'].includes(enrollmentStatus);
+
+    // If not enrolled, show access denied
+    if (!hasContentAccess) {
+        return (
+            <div className="min-h-screen bg-gray-50/30 flex items-center justify-center">
+                <div className="text-center max-w-md">
+                    <div className="mb-4">
+                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Lock className="w-8 h-8 text-red-600" />
+                        </div>
+                        <h2 className="text-xl font-semibold text-gray-900 mb-2">Content Locked</h2>
+                        <p className="text-gray-600">
+                            You need to be enrolled in this course to access this content.
+                        </p>
+                    </div>
+                    <Button 
+                        onClick={() => window.history.back()} 
+                        variant="outline"
+                        className="mt-4"
+                    >
+                        Go Back
+                    </Button>
+                </div>
+            </div>
+        );
+    }
 
     // Loading state
     if (!courseList || !courseVideoDetail?.courseVideoId) {

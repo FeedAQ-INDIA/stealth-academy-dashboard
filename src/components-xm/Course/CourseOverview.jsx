@@ -29,7 +29,8 @@ function CourseOverview() {
     const {CourseId} = useParams();
     const {
         courseList,
-        userCourseContentProgress
+        userCourseContentProgress,
+        userCourseEnrollment
     } = useCourse();
     const {userDetail} = useAuthStore();
 
@@ -89,6 +90,33 @@ function CourseOverview() {
 
         return totalContent > 0 ? Math.round((completedContent / totalContent) * 100) : 0;
     };
+
+    // Get enrollment status
+    const getEnrollmentStatus = () => {
+        if (!userCourseEnrollment || userCourseEnrollment.length === 0) {
+            return { status: 'NOT_ENROLLED', displayText: 'NOT ENROLLED', color: 'gray' };
+        }
+        
+        const enrollment = userCourseEnrollment[0]; // Get the first enrollment record
+        const statusConfig = {
+            'NOT_STARTED': { displayText: 'NOT STARTED', color: 'orange' },
+            'ENROLLED': { displayText: 'ENROLLED', color: 'green' },
+            'IN_PROGRESS': { displayText: 'IN PROGRESS', color: 'blue' },
+            'PAUSED': { displayText: 'PAUSED', color: 'yellow' },
+            'COMPLETED': { displayText: 'COMPLETED', color: 'purple' },
+            'CERTIFIED': { displayText: 'CERTIFIED', color: 'gold' }
+        };
+        
+        return {
+            status: enrollment.enrollmentStatus,
+            displayText: statusConfig[enrollment.enrollmentStatus]?.displayText || enrollment.enrollmentStatus,
+            color: statusConfig[enrollment.enrollmentStatus]?.color || 'gray',
+            enrollmentDate: enrollment.enrollmentDate,
+            completionDate: enrollment.completionDate
+        };
+    };
+
+    const enrollmentInfo = getEnrollmentStatus();
 
     const progress = calculateProgress();
 
@@ -176,13 +204,26 @@ function CourseOverview() {
 
                             <div className="flex flex-col items-center gap-2">
                                      <div className="text-center">
-                                        <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full font-semibold text-sm animate-bounce">
-                                            <Check className="h-4 w-4"/>
-                                            ENROLLED
+                                        <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm ${
+                                            enrollmentInfo.color === 'green' ? 'bg-green-100 text-green-800 animate-bounce' :
+                                            enrollmentInfo.color === 'blue' ? 'bg-blue-100 text-blue-800' :
+                                            enrollmentInfo.color === 'orange' ? 'bg-orange-100 text-orange-800' :
+                                            enrollmentInfo.color === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
+                                            enrollmentInfo.color === 'purple' ? 'bg-purple-100 text-purple-800' :
+                                            enrollmentInfo.color === 'gold' ? 'bg-yellow-100 text-yellow-900' :
+                                            'bg-gray-100 text-gray-800'
+                                        }`}>
+                                            {enrollmentInfo.status === 'ENROLLED' || enrollmentInfo.status === 'COMPLETED' || enrollmentInfo.status === 'CERTIFIED' ? (
+                                                <Check className="h-4 w-4"/>
+                                            ) : null}
+                                            {enrollmentInfo.displayText}
                                         </div>
-                                        <p className='text-sm text-gray-600 cursor-pointer hover:text-blue-600 hover:underline transition-colors mt-1'>
-                                            View Order
-                                        </p>
+                                        {enrollmentInfo.status !== 'NOT_ENROLLED' && (
+                                            <p className='text-sm text-gray-600 cursor-pointer hover:text-blue-600 hover:underline transition-colors mt-1'>
+                                                {enrollmentInfo.enrollmentDate && `Enrolled: ${new Date(enrollmentInfo.enrollmentDate).toLocaleDateString()}`}
+                                                {enrollmentInfo.completionDate && ` | Completed: ${new Date(enrollmentInfo.completionDate).toLocaleDateString()}`}
+                                            </p>
+                                        )}
                                     </div>
 
                             </div>

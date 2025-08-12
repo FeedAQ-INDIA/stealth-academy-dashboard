@@ -25,14 +25,11 @@ import {Skeleton} from "@/components/ui/skeleton.jsx";
 function CourseQuiz() {
     const {CourseId, CourseQuizId} = useParams();
     const {
-        userEnrollmentObj,
+        userCourseEnrollment,
         userCourseContentProgress,
         fetchUserCourseContentProgress,
-        isUserEnrolledAlready,
-        courseList,
-        enroll,
-        disroll,
-        enrollStatus
+        fetchUserCourseEnrollment,
+        courseList
     } = useCourse();
     const { userDetail } = useAuthStore();
 
@@ -48,7 +45,7 @@ function CourseQuiz() {
         if (courseList && CourseQuizId) {
             fetchCourseVideo();
         }
-    }, [courseList, userEnrollmentObj, CourseQuizId]);
+    }, [courseList, userCourseEnrollment, CourseQuizId]);
 
     const fetchCourseVideo = async () => {
         setIsLoading(true);
@@ -65,7 +62,11 @@ function CourseQuiz() {
 
             const video = res.data.data?.results?.[0];
             setCourseQuizDetail(video);
-            setCourseTopicContent(courseList?.courseTopic?.find(a => a.courseTopicId == video.courseTopicId)?.courseTopicContent?.find(a => a.contentId == video.courseQuizId && a.courseTopicContentType == 'CourseQuiz'));
+            
+            // Find the content from the new courseContent structure
+            const content = courseList?.courseContent
+                ?.find(a => a.courseContentId === video.courseContentId);
+            setCourseTopicContent(content || {});
         } catch (err) {
             console.error(err);
             toast({
@@ -80,12 +81,12 @@ function CourseQuiz() {
 
     const saveUserEnrollmentData = async () => {
         try {
-            await axiosConn.post(import.meta.env.VITE_API_URL + "/saveUserEnrollmentData", {
-                userEnrollmentId: userEnrollmentObj?.userEnrollmentId,
+            if (!courseList?.courseId || !courseQuizDetail?.courseContentId) return;
+
+            await axiosConn.post(import.meta.env.VITE_API_URL + "/saveUserCourseContentProgress", {
                 courseId: courseList.courseId,
-                courseTopicContentId: courseTopicContent.courseTopicContentId,
-                courseTopicId: courseQuizDetail.courseTopicId,
-                enrollmentStatus: 'COMPLETED'
+                courseContentId: courseQuizDetail.courseContentId,
+                logStatus: 'COMPLETED'
             });
 
             toast({
@@ -93,8 +94,8 @@ function CourseQuiz() {
                 description: "Quiz marked as completed successfully."
             });
 
-            fetchUserCourseContentProgress();
-            enrollStatus();
+            fetchUserCourseContentProgress(userDetail.userId);
+            fetchUserCourseEnrollment(userDetail.userId);
         } catch (err) {
             console.error(err);
             toast({
@@ -107,11 +108,11 @@ function CourseQuiz() {
 
     const deleteUserEnrollmentData = async () => {
         try {
-            await axiosConn.post(import.meta.env.VITE_API_URL + "/deleteUserEnrollmentData", {
-                userEnrollmentId: userEnrollmentObj?.userEnrollmentId,
+            if (!courseList?.courseId || !courseQuizDetail?.courseContentId) return;
+
+            await axiosConn.post(import.meta.env.VITE_API_URL + "/deleteUserCourseContentProgress", {
                 courseId: courseList.courseId,
-                courseTopicContentId: courseTopicContent.courseTopicContentId,
-                courseTopicId: courseQuizDetail.courseTopicId
+                courseContentId: courseQuizDetail.courseContentId
             });
 
             toast({
@@ -119,8 +120,8 @@ function CourseQuiz() {
                 description: "Quiz completion status removed."
             });
 
-            fetchUserCourseContentProgress();
-            enrollStatus();
+            fetchUserCourseContentProgress(userDetail.userId);
+            fetchUserCourseEnrollment(userDetail.userId);
         } catch (err) {
             console.error(err);
             toast({
@@ -132,28 +133,44 @@ function CourseQuiz() {
     };
 
     useEffect(() => {
-        const allContents = courseList?.courseTopic?.flatMap(topic =>
-            topic?.courseTopicContent?.map(content => ({
-                ...content,
-                courseTopicTitle: topic.courseTopicTitle
-            })) || []
+        if (!courseList?.courseContent || !courseQuizDetail?.courseContentId) {
+            setPrevContent(null);
+            setNextContent(null);
+            return;
+        }
+
+        // Find current content index by matching the courseContentId from the quiz details
+        const currentIndex = courseList.courseContent.findIndex(
+            content => content.courseContentId === courseQuizDetail.courseContentId
         );
 
-        const currentIndex = allContents.findIndex(
-            content => content.courseTopicContentId === courseTopicContent?.courseTopicContentId
-        );
+        if (currentIndex === -1) {
+            setPrevContent(null);
+            setNextContent(null);
+            return;
+        }
 
-        setPrevContent(currentIndex > 0 ? allContents[currentIndex - 1] : null);
-        setNextContent(currentIndex < allContents.length - 1 ? allContents[currentIndex + 1] : null);
-    }, [courseList, courseTopicContent]);
+        setPrevContent(currentIndex > 0 ? courseList.courseContent[currentIndex - 1] : null);
+        setNextContent(currentIndex < courseList.courseContent.length - 1 ? courseList.courseContent[currentIndex + 1] : null);
+    }, [courseList, courseQuizDetail?.courseContentId]);
 
-    const navigateToNextModule = (context) => {
-        if (context.courseTopicContentType == 'CourseVideo') {
-            navigate(`/course/${context?.courseId}/video/${context?.contentId}`);
-        } else if (context.courseTopicContentType == 'CourseWritten') {
-            navigate(`/course/${context?.courseId}/doc/${context?.contentId}`);
-        } else if (context.courseTopicContentType == 'CourseQuiz') {
-            navigate(`/course/${context?.courseId}/quiz/${context?.contentId}`);
+    const navigateToNextModule = (content) => {
+        if (!content) return;
+
+        console.log('Navigating to content:', content);
+        console.log('Course list:', courseList);
+
+        const routes = {
+            'CourseVideo': `/course/${courseList?.courseId}/video/${content.courseContentId}`,
+            'CourseWritten': `/course/${courseList?.courseId}/doc/${content.courseContentId}`,
+            'CourseQuiz': `/course/${courseList?.courseId}/quiz/${content.courseContentId}`
+        };
+
+        const route = routes[content.courseContentType];
+        console.log('Generated route:', route);
+        
+        if (route) {
+            navigate(route);
         }
     };
 
@@ -177,18 +194,49 @@ function CourseQuiz() {
         return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
     };
 
-    const isCompleted = userCourseContentProgress?.filter(b =>
-        (b.courseId == CourseId &&
-            b?.courseTopicContentId == courseTopicContent?.courseTopicContentId &&
-            b.enrollmentStatus == 'COMPLETED')
-    )?.length > 0;
+    const isCompleted = userCourseContentProgress?.some(
+        log => log.courseId == CourseId && 
+               log.courseContentId === courseQuizDetail?.courseContentId && 
+               log.progressStatus === 'COMPLETED'
+    );
 
     // Calculate progress
-    const totalContent = courseList?.courseTopic?.flatMap(topic => topic?.courseTopicContent || []).length || 0;
+    const totalContent = courseList?.courseContent?.length || 0;
     const completedContent = userCourseContentProgress?.filter(b =>
-        b.courseId == CourseId && b.enrollmentStatus == 'COMPLETED'
+        b.courseId == CourseId && b.progressStatus == 'COMPLETED'
     )?.length || 0;
     const progressPercentage = totalContent > 0 ? (completedContent / totalContent) * 100 : 0;
+
+    // Check enrollment access
+    const isUserEnrolled = userCourseEnrollment && userCourseEnrollment.length > 0;
+    const enrollmentStatus = userCourseEnrollment?.[0]?.enrollmentStatus;
+    const hasContentAccess = isUserEnrolled && ['ENROLLED', 'IN_PROGRESS', 'COMPLETED', 'CERTIFIED'].includes(enrollmentStatus);
+
+    // If not enrolled, show access denied
+    if (!hasContentAccess) {
+        return (
+            <div className="min-h-screen bg-gray-50/30 flex items-center justify-center">
+                <div className="text-center max-w-md">
+                    <div className="mb-4">
+                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Trophy className="w-8 h-8 text-red-600" />
+                        </div>
+                        <h2 className="text-xl font-semibold text-gray-900 mb-2">Quiz Locked</h2>
+                        <p className="text-gray-600">
+                            You need to be enrolled in this course to access this quiz.
+                        </p>
+                    </div>
+                    <Button 
+                        onClick={() => window.history.back()} 
+                        variant="outline"
+                        className="mt-4"
+                    >
+                        Go Back
+                    </Button>
+                </div>
+            </div>
+        );
+    }
 
     if (isLoading) {
         return (
@@ -222,7 +270,7 @@ function CourseQuiz() {
                     <BreadcrumbList>
                         <BreadcrumbItem>
                             <BreadcrumbPage className="truncate max-w-[30ch] font-medium">
-                                {courseTopicContent?.courseTopicContentTitle}
+                                {courseQuizDetail?.courseQuizTitle || 'Loading...'}
                             </BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
@@ -266,7 +314,7 @@ function CourseQuiz() {
                             </Badge>
                             <Badge variant="outline" className="gap-1">
                                 <Clock className="w-3 h-3" />
-                                {formatDuration(courseTopicContent?.courseTopicContentDuration)}
+                                {formatDuration(courseTopicContent?.courseContentDuration)}
                             </Badge>
                             {isCompleted && (
                                 <Badge variant="default" className="gap-1 bg-green-100 text-green-800 border-green-200">
@@ -279,7 +327,7 @@ function CourseQuiz() {
                         <div className="flex items-start justify-between gap-4">
                             <div className="flex-1">
                                 <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
-                                    {courseTopicContent?.courseTopicContentTitle}
+                                    {courseQuizDetail?.courseQuizTitle || 'Loading...'}
                                 </CardTitle>
                                 <p className="text-sm text-muted-foreground mt-2">
                                     Test your knowledge with this interactive quiz
@@ -333,9 +381,9 @@ function CourseQuiz() {
                         {nextContent && (
                             <div className="flex items-center gap-1">
                                 <span>Next:</span>
-                                {getContentIcon(nextContent.courseTopicContentType)}
+                                {getContentIcon(nextContent.courseContentType)}
                                 <span className="truncate max-w-[200px]">
-                                    {nextContent.courseTopicContentTitle}
+                                    {courseTopicContent?.courseContentTitle || nextContent.courseContentId}
                                 </span>
                             </div>
                         )}

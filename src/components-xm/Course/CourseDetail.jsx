@@ -16,12 +16,14 @@ export function CourseDetail() {
     const {
         course: courseList,
         userCourseContentProgress,
+        userCourseEnrollment,
         loading,
         error,
         progress,
         actions: {
             fetchCourseDetail,
-            fetchUserCourseContentProgress
+            fetchUserCourseContentProgress,
+            fetchUserCourseEnrollment
         }
     } = useCourseState(CourseId);
 
@@ -29,8 +31,9 @@ export function CourseDetail() {
         fetchCourseDetail();
         if (userDetail?.userId) {
             fetchUserCourseContentProgress(userDetail.userId);
+            fetchUserCourseEnrollment(userDetail.userId);
         }
-    }, [CourseId, userDetail?.userId, fetchCourseDetail, fetchUserCourseContentProgress]);
+    }, [CourseId, userDetail?.userId, fetchCourseDetail, fetchUserCourseContentProgress, fetchUserCourseEnrollment]);
 
     const identifyContentTypeIcons = (type) => {
         if(type === 'CourseVideo') return <Video/>;
@@ -56,7 +59,9 @@ export function CourseDetail() {
         <CourseContext.Provider value={{ 
             courseList, 
             userCourseContentProgress,
+            userCourseEnrollment,
             fetchUserCourseContentProgress,
+            fetchUserCourseEnrollment,
             identifyContentTypeIcons,
             progress 
         }}>
