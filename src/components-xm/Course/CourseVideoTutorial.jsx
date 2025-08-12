@@ -83,7 +83,7 @@ const useVideoData = (CourseVideoId, courseList) => {
     };
 };
 
-const useEnrollmentActions = (courseList, courseVideoDetail, fetchUserEnrollmentData) => {
+const useEnrollmentActions = (courseList, courseVideoDetail, fetchUserCourseContentProgress, userDetail) => {
     const saveUserEnrollmentData = useCallback(async () => {
         if (!courseList?.courseId || !courseVideoDetail?.courseContentId) return;
 
@@ -96,7 +96,7 @@ const useEnrollmentActions = (courseList, courseVideoDetail, fetchUserEnrollment
             });
 
             toast({ title: "Progress saved successfully" });
-            fetchUserEnrollmentData();
+            fetchUserCourseContentProgress(userDetail?.userId);
         } catch (error) {
             console.error('Error saving enrollment data:', error);
             toast({
@@ -104,19 +104,19 @@ const useEnrollmentActions = (courseList, courseVideoDetail, fetchUserEnrollment
                 variant: "destructive"
             });
         }
-    }, [courseList?.courseId, courseVideoDetail?.courseContentId, fetchUserEnrollmentData]);
+    }, [courseList?.courseId, courseVideoDetail?.courseContentId, fetchUserCourseContentProgress, userDetail?.userId]);
 
     const deleteUserEnrollmentData = useCallback(async () => {
         if (!courseList?.courseId || !courseVideoDetail?.courseContentId) return;
 
         try {
-            await axiosConn.post(`${API_BASE_URL}/deleteUserEnrollmentData`, {
+            await axiosConn.post(`${API_BASE_URL}/deleteUserCourseContentProgress`, {
                 courseId: courseList.courseId,
                 courseContentId: courseVideoDetail.courseContentId
             });
 
             toast({ title: "Progress updated successfully" });
-            fetchUserEnrollmentData();
+            fetchUserCourseContentProgress(userDetail?.userId);
         } catch (error) {
             console.error('Error deleting enrollment data:', error);
             toast({
@@ -124,7 +124,7 @@ const useEnrollmentActions = (courseList, courseVideoDetail, fetchUserEnrollment
                 variant: "destructive"
             });
         }
-    }, [courseList?.courseId, courseVideoDetail?.courseContentId, fetchUserEnrollmentData]);
+    }, [courseList?.courseId, courseVideoDetail?.courseContentId, fetchUserCourseContentProgress, userDetail?.userId]);
 
     return { saveUserEnrollmentData, deleteUserEnrollmentData };
 };
@@ -301,7 +301,7 @@ const VideoDescription = React.memo(({ description }) => (
 function CourseVideoTutorial() {
     const { userDetail } = useAuthStore();
     const { CourseId, CourseVideoId } = useParams();
-    const { userEnrollmentCourseLog, fetchUserEnrollmentData, courseList } = useCourse();
+    const { userCourseContentProgress, fetchUserCourseContentProgress, courseList } = useCourse();
 
     const [triggerNotesRefresh, setTriggerNotesRefresh] = useState(false);
 
@@ -310,7 +310,8 @@ function CourseVideoTutorial() {
     const { saveUserEnrollmentData, deleteUserEnrollmentData } = useEnrollmentActions(
         courseList,
         courseVideoDetail,
-        fetchUserEnrollmentData
+        fetchUserCourseContentProgress,
+        userDetail
     );
     const { prevContent, nextContent, navigateToContent } = useNavigation(courseList, CourseVideoId);
 
@@ -325,16 +326,48 @@ function CourseVideoTutorial() {
 
     // Memoized values
     const isCompleted = useMemo(() => {
-        if (!userEnrollmentCourseLog || !CourseId || !courseContent?.courseContentId) {
+        if (!userCourseContentProgress || !CourseId || !courseVideoDetail?.courseContentId) {
+            console.log('isCompleted check failed - missing data:', {
+                hasProgress: !!userCourseContentProgress,
+                CourseId,
+                courseContentId: courseVideoDetail?.courseContentId
+            });
             return false;
         }
 
-        return userEnrollmentCourseLog.some(
-            log => log.courseId === CourseId &&
-                log.courseContentId === courseContent.courseContentId &&
-                log.enrollmentStatus === ENROLLMENT_STATUS.COMPLETED
+        console.log('Checking completion status:', {
+            CourseId,
+            courseContentId: courseVideoDetail.courseContentId,
+            userProgress: userCourseContentProgress,
+            progressLogs: userCourseContentProgress.map(log => ({
+                courseId: log.courseId,
+                courseContentId: log.courseContentId,
+                status: log.progressStatus
+            }))
+        });
+
+        const completed = userCourseContentProgress.some(
+            log => {
+                const courseIdMatch = log.courseId == CourseId; // Using == for type-flexible comparison
+                const contentIdMatch = log.courseContentId === courseVideoDetail.courseContentId;
+                const statusMatch = log.progressStatus === ENROLLMENT_STATUS.COMPLETED;
+                
+                console.log('Checking log:', {
+                    logCourseId: log.courseId,
+                    logContentId: log.courseContentId,
+                    logStatus: log.progressStatus,
+                    courseIdMatch,
+                    contentIdMatch,
+                    statusMatch
+                });
+                
+                return courseIdMatch && contentIdMatch && statusMatch;
+            }
         );
-    }, [userEnrollmentCourseLog, CourseId, courseContent?.courseContentId]);
+        
+        console.log('Final completion status:', completed);
+        return completed;
+    }, [userCourseContentProgress, CourseId, courseVideoDetail?.courseContentId]);
 
     const notesProps = useMemo(() => {
         const contentData = courseList?.courseContent
@@ -377,7 +410,7 @@ function CourseVideoTutorial() {
     return (
         <div className="min-h-screen bg-gray-50/30">
             <NavigationHeader
-            courseVideoDetail={courseVideoDetail}s
+                courseVideoDetail={courseVideoDetail}
                 courseContent={courseContent}
                 prevContent={prevContent}
                 nextContent={nextContent}

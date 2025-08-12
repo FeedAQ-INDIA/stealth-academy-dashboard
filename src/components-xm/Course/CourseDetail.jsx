@@ -56,7 +56,7 @@ export function CourseDetail() {
         <CourseContext.Provider value={{ 
             courseList, 
             userCourseContentProgress,
-            fetchUserEnrollmentData: fetchUserCourseContentProgress,
+            fetchUserCourseContentProgress,
             identifyContentTypeIcons,
             progress 
         }}>

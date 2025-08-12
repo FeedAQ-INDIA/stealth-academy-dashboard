@@ -26,8 +26,8 @@ function CourseQuiz() {
     const {CourseId, CourseQuizId} = useParams();
     const {
         userEnrollmentObj,
-        userEnrollmentCourseLog,
-        fetchUserEnrollmentData,
+        userCourseContentProgress,
+        fetchUserCourseContentProgress,
         isUserEnrolledAlready,
         courseList,
         enroll,
@@ -93,7 +93,7 @@ function CourseQuiz() {
                 description: "Quiz marked as completed successfully."
             });
 
-            fetchUserEnrollmentData();
+            fetchUserCourseContentProgress();
             enrollStatus();
         } catch (err) {
             console.error(err);
@@ -119,7 +119,7 @@ function CourseQuiz() {
                 description: "Quiz completion status removed."
             });
 
-            fetchUserEnrollmentData();
+            fetchUserCourseContentProgress();
             enrollStatus();
         } catch (err) {
             console.error(err);
@@ -177,7 +177,7 @@ function CourseQuiz() {
         return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
     };
 
-    const isCompleted = userEnrollmentCourseLog?.filter(b =>
+    const isCompleted = userCourseContentProgress?.filter(b =>
         (b.courseId == CourseId &&
             b?.courseTopicContentId == courseTopicContent?.courseTopicContentId &&
             b.enrollmentStatus == 'COMPLETED')
@@ -185,7 +185,7 @@ function CourseQuiz() {
 
     // Calculate progress
     const totalContent = courseList?.courseTopic?.flatMap(topic => topic?.courseTopicContent || []).length || 0;
-    const completedContent = userEnrollmentCourseLog?.filter(b =>
+    const completedContent = userCourseContentProgress?.filter(b =>
         b.courseId == CourseId && b.enrollmentStatus == 'COMPLETED'
     )?.length || 0;
     const progressPercentage = totalContent > 0 ? (completedContent / totalContent) * 100 : 0;

@@ -25,7 +25,7 @@ function CourseSidebar() {
 
     const [data, setData] = useState(null);
 
-    const { userEnrollmentCourseLog, courseList, identifyContentTypeIcons } = useCourse();
+    const { userCourseContentProgress, courseList, identifyContentTypeIcons } = useCourse();
 
     const contentUrlMap = {
         CourseVideo: "video",
@@ -113,11 +113,11 @@ function CourseSidebar() {
                                             >
                                                 <Link to={item?.url}>
                                                     <div className="flex items-center gap-2">
-                                                        {userEnrollmentCourseLog?.some(
+                                                        {userCourseContentProgress?.some(
                                                             (log) =>
                                                                 log.courseId == CourseId &&
                                                                 log.courseContentId == item?.courseContentId &&
-                                                                log.enrollmentStatus === "COMPLETED"
+                                                                log.progressStatus === "COMPLETED"
                                                         ) ? (
                                                             <Avatar className="border shadow-md bg-green-500">
                                                                 <AvatarFallback className="bg-green-500">

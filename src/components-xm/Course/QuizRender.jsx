@@ -39,8 +39,8 @@ function QuizRender({saveUserEnrollmentData, deleteUserEnrollmentData, fetchCour
     const {CourseId, CourseQuizId} = useParams();
     const {
         userEnrollmentObj,
-        userEnrollmentCourseLog,
-        fetchUserEnrollmentData,
+        userCourseContentProgress,
+        fetchUserCourseContentProgress,
         isUserEnrolledAlready,
         courseList,
         enroll,

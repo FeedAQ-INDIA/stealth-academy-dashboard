@@ -29,7 +29,7 @@ function CourseOverview() {
     const {CourseId} = useParams();
     const {
         courseList,
-        userEnrollmentCourseLog
+        userCourseContentProgress
     } = useCourse();
     const {userDetail} = useAuthStore();
 
@@ -83,8 +83,8 @@ function CourseOverview() {
         const totalContent = courseList.courseTopic.reduce((acc, topic) =>
             acc + (topic.courseTopicContent?.length || 0), 0);
 
-        const completedContent = userEnrollmentCourseLog?.filter(
-            log => log.courseId == CourseId && log.enrollmentStatus == 'COMPLETED'
+        const completedContent = userCourseContentProgress?.filter(
+            log => log.courseId == CourseId && log.progressStatus == 'COMPLETED'
         ).length || 0;
 
         return totalContent > 0 ? Math.round((completedContent / totalContent) * 100) : 0;
@@ -273,10 +273,10 @@ function CourseOverview() {
                                                                 className="flex items-center gap-3 p-3 bg-white rounded-lg border hover:border-blue-200 transition-all duration-200 hover:shadow-sm group"
                                                             >
                                                                 <div className="flex items-center gap-2">
-                                                                    {userEnrollmentCourseLog?.filter(log =>
+                                                                    {userCourseContentProgress?.filter(log =>
                                                                         log.courseId == CourseId &&
                                                                         log?.courseContentId == content?.courseContentId &&
-                                                                        log.enrollmentStatus == 'COMPLETED'
+                                                                        log.progressStatus == 'COMPLETED'
                                                                     )?.length > 0 ? (
                                                                         <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center animate-pulse">
                                                                             <Check className="h-4 w-4 text-green-600"/>

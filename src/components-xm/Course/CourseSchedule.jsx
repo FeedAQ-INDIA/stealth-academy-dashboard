@@ -49,7 +49,7 @@ function CourseSchedule() {
     const {CourseId} = useParams();
     const {
         userEnrollmentObj,
-        userEnrollmentCourseLog,
+        userCourseContentProgress,
         isUserEnrolledAlready,
         courseList,
         enroll,

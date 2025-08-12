@@ -5,6 +5,7 @@ export const useCourseState = (courseId) => {
   const [state, setState] = useState({
     course: null,
     userCourseContentProgress: null,
+    userCourseEnrollment: null,
     notes: [],
     loading: false,
     error: null,
@@ -70,6 +71,38 @@ export const useCourseState = (courseId) => {
     }
   }, [courseId, setLoading]);
 
+  const fetchUserCourseEnrollment = useCallback(async (userId) => {
+    if (!userId || !courseId) return;
+    
+    try {
+      setLoading(true);
+      const response = await axiosConn.post(import.meta.env.VITE_API_URL + "/searchCourse", {
+        limit: 10,
+        offset: 0,
+        getThisData: {
+          datasource: "UserCourseEnrollment",
+          attributes: [],
+          where: {
+            userId,
+            courseId,
+          },
+        },
+      });
+      setState(prev => ({
+        ...prev,
+        userCourseEnrollment: response.data.data?.results,
+        loading: false,
+        error: null
+      }));
+    } catch (error) {
+      setState(prev => ({
+        ...prev,
+        error: error.message,
+        loading: false
+      }));
+    }
+  }, [courseId, setLoading]);
+
   const calculateProgress = useMemo(() => {
     if (!state.course?.courseTopic || !state.userCourseContentProgress) return 0;
 
@@ -79,7 +112,7 @@ export const useCourseState = (courseId) => {
     );
 
     const completedContent = state.userCourseContentProgress.filter(
-      log => log.courseId === courseId && log.enrollmentStatus === 'COMPLETED'
+      log => log.courseId === courseId && log.progressStatus === 'COMPLETED'
     ).length;
 
     return totalContent > 0 ? Math.round((completedContent / totalContent) * 100) : 0;
@@ -91,6 +124,7 @@ export const useCourseState = (courseId) => {
     actions: {
       fetchCourseDetail,
       fetchUserCourseContentProgress,
+      fetchUserCourseEnrollment,
       setError,
       setLoading,
       updateState: setState

@@ -24,7 +24,7 @@ function CourseWritten() {
     const { userDetail } = useAuthStore();
 
     const {CourseId, CourseDocId} = useParams();
-    const {userEnrollmentObj, userEnrollmentCourseLog, fetchUserEnrollmentData, isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus} = useCourse();
+    const {userEnrollmentObj, userCourseContentProgress, fetchUserCourseContentProgress, isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus} = useCourse();
 
     const [courseVideoDetail, setCourseVideoDetail] = useState({});
     const [courseTopicContent, setCourseTopicContent] = useState({});
@@ -68,7 +68,7 @@ function CourseWritten() {
                 toast({
                     title: "status is updated"
                 });
-                fetchUserEnrollmentData(); enrollStatus()
+                fetchUserCourseContentProgress(); enrollStatus()
             })
             .catch((err) => {
                 console.log(err);
@@ -91,7 +91,7 @@ function CourseWritten() {
                 toast({
                     title: "status is updated"
                 });
-                fetchUserEnrollmentData(); enrollStatus()
+                fetchUserCourseContentProgress(); enrollStatus()
             })
             .catch((err) => {
                 console.log(err);
@@ -138,7 +138,7 @@ function CourseWritten() {
         setTriggerNotesRefresh(prev => !prev);
     };
 
-    const isCompleted = userEnrollmentCourseLog?.filter(b => (b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED'))?.length > 0;
+    const isCompleted = userCourseContentProgress?.filter(b => (b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED'))?.length > 0;
 
     const formatDuration = (totalMinutes) => {
         const minutes = +totalMinutes || 0;
