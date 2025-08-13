@@ -71,7 +71,7 @@ export function CourseDetail() {
                     className="min-h-[calc(100svh-4em)]"
                     style={{borderRadius: '0px', margin: '0px'}}
                 >
-                    <div className="h-[calc(100svh-4em)] overflow-y-auto">
+                    <div className="w-full">
                         <Outlet/>
                     </div>
                 </SidebarInset>
