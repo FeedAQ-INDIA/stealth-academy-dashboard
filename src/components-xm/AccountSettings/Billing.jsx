@@ -236,7 +236,7 @@ function Billing() {
                                         <button
                                             key={tab.id}
                                             onClick={() => setActiveTab(tab.id)}
-                                            className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+                                            className={`flex items-center gap-2 px-2 py-1 rounded-lg font-medium transition-all duration-200 ${
                                                 isActive
                                                     ? 'bg-blue-600 text-white shadow-md'
                                                     : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
