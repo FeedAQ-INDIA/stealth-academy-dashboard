@@ -1,4 +1,4 @@
-import {Card, CardHeader} from "@/components/ui/card.jsx";
+import {Card, CardHeader, CardContent, CardTitle} from "@/components/ui/card.jsx";
 import React, {useEffect} from "react";
 import {Button} from "@/components/ui/button.jsx";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
@@ -14,12 +14,46 @@ import {toast} from "@/components/hooks/use-toast.js";
 import {SidebarTrigger} from "@/components/ui/sidebar.jsx";
 import {Separator} from "@/components/ui/separator.jsx";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
-import {BookOpen, CircleArrowLeft, CircleArrowRight, User} from "lucide-react";
-import {Link} from "react-router-dom";
+import {BookOpen, CircleArrowLeft, CircleArrowRight, User, Settings, Shield, CreditCard, Bell, UserCircle, LogOut} from "lucide-react";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 
 
 function MyAccount() {
     const {userDetail, fetchUserDetail} = useAuthStore()
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    // Navigation items for account settings tabs
+    const navigationItems = [
+        { 
+            id: "profile", 
+            label: "Profile", 
+            icon: UserCircle, 
+            path: "/account-settings/profile",
+            description: "Manage your personal information"
+        },
+        { 
+            id: "security", 
+            label: "Security", 
+            icon: Shield, 
+            path: "/account-settings/security",
+            description: "Password and security settings"
+        },
+        { 
+            id: "billing", 
+            label: "Billing", 
+            icon: CreditCard, 
+            path: "/account-settings/billing",
+            description: "Payment methods and billing history"
+        },
+        { 
+            id: "notifications", 
+            label: "Notifications", 
+            icon: Bell, 
+            path: "/account-settings/notifications",
+            description: "Configure your notification preferences"
+        },
+    ];
 
     const createAccountSchema = z.object({
         firstName: z.string()
@@ -62,154 +96,193 @@ function MyAccount() {
     }
 
     return (
-        <>
-
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
             <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
                 <SidebarTrigger className="-ml-1"/>
                 <Separator orientation="vertical" className="mr-2 h-4"/>
                 <Breadcrumb>
                     <BreadcrumbList>
-
                         <BreadcrumbItem>
-                            <BreadcrumbPage
-                                className="truncate max-w-[30ch]">My Account</BreadcrumbPage>
+                            <BreadcrumbPage className="truncate max-w-[30ch]">Account Settings</BreadcrumbPage>
                         </BreadcrumbItem>
-
                     </BreadcrumbList>
                 </Breadcrumb>
-                <div className="ml-auto sm:flex-initial">
-
-                </div>
+                <div className="ml-auto sm:flex-initial"></div>
             </header>
 
-            <div className="p-3 md:p-6">
-                <Card className="rounded-sm border-0 bg-gradient-to-r  from-yellow-300 via-orange-400 to-yellow-700  text-white shadow-2xl mb-8 overflow-hidden relative">
-                    <div className="absolute inset-0 bg-black/10"></div>
-                    <CardHeader className="relative z-10 pb-8">
-                        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div className="p-4 mx-auto">
+                {/* Hero Header with Navigation */}
+                <Card className="w-full rounded-xl border-0 bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-700 text-white shadow-2xl mb-8">
+                    <CardHeader>
+                        <CardTitle className="text-center text-2xl sm:text-3xl font-bold tracking-wide">
+                            Account Settings
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="">
+                            <div className="flex flex-wrap gap-2 p-1 bg-white rounded-xl shadow-sm border">
+                                {navigationItems.map((item) => {
+                                    const Icon = item.icon;
+                                    const isActive = location.pathname === item.path;
+                                    
+                                    return (
+                                        <button
+                                            key={item.id}
+                                            onClick={() => navigate(item.path)}
+                                            className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+                                                isActive || (item.path === '/account-settings/profile' && location.pathname === '/account-settings')
+                                                    ? 'bg-blue-600 text-white shadow-md'
+                                                    : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                                            }`}
+                                        >
+                                            <Icon size={18} />
+                                            <span className="hidden sm:inline">{item.label}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Profile Information Card */}
+                <Card className="mb-6 border-0 shadow-lg bg-white/80 backdrop-blur">
+                    <CardContent className="p-6">
+                        <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
                             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full lg:w-auto">
                                 <div className="relative flex-shrink-0">
-                                    <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-white/20 shadow-xl">
-                                        <AvatarFallback className="text-xl sm:text-2xl bg-white/20 text-white font-bold">
+                                    <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-blue-200 shadow-xl">
+                                        <AvatarFallback className="text-xl sm:text-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold">
                                             {userDetail?.nameInitial}
                                         </AvatarFallback>
                                     </Avatar>
                                     <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-5 h-5 sm:w-6 sm:h-6 bg-green-400 rounded-full border-2 border-white"></div>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h1 className="text-2xl sm:text-3xl font-bold mb-2 leading-tight">
-                                        Welcome , {userDetail?.derivedUserName}!
+                                    <h1 className="text-2xl sm:text-3xl font-bold mb-2 leading-tight text-gray-800">
+                                        {userDetail?.derivedUserName}
                                     </h1>
-                                    <p className="text-blue-100 text-base sm:text-lg flex items-center gap-2 flex-wrap">
+                                    <p className="text-gray-600 text-base sm:text-lg flex items-center gap-2 flex-wrap">
                                         <User className="w-4 h-4 flex-shrink-0" />
                                         <span className="break-words">Member since {userDetail?.created_date}</span>
                                     </p>
+                                    <p className="text-gray-500 text-sm mt-1">{userDetail?.email}</p>
                                 </div>
                             </div>
                             <div className="flex flex-col xs:flex-row gap-3 w-full lg:w-auto">
-                                <Link to={'/explore'}>   <Button
-                                    variant="secondary"
-                                    className="bg-white/20 hover:bg-white/30 border-white/30 text-white backdrop-blur-sm w-full xs:w-auto justify-center xs:justify-start"
-                                >
-                                    <BookOpen className="w-4 h-4 mr-2 flex-shrink-0" />
-                                    <span className="whitespace-nowrap">Explore Courses</span>
-                                </Button> </Link>
+                                <Link to={'/explore'}>
+                                    <Button
+                                        variant="default"
+                                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white w-full xs:w-auto justify-center xs:justify-start"
+                                    >
+                                        <BookOpen className="w-4 h-4 mr-2 flex-shrink-0" />
+                                        <span className="whitespace-nowrap">Explore Courses</span>
+                                    </Button>
+                                </Link>
                             </div>
                         </div>
-                    </CardHeader>
+                    </CardContent>
                 </Card>
 
-                <div className="my-16">
-                    <Form {...createAccountForm}>
-                        <form
-                            onSubmit={createAccountForm.handleSubmit(onSubmit)}
-                            className="w-full space-y-6"
-                        >
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="grid w-full   items-center gap-1.5">
-                                    <FormField
-                                        control={createAccountForm.control}
-                                        name="firstName"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>First Name</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="First Name" {...field} />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
-
+                {/* Form Section */}
+                <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
+                    <CardHeader>
+                        <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                            <Settings className="w-5 h-5" />
+                            Personal Information
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Form {...createAccountForm}>
+                            <form
+                                onSubmit={createAccountForm.handleSubmit(onSubmit)}
+                                className="w-full space-y-6"
+                            >
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="grid w-full items-center gap-1.5">
+                                        <FormField
+                                            control={createAccountForm.control}
+                                            name="firstName"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormLabel>First Name</FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="First Name" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                    <div className="grid w-full items-center gap-1.5">
+                                        <FormField
+                                            control={createAccountForm.control}
+                                            name="lastName"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormLabel>Last Name</FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="Last Name" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                    <div className="grid w-full items-center gap-1.5">
+                                        <Label htmlFor="email">Email</Label>
+                                        <Input type="email" id="email" value={userDetail.email} readOnly className="bg-gray-50"/>
+                                    </div>
+                                    <div className="grid w-full items-center gap-1.5">
+                                        <FormField
+                                            control={createAccountForm.control}
+                                            name="number"
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormLabel>Phone Number</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            {...field}
+                                                            type="text"
+                                                            placeholder="Phone Number"
+                                                            inputMode="numeric"
+                                                            pattern="[0-9]*"
+                                                            onChange={(e) => {
+                                                                const cleaned = e.target.value.replace(/\D/g, "");
+                                                                field.onChange(cleaned);
+                                                            }}
+                                                            value={field.value}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage/>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                    <div className="grid w-full items-center gap-1.5">
+                                        <Label htmlFor="language">Language</Label>
+                                        <Input type="text" id="language" value="English" readOnly className="bg-gray-50"/>
+                                    </div>
+                                    <div className="grid w-full items-center gap-1.5">
+                                        <Label htmlFor="country">Country</Label>
+                                        <Input type="text" id="country" value="India" readOnly className="bg-gray-50"/>
+                                    </div>
                                 </div>
-                                <div className="grid w-full  items-center gap-1.5">
-                                    <FormField
-                                        control={createAccountForm.control}
-                                        name="lastName"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Last Name</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Last Name" {...field} />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
-
+                                <div className="flex gap-4 pt-6">
+                                    <Button onClick={() => createAccountForm.reset()} variant="outline" className="border-gray-300">
+                                        Reset
+                                    </Button>
+                                    <Button type="submit" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                                        Save Changes
+                                    </Button>
                                 </div>
-                                <div className="grid w-full  items-center gap-1.5">
-
-                                    <Label htmlFor="email">Email</Label>
-                                    <Input type="email" id="email" value={userDetail.email} readOnly/>
-                                </div>
-                                <div className="grid w-full  items-center gap-1.5">
-                                    <FormField
-                                        control={createAccountForm.control}
-                                        name="number"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Phone Number</FormLabel>
-                                                <FormControl>
-
-                                                    <Input
-                                                        {...field}
-                                                        type="text" // change to text to allow better control
-                                                        placeholder="Phone Number"
-                                                        inputMode="numeric"
-                                                        pattern="[0-9]*"
-                                                        onChange={(e) => {
-                                                            const cleaned = e.target.value.replace(/\D/g, ""); // remove non-digits
-                                                            field.onChange(cleaned);
-                                                        }}
-                                                        value={field.value}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                </div>
-                                <div className="grid w-full  items-center gap-1.5">
-                                    <Label htmlFor="language">Language</Label>
-                                    <Input type="text" id="language" value="English" readOnly/>
-                                </div>
-                                <div className="grid w-full  items-center gap-1.5">
-                                    <Label htmlFor="country">Country</Label>
-                                    <Input type="text" id="country" value="India" readOnly/>
-                                </div>
-                            </div>
-                            <div className="flex gap-4 my-6">
-                                <Button onClick={()=> createAccountForm.reset()} variant="outline">Reset</Button>
-                                <Button type="submit">Save</Button>
-                            </div>
-                        </form>
-                    </Form>
-                </div>
+                            </form>
+                        </Form>
+                    </CardContent>
+                </Card>
             </div>
-
-        </>)
+        </div>
+    );
 
 }
 

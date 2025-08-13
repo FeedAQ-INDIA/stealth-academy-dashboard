@@ -332,9 +332,9 @@ function CourseSidebar() {
             <SidebarContent ref={sidebarContentRef}>
                 {data?.navMain?.map((group) => (
                     <SidebarGroup key={group?.title} className="font-medium text-xs">
-                        <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
+                {group?.title && group?.title?.length> 0 && <SidebarGroupLabel>{group.title}</SidebarGroupLabel>}
 
-                        <SidebarGroupContent>
+                        <SidebarGroupContent  >
                             <SidebarMenu>
                                 {group?.items?.map((item) => {
                                     const isActive = item?.isActive;

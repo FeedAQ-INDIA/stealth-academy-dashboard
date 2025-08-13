@@ -55,7 +55,7 @@ export function Dashboard() {
 
 
     return (
-        <div className="p-3 md:p-6">
+        <div className="p-4">
             <Card className="rounded-sm  border-0 bg-gradient-to-r  from-yellow-300 via-orange-400 to-yellow-700 text-white shadow-2xl mb-8 overflow-hidden relative">
                 <div className="absolute inset-0 bg-black/10"></div>
                 <CardHeader className="relative z-10 pb-8">
@@ -71,7 +71,7 @@ export function Dashboard() {
                             </div>
                             <div className="flex-1 min-w-0">
                                 <h1 className="text-2xl sm:text-3xl font-bold mb-2 leading-tight">
-                                    Welcome , {userDetail?.derivedUserName}!
+                                    Welcome, {userDetail?.derivedUserName}! 👋
                                 </h1>
                                 <p className="text-blue-100 text-base sm:text-lg flex items-center gap-2 flex-wrap">
                                     <User className="w-4 h-4 flex-shrink-0" />

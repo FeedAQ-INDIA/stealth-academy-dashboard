@@ -1,5 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Car, ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { 
+  Car, 
+  ChevronLeft, 
+  ChevronRight, 
+  Search, 
+  Filter, 
+  SortAsc, 
+  SortDesc,
+  BookOpen,
+  Clock,
+  Star,
+  TrendingUp,
+  Grid3X3,
+  List,
+  MoreHorizontal
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,6 +30,20 @@ import { CourseCard } from "@/components-xm/Modules/CourseCard.jsx";
 import Header from "@/components-xm/Header/Header.jsx";
 import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
 import { LoaderOne } from "@/components/ui/loader.jsx";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function MyCourse() {
   const navigate = useNavigate();
@@ -23,6 +52,9 @@ export function MyCourse() {
   const [offset, setOffset] = useState(0);
   const [courseList, setCourseList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const [sortBy, setSortBy] = useState('recent'); // 'recent', 'title', 'progress'
+  const [filterBy, setFilterBy] = useState('all'); // 'all', 'in-progress', 'completed', 'not-started'
 
   const getSearchValueFromURL = (key) => {
     const params = new URLSearchParams(location.search);
@@ -151,6 +183,36 @@ export function MyCourse() {
     });
   };
 
+  const handleSortChange = (value) => {
+    setSortBy(value);
+    // Add sorting logic here based on the value
+    let orderClause = [];
+    switch (value) {
+      case 'title':
+        orderClause = [["courseTitle", "ASC"]];
+        break;
+      case 'recent':
+        orderClause = [["createdAt", "DESC"]];
+        break;
+      case 'progress':
+        // This would need to be implemented based on your progress tracking
+        orderClause = [["updatedAt", "DESC"]];
+        break;
+      default:
+        orderClause = [["createdAt", "DESC"]];
+    }
+    
+    updateApiQuery("Course", {
+      order: orderClause,
+    });
+  };
+
+  const handleFilterChange = (value) => {
+    setFilterBy(value);
+    // Add filtering logic here based on the value
+    // This would depend on how you track course status
+  };
+
   useEffect(() => {
     setApiQuery({
       limit: limit,
@@ -165,99 +227,213 @@ export function MyCourse() {
   }, [exploreCourseText]);
 
   return (
-    <>
-      <div className=" items-center justify-items-center">
-                          <div className="my-4">
-          {loading ? (
-            <div className="flex items-center justify-center min-h-[400px] w-full">
-              <LoaderOne />
+    <div className="space-y-6">
+      {/* Header Section */}
+      {/* <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between"> */}
+        {/* <div>
+          <h2 className="text-2xl font-bold text-gray-900">My Courses</h2>
+          <p className="text-gray-600 mt-1">
+            {totalCount > 0 ? `${totalCount} course${totalCount !== 1 ? 's' : ''} enrolled` : 'No courses enrolled yet'}
+          </p>
+        </div> */}
+        
+        {/* Quick Stats */}
+        {/* {courseList.length > 0 && (
+          <div className="flex gap-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">{courseList.filter(c => c.status === 'IN_PROGRESS').length}</div>
+              <div className="text-xs text-gray-500">In Progress</div>
             </div>
-          ) : (
-            <>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 my-4 items-center">
-                {courseList?.map((a) => (
-                  <CourseCard key={a.id} course={a} />
-                ))}
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">{courseList.filter(c => c.status === 'COMPLETED').length}</div>
+              <div className="text-xs text-gray-500">Completed</div>
+            </div>
+          </div>
+        )} */}
+      {/* </div> */}
+
+      {/* Search and Filters */}
+      <Card className="border-0 shadow-sm">
+        <CardContent className="p-4">
+          <div className="flex flex-col lg:flex-row gap-4 items-center">
+            {/* Search */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Search your courses..."
+                value={exploreCourseText}
+                onChange={(e) => {
+                  setExploreCourseText(e.target.value);
+                  handleSearchChange(e.target.value);
+                }}
+                className="pl-10 border-gray-200 focus:border-blue-500"
+              />
+            </div>
+
+            {/* Filters */}
+            <div className="flex gap-2 items-center">
+              <Select value={filterBy} onValueChange={handleFilterChange}>
+                <SelectTrigger className="w-32">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Filter" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Courses</SelectItem>
+                  <SelectItem value="in-progress">In Progress</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="not-started">Not Started</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={sortBy} onValueChange={handleSortChange}>
+                <SelectTrigger className="w-32">
+                  <SortAsc className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Sort" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="recent">Recently Added</SelectItem>
+                  <SelectItem value="title">Title A-Z</SelectItem>
+                  <SelectItem value="progress">Progress</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* View Mode Toggle */}
+              <div className="flex border rounded-lg p-1">
+                <Button
+                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                  className="h-8 w-8 p-0"
+                >
+                  <Grid3X3 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                  className="h-8 w-8 p-0"
+                >
+                  <List className="h-4 w-4" />
+                </Button>
               </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-              {/* Empty State */}
-              {courseList?.length === 0 && !loading && (
-                <div className="text-center py-16">
-                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Search className="w-8 h-8 text-gray-400" />
+      {/* Content */}
+      <div className="min-h-[400px]">
+        {loading ? (
+          <div className="flex items-center justify-center min-h-[400px] w-full">
+            <div className="text-center">
+              <LoaderOne />
+              <p className="mt-4 text-gray-600">Loading your courses...</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Courses Grid/List */}
+            <div className={`gap-6 ${
+              viewMode === 'grid' 
+                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
+                : 'flex flex-col space-y-4'
+            }`}>
+              {courseList?.map((course) => (
+                <CourseCard key={course.id} course={course} viewMode={viewMode} />
+              ))}
+            </div>
+
+            {/* Empty State */}
+            {courseList?.length === 0 && !loading && (
+              <Card className="border-2 border-dashed border-gray-200">
+                <CardContent className="text-center py-16">
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <BookOpen className="w-10 h-10 text-blue-500" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                    No courses found
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    {exploreCourseText ? 'No courses found' : 'Start Your Learning Journey'}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
-                    Try adjusting your search terms or browse our popular
-                    categories to find the perfect course for you.
+                  <p className="text-gray-600 max-w-md mx-auto mb-6">
+                    {exploreCourseText 
+                      ? 'Try adjusting your search terms or browse our course catalog.'
+                      : 'You haven\'t enrolled in any courses yet. Explore our course catalog to get started.'
+                    }
                   </p>
-                </div>
-              )}
+                  <Button 
+                    onClick={() => navigate('/explore')}
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  >
+                    <Search className="mr-2 h-4 w-4" />
+                    Explore Courses
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
 
-              {courseList.length > 0 ? (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="text-sm text-gray-600">
-                    Showing {offset + 1} to{" "}
-                    {Math.min(offset + limit, totalCount)} of {totalCount}{" "}
-                    courses
-                  </div>
-                  <Pagination className="mr-0 ml-auto w-auto">
-                    <PaginationContent>
-                      <PaginationItem>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          disabled={offset === 0}
-                          onClick={() => {
-                            setOffset(Math.max(offset - limit, 0));
-                            setApiQuery((prevQuery) => ({
-                              ...prevQuery,
-                              offset: Math.max(offset - limit, 0),
-                            }));
-                          }}
-                        >
-                          <ChevronLeft className="h-4 w-4 mr-1" />
-                          Previous
-                        </Button>
-                      </PaginationItem>
-                      <PaginationItem>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          disabled={offset + limit >= totalCount}
-                          onClick={() => {
-                            setOffset(
-                              offset + limit < totalCount
-                                ? offset + limit
-                                : offset
-                            );
-                            setApiQuery((prevQuery) => ({
-                              ...prevQuery,
-                              offset:
+            {/* Pagination */}
+            {courseList.length > 0 && (
+              <Card className="border-0 shadow-sm mt-6">
+                <CardContent className="p-4">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="text-sm text-gray-600">
+                      Showing {offset + 1} to{" "}
+                      {Math.min(offset + limit, totalCount)} of {totalCount}{" "}
+                      course{totalCount !== 1 ? 's' : ''}
+                    </div>
+                    <Pagination className="mr-0 ml-auto w-auto">
+                      <PaginationContent>
+                        <PaginationItem>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={offset === 0}
+                            onClick={() => {
+                              setOffset(Math.max(offset - limit, 0));
+                              setApiQuery((prevQuery) => ({
+                                ...prevQuery,
+                                offset: Math.max(offset - limit, 0),
+                              }));
+                            }}
+                            className="hover:bg-blue-50"
+                          >
+                            <ChevronLeft className="h-4 w-4 mr-1" />
+                            Previous
+                          </Button>
+                        </PaginationItem>
+                        <PaginationItem>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={offset + limit >= totalCount}
+                            onClick={() => {
+                              setOffset(
                                 offset + limit < totalCount
                                   ? offset + limit
-                                  : offset,
-                            }));
-                          }}
-                        >
-                          Next
-                          <ChevronRight className="h-4 w-4 ml-1" />
-                        </Button>
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
-                </div>
-              ) : (
-                <></>
-              )}
-            </>
-          )}
-        </div>
-
+                                  : offset
+                              );
+                              setApiQuery((prevQuery) => ({
+                                ...prevQuery,
+                                offset:
+                                  offset + limit < totalCount
+                                    ? offset + limit
+                                    : offset,
+                              }));
+                            }}
+                            className="hover:bg-blue-50"
+                          >
+                            Next
+                            <ChevronRight className="h-4 w-4 ml-1" />
+                          </Button>
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </>
+        )}
       </div>
-    </>
+    </div>
   );
 }

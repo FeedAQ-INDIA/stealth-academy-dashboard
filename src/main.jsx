@@ -16,6 +16,9 @@ import CourseOverview from "@/components-xm/Course/CourseOverview.jsx";
 import CourseVideoTutorial from "@/components-xm/Course/CourseVideoTutorial.jsx";
 import { AccountDetail } from "@/components-xm/AccountSettings/AccountDetail.jsx";
 import MyAccount from "@/components-xm/AccountSettings/MyAccount.jsx";
+import Security from "@/components-xm/AccountSettings/Security.jsx";
+import Billing from "@/components-xm/AccountSettings/Billing.jsx";
+import Notifications from "@/components-xm/AccountSettings/Notifications.jsx";
 import CourseWritten from "@/components-xm/Course/CourseWritten.jsx";
 import CourseDocThirdParty from "@/components-xm/Course/CourseDocThirdParty.jsx";
 import CourseQuiz from "@/components-xm/Course/CourseQuiz.jsx";
@@ -26,6 +29,7 @@ import CourseSnapView from "@/components-xm/HomeFiles/CourseSnapView.jsx";
 import BringYourOwnCourse from "./components-xm/BringYourOwnCourse.jsx";
 import { MyCourse } from "./components-xm/MyJourney/MyCourse.jsx";
 import { MyWishlist } from "./components-xm/MyJourney/MyWishlist.jsx";
+import { MyOrders } from "./components-xm/MyJourney/MyOrders.jsx";
 
 const router = createBrowserRouter([
   // {
@@ -64,8 +68,24 @@ const router = createBrowserRouter([
         element: <AccountDetail />,
         children: [
           {
+            index: true,
+            element: <MyAccount />,
+          },
+          {
             path: "/account-settings/profile",
             element: <MyAccount />,
+          },
+          {
+            path: "/account-settings/security",
+            element: <Security />,
+          },
+          {
+            path: "/account-settings/billing",
+            element: <Billing />,
+          },
+          {
+            path: "/account-settings/notifications",
+            element: <Notifications />,
           },
         ],
       },
@@ -102,16 +122,20 @@ const router = createBrowserRouter([
       },
 
       {
-        path: "/my-learning-path",
+        path: "/my-journey",
         element: <MyLearningPath />,
         children: [
           {
-            path: "/my-learning-path/my-course",
+            path: "/my-journey/courses",
             element: <MyCourse />,
           },
-                    {
-            path: "/my-learning-path/my-wishlist",
+          {
+            path: "/my-journey/wishlist",
             element: <MyWishlist />,
+          },
+          {
+            path: "/my-journey/orders",
+            element: <MyOrders />,
           },
         ],
       },

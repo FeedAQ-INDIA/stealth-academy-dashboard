@@ -58,7 +58,7 @@ function App() {
     return (
         <>
                  {publicUri.includes(window.location.pathname) ? <></> :<Header/>}
-                <div className={`overflow-y-auto ${publicUri.includes(window.location.pathname) ? '' : 'h-[calc(100svh-4em)]' }`}>
+                <div className={` overflow-y-auto ${publicUri.includes(window.location.pathname) ? '' : 'h-[calc(100svh-4em)]' }`}>
                     <Outlet/>
                 </div>
 

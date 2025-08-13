@@ -156,7 +156,7 @@ export function Explore() {
 
         <>
             {userDetail ? <Header/> : <PublicHeader/>}
-            <div className="p-3 md:p-6  overflow-y-auto h-[calc(100svh-4em)]">
+            <div className="p-4  overflow-y-auto h-[calc(100svh-4em)]">
                 <div className=" items-center justify-items-center">
                     <Card className="w-full rounded-sm border-0 bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-700 text-white shadow-2xl mb-8 py-6">
                         <CardHeader>
@@ -226,51 +226,67 @@ export function Explore() {
                                 </div>
                             )}
 
-                            {courseList.length > 0 ?
-                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                                    <div className="text-sm text-gray-600">
-                                        Showing {offset + 1} to {Math.min(offset + limit, totalCount)} of {totalCount} courses
-                                    </div>
-                                    <Pagination className="mr-0 ml-auto w-auto">
-                                        <PaginationContent>
-                                            <PaginationItem>
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    disabled={offset === 0}
-                                                    onClick={() => {
-                                                        setOffset(Math.max(offset - limit, 0));
-                                                        setApiQuery((prevQuery) => ({
-                                                            ...prevQuery,
-                                                            offset: Math.max(offset - limit, 0),
-                                                        }));
-                                                    }}
-                                                >
-                                                    <ChevronLeft className="h-4 w-4 mr-1" />
-                                                    Previous
-                                                </Button>
-                                            </PaginationItem>
-                                            <PaginationItem>
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    disabled={offset + limit >= totalCount}
-                                                    onClick={() => {
-                                                        setOffset(offset + limit < totalCount ? offset + limit : offset);
-                                                        setApiQuery((prevQuery) => ({
-                                                            ...prevQuery,
-                                                            offset: offset + limit < totalCount ? offset + limit : offset,
-                                                        }));
-                                                    }}
-                                                >
-                                                    Next
-                                                    <ChevronRight className="h-4 w-4 ml-1" />
-                                                </Button>
-                                            </PaginationItem>
-                                        </PaginationContent>
-                                    </Pagination>
-                                </div>
-                                : <></>}
+                        {/* Pagination */}
+                               {courseList.length > 0 && (
+                                 <Card className="border-0 shadow-sm mt-6">
+                                   <CardContent className="p-4">
+                                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                       <div className="text-sm text-gray-600">
+                                         Showing {offset + 1} to{" "}
+                                         {Math.min(offset + limit, totalCount)} of {totalCount}{" "}
+                                         course{totalCount !== 1 ? 's' : ''}
+                                       </div>
+                                       <Pagination className="mr-0 ml-auto w-auto">
+                                         <PaginationContent>
+                                           <PaginationItem>
+                                             <Button
+                                               size="sm"
+                                               variant="outline"
+                                               disabled={offset === 0}
+                                               onClick={() => {
+                                                 setOffset(Math.max(offset - limit, 0));
+                                                 setApiQuery((prevQuery) => ({
+                                                   ...prevQuery,
+                                                   offset: Math.max(offset - limit, 0),
+                                                 }));
+                                               }}
+                                               className="hover:bg-blue-50"
+                                             >
+                                               <ChevronLeft className="h-4 w-4 mr-1" />
+                                               Previous
+                                             </Button>
+                                           </PaginationItem>
+                                           <PaginationItem>
+                                             <Button
+                                               size="sm"
+                                               variant="outline"
+                                               disabled={offset + limit >= totalCount}
+                                               onClick={() => {
+                                                 setOffset(
+                                                   offset + limit < totalCount
+                                                     ? offset + limit
+                                                     : offset
+                                                 );
+                                                 setApiQuery((prevQuery) => ({
+                                                   ...prevQuery,
+                                                   offset:
+                                                     offset + limit < totalCount
+                                                       ? offset + limit
+                                                       : offset,
+                                                 }));
+                                               }}
+                                               className="hover:bg-blue-50"
+                                             >
+                                               Next
+                                               <ChevronRight className="h-4 w-4 ml-1" />
+                                             </Button>
+                                           </PaginationItem>
+                                         </PaginationContent>
+                                       </Pagination>
+                                     </div>
+                                   </CardContent>
+                                 </Card>
+                               )}
                         </>}
 
                     </div>

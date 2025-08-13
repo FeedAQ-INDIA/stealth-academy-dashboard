@@ -86,10 +86,10 @@ function NavigationMenuDemo({orientation}) {
                 </NavigationMenuItem> */}
 
  <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : 'flex-1 sm:flex-none'}>
-                    <Link to="/my-learning-path" className="w-full block">
+                    <Link to="/my-journey" className="w-full block">
                         <Button
                             className="w-full justify-center  px-2"
-                            variant={location.pathname.includes('my-learning-path') ? 'secondary' : 'ghost'}
+                            variant={location.pathname.includes('my-journey') ? 'secondary' : 'ghost'}
                         >
                             MY JOURNEY
                         </Button>
