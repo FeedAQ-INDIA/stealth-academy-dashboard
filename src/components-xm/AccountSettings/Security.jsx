@@ -27,7 +27,7 @@ function Security() {
 
             <div className="p-4 mx-auto">
                 {/* Security Header */}
-                <Card className="w-full rounded-xl border-0 bg-gradient-to-r from-red-400 via-pink-500 to-purple-600 text-white shadow-2xl mb-8">
+                <Card className="w-full rounded-xl border-0 bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-700  text-white shadow-2xl mb-8">
                     <CardHeader>
                         <CardTitle className="text-center text-2xl sm:text-3xl font-bold tracking-wide flex items-center justify-center gap-3">
                             <Shield className="w-8 h-8" />
@@ -59,7 +59,7 @@ function Security() {
                 </Card>
 
                 {/* Password Section */}
-                <Card className="mb-6 border-0 shadow-lg bg-white/80 backdrop-blur">
+                {/* <Card className="mb-6 border-0 shadow-lg bg-white/80 backdrop-blur">
                     <CardHeader>
                         <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
                             <Key className="w-5 h-5" />
@@ -96,10 +96,10 @@ function Security() {
                             Update Password
                         </Button>
                     </CardContent>
-                </Card>
+                </Card> */}
 
                 {/* Two-Factor Authentication */}
-                <Card className="mb-6 border-0 shadow-lg bg-white/80 backdrop-blur">
+                {/* <Card className="mb-6 border-0 shadow-lg bg-white/80 backdrop-blur">
                     <CardHeader>
                         <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
                             <Smartphone className="w-5 h-5" />
@@ -120,7 +120,7 @@ function Security() {
                             </Button>
                         </div>
                     </CardContent>
-                </Card>
+                </Card> */}
 
                 {/* Login Activity */}
                 <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">

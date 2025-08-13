@@ -18,7 +18,7 @@ import {
 import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible.jsx";
-import {ArrowLeft, ChevronRight, Clock, Loader, UserCircle, Shield, CreditCard, Bell, LogOut} from "lucide-react";
+import {ArrowLeft, ChevronRight, Clock, Loader, UserCircle, Shield, CreditCard, Bell, LogOut, ShoppingBag} from "lucide-react";
 import {Separator} from "@/components/ui/separator.jsx";
 
 
@@ -56,6 +56,12 @@ function AccountSidebar({...props}) {
                         url: `/account-settings/billing`,
                         isActive: location.pathname === '/account-settings/billing',
                         icon: CreditCard,
+                    },
+                    {
+                        title: "Orders",
+                        url: `/account-settings/orders`,
+                        isActive: location.pathname === '/account-settings/orders',
+                        icon: ShoppingBag,
                     },
                     {
                         title: "Notifications",

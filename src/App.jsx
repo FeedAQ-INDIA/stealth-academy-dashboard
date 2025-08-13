@@ -6,6 +6,7 @@ import "./App.css"
 import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
 import HomePage from "@/components-xm/HomeFiles/HomePage.jsx";
 import {LoaderOne} from "@/components/ui/loader.jsx";
+import { Toaster } from "@/components/ui/toaster.jsx";
 
 
 function App() {
@@ -61,8 +62,7 @@ function App() {
                 <div className={` overflow-y-auto ${publicUri.includes(window.location.pathname) ? '' : 'h-[calc(100svh-4em)]' }`}>
                     <Outlet/>
                 </div>
-
-
+                <Toaster />
         </>
     );
 }

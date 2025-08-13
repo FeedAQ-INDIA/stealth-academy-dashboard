@@ -14,7 +14,7 @@ import {toast} from "@/components/hooks/use-toast.js";
 import {SidebarTrigger} from "@/components/ui/sidebar.jsx";
 import {Separator} from "@/components/ui/separator.jsx";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
-import {BookOpen, CircleArrowLeft, CircleArrowRight, User, Settings, Shield, CreditCard, Bell, UserCircle, LogOut} from "lucide-react";
+import {BookOpen, CircleArrowLeft, CircleArrowRight, User, Settings, Shield, CreditCard, Bell, UserCircle, LogOut, ShoppingBag} from "lucide-react";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 
 
@@ -45,6 +45,13 @@ function MyAccount() {
             icon: CreditCard, 
             path: "/account-settings/billing",
             description: "Payment methods and billing history"
+        },
+        { 
+            id: "orders", 
+            label: "Orders", 
+            icon: ShoppingBag, 
+            path: "/account-settings/orders",
+            description: "View and manage your order history"
         },
         { 
             id: "notifications", 

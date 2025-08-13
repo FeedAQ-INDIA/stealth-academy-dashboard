@@ -18,6 +18,7 @@ import { AccountDetail } from "@/components-xm/AccountSettings/AccountDetail.jsx
 import MyAccount from "@/components-xm/AccountSettings/MyAccount.jsx";
 import Security from "@/components-xm/AccountSettings/Security.jsx";
 import Billing from "@/components-xm/AccountSettings/Billing.jsx";
+import Orders from "@/components-xm/AccountSettings/Orders.jsx";
 import Notifications from "@/components-xm/AccountSettings/Notifications.jsx";
 import CourseWritten from "@/components-xm/Course/CourseWritten.jsx";
 import CourseDocThirdParty from "@/components-xm/Course/CourseDocThirdParty.jsx";
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
           {
             path: "/account-settings/billing",
             element: <Billing />,
+          },
+          {
+            path: "/account-settings/orders",
+            element: <Orders />,
           },
           {
             path: "/account-settings/notifications",

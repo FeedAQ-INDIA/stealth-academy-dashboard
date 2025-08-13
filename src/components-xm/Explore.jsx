@@ -147,6 +147,7 @@ export function Explore() {
         const searchValue = value;
         const trimmed = searchValue.trim();
 
+        if(trimmed?.length == 0) return;
         const params = new URLSearchParams(location.search);
         if (trimmed) {
             params.set("search", trimmed);
@@ -172,13 +173,13 @@ export function Explore() {
                 orderClause = [["courseTitle", "ASC"]];
                 break;
             case 'recent':
-                orderClause = [["createdAt", "DESC"]];
+                orderClause = [["course_created_at", "DESC"]];
                 break;
             case 'popular':
-                orderClause = [["updatedAt", "DESC"]]; // You can implement actual popularity logic
+                orderClause = [["course_updated_at", "DESC"]]; // You can implement actual popularity logic
                 break;
             default:
-                orderClause = [["createdAt", "DESC"]];
+                orderClause = [["course_created_at", "DESC"]];
         }
         
         updateApiQuery("Course", {
