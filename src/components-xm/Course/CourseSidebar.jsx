@@ -13,12 +13,17 @@ import {
     SidebarMenuSubItem,
 } from "@/components/ui/sidebar.jsx";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import {Check, MonitorPlay, SquareArrowLeft, Lock} from "lucide-react";
+import {Check, MonitorPlay, SquareArrowLeft, Lock, ChevronDown, ChevronUp, Info, Clock, Target, Users, BookOpen, Trophy, TrendingUp} from "lucide-react";
 import { Separator } from "@/components/ui/separator.jsx";
 import { useCourse } from "@/components-xm/Course/CourseContext.jsx";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar.jsx";
 import { Button } from "@/components/ui/button.jsx";
 import { toast } from "@/components/hooks/use-toast.js";
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 function CourseSidebar() {
     const location = useLocation();
@@ -30,6 +35,7 @@ function CourseSidebar() {
     const sidebarContentRef = useRef(null);
     const [activeContentId, setActiveContentId] = useState(null);
     const [isScrolling, setIsScrolling] = useState(false);
+    const [isInfoExpanded, setIsInfoExpanded] = useState(false);
 
     const { userCourseContentProgress, userCourseEnrollment, courseList, identifyContentTypeIcons } = useCourse();
 
@@ -42,6 +48,13 @@ function CourseSidebar() {
     // Check if user is enrolled and has access to content
     const isUserEnrolled = userCourseEnrollment && userCourseEnrollment.length > 0;
     const enrollmentStatus = userCourseEnrollment?.[0]?.enrollmentStatus;
+    
+    // Calculate course progress
+    const completedContent = userCourseContentProgress?.filter(p => 
+        p.courseId == CourseId && p.progressStatus === 'COMPLETED'
+    )?.length || 0;
+    const totalContent = courseList?.courseContent?.length || 0;
+    const progressPercentage = totalContent > 0 ? Math.round((completedContent / totalContent) * 100) : 0;
     
     // Define which enrollment statuses allow content access
     const hasContentAccess = isUserEnrolled && ['ENROLLED', 'IN_PROGRESS', 'COMPLETED', 'CERTIFIED'].includes(enrollmentStatus);
@@ -202,41 +215,115 @@ function CourseSidebar() {
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 animate-pulse z-10" />
             )}
             
-            <SidebarHeader>
-                <h2 className="text-lg font-medium text-black text-center line-clamp-1">
-                    {courseList?.courseTitle}
-                </h2>
-
-                <div className="items-center w-full">
-                    <div className="mx-auto w-fit flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 border border-blue-200">
-                        <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
-                        <p className="text-sm font-semibold text-gray-700">
-                            {courseList?.courseCompletionStatus}
-                        </p>
-                    </div>
-
-                    <Link to="/explore">
-                        <Button className="w-full flex gap-2 text-muted-foreground" size="sm" variant="ghost">
-                            <SquareArrowLeft />
-                            Explore more courses
-                        </Button>
-                    </Link>
+            <SidebarHeader className="pb-2 space-y-3">
+                <div className="space-y-2">
+                    <h2 className="text-base font-medium text-black text-center line-clamp-1">
+                        {courseList?.courseTitle}
+                    </h2>
                     
-                    {activeContentId && (
-                        <div className="flex flex-col items-center gap-1 mt-2">
+                    <Collapsible open={isInfoExpanded} onOpenChange={setIsInfoExpanded}>
+                        <CollapsibleTrigger asChild>
                             <Button 
-                                onClick={scrollToActiveItem}
+                                variant="ghost" 
                                 size="sm" 
-                                variant="ghost"
-                                className="text-xs py-1 h-6 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                                className="w-full h-9 text-xs text-gray-600 hover:text-gray-800 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 flex items-center justify-center gap-2 transition-all duration-200 border border-transparent hover:border-blue-200 rounded-lg"
                             >
-                                📍 Find Active Content
+                                <Info size={14} className={isInfoExpanded ? "text-blue-600" : ""} />
+                                <span className="font-medium">Course Details</span>
+                                {isInfoExpanded ? (
+                                    <ChevronUp size={14} className="text-blue-600" />
+                                ) : (
+                                    <ChevronDown size={14} />
+                                )}
                             </Button>
-                            <div className="text-xs text-gray-400 text-center opacity-60">
-                                or press Ctrl+G
+                        </CollapsibleTrigger>
+                        
+                        <CollapsibleContent className="mt-3 space-y-3 animate-in slide-in-from-top-2 duration-300">
+                            {/* Enrollment Status Badge */}
+                            <div className="mx-auto w-fit flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 shadow-sm">
+                                <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
+                                <p className="text-xs font-semibold text-gray-700 capitalize">
+                                    {enrollmentStatus?.toLowerCase()?.replace('_', ' ')}
+                                </p>
+                                {enrollmentStatus === 'COMPLETED' && <Trophy size={12} className="text-yellow-500" />}
+                                {enrollmentStatus === 'CERTIFIED' && <Target size={12} className="text-green-500" />}
                             </div>
-                        </div>
-                    )}
+
+                            {/* Course Statistics */}
+                            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-3 space-y-2 border border-gray-200">
+                                <div className="flex items-center justify-between text-xs">
+                                    <div className="flex items-center gap-1.5 text-gray-600">
+                                        <BookOpen size={12} />
+                                        <span>Progress</span>
+                                    </div>
+                                    <div className="flex items-center gap-1 text-blue-600 font-medium">
+                                        <TrendingUp size={12} />
+                                        {progressPercentage}%
+                                    </div>
+                                </div>
+                                
+                                <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                                    <div 
+                                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500 ease-out"
+                                        style={{ width: `${progressPercentage}%` }}
+                                    ></div>
+                                </div>
+                                
+                                <div className="grid grid-cols-2 gap-2 text-xs">
+                                    <div className="flex items-center gap-1.5 text-gray-600">
+                                        <Check size={10} className="text-green-500" />
+                                        <span>{completedContent} Completed</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-gray-600">
+                                        <Clock size={10} className="text-orange-500" />
+                                        <span>{totalContent - completedContent} Remaining</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Quick Actions */}
+                            <div className="space-y-2">
+                                <Link to="/explore">
+                                    <Button className="w-full flex gap-2 text-muted-foreground text-xs py-2 h-8 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200" size="sm" variant="ghost">
+                                        <SquareArrowLeft size={14} />
+                                        Explore More Courses
+                                    </Button>
+                                </Link>
+                                
+                                {activeContentId && (
+                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 space-y-1">
+                                        <Button 
+                                            onClick={scrollToActiveItem}
+                                            size="sm" 
+                                            variant="ghost"
+                                            className="w-full text-xs py-1.5 h-7 text-blue-600 hover:text-blue-800 hover:bg-blue-100 transition-all duration-200 flex items-center gap-2"
+                                        >
+                                            <Target size={12} />
+                                            Find Active Content
+                                        </Button>
+                                        <div className="text-xs text-blue-500 text-center opacity-75 flex items-center justify-center gap-1">
+                                            <span>or press</span>
+                                            <kbd className="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-xs font-mono">Ctrl+G</kbd>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Course Info Footer */}
+                            <div className="pt-2 border-t border-gray-200">
+                                <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
+                                    <div className="flex items-center gap-1">
+                                        <Users size={10} />
+                                        <span>Interactive</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <Clock size={10} />
+                                        <span>Self-paced</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </CollapsibleContent>
+                    </Collapsible>
                 </div>
             </SidebarHeader>
 
