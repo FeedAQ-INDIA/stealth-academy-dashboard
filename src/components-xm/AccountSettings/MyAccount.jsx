@@ -96,7 +96,7 @@ function MyAccount() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
             <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
                 <SidebarTrigger className="-ml-1"/>
                 <Separator orientation="vertical" className="mr-2 h-4"/>
@@ -111,15 +111,36 @@ function MyAccount() {
             </header>
 
             <div className="p-4 mx-auto">
-                {/* Hero Header with Navigation */}
-                <Card className="w-full rounded-xl border-0 bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-700 text-white shadow-2xl mb-8">
-                    <CardHeader>
-                        <CardTitle className="text-center text-2xl sm:text-3xl font-bold tracking-wide">
-                            Account Settings
-                        </CardTitle>
+       
+
+                {/* Profile Information Card */}
+                <Card className="mb-6 border-0 shadow-lg  bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-700  ">
+                    <CardHeader className="p-6">
+                        <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full lg:w-auto">
+                                <div className="relative flex-shrink-0">
+                                    <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-blue-200 shadow-xl">
+                                        <AvatarFallback className="text-xl sm:text-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold">
+                                            {userDetail?.nameInitial}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-5 h-5 sm:w-6 sm:h-6 bg-green-400 rounded-full border-2 border-white"></div>
+                                </div>
+                                <div className="flex-1 min-w-0 ">
+                                    <h1 className="text-2xl sm:text-3xl font-bold mb-2 leading-tight text-white">
+                                        WELCOME, {userDetail?.derivedUserName}
+                                    </h1>
+                                    <p className="text-white text-base sm:text-lg flex items-center gap-2 flex-wrap">
+                                        <User className="w-4 h-4 flex-shrink-0" />
+                                        <span className="break-words">Member since {userDetail?.created_date}</span>
+                                    </p>
+                                 </div>
+                            </div>
+                             
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="">
+                         <div className="">
                             <div className="flex flex-wrap gap-2 p-1 bg-white rounded-xl shadow-sm border">
                                 {navigationItems.map((item) => {
                                     const Icon = item.icon;
@@ -142,45 +163,7 @@ function MyAccount() {
                                 })}
                             </div>
                         </div>
-                    </CardContent>
-                </Card>
 
-                {/* Profile Information Card */}
-                <Card className="mb-6 border-0 shadow-lg bg-white/80 backdrop-blur">
-                    <CardContent className="p-6">
-                        <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full lg:w-auto">
-                                <div className="relative flex-shrink-0">
-                                    <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-blue-200 shadow-xl">
-                                        <AvatarFallback className="text-xl sm:text-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold">
-                                            {userDetail?.nameInitial}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-5 h-5 sm:w-6 sm:h-6 bg-green-400 rounded-full border-2 border-white"></div>
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <h1 className="text-2xl sm:text-3xl font-bold mb-2 leading-tight text-gray-800">
-                                        {userDetail?.derivedUserName}
-                                    </h1>
-                                    <p className="text-gray-600 text-base sm:text-lg flex items-center gap-2 flex-wrap">
-                                        <User className="w-4 h-4 flex-shrink-0" />
-                                        <span className="break-words">Member since {userDetail?.created_date}</span>
-                                    </p>
-                                    <p className="text-gray-500 text-sm mt-1">{userDetail?.email}</p>
-                                </div>
-                            </div>
-                            <div className="flex flex-col xs:flex-row gap-3 w-full lg:w-auto">
-                                <Link to={'/explore'}>
-                                    <Button
-                                        variant="default"
-                                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white w-full xs:w-auto justify-center xs:justify-start"
-                                    >
-                                        <BookOpen className="w-4 h-4 mr-2 flex-shrink-0" />
-                                        <span className="whitespace-nowrap">Explore Courses</span>
-                                    </Button>
-                                </Link>
-                            </div>
-                        </div>
                     </CardContent>
                 </Card>
 
