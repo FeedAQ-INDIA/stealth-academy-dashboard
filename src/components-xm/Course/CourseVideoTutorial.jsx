@@ -466,7 +466,7 @@ function CourseVideoTutorial() {
 
 
     return (
-        <div className="min-h-screen bg-gray-50/30">
+        <div className="min-h-screen ">
             <NavigationHeader
                 courseVideoDetail={courseVideoDetail}
                 courseContent={courseContent}

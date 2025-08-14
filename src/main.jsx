@@ -10,6 +10,7 @@ import { refreshToken } from "./utils/refreshTokenUtils";
 
 import { Dashboard } from "@/components-xm/Dashboard.jsx";
 import { Explore } from "@/components-xm/Explore.jsx";
+import { Marketplace, BringYourOwnCourse as BringYourOwnCourseExplore, PrivilegedAccess } from "@/components-xm/Explore/index.js";
 import { MyLearningPath } from "@/components-xm/MyJourney/MyLearningPath.jsx";
 import { CourseDetail } from "@/components-xm/Course/CourseDetail.jsx";
 import CourseOverview from "@/components-xm/Course/CourseOverview.jsx";
@@ -38,15 +39,32 @@ const router = createBrowserRouter([
   //     element: <HomeExplore/>,
   // },
 
-  {
-    path: "/explore/:CourseId",
-    element: <CourseSnapView />,
-  },
+  
+      {
+        path: "/explore/:CourseId",
+        element: <CourseSnapView />,
+      },
 
-  {
-    path: "/explore",
-    element: <Explore />,
-  },
+      {
+        path: "/explore",
+        element: <Explore />,
+        children: [
+          {
+            path: "marketplace",
+            element: <Marketplace />,
+          },
+          {
+            path: "bring-your-own-course",
+            element: <BringYourOwnCourseExplore />,
+          },
+          {
+            path: "privileged-access",
+            element: <PrivilegedAccess />,
+          },
+        ],
+      },
+
+
   {
     path: "/",
     element: <App />,

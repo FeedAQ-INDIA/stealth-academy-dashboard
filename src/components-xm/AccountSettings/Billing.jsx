@@ -52,12 +52,6 @@ function Billing() {
             description: "Purchase credit packages"
         },
         { 
-            id: "services", 
-            label: "Service Costs", 
-            icon: Star, 
-            description: "View service pricing"
-        },
-        { 
             id: "history", 
             label: "Transaction History", 
             icon: Clock, 
@@ -135,15 +129,7 @@ function Billing() {
         }
     ];
 
-    // Service costs in credits
-    const serviceCosts = [
-        { service: 'Course Access', cost: 100, description: 'Per course enrollment' },
-        { service: 'Mock Interview', cost: 50, description: 'AI-powered practice session' },
-        { service: 'Career Guidance', cost: 75, description: 'Personalized counseling' },
-        { service: 'Resume Review', cost: 25, description: 'AI analysis and feedback' },
-        { service: 'Skill Assessment', cost: 30, description: 'Comprehensive evaluation' }
-    ];
-
+ 
     // Credit transaction history will come from store
     
     const handlePurchaseCredits = (plan) => {
@@ -213,7 +199,7 @@ function Billing() {
                         <p className="text-center text-white/90 text-lg mb-6">
                             Manage your credits, purchase new packages, and track your usage
                         </p>
-                        <div className="flex items-center justify-center gap-8 text-center mb-6">
+                        {/* <div className="flex items-center justify-center gap-8 text-center mb-6">
                             <div>
                                 <p className="text-3xl font-bold">{currentCredits.toLocaleString()}</p>
                                 <p className="text-white/80">Available Credits</p>
@@ -223,7 +209,7 @@ function Billing() {
                                 <p className="text-3xl font-bold text-yellow-300">{creditsExpiringSoon}</p>
                                 <p className="text-white/80">Expiring Soon</p>
                             </div>
-                        </div>
+                        </div> */}
                         
                         {/* Content Tabs */}
                         <div className="">
@@ -452,70 +438,6 @@ function Billing() {
                         </div>
                     )}
 
-                    {/* Service Costs Tab */}
-                    {activeTab === "services" && (
-                        <div className="space-y-6">
-                        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Star className="w-5 h-5" />
-                                    Service Credit Costs
-                                </CardTitle>
-                                <p className="text-gray-600">Here's how many credits each service costs</p>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {serviceCosts.map((service, index) => (
-                                        <Card key={index} className="border border-gray-200 hover:border-purple-300 transition-colors">
-                                            <CardContent className="p-4">
-                                                <div className="flex items-center justify-between">
-                                                    <div>
-                                                        <h3 className="font-semibold">{service.service}</h3>
-                                                        <p className="text-sm text-gray-600">{service.description}</p>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <div className="flex items-center gap-1">
-                                                            <Coins className="w-4 h-4 text-yellow-500" />
-                                                            <span className="font-bold text-lg">{service.cost}</span>
-                                                        </div>
-                                                        <p className="text-xs text-gray-500">credits</p>
-                                                    </div>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
-                            <CardContent className="p-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-green-100 rounded-full">
-                                        <CheckCircle className="w-6 h-6 text-green-600" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-semibold text-lg">Credit Calculation Made Simple</h3>
-                                        <p className="text-gray-600">
-                                            All services are priced in credits for transparent and predictable costs. 
-                                            Use our credit calculator to plan your learning budget effectively.
-                                        </p>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Interactive Service Pricing */}
-                        <div className="mt-8">
-                            <ServicePricingGrid 
-                                title="Try Our Services"
-                                subtitle="Use your credits to access premium learning services"
-                                onServiceSelect={handleServiceSelect}
-                                className="mt-6"
-                            />
-                        </div>
-                        </div>
-                    )}
 
                     {/* Transaction History Tab */}
                     {activeTab === "history" && (

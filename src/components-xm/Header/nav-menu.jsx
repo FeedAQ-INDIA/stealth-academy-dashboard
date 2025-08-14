@@ -101,7 +101,7 @@ function NavigationMenuDemo({orientation}) {
                             className="w-full justify-center px-2"
                             variant={location.pathname.includes('bring-your-own-course') ? 'secondary' : 'ghost'}
                         >
-                            CRAFT YOUR COURSE
+                            BRING YOUR OWN COURSE
                         </Button>
                     </Link>
                 </NavigationMenuItem>

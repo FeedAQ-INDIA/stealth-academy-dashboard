@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { 
-  Car, 
-  ChevronLeft, 
-  ChevronRight, 
-  Search, 
-  Heart, 
+import {
+  Car,
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  Heart,
   HeartOff,
   Filter,
   SortAsc,
@@ -14,7 +14,7 @@ import {
   Clock,
   DollarSign,
   ShoppingCart,
-  Trash2
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,7 +31,7 @@ import Header from "@/components-xm/Header/Header.jsx";
 import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
 import { LoaderOne } from "@/components/ui/loader.jsx";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -48,8 +48,8 @@ export function MyWishlist() {
   const [offset, setOffset] = useState(0);
   const [courseList, setCourseList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [viewMode, setViewMode] = useState('grid');
-  const [sortBy, setSortBy] = useState('recent');
+  const [viewMode, setViewMode] = useState("grid");
+  const [sortBy, setSortBy] = useState("recent");
   const [selectedCourses, setSelectedCourses] = useState(new Set());
 
   const getSearchValueFromURL = (key) => {
@@ -73,6 +73,7 @@ export function MyWishlist() {
     getThisData: {
       datasource: "Course",
       attributes: [],
+      
     },
   });
 
@@ -183,19 +184,19 @@ export function MyWishlist() {
     setSortBy(value);
     let orderClause = [];
     switch (value) {
-      case 'title':
+      case "title":
         orderClause = [["courseTitle", "ASC"]];
         break;
-      case 'recent':
+      case "recent":
         orderClause = [["createdAt", "DESC"]];
         break;
-      case 'price':
+      case "price":
         orderClause = [["coursePrice", "ASC"]];
         break;
       default:
         orderClause = [["createdAt", "DESC"]];
     }
-    
+
     updateApiQuery("Course", {
       order: orderClause,
     });
@@ -205,7 +206,7 @@ export function MyWishlist() {
     try {
       // API call to remove from wishlist
       // await axiosConn.delete(`/wishlist/${courseId}`);
-      setCourseList(prev => prev.filter(course => course.id !== courseId));
+      setCourseList((prev) => prev.filter((course) => course.id !== courseId));
       toast({
         title: "Removed from wishlist",
         description: "Course has been removed from your wishlist.",
@@ -237,7 +238,7 @@ export function MyWishlist() {
   };
 
   const toggleCourseSelection = (courseId) => {
-    setSelectedCourses(prev => {
+    setSelectedCourses((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(courseId)) {
         newSet.delete(courseId);
@@ -337,17 +338,17 @@ export function MyWishlist() {
               {/* View Mode Toggle */}
               <div className="flex border rounded-lg p-1">
                 <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  variant={viewMode === "grid" ? "default" : "ghost"}
                   size="sm"
-                  onClick={() => setViewMode('grid')}
+                  onClick={() => setViewMode("grid")}
                   className="h-8 w-8 p-0"
                 >
                   <Grid3X3 className="h-4 w-4" />
                 </Button>
                 <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  variant={viewMode === "list" ? "default" : "ghost"}
                   size="sm"
-                  onClick={() => setViewMode('list')}
+                  onClick={() => setViewMode("list")}
                   className="h-8 w-8 p-0"
                 >
                   <List className="h-4 w-4" />
@@ -370,15 +371,17 @@ export function MyWishlist() {
         ) : (
           <>
             {/* Courses Grid/List */}
-            <div className={`gap-6 ${
-              viewMode === 'grid' 
-                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
-                : 'flex flex-col space-y-4'
-            }`}>
+            <div
+              className={`gap-6 ${
+                viewMode === "grid"
+                  ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                  : "flex flex-col space-y-4"
+              }`}
+            >
               {courseList?.map((course) => (
-                <WishlistCourseCard 
-                  key={course.id} 
-                  course={course} 
+                <WishlistCourseCard
+                  key={course.id}
+                  course={course}
                   viewMode={viewMode}
                   isSelected={selectedCourses.has(course.id)}
                   onToggleSelect={() => toggleCourseSelection(course.id)}
@@ -396,16 +399,17 @@ export function MyWishlist() {
                     <Heart className="w-10 h-10 text-red-500" />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    {exploreCourseText ? 'No courses found' : 'Your Wishlist is Empty'}
+                    {exploreCourseText
+                      ? "No courses found"
+                      : "Your Wishlist is Empty"}
                   </h3>
                   <p className="text-gray-600 max-w-md mx-auto mb-6">
-                    {exploreCourseText 
-                      ? 'Try adjusting your search terms.'
-                      : 'Save interesting courses to your wishlist to view them later. Start exploring our course catalog!'
-                    }
+                    {exploreCourseText
+                      ? "Try adjusting your search terms."
+                      : "Save interesting courses to your wishlist to view them later. Start exploring our course catalog!"}
                   </p>
-                  <Button 
-                    onClick={() => navigate('/explore')}
+                  <Button
+                    onClick={() => navigate("/explore")}
                     className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600"
                   >
                     <Search className="mr-2 h-4 w-4" />
@@ -423,7 +427,7 @@ export function MyWishlist() {
                     <div className="text-sm text-gray-600">
                       Showing {offset + 1} to{" "}
                       {Math.min(offset + limit, totalCount)} of {totalCount}{" "}
-                      course{totalCount !== 1 ? 's' : ''}
+                      course{totalCount !== 1 ? "s" : ""}
                     </div>
                     <Pagination className="mr-0 ml-auto w-auto">
                       <PaginationContent>
@@ -484,18 +488,18 @@ export function MyWishlist() {
 }
 
 // Enhanced Wishlist Course Card Component
-function WishlistCourseCard({ 
-  course, 
-  viewMode, 
-  isSelected, 
-  onToggleSelect, 
-  onRemoveFromWishlist, 
-  onAddToCart 
+function WishlistCourseCard({
+  course,
+  viewMode,
+  isSelected,
+  onToggleSelect,
+  onRemoveFromWishlist,
+  onAddToCart,
 }) {
   const { userDetail } = useAuthStore();
   const navigate = useNavigate();
 
-  if (viewMode === 'list') {
+  if (viewMode === "list") {
     return (
       <Card className="group relative overflow-hidden border shadow-sm hover:shadow-md transition-all">
         <CardContent className="p-4">
@@ -524,22 +528,26 @@ function WishlistCourseCard({
               <h3 className="font-semibold text-lg line-clamp-1 mb-2">
                 {course.courseTitle?.toUpperCase()}
               </h3>
-              
+
               <div className="flex flex-wrap gap-2 mb-3">
-                {course.courseLevel && <Badge variant="outline">{course.courseLevel}</Badge>}
+                {course.courseLevel && (
+                  <Badge variant="outline">{course.courseLevel}</Badge>
+                )}
                 {course.courseDuration && (
                   <Badge variant="outline">
                     <Clock size={12} className="mr-1" />
-                    {`${Math.floor(+course.courseDuration / 60)}hr ${+course.courseDuration % 60}min`}
+                    {`${Math.floor(+course.courseDuration / 60)}hr ${
+                      +course.courseDuration % 60
+                    }min`}
                   </Badge>
                 )}
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="text-lg font-bold text-green-600">
-                  {course.coursePrice ? `$${course.coursePrice}` : 'Free'}
+                  {course.coursePrice ? `$${course.coursePrice}` : "Free"}
                 </div>
-                
+
                 <div className="flex gap-2">
                   <Button
                     size="sm"
@@ -592,12 +600,18 @@ function WishlistCourseCard({
       <CardHeader className="p-0">
         <div className="overflow-x-auto mb-2">
           <div className="flex gap-2">
-            {course.courseSource && <Badge variant="outline">{course.courseSource}</Badge>}
-            {course.courseLevel && <Badge variant="outline">{course.courseLevel}</Badge>}
+            {course.courseSource && (
+              <Badge variant="outline">{course.courseSource}</Badge>
+            )}
+            {course.courseLevel && (
+              <Badge variant="outline">{course.courseLevel}</Badge>
+            )}
             {course.courseDuration && (
               <Badge variant="outline">
                 <Clock size={14} className="mr-1 inline" />
-                {`${Math.floor(+course.courseDuration / 60)}hr ${+course.courseDuration % 60}min`}
+                {`${Math.floor(+course.courseDuration / 60)}hr ${
+                  +course.courseDuration % 60
+                }min`}
               </Badge>
             )}
           </div>
@@ -611,7 +625,7 @@ function WishlistCourseCard({
           />
           <div className="absolute bottom-2 right-2">
             <Badge variant="secondary" className="bg-green-100 text-green-800">
-              {course.coursePrice ? `$${course.coursePrice}` : 'Free'}
+              {course.coursePrice ? `$${course.coursePrice}` : "Free"}
             </Badge>
           </div>
         </div>
@@ -622,16 +636,16 @@ function WishlistCourseCard({
       </CardHeader>
 
       <div className="mt-4 space-y-2">
-        <Button 
+        <Button
           className="w-full bg-blue-600 hover:bg-blue-700"
           onClick={onAddToCart}
         >
           <ShoppingCart className="mr-2 h-4 w-4" />
           Add to Cart
         </Button>
-        
-        <Button 
-          variant="outline" 
+
+        <Button
+          variant="outline"
           className="w-full"
           onClick={() => navigate(`/explore/${course.courseId}`)}
         >
