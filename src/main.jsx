@@ -10,7 +10,7 @@ import { refreshToken } from "./utils/refreshTokenUtils";
 
 import { Dashboard } from "@/components-xm/Dashboard.jsx";
 import { Explore } from "@/components-xm/Explore.jsx";
-import { Marketplace, BringYourOwnCourse as BringYourOwnCourseExplore, PrivilegedAccess } from "@/components-xm/Explore/index.js";
+import { Marketplace, BringYourOwnCourse as BringYourOwnCourseExplore, PrivilegedAccess , LiveLearning} from "@/components-xm/Explore/index.js";
 import { MyLearningPath } from "@/components-xm/MyJourney/MyLearningPath.jsx";
 import { CourseDetail } from "@/components-xm/Course/CourseDetail.jsx";
 import CourseOverview from "@/components-xm/Course/CourseOverview.jsx";
@@ -32,7 +32,7 @@ import BringYourOwnCourse from "./components-xm/BringYourOwnCourse.jsx";
 import { MyCourse } from "./components-xm/MyJourney/MyCourse.jsx";
 import { MyWishlist } from "./components-xm/MyJourney/MyWishlist.jsx";
 import { MyOrders } from "./components-xm/MyJourney/MyOrders.jsx";
-
+ 
 const router = createBrowserRouter([
   // {
   //     path: "/browse",
@@ -52,6 +52,10 @@ const router = createBrowserRouter([
           {
             path: "marketplace",
             element: <Marketplace />,
+          },
+          {
+            path: "live-learning",
+            element: <LiveLearning />,
           },
           {
             path: "bring-your-own-course",

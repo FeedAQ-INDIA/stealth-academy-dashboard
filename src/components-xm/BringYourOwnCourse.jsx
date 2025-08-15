@@ -28,7 +28,7 @@ export default function BringYourOwnCourse() {
     };
 
     return (
-        <Card className="max-w-xl mx-auto mt-10 shadow-lg">
+        <Card className="max-w-xl mx-auto my-10 shadow-lg">
             <CardHeader>
                 <h2 className="text-2xl font-bold">Bring Your Own Course</h2>
                 <p className="text-muted-foreground mt-2">
@@ -48,7 +48,7 @@ export default function BringYourOwnCourse() {
                                     onChange={(e) => handleUrlChange(idx, e.target.value)}
                                     className="flex-1"
                                 />
-                                {urls.length > 1 && (
+                                {/* {urls.length > 1 && (
                                     <Button
                                         type="button"
                                         variant="destructive"
@@ -57,14 +57,14 @@ export default function BringYourOwnCourse() {
                                     >
                                         &times;
                                     </Button>
-                                )}
+                                )} */}
                             </div>
                         ))}
-                        <Button type="button" variant="outline" onClick={addUrlField}>
+                        {/* <Button type="button" variant="outline" onClick={addUrlField}>
                             Add another URL
-                        </Button>
+                        </Button> */}
                     </div>
-                    <div>
+                    {/* <div>
                         <label className="block font-medium mb-2">Or upload a file</label>
                         <Input type="file" accept=".pdf,.doc,.docx,.txt" onChange={handleFileChange} />
                         {file && (
@@ -72,7 +72,7 @@ export default function BringYourOwnCourse() {
                                 Selected file: {file.name}
                             </div>
                         )}
-                    </div>
+                    </div> */}
                     <Button type="submit" className="w-full">
                         Analyze & Build Course
                     </Button>

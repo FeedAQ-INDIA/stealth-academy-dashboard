@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { ShoppingCart, Upload, Crown } from "lucide-react";
+import { ShoppingCart, Upload, Crown, Video } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { useAuthStore } from "@/zustland/store.js";
@@ -19,6 +19,13 @@ export function Explore() {
       icon: ShoppingCart, 
       path: "/explore/marketplace",
       description: "Browse and discover courses from our extensive catalog"
+    },
+    { 
+      id: "live-learning", 
+      label: "LIVE LEARNING", 
+      icon: Video, 
+      path: "/explore/live-learning",
+      description: "Join interactive live sessions and real-time learning experiences"
     },
     { 
       id: "bring-your-own", 
