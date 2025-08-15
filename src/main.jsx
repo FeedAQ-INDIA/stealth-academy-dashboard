@@ -19,7 +19,9 @@ import { AccountDetail } from "@/components-xm/AccountSettings/AccountDetail.jsx
 import MyAccount from "@/components-xm/AccountSettings/MyAccount.jsx";
 import Security from "@/components-xm/AccountSettings/Security.jsx";
 import Billing from "@/components-xm/AccountSettings/Billing.jsx";
-import Orders from "@/components-xm/AccountSettings/Orders.jsx";
+import BillingOverview from "@/components-xm/AccountSettings/BillingOverview.jsx";
+import BillingHistory from "@/components-xm/AccountSettings/BillingHistory.jsx";
+import { OrdersLayout, AllOrders, CompletedOrders, PendingOrders, CancelledOrders } from "@/components-xm/AccountSettings/Orders/index.js";
 import Notifications from "@/components-xm/AccountSettings/Notifications.jsx";
 import CourseWritten from "@/components-xm/Course/CourseWritten.jsx";
 import CourseDocThirdParty from "@/components-xm/Course/CourseDocThirdParty.jsx";
@@ -105,10 +107,42 @@ const router = createBrowserRouter([
           {
             path: "/account-settings/billing",
             element: <Billing />,
+            children: [
+              {
+                index: true,
+                element: <BillingOverview />,
+              },
+              {
+                path: "overview",
+                element: <BillingOverview />,
+              },
+              {
+                path: "history",
+                element: <BillingHistory />,
+              },
+            ],
           },
           {
             path: "/account-settings/orders",
-            element: <Orders />,
+            element: <OrdersLayout />,
+            children: [
+              {
+                index: true,
+                element: <AllOrders />,
+              },
+              {
+                path: "completed",
+                element: <CompletedOrders />,
+              },
+              {
+                path: "pending",
+                element: <PendingOrders />,
+              },
+              {
+                path: "cancelled",
+                element: <CancelledOrders />,
+              },
+            ],
           },
           {
             path: "/account-settings/notifications",

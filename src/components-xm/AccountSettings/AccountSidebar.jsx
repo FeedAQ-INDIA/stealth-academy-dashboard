@@ -45,22 +45,22 @@ function AccountSidebar({...props}) {
                         isActive: location.pathname === '/account-settings/profile' || location.pathname === '/account-settings',
                         icon: UserCircle,
                     },
-                    {
-                        title: "Security",
-                        url: `/account-settings/security`,
-                        isActive: location.pathname === '/account-settings/security',
-                        icon: Shield,
-                    },
+                    // {
+                    //     title: "Security",
+                    //     url: `/account-settings/security`,
+                    //     isActive: location.pathname === '/account-settings/security',
+                    //     icon: Shield,
+                    // },
                     {
                         title: "Billing",
                         url: `/account-settings/billing`,
-                        isActive: location.pathname === '/account-settings/billing',
+                        isActive: location.pathname?.includes('/account-settings/billing'),
                         icon: CreditCard,
                     },
                     {
                         title: "Orders",
                         url: `/account-settings/orders`,
-                        isActive: location.pathname === '/account-settings/orders',
+                        isActive: location.pathname?.includes('/account-settings/orders'),
                         icon: ShoppingBag,
                     },
                     {
