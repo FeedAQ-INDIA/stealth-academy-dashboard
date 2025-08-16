@@ -105,16 +105,16 @@ function Billing() {
                   }}></div>
                 </div>
                 
-                <CardHeader className="relative z-10 pb-2">
-                  <div className="flex items-center justify-center mb-2">
+                <CardHeader className=" ">
+                  {/* <div className="flex items-center justify-center mb-2">
                     <Sparkles className="w-6 h-6 text-yellow-300 animate-float" />
-                  </div>
-                  <CardTitle className="text-center tracking-wide text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
-                    What would you like to learn today?
+                  </div> */}
+                  <CardTitle className="text-center tracking-wide text-2xl md:text-3xl  font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                    Credit & Billing 
                   </CardTitle>
-                  <p className="text-center text-white/90 mt-2 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                  {/* <p className="text-center text-white/90 mt-2 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
                     Discover thousands of courses from beginner to advanced levels
-                  </p>
+                  </p> */}
                 </CardHeader>
                 
                 <CardContent className="relative z-10 pb-6">

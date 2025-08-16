@@ -112,7 +112,7 @@ export function Explore() {
                   {/* <div className="flex items-center justify-center mb-2">
                     <Sparkles className="w-6 h-6 text-yellow-300 animate-float" />
                   </div> */}
-                  <CardTitle className="text-center tracking-wide text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                  <CardTitle className="text-center tracking-wide text-2xl md:text-3xl  font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
                     What would you like to learn today?
                   </CardTitle>
                   <p className="text-center text-white/90 mt-2 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">

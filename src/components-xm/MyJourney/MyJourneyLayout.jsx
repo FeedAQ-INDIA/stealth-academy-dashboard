@@ -180,30 +180,21 @@ export function MyLearningLayout() {
         <div className="max-w-7xl mx-auto space-y-6">
           {/* Hero Section with Enhanced Gradient */}
           <div className="relative overflow-hidden">
-            <Card className="w-full rounded-2xl border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700  text-white shadow-2xl backdrop-blur-sm">
-              {/* Background Pattern */}
-              <div className="absolute inset-0 opacity-20">
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                  }}
-                ></div>
-              </div>
 
-              <CardHeader className="relative z-10 pb-2">
-                <div className="flex items-center justify-center mb-2">
-                  <Sparkles className="w-6 h-6 text-yellow-300 animate-float" />
-                </div>
-                <CardTitle className="text-center tracking-wide text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white to-yellow-100 bg-clip-text text-transparent">
-                  Welcome back, {userDetail?.firstName || "Learner"}!
-                </CardTitle>
-                <p className="text-center text-white/90 mt-2 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-                  Continue your learning journey and achieve your goals
-                </p>
-              </CardHeader>
-
-              <CardContent className="relative z-10 pb-6">
+                            <Card className="mb-6 border-0 shadow-lg   bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700   ">
+                                      <CardHeader className="">
+                                                 {/* <div className="flex items-center justify-center mb-2">
+                                                   <Sparkles className="w-6 h-6 text-yellow-300 animate-float" />
+                                                 </div> */}
+                                                 <CardTitle className="text-center tracking-wide text-2xl md:text-3xl  font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                                                   My Journey
+                                                 </CardTitle>
+                                                 {/* <p className="text-center text-white/90 mt-2 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                                                   Discover thousands of courses from beginner to advanced levels
+                                                 </p> */}
+                                               </CardHeader>
+                                               
+                                       <CardContent className="relative z-10 pb-6">
                 {/* Mobile: Horizontal scroll with arrows, Desktop: Flex wrap */}
                 <div className="relative">
                   {/* Left Arrow */}
@@ -311,7 +302,9 @@ export function MyLearningLayout() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+             
+                            </Card>
+ 
           </div>
 
           {/* Achievement Banner */}
