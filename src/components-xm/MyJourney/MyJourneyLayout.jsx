@@ -88,7 +88,6 @@ export function MyLearningLayout() {
     totalHours: 0,
   });
 
- 
   const [historySelection, setHistorySelection] = useState("CourseHistory");
 
   // Navigation items for tabs
@@ -100,7 +99,7 @@ export function MyLearningLayout() {
       path: "/my-journey",
       description: "Track your enrolled courses and progress",
     },
-        {
+    {
       id: "courses",
       label: "MY COURSES",
       icon: GraduationCap,
