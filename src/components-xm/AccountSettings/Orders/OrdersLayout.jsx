@@ -1,15 +1,19 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import {Card, CardHeader, CardContent, CardTitle} from "@/components/ui/card.jsx";
 import {Button} from "@/components/ui/button.jsx";
 import {SidebarTrigger} from "@/components/ui/sidebar.jsx";
 import {Separator} from "@/components/ui/separator.jsx";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
-import {ShoppingBag, CheckCircle, Clock, XCircle} from "lucide-react";
+import {ShoppingBag, CheckCircle, Clock, XCircle, ChevronLeft, ChevronRight} from "lucide-react";
 import { useOrderStore } from "@/zustland/store.js";
 
 function OrdersLayout() {
     const location = useLocation();
+    const [hoveredItem, setHoveredItem] = useState(null);
+    const scrollContainerRef = useRef(null);
+    const [showLeftArrow, setShowLeftArrow] = useState(false);
+    const [showRightArrow, setShowRightArrow] = useState(false);
     
     // Get orders data from Zustand store
     const { 
@@ -50,6 +54,43 @@ function OrdersLayout() {
             path: "/account-settings/orders/cancelled"
         },
     ];
+
+    // Check scroll position and update arrow visibility
+    const checkScrollPosition = () => {
+        if (scrollContainerRef.current) {
+            const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+            setShowLeftArrow(scrollLeft > 0);
+            setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
+        }
+    };
+
+    // Scroll functions
+    const scrollLeft = () => {
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+        }
+    };
+
+    const scrollRight = () => {
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+        }
+    };
+
+    // Check scroll position on mount and resize
+    useEffect(() => {
+        const container = scrollContainerRef.current;
+        if (container) {
+            checkScrollPosition();
+            container.addEventListener('scroll', checkScrollPosition);
+            window.addEventListener('resize', checkScrollPosition);
+            
+            return () => {
+                container.removeEventListener('scroll', checkScrollPosition);
+                window.removeEventListener('resize', checkScrollPosition);
+            };
+        }
+    }, []);
 
     return (
         <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -97,27 +138,95 @@ function OrdersLayout() {
                         </div>
                         
                         {/* Navigation Tabs */}
-                        <div className="">
-                            <div className="flex flex-wrap gap-2 p-1 bg-white rounded-xl shadow-sm border">
-                                {orderTabs.map((tab) => {
+                        <div className="relative">
+                            {/* Left Arrow */}
+                            {showLeftArrow && (
+                              <button
+                                onClick={scrollLeft}
+                                className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-purple-700 rounded-full p-1 shadow-lg transition-all duration-300 sm:hidden"
+                                aria-label="Scroll left"
+                              >
+                                <ChevronLeft size={16} />
+                              </button>
+                            )}
+                            
+                            {/* Right Arrow */}
+                            {showRightArrow && (
+                              <button
+                                onClick={scrollRight}
+                                className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-purple-700 rounded-full p-1 shadow-lg transition-all duration-300 sm:hidden"
+                                aria-label="Scroll right"
+                              >
+                                <ChevronRight size={16} />
+                              </button>
+                            )}
+                            
+                            <div 
+                              ref={scrollContainerRef}
+                              className="overflow-x-auto scrollbar-hide"
+                              onScroll={checkScrollPosition}
+                            >
+                              <div className="flex gap-1.5 p-1 min-w-max sm:flex-wrap sm:justify-center sm:min-w-0 sm:gap-2">
+                                {orderTabs.map((tab, index) => {
                                     const Icon = tab.icon;
                                     const isActive = location.pathname === tab.path;
+                                    const isHovered = hoveredItem === tab.id;
                                     
                                     return (
                                         <Link
                                             key={tab.id}
                                             to={tab.path}
-                                            className={`flex items-center gap-2 px-2 py-1 rounded-lg font-medium transition-all duration-200 ${
-                                                isActive
-                                                    ? 'bg-blue-600 text-white shadow-md'
-                                                    : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                                            onMouseEnter={() => setHoveredItem(tab.id)}
+                                            onMouseLeave={() => setHoveredItem(null)}
+                                            className={`group relative overflow-hidden rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50 flex-shrink-0 
+                                              px-2 py-1.5 sm:px-3 sm:py-2 ${
+                                              isActive
+                                                ? 'bg-orange-600 text-white shadow-lg ring-1 ring-orange/50'
+                                                : 'bg-white/10 hover:bg-white/20 text-orange-800 backdrop-blur-sm border border-orange/20 hover:border-orange/40'
                                             }`}
+                                            style={{
+                                              animationDelay: `${index * 50}ms`
+                                            }}
+                                            aria-label={`Navigate to ${tab.label}`}
                                         >
-                                            <Icon size={18} />
-                                            <span className="hidden sm:inline">{tab.label}</span>
+                                          {/* Animated background for active state */}
+                                          {isActive && (
+                                            <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-yellow-600 rounded-lg"></div>
+                                          )}
+                                          
+                                          {/* Hover effect background */}
+                                          <div className={`absolute inset-0 bg-gradient-to-br from-orange/20 to-yellow/10 rounded-lg transition-opacity duration-300 ${isHovered && !isActive ? 'opacity-100' : 'opacity-0'}`}></div>
+                                          
+                                          <div className="relative z-10 flex items-center gap-1.5 sm:gap-2">
+                                            <div className={`p-1 sm:p-1.5 rounded transition-all duration-300 ${
+                                              isActive 
+                                                ? 'bg-yellow-100 text-orange-700' 
+                                                : isHovered 
+                                                  ? 'bg-orange/20 text-orange-800 scale-110' 
+                                                  : 'bg-orange/10 text-orange-800'
+                                            }`}>
+                                              <Icon size={14} className="sm:w-4 sm:h-4" />
+                                            </div>
+                                            
+                                            <span className={`font-medium whitespace-nowrap transition-colors duration-300 
+                                              text-[10px] sm:text-xs ${
+                                              isActive ? 'text-white' : 'text-orange-800'
+                                            }`}>
+                                              <span className="hidden xs:inline">{tab.label}</span>
+                                              <span className="xs:hidden">
+                                                {tab.label.split(' ')[0]}
+                                              </span>
+                                            </span>
+                                          </div>
+                                          
+                                          {/* Animated border for active state */}
+                                          {isActive && (
+                                            <div className="absolute inset-0 rounded-lg border border-yellow-300 animate-pulse-subtle"></div>
+                                          )}
                                         </Link>
                                     );
                                 })}
+                              </div>
                             </div>
                         </div>
                     </CardContent>

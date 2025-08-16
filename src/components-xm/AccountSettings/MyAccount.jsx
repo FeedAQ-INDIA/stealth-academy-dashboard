@@ -1,5 +1,5 @@
 import {Card, CardHeader, CardContent, CardTitle} from "@/components/ui/card.jsx";
-import React, {useEffect} from "react";
+import React, {useEffect, useState, useRef, useMemo} from "react";
 import {Button} from "@/components/ui/button.jsx";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
 import {Label} from "@/components/ui/label.jsx";
@@ -14,7 +14,7 @@ import {toast} from "@/components/hooks/use-toast.js";
 import {SidebarTrigger} from "@/components/ui/sidebar.jsx";
 import {Separator} from "@/components/ui/separator.jsx";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
-import {BookOpen, CircleArrowLeft, CircleArrowRight, User, Settings, Shield, CreditCard, Bell, UserCircle, LogOut, ShoppingBag} from "lucide-react";
+import {BookOpen, CircleArrowLeft, CircleArrowRight, User, Settings, Shield, CreditCard, Bell, UserCircle, LogOut, ShoppingBag, ChevronLeft, ChevronRight} from "lucide-react";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 
 
@@ -22,9 +22,13 @@ function MyAccount() {
     const {userDetail, fetchUserDetail} = useAuthStore()
     const location = useLocation();
     const navigate = useNavigate();
+    const [hoveredItem, setHoveredItem] = useState(null);
+    const scrollContainerRef = useRef(null);
+    const [showLeftArrow, setShowLeftArrow] = useState(false);
+    const [showRightArrow, setShowRightArrow] = useState(false);
 
     // Navigation items for account settings tabs
-    const navigationItems = [
+    const navigationItems = useMemo(() => [
         { 
             id: "profile", 
             label: "Profile", 
@@ -60,7 +64,7 @@ function MyAccount() {
             path: "/account-settings/notifications",
             description: "Configure your notification preferences"
         },
-    ];
+    ], []);
 
     const createAccountSchema = z.object({
         firstName: z.string()
@@ -84,6 +88,43 @@ function MyAccount() {
             });
         }
     }, [userDetail]);
+
+    // Check scroll position and update arrow visibility
+    const checkScrollPosition = () => {
+        if (scrollContainerRef.current) {
+            const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+            setShowLeftArrow(scrollLeft > 0);
+            setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
+        }
+    };
+
+    // Scroll functions
+    const scrollLeft = () => {
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+        }
+    };
+
+    const scrollRight = () => {
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+        }
+    };
+
+    // Check scroll position on mount and resize
+    useEffect(() => {
+        const container = scrollContainerRef.current;
+        if (container) {
+            checkScrollPosition();
+            container.addEventListener('scroll', checkScrollPosition);
+            window.addEventListener('resize', checkScrollPosition);
+            
+            return () => {
+                container.removeEventListener('scroll', checkScrollPosition);
+                window.removeEventListener('resize', checkScrollPosition);
+            };
+        }
+    }, []);
 
     function onSubmit(data) {
         axiosConn.post(import.meta.env.VITE_API_URL + '/saveUserDetail', {
@@ -147,27 +188,95 @@ function MyAccount() {
                         </div>
                     </CardHeader>
                     <CardContent>
-                         <div className="">
-                            <div className="flex flex-wrap gap-2 p-1 bg-white rounded-xl shadow-sm border">
-                                {navigationItems.map((item) => {
+                         <div className="relative">
+                            {/* Left Arrow */}
+                            {showLeftArrow && (
+                              <button
+                                onClick={scrollLeft}
+                                className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-purple-700 rounded-full p-1 shadow-lg transition-all duration-300 sm:hidden"
+                                aria-label="Scroll left"
+                              >
+                                <ChevronLeft size={16} />
+                              </button>
+                            )}
+                            
+                            {/* Right Arrow */}
+                            {showRightArrow && (
+                              <button
+                                onClick={scrollRight}
+                                className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-purple-700 rounded-full p-1 shadow-lg transition-all duration-300 sm:hidden"
+                                aria-label="Scroll right"
+                              >
+                                <ChevronRight size={16} />
+                              </button>
+                            )}
+                            
+                            <div 
+                              ref={scrollContainerRef}
+                              className="overflow-x-auto scrollbar-hide"
+                              onScroll={checkScrollPosition}
+                            >
+                              <div className="flex gap-1.5 p-1 min-w-max sm:flex-wrap sm:justify-center sm:min-w-0 sm:gap-2">
+                                {navigationItems.map((item, index) => {
                                     const Icon = item.icon;
-                                    const isActive = location.pathname === item.path;
+                                    const isActive = location.pathname === item.path || (item.path === '/account-settings/profile' && location.pathname === '/account-settings');
+                                    const isHovered = hoveredItem === item.id;
                                     
                                     return (
                                         <button
                                             key={item.id}
                                             onClick={() => navigate(item.path)}
-                                            className={`flex items-center gap-2 px-2 py-1 rounded-lg font-medium transition-all duration-200 ${
-                                                isActive || (item.path === '/account-settings/profile' && location.pathname === '/account-settings')
-                                                    ? 'bg-blue-600 text-white shadow-md'
-                                                    : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+                                            onMouseEnter={() => setHoveredItem(item.id)}
+                                            onMouseLeave={() => setHoveredItem(null)}
+                                            className={`group relative overflow-hidden rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50 flex-shrink-0 
+                                              px-2 py-1.5 sm:px-3 sm:py-2 ${
+                                              isActive
+                                                ? 'bg-orange-600 text-white shadow-lg ring-1 ring-orange/50'
+                                                : 'bg-white/10 hover:bg-white/20 text-orange-800 backdrop-blur-sm border border-orange/20 hover:border-orange/40'
                                             }`}
+                                            style={{
+                                              animationDelay: `${index * 50}ms`
+                                            }}
+                                            aria-label={`Navigate to ${item.label}`}
                                         >
-                                            <Icon size={18} />
-                                            <span className="hidden sm:inline">{item.label}</span>
+                                          {/* Animated background for active state */}
+                                          {isActive && (
+                                            <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-yellow-600 rounded-lg"></div>
+                                          )}
+                                          
+                                          {/* Hover effect background */}
+                                          <div className={`absolute inset-0 bg-gradient-to-br from-orange/20 to-yellow/10 rounded-lg transition-opacity duration-300 ${isHovered && !isActive ? 'opacity-100' : 'opacity-0'}`}></div>
+                                          
+                                          <div className="relative z-10 flex items-center gap-1.5 sm:gap-2">
+                                            <div className={`p-1 sm:p-1.5 rounded transition-all duration-300 ${
+                                              isActive 
+                                                ? 'bg-yellow-100 text-orange-700' 
+                                                : isHovered 
+                                                  ? 'bg-orange/20 text-orange-800 scale-110' 
+                                                  : 'bg-orange/10 text-orange-800'
+                                            }`}>
+                                              <Icon size={14} className="sm:w-4 sm:h-4" />
+                                            </div>
+                                            
+                                            <span className={`font-medium whitespace-nowrap transition-colors duration-300 
+                                              text-[10px] sm:text-xs ${
+                                              isActive ? 'text-white' : 'text-orange-800'
+                                            }`}>
+                                              <span className="hidden xs:inline">{item.label}</span>
+                                              <span className="xs:hidden">
+                                                {item.label.split(' ')[0]}
+                                              </span>
+                                            </span>
+                                          </div>
+                                          
+                                          {/* Animated border for active state */}
+                                          {isActive && (
+                                            <div className="absolute inset-0 rounded-lg border border-yellow-300 animate-pulse-subtle"></div>
+                                          )}
                                         </button>
                                     );
                                 })}
+                              </div>
                             </div>
                         </div>
 

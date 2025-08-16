@@ -326,7 +326,7 @@ export function Marketplace() {
       </Card>
 
       {/* Marketplace Course Content */}
-      <div className="min-h-[400px]">
+      <div className="min-h-[400px] mt-6">
         {loading ? (
           <div className="flex items-center justify-center min-h-[400px] w-full">
             <div className="text-center">
