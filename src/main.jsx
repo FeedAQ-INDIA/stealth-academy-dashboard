@@ -11,16 +11,16 @@ import { refreshToken } from "./utils/refreshTokenUtils";
 import { Dashboard } from "@/components-xm/Dashboard.jsx";
 import { Explore } from "@/components-xm/Explore.jsx";
 import { Marketplace, BringYourOwnCourse as BringYourOwnCourseExplore, PrivilegedAccess , LiveLearning} from "@/components-xm/Explore/index.js";
-import { MyLearningPath } from "@/components-xm/MyJourney/MyLearningPath.jsx";
+import { MyLearningLayout } from "@/components-xm/MyJourney/MyJourneyLayout.jsx";
 import { CourseDetail } from "@/components-xm/Course/CourseDetail.jsx";
 import CourseOverview from "@/components-xm/Course/CourseOverview.jsx";
 import CourseVideoTutorial from "@/components-xm/Course/CourseVideoTutorial.jsx";
 import { AccountDetail } from "@/components-xm/AccountSettings/AccountDetail.jsx";
 import MyAccount from "@/components-xm/AccountSettings/MyAccount.jsx";
 import Security from "@/components-xm/AccountSettings/Security.jsx";
-import Billing from "@/components-xm/AccountSettings/Billing.jsx";
-import BillingOverview from "@/components-xm/AccountSettings/BillingOverview.jsx";
-import BillingHistory from "@/components-xm/AccountSettings/BillingHistory.jsx";
+import Billing from "@/components-xm/AccountSettings/Billing/Billing.jsx";
+import BillingOverview from "@/components-xm/AccountSettings/Billing/BillingOverview.jsx";
+import BillingHistory from "@/components-xm/AccountSettings/Billing/BillingHistory.jsx";
 import { OrdersLayout, AllOrders, CompletedOrders, PendingOrders, CancelledOrders } from "@/components-xm/AccountSettings/Orders/index.js";
 import Notifications from "@/components-xm/AccountSettings/Notifications.jsx";
 import CourseWritten from "@/components-xm/Course/CourseWritten.jsx";
@@ -33,8 +33,8 @@ import CourseSnapView from "@/components-xm/HomeFiles/CourseSnapView.jsx";
 import BringYourOwnCourse from "./components-xm/BringYourOwnCourse.jsx";
 import { MyCourse } from "./components-xm/MyJourney/MyCourse.jsx";
 import { MyWishlist } from "./components-xm/MyJourney/MyWishlist.jsx";
-import { MyOrders } from "./components-xm/MyJourney/MyOrders.jsx";
- 
+import MyJourneyOverview from "./components-xm/MyJourney/MyJourneyOverview.jsx";
+  
 const router = createBrowserRouter([
   // {
   //     path: "/browse",
@@ -111,17 +111,14 @@ const router = createBrowserRouter([
               {
                 index: true,
                 element: <BillingOverview />,
-              },
-              {
-                path: "overview",
-                element: <BillingOverview />,
-              },
+              }, 
               {
                 path: "history",
                 element: <BillingHistory />,
               },
             ],
           },
+           
           {
             path: "/account-settings/orders",
             element: <OrdersLayout />,
@@ -184,8 +181,12 @@ const router = createBrowserRouter([
 
       {
         path: "/my-journey",
-        element: <MyLearningPath />,
+        element: <MyLearningLayout />,
         children: [
+          {
+            index: true,
+            element: <MyJourneyOverview />,
+          },
           {
             path: "/my-journey/courses",
             element: <MyCourse />,
@@ -194,10 +195,7 @@ const router = createBrowserRouter([
             path: "/my-journey/wishlist",
             element: <MyWishlist />,
           },
-          {
-            path: "/my-journey/orders",
-            element: <MyOrders />,
-          },
+          
         ],
       },
 

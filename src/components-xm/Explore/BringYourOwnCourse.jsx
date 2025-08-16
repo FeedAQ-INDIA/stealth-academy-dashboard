@@ -76,13 +76,14 @@ export function BringYourOwnCourse() {
     offset: offset,
     getThisData: {
       datasource: "Course",
-      attributes: [],
+      attributes: [], 
       include: [
         {
-          datasource: "UserCourseEnrollment",
-          as: "enrollments",
+          datasource: "CourseAccess",
+          as: "accessControls",
           where: {
             userId: userDetail.id,
+            accessLevel: "OWN",
           },
           required: true,
         },
@@ -229,8 +230,18 @@ export function BringYourOwnCourse() {
       offset: offset,
       getThisData: {
         datasource: "Course",
-        // order: [["courseIsLocked", "ASC"]],
         attributes: [],
+        include: [
+        {
+          datasource: "CourseAccess",
+          as: "accessControls",
+          where: {
+            userId: userDetail.id,
+            accessLevel: "OWN",
+          },
+          required: true,
+        },
+      ],
       },
     });
     handleSearchChange(exploreCourseText);

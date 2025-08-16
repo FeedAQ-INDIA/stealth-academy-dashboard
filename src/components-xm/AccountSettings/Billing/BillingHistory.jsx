@@ -137,44 +137,6 @@ function BillingHistory() {
 
     return (
         <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-            <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
-                <SidebarTrigger className="-ml-1"/>
-                <Separator orientation="vertical" className="mr-2 h-4"/>
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem>
-                            <BreadcrumbPage className="truncate max-w-[30ch]">Credits & Billing - Transaction History</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
-                <div className="ml-auto sm:flex-initial"></div>
-            </header>
-
-            <div className="p-4 mx-auto max-w-7xl">
-                {/* Header Section */}
-                <Card className="w-full rounded-xl border-0 bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-700  text-white shadow-2xl mb-8">
-                    <CardHeader>
-                        <CardTitle className="text-center text-2xl sm:text-3xl font-bold tracking-wide flex items-center justify-center gap-3">
-                            <Clock className="w-8 h-8" />
-                            Transaction History
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-center text-white/90 text-lg mb-6">
-                            View and manage your complete credit transaction history
-                        </p>
-                        
-                        {/* Navigation Links */}
-                        <div className="flex justify-center gap-4">
-                            <Link to="/account-settings/billing/overview" className="hover:bg-white/20 px-4 py-2 rounded-lg text-white/80 hover:text-white font-medium transition-all">
-                                Overview
-                            </Link>
-                            <Link to="/account-settings/billing/history" className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-white font-medium transition-all">
-                                Transaction History
-                            </Link>
-                        </div>
-                    </CardContent>
-                </Card>
 
                 {/* Transaction History Content */}
                 <div className="space-y-6">
@@ -358,8 +320,7 @@ function BillingHistory() {
                         </CardContent>
                     </Card>
                 </div>
-            </div>
-        </div>
+         </div>
     );
 }
 

@@ -26,45 +26,7 @@ function MyAccount() {
     const scrollContainerRef = useRef(null);
     const [showLeftArrow, setShowLeftArrow] = useState(false);
     const [showRightArrow, setShowRightArrow] = useState(false);
-
-    // Navigation items for account settings tabs
-    const navigationItems = useMemo(() => [
-        { 
-            id: "profile", 
-            label: "Profile", 
-            icon: UserCircle, 
-            path: "/account-settings/profile",
-            description: "Manage your personal information"
-        },
-        { 
-            id: "security", 
-            label: "Security", 
-            icon: Shield, 
-            path: "/account-settings/security",
-            description: "Password and security settings"
-        },
-        { 
-            id: "billing", 
-            label: "Billing", 
-            icon: CreditCard, 
-            path: "/account-settings/billing",
-            description: "Payment methods and billing history"
-        },
-        { 
-            id: "orders", 
-            label: "Orders", 
-            icon: ShoppingBag, 
-            path: "/account-settings/orders",
-            description: "View and manage your order history"
-        },
-        { 
-            id: "notifications", 
-            label: "Notifications", 
-            icon: Bell, 
-            path: "/account-settings/notifications",
-            description: "Configure your notification preferences"
-        },
-    ], []);
+ 
 
     const createAccountSchema = z.object({
         firstName: z.string()
@@ -98,18 +60,7 @@ function MyAccount() {
         }
     };
 
-    // Scroll functions
-    const scrollLeft = () => {
-        if (scrollContainerRef.current) {
-            scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
-        }
-    };
-
-    const scrollRight = () => {
-        if (scrollContainerRef.current) {
-            scrollContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
-        }
-    };
+ 
 
     // Check scroll position on mount and resize
     useEffect(() => {
@@ -162,7 +113,7 @@ function MyAccount() {
        
 
                 {/* Profile Information Card */}
-                <Card className="mb-6 border-0 shadow-lg  bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-700  ">
+                <Card className="mb-6 border-0 shadow-lg   bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700   ">
                     <CardHeader className="p-6">
                         <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
                             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full lg:w-auto">
@@ -187,100 +138,8 @@ function MyAccount() {
                              
                         </div>
                     </CardHeader>
-                    <CardContent>
-                         <div className="relative">
-                            {/* Left Arrow */}
-                            {showLeftArrow && (
-                              <button
-                                onClick={scrollLeft}
-                                className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-purple-700 rounded-full p-1 shadow-lg transition-all duration-300 sm:hidden"
-                                aria-label="Scroll left"
-                              >
-                                <ChevronLeft size={16} />
-                              </button>
-                            )}
-                            
-                            {/* Right Arrow */}
-                            {showRightArrow && (
-                              <button
-                                onClick={scrollRight}
-                                className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-purple-700 rounded-full p-1 shadow-lg transition-all duration-300 sm:hidden"
-                                aria-label="Scroll right"
-                              >
-                                <ChevronRight size={16} />
-                              </button>
-                            )}
-                            
-                            <div 
-                              ref={scrollContainerRef}
-                              className="overflow-x-auto scrollbar-hide"
-                              onScroll={checkScrollPosition}
-                            >
-                              <div className="flex gap-1.5 p-1 min-w-max sm:flex-wrap sm:justify-center sm:min-w-0 sm:gap-2">
-                                {navigationItems.map((item, index) => {
-                                    const Icon = item.icon;
-                                    const isActive = location.pathname === item.path || (item.path === '/account-settings/profile' && location.pathname === '/account-settings');
-                                    const isHovered = hoveredItem === item.id;
-                                    
-                                    return (
-                                        <button
-                                            key={item.id}
-                                            onClick={() => navigate(item.path)}
-                                            onMouseEnter={() => setHoveredItem(item.id)}
-                                            onMouseLeave={() => setHoveredItem(null)}
-                                            className={`group relative overflow-hidden rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50 flex-shrink-0 
-                                              px-2 py-1.5 sm:px-3 sm:py-2 ${
-                                              isActive
-                                                ? 'bg-orange-600 text-white shadow-lg ring-1 ring-orange/50'
-                                                : 'bg-white/10 hover:bg-white/20 text-orange-800 backdrop-blur-sm border border-orange/20 hover:border-orange/40'
-                                            }`}
-                                            style={{
-                                              animationDelay: `${index * 50}ms`
-                                            }}
-                                            aria-label={`Navigate to ${item.label}`}
-                                        >
-                                          {/* Animated background for active state */}
-                                          {isActive && (
-                                            <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-yellow-600 rounded-lg"></div>
-                                          )}
-                                          
-                                          {/* Hover effect background */}
-                                          <div className={`absolute inset-0 bg-gradient-to-br from-orange/20 to-yellow/10 rounded-lg transition-opacity duration-300 ${isHovered && !isActive ? 'opacity-100' : 'opacity-0'}`}></div>
-                                          
-                                          <div className="relative z-10 flex items-center gap-1.5 sm:gap-2">
-                                            <div className={`p-1 sm:p-1.5 rounded transition-all duration-300 ${
-                                              isActive 
-                                                ? 'bg-yellow-100 text-orange-700' 
-                                                : isHovered 
-                                                  ? 'bg-orange/20 text-orange-800 scale-110' 
-                                                  : 'bg-orange/10 text-orange-800'
-                                            }`}>
-                                              <Icon size={14} className="sm:w-4 sm:h-4" />
-                                            </div>
-                                            
-                                            <span className={`font-medium whitespace-nowrap transition-colors duration-300 
-                                              text-[10px] sm:text-xs ${
-                                              isActive ? 'text-white' : 'text-orange-800'
-                                            }`}>
-                                              <span className="hidden xs:inline">{item.label}</span>
-                                              <span className="xs:hidden">
-                                                {item.label.split(' ')[0]}
-                                              </span>
-                                            </span>
-                                          </div>
-                                          
-                                          {/* Animated border for active state */}
-                                          {isActive && (
-                                            <div className="absolute inset-0 rounded-lg border border-yellow-300 animate-pulse-subtle"></div>
-                                          )}
-                                        </button>
-                                    );
-                                })}
-                              </div>
-                            </div>
-                        </div>
-
-                    </CardContent>
+              
+ 
                 </Card>
 
                 {/* Form Section */}

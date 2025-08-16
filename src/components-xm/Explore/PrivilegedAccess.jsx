@@ -71,10 +71,11 @@ export function PrivilegedAccess() {
       attributes: [],
       include: [
         {
-          datasource: "UserCourseEnrollment",
-          as: "enrollments",
+          datasource: "CourseAccess",
+          as: "accessControls",
           where: {
             userId: userDetail.id,
+            accessLevel: "SHARED",
           },
           required: true,
         },
@@ -221,8 +222,18 @@ export function PrivilegedAccess() {
       offset: offset,
       getThisData: {
         datasource: "Course",
-        // order: [["courseIsLocked", "ASC"]],
         attributes: [],
+        include: [
+        {
+          datasource: "CourseAccess",
+          as: "accessControls",
+          where: {
+            userId: userDetail.id,
+            accessLevel: "SHARED",
+          },
+          required: true,
+        },
+      ],
       },
     });
     handleSearchChange(exploreCourseText);

@@ -63,6 +63,9 @@ export function Marketplace() {
     getThisData: {
       datasource: "Course",
       attributes: [],
+      where: {
+        isMarketplaceFlag: true,
+      },
     },
   });
 
@@ -128,6 +131,7 @@ export function Marketplace() {
   };
 
   useEffect(() => {
+    console.log("API Query:", apiQuery);
     fetchCourses();
   }, [apiQuery]);
 
@@ -238,6 +242,9 @@ export function Marketplace() {
       getThisData: {
         datasource: "Course",
         attributes: [],
+        where: {
+          isMarketplaceFlag: true,
+        },
       },
     });
     handleSearchChange(exploreCourseText);
