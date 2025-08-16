@@ -109,9 +109,9 @@ export function Explore() {
                 </div>
                 
                 <CardHeader className="relative z-10 pb-2">
-                  <div className="flex items-center justify-center mb-2">
+                  {/* <div className="flex items-center justify-center mb-2">
                     <Sparkles className="w-6 h-6 text-yellow-300 animate-float" />
-                  </div>
+                  </div> */}
                   <CardTitle className="text-center tracking-wide text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
                     What would you like to learn today?
                   </CardTitle>

@@ -124,7 +124,7 @@ function NavigationMenuDemo({ orientation }) {
             <Button
               className="w-full justify-center px-2"
               variant={
-                location.pathname.includes("bring-your-own-course")
+                location.pathname === ("/bring-your-own-course")
                   ? "secondary"
                   : "ghost"
               }

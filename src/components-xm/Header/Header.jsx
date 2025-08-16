@@ -39,7 +39,7 @@ export default function Header( ) {
                     {/*    {userDetail?.nameInitial}*/}
                     {/*</Button> */}
                     <Avatar className="w-12 h-12   bg-orange-400   shadow-sm hover:shadow-xl">
-                    <AvatarFallback className="text-lg sm:text-lg bg-orange-400  text-white font-bold">
+                    <AvatarFallback className="text-lg sm:text-lg  bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold">
                         {userDetail?.nameInitial}
                     </AvatarFallback>
                 </Avatar>
