@@ -17,13 +17,13 @@ export function Explore() {
 
   // Navigation items for tabs
   const navigationItems = useMemo(() => [
-    { 
-      id: "marketplace", 
-      label: "MARKETPLACE", 
-      icon: ShoppingCart, 
-      path: "/explore/marketplace",
-      description: "Browse and discover courses from our extensive catalog"
-    },
+    // { 
+    //   id: "marketplace", 
+    //   label: "MARKETPLACE", 
+    //   icon: ShoppingCart, 
+    //   path: "/explore/marketplace",
+    //   description: "Browse and discover courses from our extensive catalog"
+    // },
     { 
       id: "live-learning", 
       label: "LIVE LEARNING", 

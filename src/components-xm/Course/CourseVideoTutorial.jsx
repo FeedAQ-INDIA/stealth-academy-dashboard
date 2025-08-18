@@ -84,7 +84,7 @@ const useVideoData = (CourseVideoId, courseList) => {
 };
 
 const useEnrollmentActions = (courseList, courseVideoDetail, fetchUserCourseContentProgress, userDetail) => {
-    const saveUserEnrollmentData = useCallback(async () => {
+    const saveUserCourseContentProgress = useCallback(async () => {
         if (!courseList?.courseId || !courseVideoDetail?.courseContentId) return;
 
         try {
@@ -106,7 +106,7 @@ const useEnrollmentActions = (courseList, courseVideoDetail, fetchUserCourseCont
         }
     }, [courseList?.courseId, courseVideoDetail?.courseContentId, fetchUserCourseContentProgress, userDetail?.userId]);
 
-    const deleteUserEnrollmentData = useCallback(async () => {
+    const deleteUserCourseContentProgress = useCallback(async () => {
         if (!courseList?.courseId || !courseVideoDetail?.courseContentId) return;
 
         try {
@@ -126,7 +126,7 @@ const useEnrollmentActions = (courseList, courseVideoDetail, fetchUserCourseCont
         }
     }, [courseList?.courseId, courseVideoDetail?.courseContentId, fetchUserCourseContentProgress, userDetail?.userId]);
 
-    return { saveUserEnrollmentData, deleteUserEnrollmentData };
+    return { saveUserCourseContentProgress, deleteUserCourseContentProgress };
 };
 
 const useNavigation = (courseList, courseVideoDetail) => {
@@ -334,7 +334,7 @@ function CourseVideoTutorial() {
 
     // Custom hooks
     const { courseVideoDetail, courseContent, playerRefresh } = useVideoData(CourseVideoId, courseList);
-    const { saveUserEnrollmentData, deleteUserEnrollmentData } = useEnrollmentActions(
+    const { saveUserCourseContentProgress, deleteUserCourseContentProgress } = useEnrollmentActions(
         courseList,
         courseVideoDetail,
         fetchUserCourseContentProgress,
@@ -413,12 +413,12 @@ function CourseVideoTutorial() {
     }, []);
 
     const handleMarkComplete = useCallback(() => {
-        saveUserEnrollmentData();
-    }, [saveUserEnrollmentData]);
+        saveUserCourseContentProgress();
+    }, [saveUserCourseContentProgress]);
 
     const handleUndoComplete = useCallback(() => {
-        deleteUserEnrollmentData();
-    }, [deleteUserEnrollmentData]);
+        deleteUserCourseContentProgress();
+    }, [deleteUserCourseContentProgress]);
 
     // Check enrollment access
     const isUserEnrolled = userCourseEnrollment && userCourseEnrollment.length > 0;
@@ -489,7 +489,7 @@ function CourseVideoTutorial() {
                         <Card className="border-0 shadow-md overflow-hidden">
                             <div className="aspect-video bg-black rounded-lg overflow-hidden">
                                 <YouTubePlayer
-                                    saveUserEnrollmentData={saveUserEnrollmentData}
+                                    saveUserCourseContentProgress={saveUserCourseContentProgress}
                                     playerRefresh={playerRefresh}
                                     videoUrl={courseVideoDetail?.courseVideoUrl}
                                     playerId={`player-${courseVideoDetail?.courseVideoId}`}
