@@ -59,7 +59,7 @@ function NavMenuLangStudio({ orientation }) {
             orientation === "vertical" ? "w-full" : "flex-1 sm:flex-none"
           }
         >
-          <Link to="/lang-studio/dashboard" className="w-full block ">
+          <Link to="/lang-studio" className="w-full block ">
             <Button
               className="w-full justify-center  px-2"
               variant={
