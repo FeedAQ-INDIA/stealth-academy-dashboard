@@ -49,6 +49,7 @@ import LearningArena from "./components-xm/LangStudio/LearningArena.jsx";
 import LearningDashboard from "./components-xm/LangStudio/Dashboard.jsx";
 import LearningArenaItem from "./components-xm/LangStudio/LearningArenaItem.jsx";
 import ComprehensionSkillsSession from "./components-xm/LangStudio/ComprehensionSkillsSession.jsx";
+import ReadingSkillsSession from "./components-xm/LangStudio/ReadingSkillsSession.jsx";
 
 const router = createBrowserRouter([
   // {
@@ -221,8 +222,12 @@ const router = createBrowserRouter([
         element: <LearningArena />,
       },
       {
-        path: "/lang-studio/learning-arena/:arenaName/:sessionId",
+        path: "/lang-studio/learning-arena/comprehension-skills/:sessionId",
         element: <ComprehensionSkillsSession />,
+      },
+      {
+        path: "/lang-studio/learning-arena/reading-skills/:sessionId",
+        element: <ReadingSkillsSession />,
       },
       {
         path: "/lang-studio/learning-arena/:arenaName",
