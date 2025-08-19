@@ -15,9 +15,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.jsx";
-
+import NavMenuLangStudio from "./NavMenuLangStudio.jsx";
+ 
 export default function Header() {
   const { userDetail } = useAuthStore();
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
   useEffect(() => {
     console.log("Header compoenent mounted", userDetail);
@@ -27,28 +29,31 @@ export default function Header() {
     <header className="flex h-16 items-center justify-between bg-white px-4 shadow-md border-b">
       <div className="flex gap-2 items-center">
         <div>
-          <Dialog>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger className="p-2 hover:bg-muted/50 hover:cursor-pointer rounded-md">
                  <Grip size={30} />
              </DialogTrigger>
-            <DialogContent className="  max-h-[90vw]">
+            <DialogContent className=" min-h-fit max-h-screen">
               <DialogHeader>
                 <DialogTitle className="mb-4">Switch Apps</DialogTitle>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 ">
+                  <Link to="/dashboard" onClick={() => setIsDialogOpen(false)}>
 
                   <Card className="bg-blue-500  hover:bg-indigo-600 cursor-pointer">
                     <CardHeader className="flex flex-col items-center">
                      <Presentation size={42} className="text-white" />
-                      <CardTitle className="text-lg font-semibold text-white">Content Library</CardTitle>
+                      <CardTitle className="text-lg font-semibold text-white tracking-wide">Content Library</CardTitle>
                     </CardHeader>
                   </Card>
-
-                   <Card className="bg-green-500 hover:bg-emerald-600  cursor-pointer">
-                    <CardHeader className="flex flex-col items-center">
-                      <Globe size={42} className="text-white" />
-                      <CardTitle className="text-lg font-semibold text-white">Lang Studio</CardTitle>
-                    </CardHeader>
-                  </Card>
+</Link>
+                  <Link to="/lang-studio" onClick={() => setIsDialogOpen(false)}>
+                    <Card className="bg-green-500 hover:bg-emerald-600  cursor-pointer">
+                      <CardHeader className="flex flex-col items-center">
+                        <Globe size={42} className="text-white" />
+                        <CardTitle className="text-lg font-semibold text-white tracking-wide">Lang Studio</CardTitle>
+                      </CardHeader>
+                    </Card>
+                  </Link>
                 </div>
               </DialogHeader>
             </DialogContent>
@@ -66,7 +71,7 @@ export default function Header() {
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex items-center gap-4 ml-4">
-        <NavigationMenuDemo />
+        {location.pathname.includes("/lang-studio") ? <NavMenuLangStudio /> : <NavigationMenuDemo />}
       </div>
 
       {/* Right-side button */}

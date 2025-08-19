@@ -10,7 +10,12 @@ import { refreshToken } from "./utils/refreshTokenUtils";
 
 import { Dashboard } from "@/components-xm/Dashboard.jsx";
 import { Explore } from "@/components-xm/Explore.jsx";
-import { Marketplace, BringYourOwnCourse as BringYourOwnCourseExplore, PrivilegedAccess , LiveLearning} from "@/components-xm/Explore/index.js";
+import {
+  Marketplace,
+  BringYourOwnCourse as BringYourOwnCourseExplore,
+  PrivilegedAccess,
+  LiveLearning,
+} from "@/components-xm/Explore/index.js";
 import { MyLearningLayout } from "@/components-xm/MyJourney/MyJourneyLayout.jsx";
 import { CourseDetail } from "@/components-xm/Course/CourseDetail.jsx";
 import CourseOverview from "@/components-xm/Course/CourseOverview.jsx";
@@ -21,7 +26,13 @@ import Security from "@/components-xm/AccountSettings/Security.jsx";
 import Billing from "@/components-xm/AccountSettings/Billing/Billing.jsx";
 import BillingOverview from "@/components-xm/AccountSettings/Billing/BillingOverview.jsx";
 import BillingHistory from "@/components-xm/AccountSettings/Billing/BillingHistory.jsx";
-import { OrdersLayout, AllOrders, CompletedOrders, PendingOrders, CancelledOrders } from "@/components-xm/AccountSettings/Orders/index.js";
+import {
+  OrdersLayout,
+  AllOrders,
+  CompletedOrders,
+  PendingOrders,
+  CancelledOrders,
+} from "@/components-xm/AccountSettings/Orders/index.js";
 import Notifications from "@/components-xm/AccountSettings/Notifications.jsx";
 import CourseWritten from "@/components-xm/Course/CourseWritten.jsx";
 import CourseDocThirdParty from "@/components-xm/Course/CourseDocThirdParty.jsx";
@@ -34,42 +45,44 @@ import BringYourOwnCourse from "./components-xm/BringYourOwnCourse.jsx";
 import { MyCourse } from "./components-xm/MyJourney/MyCourse.jsx";
 import { MyWishlist } from "./components-xm/MyJourney/MyWishlist.jsx";
 import MyJourneyOverview from "./components-xm/MyJourney/MyJourneyOverview.jsx";
-  
+import LearningArena from "./components-xm/LangStudio/LearningArena.jsx";
+import LearningDashboard from "./components-xm/LangStudio/Dashboard.jsx";
+import LearningArenaItem from "./components-xm/LangStudio/LearningArenaItem.jsx";
+import ComprehensionSkillsSession from "./components-xm/LangStudio/ComprehensionSkillsSession.jsx";
+
 const router = createBrowserRouter([
   // {
   //     path: "/browse",
   //     element: <HomeExplore/>,
   // },
 
-  
-      {
-        path: "/explore/:CourseId",
-        element: <CourseSnapView />,
-      },
+  {
+    path: "/explore/:CourseId",
+    element: <CourseSnapView />,
+  },
 
+  {
+    path: "/explore",
+    element: <Explore />,
+    children: [
       {
-        path: "/explore",
-        element: <Explore />,
-        children: [
-          {
-            path: "marketplace",
-            element: <Marketplace />,
-          },
-          {
-            path: "live-learning",
-            element: <LiveLearning />,
-          },
-          {
-            path: "bring-your-own-course",
-            element: <BringYourOwnCourseExplore />,
-          },
-          {
-            path: "privileged-access",
-            element: <PrivilegedAccess />,
-          },
-        ],
+        path: "marketplace",
+        element: <Marketplace />,
       },
-
+      {
+        path: "live-learning",
+        element: <LiveLearning />,
+      },
+      {
+        path: "bring-your-own-course",
+        element: <BringYourOwnCourseExplore />,
+      },
+      {
+        path: "privileged-access",
+        element: <PrivilegedAccess />,
+      },
+    ],
+  },
 
   {
     path: "/",
@@ -111,14 +124,14 @@ const router = createBrowserRouter([
               {
                 index: true,
                 element: <BillingOverview />,
-              }, 
+              },
               {
                 path: "history",
                 element: <BillingHistory />,
               },
             ],
           },
-           
+
           {
             path: "/account-settings/orders",
             element: <OrdersLayout />,
@@ -195,7 +208,6 @@ const router = createBrowserRouter([
             path: "/my-journey/wishlist",
             element: <MyWishlist />,
           },
-          
         ],
       },
 
@@ -203,6 +215,23 @@ const router = createBrowserRouter([
         path: "/bring-your-own-course",
         element: <BringYourOwnCourse />,
       },
+
+      {
+        path: "/lang-studio/learning-arena",
+        element: <LearningArena />,
+      },
+      {
+        path: "/lang-studio/learning-arena/:arenaName/:sessionId",
+        element: <ComprehensionSkillsSession />,
+      },
+      {
+        path: "/lang-studio/learning-arena/:arenaName",
+        element: <LearningArenaItem />,
+      },
+      {
+        path: "/lang-studio",
+        element: <LearningDashboard />,
+      }
     ],
   },
 ]);
