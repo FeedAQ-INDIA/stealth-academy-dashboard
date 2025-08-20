@@ -101,18 +101,11 @@ export function MyJourney() {
     },
     {
       id: "courses",
-      label: "MY COURSES",
+      label: "HISTORY",
       icon: GraduationCap,
       path: "/my-journey/courses",
       description: "Track your enrolled courses and progress",
-    },
-    {
-      id: "wishlist",
-      label: "WISHLIST",
-      icon: Heart,
-      path: "/my-journey/wishlist",
-      description: "Courses you want to take later",
-    },
+    }, 
   ];
 
   // Check scroll position and update arrow visibility
