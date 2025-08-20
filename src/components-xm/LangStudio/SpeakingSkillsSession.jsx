@@ -1,16 +1,18 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Progress } from "@/components/ui/progress";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card.jsx";
+import { Button } from "@/components/ui/button.jsx";
+import { Badge } from "@/components/ui/badge.jsx";
+import { Progress } from "@/components/ui/progress.jsx";
+import { Textarea } from "@/components/ui/textarea.jsx";
+import { Separator } from "@/components/ui/separator.jsx";
 
-const ReadingSkillsSession = () => {
+const SpeakingSkillsSession = () => {
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [rating, setRating] = useState(0);
   const [notes, setNotes] = useState("");
   const [recordingStates, setRecordingStates] = useState({});
@@ -24,26 +26,58 @@ const ReadingSkillsSession = () => {
   const timerIntervalsRef = useRef({});
   const monitoringStateRef = useRef({});
 
-  // Sample reading skills data - replace with props or API data
-  const readingData = {
-    title: "Reading Skills Practice: Technology and Society",
+  // Sample speaking skills data - replace with props or API data
+  const speakingData = {
+    title: "Speaking Skills Practice: Professional Communication",
     description:
-      "Read the passage aloud while recording your voice. This will help improve your pronunciation, fluency, and reading confidence.",
-    passage: {
-      title: "The Digital Revolution",
-      content: `The digital revolution has transformed every aspect of modern life. From how we communicate to how we work, technology has become an integral part of our daily existence. Smartphones, computers, and the internet have created unprecedented opportunities for connection and collaboration across the globe.
-
-This technological shift has brought both benefits and challenges. While we can now access information instantly and connect with people worldwide, concerns about digital privacy, screen time, and social media's impact on mental health have emerged. Understanding how to navigate this digital landscape effectively has become a crucial life skill.
-
-The pace of technological change continues to accelerate, with artificial intelligence, virtual reality, and automation reshaping industries and creating new possibilities for human advancement. As we move forward, it's essential to embrace these technologies while maintaining our human values and connections.
-
-Education has been one of the most significantly transformed sectors. Online learning platforms have made education accessible to millions who previously lacked opportunities. Students can now attend virtual classrooms, access digital libraries, and collaborate on projects regardless of their geographical location.`,
-      wordCount: 158,
-      estimatedTime: "2-3 minutes",
-    },
+      "Practice your speaking skills with these prompts. Record your responses and receive feedback on your communication abilities.",
+    questions: [
+      {
+        id: 1,
+        topic: "Self Introduction",
+        question: "Please introduce yourself professionally. Include your name, background, current role or studies, and your career goals.",
+        tips: ["Speak clearly and confidently", "Maintain a professional tone", "Keep it between 1-2 minutes"],
+        estimatedTime: "1-2 minutes",
+        category: "Professional"
+      },
+      {
+        id: 2,
+        topic: "Problem Solving",
+        question: "Describe a challenging situation you faced and how you solved it. Explain your thought process and the outcome.",
+        tips: ["Use the STAR method (Situation, Task, Action, Result)", "Be specific with examples", "Focus on your role in the solution"],
+        estimatedTime: "2-3 minutes",
+        category: "Behavioral"
+      },
+      {
+        id: 3,
+        topic: "Future Plans",
+        question: "What are your career aspirations for the next 5 years? How do you plan to achieve these goals?",
+        tips: ["Be realistic and specific", "Connect your goals to your current path", "Show ambition and planning"],
+        estimatedTime: "1-2 minutes",
+        category: "Professional"
+      },
+      {
+        id: 4,
+        topic: "Technology Impact",
+        question: "How has technology changed the way we work and communicate? Discuss both positive and negative impacts.",
+        tips: ["Provide balanced perspective", "Use specific examples", "Speak from personal experience"],
+        estimatedTime: "2-3 minutes",
+        category: "Analytical"
+      },
+      {
+        id: 5,
+        topic: "Leadership Experience",
+        question: "Tell me about a time when you had to lead a team or take initiative in a group setting.",
+        tips: ["Highlight leadership qualities", "Describe challenges and solutions", "Mention team dynamics"],
+        estimatedTime: "2-3 minutes",
+        category: "Leadership"
+      }
+    ]
   };
 
-  const startRecording = async () => {
+  const currentQuestion = speakingData.questions[currentQuestionIndex];
+
+  const startRecording = async (questionIndex = currentQuestionIndex) => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -55,19 +89,18 @@ Education has been one of the most significantly transformed sectors. Online lea
       });
 
       // Set up audio context for level monitoring
-      const audioContext = new (window.AudioContext ||
-        window.webkitAudioContext)();
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       const analyser = audioContext.createAnalyser();
       const microphone = audioContext.createMediaStreamSource(stream);
 
-      analyser.fftSize = 512; // Increased for better resolution
+      analyser.fftSize = 512;
       analyser.smoothingTimeConstant = 0.8;
       analyser.minDecibels = -90;
       analyser.maxDecibels = -10;
       microphone.connect(analyser);
 
-      audioContextRef.current[0] = audioContext;
-      analyserRef.current[0] = analyser;
+      audioContextRef.current[questionIndex] = audioContext;
+      analyserRef.current[questionIndex] = analyser;
 
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType: "audio/webm;codecs=opus",
@@ -78,90 +111,99 @@ Education has been one of the most significantly transformed sectors. Online lea
       const startTime = Date.now();
       setRecordingTimes({
         ...recordingTimes,
-        [0]: 0,
+        [questionIndex]: 0,
       });
 
       const timerInterval = setInterval(() => {
         const elapsed = Math.floor((Date.now() - startTime) / 1000);
         setRecordingTimes((prev) => ({
           ...prev,
-          [0]: elapsed,
+          [questionIndex]: elapsed,
         }));
       }, 1000);
 
-      timerIntervalsRef.current[0] = timerInterval;
+      timerIntervalsRef.current[questionIndex] = timerInterval;
 
       // Monitor audio levels
       const monitorAudioLevel = () => {
-        if (!monitoringStateRef.current[0] || !analyserRef.current[0]) {
+        if (!monitoringStateRef.current[questionIndex] || !analyserRef.current[questionIndex]) {
           return;
         }
 
-        const analyser = analyserRef.current[0];
+        const analyser = analyserRef.current[questionIndex];
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
-        analyser.getByteFrequencyData(dataArray); // Use frequency data instead of time domain
+        analyser.getByteFrequencyData(dataArray);
 
-        // Calculate RMS (Root Mean Square) for better audio level detection
+        // Calculate RMS (Root Mean Square) for audio level
         let sum = 0;
         for (let i = 0; i < dataArray.length; i++) {
           sum += dataArray[i] * dataArray[i];
         }
         const rms = Math.sqrt(sum / dataArray.length);
-        const level = Math.min(100, (rms / 255) * 100 * 3); // Normalize and amplify
+        const normalizedLevel = Math.min(100, (rms / 128) * 100);
 
         setAudioLevels((prev) => ({
           ...prev,
-          [0]: level,
+          [questionIndex]: normalizedLevel,
         }));
 
         // Determine recording quality based on audio level
-        let quality = "Very Low";
-        if (level > 3) quality = "Poor";
-        if (level > 15) quality = "Good";
-        if (level > 30) quality = "Excellent";
-        if (level > 80) quality = "Too Loud";
+        let quality;
+        if (normalizedLevel < 3) {
+          quality = "Very Low";
+        } else if (normalizedLevel < 15) {
+          quality = "Poor";
+        } else if (normalizedLevel > 80) {
+          quality = "Too Loud";
+        } else if (normalizedLevel > 50) {
+          quality = "Excellent";
+        } else {
+          quality = "Good";
+        }
 
         setRecordingQuality((prev) => ({
           ...prev,
-          [0]: quality,
+          [questionIndex]: quality,
         }));
 
-        // Continue monitoring using requestAnimationFrame for better performance
-        if (monitoringStateRef.current[0]) {
+        // Continue monitoring
+        if (monitoringStateRef.current[questionIndex]) {
           requestAnimationFrame(monitorAudioLevel);
         }
       };
 
       mediaRecorder.ondataavailable = (event) => {
-        chunks.push(event.data);
-      };
-
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: "audio/webm" });
-        setAudioBlobs({
-          ...audioBlobs,
-          [0]: blob,
-        });
-
-        // Cleanup
-        monitoringStateRef.current[0] = false;
-        clearInterval(timerIntervalsRef.current[0]);
-        stream.getTracks().forEach((track) => track.stop());
-        if (audioContextRef.current[0]) {
-          audioContextRef.current[0].close();
+        if (event.data.size > 0) {
+          chunks.push(event.data);
         }
       };
 
-      mediaRecordersRef.current[0] = mediaRecorder;
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(chunks, { type: "audio/webm" });
+        setAudioBlobs((prev) => ({
+          ...prev,
+          [questionIndex]: audioBlob,
+        }));
+
+        // Stop all streams
+        stream.getTracks().forEach((track) => track.stop());
+
+        // Close audio context
+        if (audioContextRef.current[questionIndex]) {
+          audioContextRef.current[questionIndex].close();
+        }
+      };
+
+      mediaRecordersRef.current[questionIndex] = mediaRecorder;
       mediaRecorder.start();
 
       setRecordingStates({
         ...recordingStates,
-        [0]: true,
+        [questionIndex]: true,
       });
 
       // Start monitoring state
-      monitoringStateRef.current[0] = true;
+      monitoringStateRef.current[questionIndex] = true;
 
       // Start audio level monitoring after state is set
       setTimeout(() => monitorAudioLevel(), 100);
@@ -171,29 +213,30 @@ Education has been one of the most significantly transformed sectors. Online lea
     }
   };
 
-  const stopRecording = () => {
-    const mediaRecorder = mediaRecordersRef.current[0];
-    if (mediaRecorder && recordingStates[0]) {
+  const stopRecording = (questionIndex = currentQuestionIndex) => {
+    const mediaRecorder = mediaRecordersRef.current[questionIndex];
+    if (mediaRecorder && recordingStates[questionIndex]) {
       // Stop monitoring first
-      monitoringStateRef.current[0] = false;
+      monitoringStateRef.current[questionIndex] = false;
 
       // Stop recording state to update UI
       setRecordingStates({
         ...recordingStates,
-        [0]: false,
+        [questionIndex]: false,
       });
 
       mediaRecorder.stop();
 
-      // Clear timer and audio level monitoring
-      if (timerIntervalsRef.current[0]) {
-        clearInterval(timerIntervalsRef.current[0]);
+      // Clear timer
+      if (timerIntervalsRef.current[questionIndex]) {
+        clearInterval(timerIntervalsRef.current[questionIndex]);
+        delete timerIntervalsRef.current[questionIndex];
       }
 
       // Reset audio level to 0
       setAudioLevels((prev) => ({
         ...prev,
-        [0]: 0,
+        [questionIndex]: 0,
       }));
     }
   };
@@ -201,9 +244,7 @@ Education has been one of the most significantly transformed sectors. Online lea
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   const getQualityColor = (quality) => {
@@ -223,6 +264,21 @@ Education has been one of the most significantly transformed sectors. Online lea
     }
   };
 
+  const getCategoryColor = (category) => {
+    switch (category) {
+      case "Professional":
+        return "bg-blue-100 text-blue-800";
+      case "Behavioral":
+        return "bg-green-100 text-green-800";
+      case "Analytical":
+        return "bg-purple-100 text-purple-800";
+      case "Leadership":
+        return "bg-orange-100 text-orange-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
   // Cleanup on component unmount
   useEffect(() => {
     return () => {
@@ -232,47 +288,70 @@ Education has been one of the most significantly transformed sectors. Online lea
       });
 
       Object.values(timerIntervalsRef.current).forEach((interval) => {
-        if (interval) clearInterval(interval);
+        clearInterval(interval);
       });
       Object.values(audioContextRef.current).forEach((context) => {
-        if (context && context.state !== "closed") context.close();
+        if (context.state !== "closed") {
+          context.close();
+        }
       });
     };
   }, []);
 
+  const nextQuestion = () => {
+    if (currentQuestionIndex < speakingData.questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    }
+  };
+
+  const previousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
+
   const submitAnswers = () => {
-    // Check if recording is completed
-    if (!audioBlobs[0]) {
-      alert("Please record your reading before submitting.");
+    // Check if at least one recording exists
+    if (Object.keys(audioBlobs).length === 0) {
+      alert('Please record at least one response before submitting.');
       return;
     }
 
     // Check if rating is provided
     if (rating === 0) {
-      alert("Please provide a rating for your reading session.");
+      alert('Please provide a rating for your speaking session.');
       return;
     }
 
     // Prepare submission data
     const submissionData = {
+      completedQuestions: Object.keys(audioBlobs).length,
+      totalQuestions: speakingData.questions.length,
       rating,
       notes: notes.trim(),
-      hasRecording: !!audioBlobs[0],
-      recordingDuration: recordingTimes[0] || 0,
-      recordingQuality: recordingQuality[0] || "Not Started",
-      completedAt: new Date().toISOString(),
+      audioResponses: Object.keys(audioBlobs).reduce((acc, key) => {
+        acc[key] = {
+          questionId: speakingData.questions[key].id,
+          topic: speakingData.questions[key].topic,
+          duration: recordingTimes[key] || 0,
+          quality: recordingQuality[key] || 'Not Started'
+        };
+        return acc;
+      }, {}),
+      completedAt: new Date().toISOString()
     };
 
-    console.log("Submitted reading session data:", submissionData);
-    alert(
-      "Reading session completed successfully! Your recording and feedback have been saved."
-    );
+    console.log("Submitted speaking session data:", submissionData);
+    alert("Speaking skills session completed successfully! Your recordings and feedback have been saved.");
   };
 
   const [hover, setHover] = useState(0);
 
+  const completedQuestions = Object.keys(audioBlobs).length;
+  const progressPercentage = (completedQuestions / speakingData.questions.length) * 100;
+
   return (
-    <div className="reading-session min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-3">
+    <div className=" p-3">
       <div className="mx-auto">
         {/* Header */}
         <Card className="mb-4">
@@ -280,20 +359,20 @@ Education has been one of the most significantly transformed sectors. Online lea
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
-                  {readingData.title}
+                  {speakingData.title}
                 </h1>
                 <p className="text-gray-600 text-sm md:text-base">
-                  {readingData.description}
+                  {speakingData.description}
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex items-center gap-4">
-                  <Progress value={audioBlobs[0] ? 100 : 0} className="w-32" />
+                  <Progress value={progressPercentage} className="w-32" />
                   <Badge
                     variant="secondary"
-                    className="bg-blue-100 text-blue-800"
+                    className="bg-red-100 text-red-800"
                   >
-                    {audioBlobs[0] ? "Recorded" : "Not Recorded"}
+                    {completedQuestions} / {speakingData.questions.length} Completed
                   </Badge>
                 </div>
               </div>
@@ -301,90 +380,113 @@ Education has been one of the most significantly transformed sectors. Online lea
           </CardHeader>
         </Card>
 
-        {/* Recording Overview */}
+        {/* Question Navigation */}
         <div className="mb-6 bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="bg-red-100 text-red-800 p-2 rounded-lg">🎤</div>
-            <h2 className="text-xl font-semibold">Recording Progress</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="flex flex-col items-center p-4 bg-green-50 rounded-lg">
-              <span className="text-sm text-gray-600 mb-1">
-                Recording Status
-              </span>
-              <span className="text-2xl font-bold text-green-600">
-                {audioBlobs[0] ? "✓ Complete" : "Pending"}
-              </span>
-            </div>
-            <div className="flex flex-col items-center p-4 bg-blue-50 rounded-lg">
-              <span className="text-sm text-gray-600 mb-1">Total Words</span>
-              <span className="text-2xl font-bold text-blue-600">
-                {readingData.passage.wordCount}
-              </span>
-            </div>
-            <div className="flex flex-col items-center p-4 bg-purple-50 rounded-lg">
-              <span className="text-sm text-gray-600 mb-1">
-                Current Recording
-              </span>
-              <span className="text-2xl font-bold text-purple-600">
-                {recordingStates[0]
-                  ? formatTime(recordingTimes[0] || 0)
-                  : "--:--"}
-              </span>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold flex items-center gap-3">
+              <div className="bg-red-100 text-red-800 p-2 rounded-lg">🎯</div>
+              Question {currentQuestionIndex + 1} of {speakingData.questions.length}
+            </h2>
+            <div className="flex gap-2">
+              <Button
+                onClick={previousQuestion}
+                disabled={currentQuestionIndex === 0}
+                variant="outline"
+                size="sm"
+              >
+                ← Previous
+              </Button>
+              <Button
+                onClick={nextQuestion}
+                disabled={currentQuestionIndex === speakingData.questions.length - 1}
+                variant="outline"
+                size="sm"
+              >
+                Next →
+              </Button>
             </div>
           </div>
-
-          {recordingStates[0] && (
-            <div className="p-4 bg-red-50 rounded-lg border border-red-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                  <span className="text-red-800 font-medium">Recording...</span>
-                  <span className="text-red-600">
-                    {formatTime(recordingTimes[0] || 0)}
-                  </span>
+          
+          {/* Question Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {speakingData.questions.map((_, index) => (
+              <div
+                key={index}
+                className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                  index === currentQuestionIndex
+                    ? "border-red-500 bg-red-50"
+                    : audioBlobs[index]
+                    ? "border-green-500 bg-green-50"
+                    : "border-gray-200 bg-gray-50 hover:bg-gray-100"
+                }`}
+                onClick={() => setCurrentQuestionIndex(index)}
+              >
+                <div className="text-center">
+                  <div className={`text-lg font-bold ${
+                    index === currentQuestionIndex
+                      ? "text-red-600"
+                      : audioBlobs[index]
+                      ? "text-green-600"
+                      : "text-gray-600"
+                  }`}>
+                    Q{index + 1}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {audioBlobs[index] ? "✓ Recorded" : "Not Recorded"}
+                  </div>
                 </div>
-                <Button onClick={stopRecording} variant="destructive" size="sm">
-                  Stop Recording
-                </Button>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
         </div>
 
-        {/* Main Content */}
+        {/* Current Question */}
         <div className="grid grid-cols-1 gap-8">
-          {/* Reading Passage */}
+          {/* Question Card */}
           <div className="">
             <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3">
                   <div className="bg-indigo-100 text-indigo-800 p-2 rounded-lg tracking-wide">
-                    �
+                    💭
                   </div>
-                  Reading Passage
+                  {currentQuestion.topic}
+                  <Badge 
+                    variant="secondary" 
+                    className={`ml-2 ${getCategoryColor(currentQuestion.category)}`}
+                  >
+                    {currentQuestion.category}
+                  </Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="mb-4">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                    {readingData.passage.title}
-                  </h3>
                   <div className="flex items-center gap-3 mb-4">
                     <Badge
                       variant="secondary"
-                      className="bg-green-100 text-green-800"
+                      className="bg-blue-100 text-blue-800"
                     >
-                      Word Count: {readingData.passage.wordCount}
-                    </Badge>
-                    <Badge variant="outline">
-                      Est. Time: {readingData.passage.estimatedTime}
+                      Estimated Time: {currentQuestion.estimatedTime}
                     </Badge>
                   </div>
                 </div>
-                <div className="text-gray-700 leading-relaxed whitespace-pre-line bg-gray-50 p-4 rounded-lg border-l-4 border-indigo-500 max-h-96 overflow-y-auto">
-                  {readingData.passage.content}
+                <div className="text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-lg border-l-4 border-indigo-500 mb-4">
+                  <p className="text-lg font-medium mb-2">{currentQuestion.question}</p>
+                </div>
+                
+                {/* Speaking Tips */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
+                    💡 Speaking Tips:
+                  </h4>
+                  <ul className="text-sm text-blue-700 space-y-1">
+                    {currentQuestion.tips.map((tip, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="text-blue-500 mt-1">•</span>
+                        {tip}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </CardContent>
             </Card>
@@ -401,7 +503,7 @@ Education has been one of the most significantly transformed sectors. Online lea
                   Voice Recording
                 </CardTitle>
                 <Badge variant="outline" className="self-start sm:self-center">
-                  Status: {audioBlobs[0] ? "Complete" : "Pending"}
+                  Status: {audioBlobs[currentQuestionIndex] ? "Complete" : "Pending"}
                 </Badge>
               </CardHeader>
               <CardContent className="p-6">
@@ -409,7 +511,7 @@ Education has been one of the most significantly transformed sectors. Online lea
                   {/* Recording Controls */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      {!recordingStates[0] ? (
+                      {!recordingStates[currentQuestionIndex] ? (
                         <Button
                           onClick={() => startRecording()}
                           variant="destructive"
@@ -432,29 +534,29 @@ Education has been one of the most significantly transformed sectors. Online lea
                       )}
                     </div>
 
-                    {/* Timer & Status */}
+                    {/* Recording Info */}
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm">
                         <span>⏱️</span>
                         <span className="font-mono font-semibold">
-                          {formatTime(recordingTimes[0] || 0)}
+                          {formatTime(recordingTimes[currentQuestionIndex] || 0)}
                         </span>
                       </div>
-                      {(recordingTimes[0] || 0) > 0 && (
+                      {(recordingTimes[currentQuestionIndex] || 0) > 0 && (
                         <Badge
                           variant="outline"
                           className={`text-xs ${getQualityColor(
-                            recordingQuality[0] || "Not Started"
+                            recordingQuality[currentQuestionIndex] || "Not Started"
                           )}`}
                         >
-                          {recordingQuality[0] || "Not Started"}
+                          {recordingQuality[currentQuestionIndex] || "Not Started"}
                         </Badge>
                       )}
                     </div>
                   </div>
 
-                  {/* Recording Status & Voice Level - Compact */}
-                  {recordingStates[0] && (
+                  {/* Recording Status */}
+                  {recordingStates[currentQuestionIndex] && (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-2 mb-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-red-600">
@@ -464,24 +566,24 @@ Education has been one of the most significantly transformed sectors. Online lea
                           </span>
                         </div>
                         <span className="text-xs text-gray-600">
-                          Level: {Math.round(audioLevels[0] || 0)}%
+                          Level: {Math.round(audioLevels[currentQuestionIndex] || 0)}%
                         </span>
                       </div>
 
-                      {/* Compact Voice Level Bar */}
+                      {/* Audio Level Indicator */}
                       <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                         <div
                           className={`h-full transition-all duration-150 rounded-full ${
-                            (audioLevels[0] || 0) < 3
+                            (audioLevels[currentQuestionIndex] || 0) < 3
                               ? "bg-red-400"
-                              : (audioLevels[0] || 0) < 15
+                              : (audioLevels[currentQuestionIndex] || 0) < 15
                               ? "bg-yellow-400"
-                              : (audioLevels[0] || 0) > 80
+                              : (audioLevels[currentQuestionIndex] || 0) > 80
                               ? "bg-orange-400"
                               : "bg-green-400"
                           }`}
                           style={{
-                            width: `${Math.min(100, audioLevels[0] || 0)}%`,
+                            width: `${Math.min(100, audioLevels[currentQuestionIndex] || 0)}%`,
                           }}
                         />
                       </div>
@@ -496,21 +598,21 @@ Education has been one of the most significantly transformed sectors. Online lea
                     </div>
                   )}
 
-                  {/* Audio Playback - Compact */}
-                  {audioBlobs[0] && (
+                  {/* Completed Recording */}
+                  {audioBlobs[currentQuestionIndex] && (
                     <div className="bg-green-50 border border-green-200 rounded-lg p-3 space-y-2 mb-4">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-green-800 font-medium">
                           ✅ Recording Complete
                         </span>
                         <span className="text-xs text-green-700">
-                          Duration: {formatTime(recordingTimes[0] || 0)}
+                          Duration: {formatTime(recordingTimes[currentQuestionIndex] || 0)}
                         </span>
                       </div>
 
                       <audio
                         controls
-                        src={URL.createObjectURL(audioBlobs[0])}
+                        src={URL.createObjectURL(audioBlobs[currentQuestionIndex])}
                         className="w-full h-8"
                         controlsList="nodownload"
                       />
@@ -522,11 +624,11 @@ Education has been one of the most significantly transformed sectors. Online lea
                             <span
                               className={`font-medium ${
                                 getQualityColor(
-                                  recordingQuality[0] || "Not Started"
+                                  recordingQuality[currentQuestionIndex] || "Not Started"
                                 ).split(" ")[0]
                               }`}
                             >
-                              {recordingQuality[0] || "Not Started"}
+                              {recordingQuality[currentQuestionIndex] || "Not Started"}
                             </span>
                           </span>
                           <span>Format: WebM</span>
@@ -543,15 +645,15 @@ Education has been one of the most significantly transformed sectors. Online lea
                     </div>
                   )}
 
-                  {/* Instructions - Compact */}
-                  {!recordingStates[0] && !audioBlobs[0] && (
+                  {/* Recording Tips */}
+                  {!recordingStates[currentQuestionIndex] && !audioBlobs[currentQuestionIndex] && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                       <div className="flex items-start gap-2">
                         <span className="text-blue-500">💡</span>
                         <div className="text-xs text-blue-800">
                           <p className="font-medium mb-1">Recording Tips:</p>
                           <p>
-                            • Quiet environment • Clear speech • Take your time
+                            • Find a quiet environment • Speak clearly and at a natural pace • Take time to think before speaking
                           </p>
                         </div>
                       </div>
@@ -564,7 +666,7 @@ Education has been one of the most significantly transformed sectors. Online lea
         </div>
 
         {/* Session Feedback */}
-        <div className="space-y-4 mt-4">
+        <div className="space-y-4 mt-8">
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-3 tracking-wide">
@@ -586,7 +688,7 @@ Education has been one of the most significantly transformed sectors. Online lea
                   </Badge>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                  How would you rate your reading session?
+                  How would you rate your speaking session?
                 </h3>
 
                 <div className="flex items-center gap-2 mb-2">
@@ -606,7 +708,7 @@ Education has been one of the most significantly transformed sectors. Online lea
                         onMouseLeave={() => setHover(0)}
                       >
                         <span className="sr-only">{starValue} Star</span>
-                        &#9733; {/* This is the Unicode star character */}
+                        &#9733;
                       </button>
                     );
                   })}
@@ -638,13 +740,13 @@ Education has been one of the most significantly transformed sectors. Online lea
                   </Badge>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                  Additional notes about your reading experience
+                  Additional notes about your speaking experience
                 </h3>
 
                 <Textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Share your thoughts about the reading session, areas you'd like to improve, or any challenges you faced..."
+                  placeholder="Share your thoughts about the speaking session, areas you'd like to improve, challenges you faced, or topics you found interesting..."
                   rows={6}
                   className="resize-none mb-2"
                 />
@@ -663,9 +765,8 @@ Education has been one of the most significantly transformed sectors. Online lea
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-gray-600 text-center sm:text-left">
                 <p className="text-sm">
-                  Complete your recording and provide a rating to finish your
-                  reading skills practice. Notes are optional but helpful for
-                  tracking your progress.
+                  Complete at least one recording and provide a rating to finish your
+                  speaking skills practice. You can navigate between questions and record multiple responses.
                 </p>
               </div>
               <Button
@@ -674,7 +775,7 @@ Education has been one of the most significantly transformed sectors. Online lea
                 className="flex items-center gap-2"
               >
                 <span>✓</span>
-                Submit Reading Session
+                Submit Speaking Session
               </Button>
             </div>
           </CardContent>
@@ -684,4 +785,4 @@ Education has been one of the most significantly transformed sectors. Online lea
   );
 };
 
-export default ReadingSkillsSession;
+export default SpeakingSkillsSession;

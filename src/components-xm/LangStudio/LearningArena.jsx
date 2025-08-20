@@ -73,7 +73,7 @@ export default function LearningArena() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className=" ">
       <div className="p-4 md:p-6 overflow-y-auto h-[calc(100svh-4em)]">
         {/* Header Section */}
         <Card className="w-full rounded-md border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 text-white shadow-2xl backdrop-blur-sm py-4 mb-8">

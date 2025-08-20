@@ -50,6 +50,10 @@ import LearningDashboard from "./components-xm/LangStudio/Dashboard.jsx";
 import LearningArenaItem from "./components-xm/LangStudio/LearningArenaItem.jsx";
 import ComprehensionSkillsSession from "./components-xm/LangStudio/ComprehensionSkillsSession.jsx";
 import ReadingSkillsSession from "./components-xm/LangStudio/ReadingSkillsSession.jsx";
+import ListeningSkillsSession from "./components-xm/LangStudio/ListeningSkillsSession.jsx";
+import SpeakingSkillsSession from "./components-xm/LangStudio/SpeakingSkillsSession.jsx";
+import EmailWritingSkillsSession from "./components-xm/LangStudio/EmailWritingSkillsSession.jsx";
+import WritingSkillsSession from "./components-xm/LangStudio/WritingSkillsSession.jsx";
 
 const router = createBrowserRouter([
   // {
@@ -228,6 +232,22 @@ const router = createBrowserRouter([
       {
         path: "/lang-studio/learning-arena/reading-skills/:sessionId",
         element: <ReadingSkillsSession />,
+      },
+      {
+        path: "/lang-studio/learning-arena/listening-skills/:sessionId",
+        element: <ListeningSkillsSession />,
+      },
+         {
+        path: "/lang-studio/learning-arena/speaking-skills/:sessionId",
+        element: <SpeakingSkillsSession />,
+      },
+               {
+        path: "/lang-studio/learning-arena/email-writing/:sessionId",
+        element: <EmailWritingSkillsSession />,
+      },
+               {
+        path: "/lang-studio/learning-arena/writing-skills/:sessionId",
+        element: <WritingSkillsSession />,
       },
       {
         path: "/lang-studio/learning-arena/:arenaName",
