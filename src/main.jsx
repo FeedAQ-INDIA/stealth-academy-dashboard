@@ -48,12 +48,12 @@ import MyJourneyOverview from "./components-xm/MyJourney/MyJourneyOverview.jsx";
 import LearningArena from "./components-xm/LangStudio/LearningArena.jsx";
 import LearningDashboard from "./components-xm/LangStudio/Dashboard.jsx";
 import LearningArenaItem from "./components-xm/LangStudio/LearningArenaItem.jsx";
-import ComprehensionSkillsSession from "./components-xm/LangStudio/ComprehensionSkillsSession.jsx";
-import ReadingSkillsSession from "./components-xm/LangStudio/ReadingSkillsSession.jsx";
-import ListeningSkillsSession from "./components-xm/LangStudio/ListeningSkillsSession.jsx";
-import SpeakingSkillsSession from "./components-xm/LangStudio/SpeakingSkillsSession.jsx";
-import EmailWritingSkillsSession from "./components-xm/LangStudio/EmailWritingSkillsSession.jsx";
-import WritingSkillsSession from "./components-xm/LangStudio/WritingSkillsSession.jsx";
+import ComprehensionSkillsSession from "./components-xm/LangStudio/SkillSession/ComprehensionSkillsSession.jsx";
+import ReadingSkillsSession from "./components-xm/LangStudio/SkillSession/ReadingSkillsSession.jsx";
+import ListeningSkillsSession from "./components-xm/LangStudio/SkillSession/ListeningSkillsSession.jsx";
+import SpeakingSkillsSession from "./components-xm/LangStudio/SkillSession/SpeakingSkillsSession.jsx";
+import EmailWritingSkillsSession from "./components-xm/LangStudio/SkillSession/EmailWritingSkillsSession.jsx";
+import WritingSkillsSession from "./components-xm/LangStudio/SkillSession/WritingSkillsSession.jsx";
 import { MyJourney as LangStudioMyJourney} from "./components-xm/LangStudio/MyJourney.jsx";
 
 const router = createBrowserRouter([
