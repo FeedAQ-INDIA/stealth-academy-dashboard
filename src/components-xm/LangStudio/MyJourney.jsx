@@ -66,7 +66,7 @@ import {
 } from "@/components/ui/select";
 import { LoaderOne } from "@/components/ui/loader.jsx";
 
-export function MyLearningLayout() {
+export function MyJourney() {
   const location = useLocation();
   const navigate = useNavigate();
   const {

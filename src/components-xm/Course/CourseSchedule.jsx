@@ -167,7 +167,7 @@ function CourseSchedule() {
                 </div>
             </header>
 
-            <div className="p-3 sm:p-4 lg:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6">
+            <div className="p-3 sm:p-4 lg:p-6   mx-auto space-y-4 sm:space-y-6">
                 {/* Enhanced Phone Number Alert */}
                 {!userDetail?.number && (
                     <Alert variant="destructive" className="border-l-4 border-l-red-500 bg-red-50/50">

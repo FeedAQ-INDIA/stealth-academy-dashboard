@@ -139,7 +139,7 @@ export function CourseCardShowcase() {
 
     return (
         <div className="p-6 bg-gradient-to-br from-slate-50 to-gray-100 min-h-screen">
-            <div className="max-w-7xl mx-auto space-y-8">
+            <div className="  mx-auto space-y-8">
                 {/* Header */}
                 <div className="text-center">
                     <h1 className="text-4xl font-bold text-gray-900 mb-4">

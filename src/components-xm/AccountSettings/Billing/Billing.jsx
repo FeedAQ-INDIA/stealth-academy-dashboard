@@ -93,7 +93,7 @@ function Billing() {
                     </header>
 
         <div className="p-4 mx-auto">
-          <div className="max-w-7xl mx-auto space-y-6">
+          <div className="  mx-auto space-y-6">
             
             {/* Hero Section with Enhanced Gradient */}
             <div className="relative overflow-hidden">

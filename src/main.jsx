@@ -54,6 +54,7 @@ import ListeningSkillsSession from "./components-xm/LangStudio/ListeningSkillsSe
 import SpeakingSkillsSession from "./components-xm/LangStudio/SpeakingSkillsSession.jsx";
 import EmailWritingSkillsSession from "./components-xm/LangStudio/EmailWritingSkillsSession.jsx";
 import WritingSkillsSession from "./components-xm/LangStudio/WritingSkillsSession.jsx";
+import { MyJourney as LangStudioMyJourney} from "./components-xm/LangStudio/MyJourney.jsx";
 
 const router = createBrowserRouter([
   // {
@@ -224,6 +225,10 @@ const router = createBrowserRouter([
       {
         path: "/lang-studio/learning-arena",
         element: <LearningArena />,
+      },
+      {
+        path: "/lang-studio/my-journey",
+        element: <LangStudioMyJourney />,
       },
       {
         path: "/lang-studio/learning-arena/comprehension-skills/:sessionId",

@@ -110,7 +110,7 @@ function OrdersLayout() {
                 <div className="ml-auto sm:flex-initial"></div>
             </header>
 
-            <div className="p-4 mx-auto max-w-7xl">
+            <div className="p-4 mx-auto  ">
                 {/* Header Section */}
                 <Card className="w-full rounded-xl border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 text-white shadow-2xl mb-8">
                     <CardHeader>

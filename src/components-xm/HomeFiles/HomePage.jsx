@@ -166,7 +166,7 @@ export default function HomePage() {
                 <section>
 
                     <div className="bg-white py-16 ">
-                        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                        <div className="mx-auto   px-6 lg:px-8">
                             <h2 className="text-center text-lg/8 font-semibold text-gray-900">We have alumni's working
                                 in
                                 top
