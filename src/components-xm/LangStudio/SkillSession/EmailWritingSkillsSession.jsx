@@ -475,7 +475,7 @@ const EmailWritingSkillsSession = ({
                         </CardHeader>
                         <CardContent className="p-6">
                             {/* Rating Section */}
-                            <div className="mb-8">
+                            {/* <div className="mb-8">
                                 <div className="flex items-center gap-2 mb-4">
                                     <Badge variant="secondary" className="bg-orange-100 text-orange-800">
                                         RATING
@@ -519,9 +519,9 @@ const EmailWritingSkillsSession = ({
                                         {rating === 5 && "Excellent performance"}
                                     </div>
                                 )}
-                            </div>
+                            </div> */}
 
-                            <Separator className="my-6" />
+                            {/* <Separator className="my-6" /> */}
 
                             {/* Notes Section */}
                             <div>

@@ -813,7 +813,7 @@ The future of work is likely to be hybrid, combining the benefits of both remote
             </CardHeader>{" "}
             <CardContent className="p-6">
               {/* Rating Section */}
-              <div className="mb-8">
+              {/* <div className="mb-8">
                 <div className="flex items-center gap-2 mb-4">
                   <Badge
                     variant="secondary"
@@ -843,7 +843,7 @@ The future of work is likely to be hybrid, combining the benefits of both remote
                         onMouseLeave={() => setHover(0)}
                       >
                         <span className="sr-only">{starValue} Star</span>
-                        &#9733; {/* This is the Unicode star character */}
+                        &#9733;  
                       </button>
                     );
                   })}
@@ -860,9 +860,9 @@ The future of work is likely to be hybrid, combining the benefits of both remote
                     {rating === 5 && "Excellent comprehension ability"}
                   </div>
                 )}
-              </div>
+              </div> */}
 
-              <Separator className="my-6" />
+              {/* <Separator className="my-6" /> */}
 
               {/* Notes Section */}
               <div>
