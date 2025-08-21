@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dialog.jsx"
 import {Input} from "@/components/ui/input.jsx";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
+import {Loader2} from "lucide-react";
 
 function CourseOverview() {
     const {CourseId} = useParams();
@@ -41,6 +42,7 @@ function CourseOverview() {
     // Animation state
     const [isLoading, setIsLoading] = useState(true);
     const [expandedTopics, setExpandedTopics] = useState(new Set());
+    const [enrollmentLoading, setEnrollmentLoading] = useState(false);
 
 
 
@@ -77,6 +79,52 @@ function CourseOverview() {
 
     const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
+    // Enroll user in course
+    const handleEnrollment = async () => {
+        if (!userDetail?.userId || !CourseId) {
+            toast({
+                title: "Error",
+                description: "User or course information is missing",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        setEnrollmentLoading(true);
+        try {
+            const response = await axiosConn.post(
+                import.meta.env.VITE_API_URL + "/userCourseEnrollment",
+                {
+                    courseId: CourseId
+                }
+            );
+
+            if (response.data.status === 200) {
+                toast({
+                    title: "Success",
+                    description: "Successfully enrolled in the course!",
+                    variant: "default",
+                });
+                
+                // Refresh enrollment data
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                throw new Error(response.data.message || "Enrollment failed");
+            }
+        } catch (error) {
+            console.error("Enrollment error:", error);
+            toast({
+                title: "Enrollment Failed",
+                description: error.response?.data?.message || error.message || "Failed to enroll in the course",
+                variant: "destructive",
+            });
+        } finally {
+            setEnrollmentLoading(false);
+        }
+    };
+
     // Calculate progress
     const calculateProgress = () => {
         if (!courseList?.courseTopic) return 0;
@@ -97,7 +145,13 @@ function CourseOverview() {
             return { status: 'NOT_ENROLLED', displayText: 'NOT ENROLLED', color: 'gray' };
         }
         
-        const enrollment = userCourseEnrollment[0]; // Get the first enrollment record
+        // Find enrollment record for the current course
+        const enrollment = userCourseEnrollment.find(enrollment => enrollment.courseId == CourseId);
+        
+        // If no enrollment found for this specific course, user is not enrolled
+        if (!enrollment) {
+            return { status: 'NOT_ENROLLED', displayText: 'NOT ENROLLED', color: 'gray' };
+        }
         const statusConfig = {
             'NOT_STARTED': { displayText: 'NOT STARTED', color: 'orange' },
             'ENROLLED': { displayText: 'ENROLLED', color: 'green' },
@@ -203,29 +257,47 @@ function CourseOverview() {
                              </div>
 
                             <div className="flex flex-col items-center gap-2">
-                                     <div className="text-center">
-                                        <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm ${
-                                            enrollmentInfo.color === 'green' ? 'bg-green-100 text-green-800 animate-bounce' :
-                                            enrollmentInfo.color === 'blue' ? 'bg-blue-100 text-blue-800' :
-                                            enrollmentInfo.color === 'orange' ? 'bg-orange-100 text-orange-800' :
-                                            enrollmentInfo.color === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
-                                            enrollmentInfo.color === 'purple' ? 'bg-purple-100 text-purple-800' :
-                                            enrollmentInfo.color === 'gold' ? 'bg-yellow-100 text-yellow-900' :
-                                            'bg-gray-100 text-gray-800'
-                                        }`}>
-                                            {enrollmentInfo.status === 'ENROLLED' || enrollmentInfo.status === 'COMPLETED' || enrollmentInfo.status === 'CERTIFIED' ? (
-                                                <Check className="h-4 w-4"/>
-                                            ) : null}
-                                            {enrollmentInfo.displayText}
-                                        </div>
-                                        {enrollmentInfo.status !== 'NOT_ENROLLED' && (
+                                    {/* Show status badge only when user is enrolled */}
+                                    {enrollmentInfo.status !== 'NOT_ENROLLED' && (
+                                        <div className="text-center">
+                                            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm ${
+                                                enrollmentInfo.color === 'green' ? 'bg-green-100 text-green-800 animate-bounce' :
+                                                enrollmentInfo.color === 'blue' ? 'bg-blue-100 text-blue-800' :
+                                                enrollmentInfo.color === 'orange' ? 'bg-orange-100 text-orange-800' :
+                                                enrollmentInfo.color === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
+                                                enrollmentInfo.color === 'purple' ? 'bg-purple-100 text-purple-800' :
+                                                enrollmentInfo.color === 'gold' ? 'bg-yellow-100 text-yellow-900' :
+                                                'bg-gray-100 text-gray-800'
+                                            }`}>
+                                                {enrollmentInfo.status === 'ENROLLED' || enrollmentInfo.status === 'COMPLETED' || enrollmentInfo.status === 'CERTIFIED' ? (
+                                                    <Check className="h-4 w-4"/>
+                                                ) : null}
+                                                {enrollmentInfo.displayText}
+                                            </div>
                                             <p className='text-sm text-gray-600 cursor-pointer hover:text-blue-600 hover:underline transition-colors mt-1'>
                                                 {enrollmentInfo.enrollmentDate && `Enrolled: ${new Date(enrollmentInfo.enrollmentDate).toLocaleDateString()}`}
                                                 {enrollmentInfo.completionDate && ` | Completed: ${new Date(enrollmentInfo.completionDate).toLocaleDateString()}`}
                                             </p>
-                                        )}
-                                    </div>
+                                        </div>
+                                    )}
 
+                                    {/* Enroll Button - only show when user is not enrolled */}
+                                    {enrollmentInfo.status === 'NOT_ENROLLED' && (
+                                        <Button
+                                            onClick={handleEnrollment}
+                                            disabled={enrollmentLoading}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {enrollmentLoading ? (
+                                                <>
+                                                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                                    Enrolling...
+                                                </>
+                                            ) : (
+                                                'Enroll Now'
+                                            )}
+                                        </Button>
+                                    )}
                             </div>
                         </div>
                     </CardHeader>
