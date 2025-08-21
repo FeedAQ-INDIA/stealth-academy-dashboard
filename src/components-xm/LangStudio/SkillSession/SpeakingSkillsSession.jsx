@@ -665,7 +665,7 @@ const SpeakingSkillsSession = () => {
           </div>
         </div>
 
-        {/* Session Feedback */}
+        {/* Feedback */}
         <div className="space-y-4 mt-8">
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -673,10 +673,10 @@ const SpeakingSkillsSession = () => {
                 <div className="bg-green-100 text-green-800 p-2 rounded-lg">
                   📝
                 </div>
-                Session Feedback
+                Feedback
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
+            <CardContent className=" ">
               {/* Rating Section */}
               {/* <div className="mb-8">
                 <div className="flex items-center gap-2 mb-4">

@@ -800,7 +800,7 @@ The future of work is likely to be hybrid, combining the benefits of both remote
           </div>
         </div>
 
-        {/* Session Feedback */}
+        {/* Feedback */}
         <div className="space-y-4 mt-4">
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -808,10 +808,10 @@ The future of work is likely to be hybrid, combining the benefits of both remote
                 <div className="bg-orange-100 text-orange-800 p-2 rounded-lg">
                   📝
                 </div>
-                Session Feedback
+                Feedback
               </CardTitle>
             </CardHeader>{" "}
-            <CardContent className="p-6">
+            <CardContent className=" ">
               {/* Rating Section */}
               {/* <div className="mb-8">
                 <div className="flex items-center gap-2 mb-4">
