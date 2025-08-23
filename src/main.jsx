@@ -37,6 +37,7 @@ import Notifications from "@/components-xm/AccountSettings/Notifications.jsx";
 import CourseWritten from "@/components-xm/Course/CourseWritten.jsx";
 import CourseDocThirdParty from "@/components-xm/Course/CourseDocThirdParty.jsx";
 import CourseQuiz from "@/components-xm/Course/CourseQuiz.jsx";
+import CourseFlashcard from "@/components-xm/Course/CourseFlashcard.jsx";
 import { useAuthStore, useProtectedURIStore } from "@/zustland/store";
 import HomePage from "@/components-xm/HomeFiles/HomePage.jsx";
 import CourseSchedule from "@/components-xm/Course/CourseSchedule.jsx";
@@ -182,6 +183,10 @@ const router = createBrowserRouter([
           {
             path: "/course/:CourseId/quiz/:CourseQuizId",
             element: <CourseQuiz />,
+          },
+          {
+            path: "/course/:CourseId/flashcard/:CourseFlashcardId",
+            element: <CourseFlashcard />,
           },
           {
             path: "/course/:CourseId/video/:CourseVideoId",

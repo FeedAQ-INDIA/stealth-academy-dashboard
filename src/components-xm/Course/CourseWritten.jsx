@@ -10,7 +10,7 @@ import {
 import {Card, CardHeader, CardTitle, CardContent} from "@/components/ui/card.jsx";
 import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
-import {Check, CircleArrowLeft, CircleArrowRight, Clock, FileText, CheckCircle2, Undo2} from "lucide-react";
+import {Check, CircleArrowLeft, CircleArrowRight, Clock, FileText, CheckCircle2, Undo2, Zap} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {useCourse} from "@/components-xm/Course/CourseContext.jsx";
@@ -148,7 +148,8 @@ function CourseWritten() {
         const routes = {
             'CourseVideo': `/course/${courseList?.courseId}/video/${content.courseContentId}`,
             'CourseWritten': `/course/${courseList?.courseId}/doc/${content.courseContentId}`,
-            'CourseQuiz': `/course/${courseList?.courseId}/quiz/${content.courseContentId}`
+            'CourseQuiz': `/course/${courseList?.courseId}/quiz/${content.courseContentId}`,
+            'CourseFlashcard': `/course/${courseList?.courseId}/flashcard/${content.courseContentId}`
         };
 
         const route = routes[content.courseContentType];

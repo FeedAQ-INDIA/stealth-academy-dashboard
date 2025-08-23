@@ -25,7 +25,8 @@ const ENROLLMENT_STATUS = {
 const CONTENT_TYPES = {
     COURSE_VIDEO: 'CourseVideo',
     COURSE_WRITTEN: 'CourseWritten',
-    COURSE_QUIZ: 'CourseQuiz'
+    COURSE_QUIZ: 'CourseQuiz',
+    COURSE_FLASHCARD: 'CourseFlashcard'
 };
 
 // Custom hooks
@@ -180,7 +181,8 @@ const useNavigation = (courseList, courseVideoDetail) => {
         const routes = {
             [CONTENT_TYPES.COURSE_VIDEO]: `/course/${courseList?.courseId}/video/${content.courseContentId}`,
             [CONTENT_TYPES.COURSE_WRITTEN]: `/course/${courseList?.courseId}/doc/${content.courseContentId}`,
-            [CONTENT_TYPES.COURSE_QUIZ]: `/course/${courseList?.courseId}/quiz/${content.courseContentId}`
+            [CONTENT_TYPES.COURSE_QUIZ]: `/course/${courseList?.courseId}/quiz/${content.courseContentId}`,
+            [CONTENT_TYPES.COURSE_FLASHCARD]: `/course/${courseList?.courseId}/flashcard/${content.courseContentId}`
         };
 
         const route = routes[content.courseContentType];

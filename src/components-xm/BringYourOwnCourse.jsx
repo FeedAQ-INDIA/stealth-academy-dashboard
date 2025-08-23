@@ -64,12 +64,12 @@ export default function BringYourOwnCourse() {
 
         try {
             const payload = {
-                contentUrl: validUrls,
+                contentUrlsList: validUrls,
                 courseTitle: courseTitle.trim(),
                 courseDescription: courseDescription.trim()
             };
 
-            const response = await axiosConn.post("/importPlaylistToDatabase", payload);
+            const response = await axiosConn.post("/createCourseFromUrls", payload);
             
             if (response.data) {
                 toast({

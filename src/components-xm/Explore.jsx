@@ -38,13 +38,13 @@ export function Explore() {
       path: "/explore/bring-your-own-course",
       description: "Upload and share your own educational content"
     },
-    { 
-      id: "privileged-access", 
-      label: "PRIVILEGED ACCESS", 
-      icon: Crown, 
-      path: "/explore/privileged-access",
-      description: "Access exclusive premium content and features"
-    },
+    // { 
+    //   id: "privileged-access", 
+    //   label: "PRIVILEGED ACCESS", 
+    //   icon: Crown, 
+    //   path: "/explore/privileged-access",
+    //   description: "Access exclusive premium content and features"
+    // },
   ], []);
 
   // Redirect to marketplace by default if at base explore route

@@ -42,7 +42,7 @@ import {
 function CourseSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { CourseId, CourseVideoId, CourseDocId, CourseQuizId } = useParams();
+  const { CourseId, CourseVideoId, CourseDocId, CourseQuizId, CourseFlashcardId } = useParams();
 
   const [data, setData] = useState(null);
   const activeItemRef = useRef(null);
@@ -62,6 +62,7 @@ function CourseSidebar() {
     CourseVideo: "video",
     CourseWritten: "doc",
     CourseQuiz: "quiz",
+    CourseFlashcard: "flashcard",
   };
 
   // Check if user is enrolled and has access to content
@@ -115,6 +116,13 @@ function CourseSidebar() {
       CourseQuizId &&
       content.courseContentType === "CourseQuiz" &&
       content.courseContentId === CourseQuizId
+    ) {
+      return true;
+    }
+    if (
+      CourseFlashcardId &&
+      content.courseContentType === "CourseFlashcard" &&
+      content.courseContentId === CourseFlashcardId
     ) {
       return true;
     }
@@ -192,6 +200,7 @@ function CourseSidebar() {
     CourseVideoId,
     CourseDocId,
     CourseQuizId,
+    CourseFlashcardId,
     location.pathname,
     courseList,
     activeContentId,
@@ -214,15 +223,14 @@ function CourseSidebar() {
 
   useEffect(() => {
     if (courseList && location.pathname) {
-      console.log("CourseSidebar: Updating sidebar data", {
-        pathname: location.pathname,
-        CourseVideoId,
-        CourseDocId,
-        CourseQuizId,
-        courseContent: courseList?.courseContent,
-      });
-
-      setData({
+        console.log("CourseSidebar: Updating sidebar data", {
+          pathname: location.pathname,
+          CourseVideoId,
+          CourseDocId,
+          CourseQuizId,
+          CourseFlashcardId,
+          courseContent: courseList?.courseContent,
+        });      setData({
         navMain: [
           {
             title: "",
@@ -272,6 +280,7 @@ function CourseSidebar() {
     CourseVideoId,
     CourseDocId,
     CourseQuizId,
+    CourseFlashcardId,
     hasContentAccess,
   ]);
 

@@ -10,7 +10,8 @@ import {
 import {Card, CardHeader, CardTitle, CardContent} from "@/components/ui/card.jsx";
 import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
-import {Check, CircleArrowLeft, CircleArrowRight, Clock, PlayCircle, BookOpen, FileText, Trophy} from "lucide-react";
+ 
+import {Zap, Check, CircleArrowLeft, CircleArrowRight, Clock, PlayCircle, BookOpen, FileText, Trophy} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {useCourse} from "@/components-xm/Course/CourseContext.jsx";
@@ -163,7 +164,8 @@ function CourseQuiz() {
         const routes = {
             'CourseVideo': `/course/${courseList?.courseId}/video/${content.courseContentId}`,
             'CourseWritten': `/course/${courseList?.courseId}/doc/${content.courseContentId}`,
-            'CourseQuiz': `/course/${courseList?.courseId}/quiz/${content.courseContentId}`
+            'CourseQuiz': `/course/${courseList?.courseId}/quiz/${content.courseContentId}`,
+            'CourseFlashcard': `/course/${courseList?.courseId}/flashcard/${content.courseContentId}`
         };
 
         const route = routes[content.courseContentType];
@@ -182,6 +184,8 @@ function CourseQuiz() {
                 return <FileText className="w-4 h-4" />;
             case 'CourseQuiz':
                 return <Trophy className="w-4 h-4" />;
+            case 'CourseFlashcard':
+                return <Zap className="w-4 h-4" />;
             default:
                 return <BookOpen className="w-4 h-4" />;
         }

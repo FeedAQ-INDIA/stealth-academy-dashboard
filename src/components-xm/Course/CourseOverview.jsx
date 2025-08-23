@@ -208,10 +208,10 @@ function CourseOverview() {
                  </div>
             </header>
 
-            <div className=" p-4 lg:p-6 animate-fade-in">
+            <div className=" p-3 animate-fade-in">
                  <Card className="rounded-sm bg-gradient-to-br from-blue-50 to-indigo-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-                    <CardHeader className="pb-4">
-                        <div className="flex flex-wrap gap-2 w-full mb-4">
+                    <CardHeader className=" ">
+                        {/* <div className="flex flex-wrap gap-2 w-full mb-4">
 
                             <Badge variant="outline" className="hover:bg-gray-100 transition-colors flex items-center gap-1">
                                 <Clock className="h-3 w-3"/>
@@ -238,7 +238,7 @@ function CourseOverview() {
                                     {courseList?.deliveryMode}
                                 </Badge>
                             )}
-                        </div>
+                        </div> */}
 
                         <div className="flex flex-col lg:flex-row gap-4 w-full items-start lg:items-center">
                             <div className="flex-1">
