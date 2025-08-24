@@ -42,7 +42,7 @@ import {
 function CourseSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { CourseId, CourseVideoId, CourseDocId, CourseQuizId, CourseFlashcardId } = useParams();
+  const { CourseId, CourseVideoId, CourseDocId, CourseQuizId, CourseFlashcardId, CourseCertificateId } = useParams();
 
   const [data, setData] = useState(null);
   const activeItemRef = useRef(null);
@@ -63,6 +63,7 @@ function CourseSidebar() {
     CourseWritten: "doc",
     CourseQuiz: "quiz",
     CourseFlashcard: "flashcard",
+    CourseCertificate: "certificate",
   };
 
   // Check if user is enrolled and has access to content
@@ -123,6 +124,14 @@ function CourseSidebar() {
       CourseFlashcardId &&
       content.courseContentType === "CourseFlashcard" &&
       content.courseContentId === CourseFlashcardId
+    ) {
+      return true;
+    }
+    // Check based on URL parameters - this handles the case where the content ID in URL maps to a courseContentId
+    if (
+      CourseVideoId &&
+      content.courseContentType === "CourseCertificate" &&
+      content.courseContentId === CourseCertificateId
     ) {
       return true;
     }
@@ -198,6 +207,8 @@ function CourseSidebar() {
     }
   }, [
     CourseVideoId,
+    CourseCertificateId,
+    CourseId,
     CourseDocId,
     CourseQuizId,
     CourseFlashcardId,
@@ -226,11 +237,13 @@ function CourseSidebar() {
         console.log("CourseSidebar: Updating sidebar data", {
           pathname: location.pathname,
           CourseVideoId,
+          CourseCertificateId,
           CourseDocId,
           CourseQuizId,
           CourseFlashcardId,
           courseContent: courseList?.courseContent,
-        });      setData({
+        });      
+        setData({
         navMain: [
           {
             title: "",
@@ -278,6 +291,7 @@ function CourseSidebar() {
     userCourseEnrollment,
     location.pathname,
     CourseVideoId,
+    CourseCertificateId,
     CourseDocId,
     CourseQuizId,
     CourseFlashcardId,

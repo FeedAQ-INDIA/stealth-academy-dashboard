@@ -1,43 +1,162 @@
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar.jsx";
 import { Separator } from "@/components/ui/separator.jsx";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb.jsx";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card.jsx";
-import React, { useEffect, useState } from "react";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb.jsx";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card.jsx";
 import { Badge } from "@/components/ui/badge.jsx";
-import {
-  Check,
-  CircleArrowLeft,
-  CircleArrowRight,
-  Zap,
-  RotateCcw,
-  Eye,
-  EyeOff,
-  Trophy,
-  CheckCircle2,
-  Undo2,
-  Shuffle,
-} from "lucide-react";
+import { Zap, RotateCcw, Eye, EyeOff, CheckCircle2, Undo2, Shuffle, CircleArrowLeft, CircleArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button.jsx";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useCourse } from "@/components-xm/Course/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
 import { toast } from "@/components/hooks/use-toast.js";
 import { useAuthStore } from "@/zustland/store.js";
-import { Progress } from "@/components/ui/progress.jsx";
 import { Skeleton } from "@/components/ui/skeleton.jsx";
 import CreateNotesModule from "../Notes/CreateNotesModule";
 import NotesModule from "../Notes/NotesModule";
+
+// FlashcardItem extracted outside main component for clarity and performance
+const FlashcardItem = React.memo(function FlashcardItem({ card, index, isFlipped, isCompleted, onFlip }) {
+  return (
+    <div
+      className="group perspective-1000 h-72 cursor-pointer"
+      onClick={() => onFlip(index)}
+    >
+      <div
+        className={`relative w-full h-full transition-transform duration-700 transform-style-preserve-3d hover:scale-105 ${
+          isFlipped ? "rotate-y-180" : ""
+        }`}
+        style={{
+          transformStyle: "preserve-3d",
+          transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+          transition: "transform 0.7s cubic-bezier(0.4, 0.0, 0.2, 1)",
+        }}
+      >
+        {/* Front of card (Question) */}
+        <Card
+          className={`absolute inset-0 w-full h-full backface-hidden shadow-xl border-2 transition-all duration-300 ${
+            isCompleted
+              ? "border-green-400 bg-gradient-to-br from-green-50 to-emerald-100 shadow-green-200/50"
+              : "border-gray-200 bg-gradient-to-br from-white to-gray-50 hover:shadow-2xl"
+          }`}
+          style={{
+            backfaceVisibility: "hidden",
+            transform: "rotateY(0deg)",
+          }}
+        >
+          <CardContent className="p-4 sm:p-6 h-full flex flex-col justify-between relative overflow-hidden">
+            {/* Decorative background elements */}
+            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full opacity-20 transform translate-x-8 -translate-y-8"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-indigo-100 to-pink-100 rounded-full opacity-20 transform -translate-x-6 translate-y-6"></div>
+            <div className="flex items-center justify-between mb-3 sm:mb-4 relative z-10">
+              <Badge
+                variant="outline"
+                className={`text-xs font-medium shadow-sm ${
+                  card.difficulty === "EASY"
+                    ? "bg-green-100 text-green-800 border-green-300"
+                    : card.difficulty === "HARD"
+                    ? "bg-red-100 text-red-800 border-red-300"
+                    : "bg-yellow-100 text-yellow-800 border-yellow-300"
+                }`}
+              >
+                {card.difficulty || "MEDIUM"}
+              </Badge>
+              <div className="flex items-center gap-2">
+                {isCompleted && (
+                  <div className="animate-bounce">
+                    <CheckCircle2 size={16} className="text-green-600" />
+                  </div>
+                )}
+                <div className="flex items-center gap-1 text-sm text-gray-500">
+                  <EyeOff size={14} className="animate-pulse" />
+                  <span className="text-xs hidden sm:inline font-medium">Question</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex-1 flex items-center justify-center text-center px-2 relative z-10">
+              <div className="space-y-3 w-full">
+                <div className="text-base sm:text-lg font-semibold text-gray-800 leading-relaxed">
+                  {card.question}
+                </div>
+                <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mx-auto"></div>
+              </div>
+            </div>
+            <div className="mt-4 text-center relative z-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-full border border-blue-200">
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                <p className="text-xs text-blue-700 font-medium">
+                  <span className="hidden sm:inline">Click to reveal answer</span>
+                  <span className="sm:hidden">Tap for answer</span>
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        {/* Back of card (Answer) */}
+        <Card
+          className={`absolute inset-0 w-full h-full backface-hidden shadow-xl border-2 transition-all duration-300 ${
+            isCompleted
+              ? "border-green-400 bg-gradient-to-br from-green-50 to-emerald-100 shadow-green-200/50"
+              : "border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-100 hover:shadow-2xl"
+          }`}
+          style={{
+            backfaceVisibility: "hidden",
+            transform: "rotateY(180deg)",
+          }}
+        >
+          <CardContent className="p-4 h-full flex flex-col justify-between relative overflow-y-auto overflow-x-hidden">
+            {/* Decorative background elements */}
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full opacity-20 transform translate-x-10 -translate-y-10"></div>
+            <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr from-blue-100 to-cyan-100 rounded-full opacity-20 transform -translate-x-8 translate-y-8"></div>
+            <div className="flex items-center justify-between mb-3 sm:mb-4 relative z-10">
+              <Badge
+                variant="outline"
+                className="text-xs font-medium bg-blue-100 text-blue-800 border-blue-300 shadow-sm"
+              >
+                Answer
+              </Badge>
+              <div className="flex items-center gap-2">
+                {isCompleted && (
+                  <div className="animate-bounce">
+                    <CheckCircle2 size={16} className="text-green-600" />
+                  </div>
+                )}
+                <div className="flex items-center gap-1 text-sm text-blue-600">
+                  <Eye size={14} />
+                  <span className="text-xs hidden sm:inline font-medium">Revealed</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex-1 flex items-center justify-center text-center px-2 relative z-10">
+              <div className="space-y-3 w-full">
+                <div className="text-base sm:text-lg font-semibold text-gray-800 leading-relaxed">
+                  {card.answer}
+                </div>
+                {card.explanation && (
+                  <div className="mt-3 p-3 bg-white/80 backdrop-blur-sm rounded-lg border border-blue-200 shadow-sm">
+                    <p className="text-sm text-gray-700 leading-relaxed">
+                      <span className="font-semibold text-blue-700">💡 Explanation:</span>{" "}
+                      {card.explanation}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="mt-3 text-center relative z-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/80 backdrop-blur-sm rounded-full border border-gray-200">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <p className="text-xs text-gray-600 font-medium">
+                  <span className="hidden sm:inline">Click to show question</span>
+                  <span className="sm:hidden">Tap for question</span>
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+});
 
 function CourseFlashcard() {
   const { userDetail } = useAuthStore();
@@ -53,19 +172,21 @@ function CourseFlashcard() {
   const [courseFlashcardDetail, setCourseFlashcardDetail] = useState({});
   const [flashcards, setFlashcards] = useState([]);
   const [courseTopicContent, setCourseTopicContent] = useState({});
-  const [prevContent, setPrevContent] = useState({});
-  const [nextContent, setNextContent] = useState({});
+  const [prevContent, setPrevContent] = useState(null);
+  const [nextContent, setNextContent] = useState(null);
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [flippedCards, setFlippedCards] = useState(new Set());
   const [completedCards, setCompletedCards] = useState(new Set());
   const [difficultyFilter, setDifficultyFilter] = useState("all");
-  const navigate = useNavigate();
   const [triggerNotesRefresh, setTriggerNotesRefresh] = useState(false);
 
   const handleNotesSave = () => {
     setTriggerNotesRefresh((prev) => !prev);
   };
 
+
+  // Navigation logic for prev/next content (similar to CourseVideoTutorial)
   useEffect(() => {
     if (courseList && CourseFlashcardId) {
       fetchCourseFlashcard();
@@ -115,7 +236,7 @@ function CourseFlashcard() {
       );
       setCourseTopicContent(content || {});
 
-      // Find previous and next content
+      // Find previous and next content (navigation logic)
       const currentIndex = courseList?.courseContent?.findIndex(
         (a) => a.courseContentId === flashcardSet?.courseContentId
       );
@@ -128,8 +249,11 @@ function CourseFlashcard() {
             ? courseList.courseContent[currentIndex + 1]
             : null;
 
-        setPrevContent(prev || {});
-        setNextContent(next || {});
+        setPrevContent(prev);
+        setNextContent(next);
+      } else {
+        setPrevContent(null);
+        setNextContent(null);
       }
     } catch (err) {
       console.error("Error fetching flashcard data:", err);
@@ -205,73 +329,80 @@ function CourseFlashcard() {
       progress.progressStatus === "COMPLETED"
   );
 
-  const handleFlipCard = (cardIndex) => {
-    const newFlipped = new Set(flippedCards);
-    if (newFlipped.has(cardIndex)) {
-      newFlipped.delete(cardIndex);
-    } else {
-      newFlipped.add(cardIndex);
-    }
-    setFlippedCards(newFlipped);
-  };
-
-  const handleMarkAsKnown = (cardIndex) => {
-    const newCompleted = new Set(completedCards);
-    newCompleted.add(cardIndex);
-    setCompletedCards(newCompleted);
-
-    toast({
-      title: "✅ Marked as Known",
-      description: "Great job! Keep going!",
+  // Flip a single card
+  const handleFlipCard = useCallback((cardIndex) => {
+    setFlippedCards((prev) => {
+      const newFlipped = new Set(prev);
+      if (newFlipped.has(cardIndex)) {
+        newFlipped.delete(cardIndex);
+      } else {
+        newFlipped.add(cardIndex);
+      }
+      return newFlipped;
     });
-  };
+  }, []);
 
-  const handleMarkAsUnknown = (cardIndex) => {
-    const newCompleted = new Set(completedCards);
-    newCompleted.delete(cardIndex);
-    setCompletedCards(newCompleted);
-  };
 
-  const handleShuffle = () => {
-    const shuffled = [...flashcards].sort(() => Math.random() - 0.5);
-    setFlashcards(shuffled);
+  // Shuffle flashcards
+  const handleShuffle = useCallback(() => {
+    setFlashcards((prev) => {
+      const shuffled = [...prev].sort(() => Math.random() - 0.5);
+      return shuffled;
+    });
     setFlippedCards(new Set());
-  };
+  }, []);
 
-  const handleReset = () => {
+  // Reset all progress
+  const handleReset = useCallback(() => {
     setFlippedCards(new Set());
     setCompletedCards(new Set());
-  };
+  }, []);
 
-  const handleFlipAll = () => {
-    if (flippedCards.size === flashcards.length) {
-      setFlippedCards(new Set());
-    } else {
-      setFlippedCards(
-        new Set(Array.from({ length: flashcards.length }, (_, i) => i))
-      );
-    }
-  };
+  // Flip all cards
+  const handleFlipAll = useCallback(() => {
+    setFlippedCards((prev) => {
+      if (prev.size === flashcards.length) {
+        return new Set();
+      } else {
+        return new Set(Array.from({ length: flashcards.length }, (_, i) => i));
+      }
+    });
+  }, [flashcards.length]);
 
-  const getContentUrlFromType = (content) => {
-    const urlMap = {
-      CourseVideo: "video",
-      CourseWritten: "doc",
-      CourseQuiz: "quiz",
-      CourseFlashcard: "flashcard",
-    };
-    return urlMap[content?.courseContentType] || "";
-  };
 
-  const filteredFlashcards = flashcards.filter((card) => {
-    if (difficultyFilter === "all") return true;
-    return card.difficulty?.toLowerCase() === difficultyFilter.toLowerCase();
-  });
+  // Navigation handler (similar to CourseVideoTutorial)
+  const onNavigate = useCallback(
+    (content) => {
+      if (!content || !courseList?.courseId) return;
+      const type = content.courseContentType;
+      const id = content.courseContentId;
+      const routes = {
+        CourseVideo: `/course/${courseList.courseId}/video/${id}`,
+        CourseWritten: `/course/${courseList.courseId}/doc/${id}`,
+        CourseQuiz: `/course/${courseList.courseId}/quiz/${id}`,
+        CourseFlashcard: `/course/${courseList.courseId}/flashcard/${id}`,
+      };
+      const route = routes[type];
+      if (route) navigate(route);
+    },
+    [navigate, courseList]
+  );
 
-  const progressPercentage =
-    flashcards.length > 0
+
+  // Memoized filtered flashcards
+  const filteredFlashcards = useMemo(() => {
+    if (difficultyFilter === "all") return flashcards;
+    return flashcards.filter((card) =>
+      card.difficulty?.toLowerCase() === difficultyFilter.toLowerCase()
+    );
+  }, [flashcards, difficultyFilter]);
+
+  // Memoized progress percentage
+  const progressPercentage = useMemo(() => {
+    return flashcards.length > 0
       ? Math.round((completedCards.size / flashcards.length) * 100)
       : 0;
+  }, [completedCards.size, flashcards.length]);
 
   if (isLoading) {
     return (
@@ -287,198 +418,6 @@ function CourseFlashcard() {
     );
   }
 
-  // Individual card component with enhanced animations
-  const FlashcardItem = ({ card, index }) => {
-    const isFlipped = flippedCards.has(index);
-    const isCompleted = completedCards.has(index);
-
-    return (
-      <div
-        className="group perspective-1000 h-72 cursor-pointer"
-        onClick={() => handleFlipCard(index)}
-      >
-        <div
-          className={`relative w-full h-full transition-transform duration-700 transform-style-preserve-3d hover:scale-105 ${
-            isFlipped ? "rotate-y-180" : ""
-          }`}
-          style={{
-            transformStyle: "preserve-3d",
-            transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
-            transition: "transform 0.7s cubic-bezier(0.4, 0.0, 0.2, 1)",
-          }}
-        >
-          {/* Front of card (Question) */}
-          <Card
-            className={`absolute inset-0 w-full h-full backface-hidden shadow-xl border-2 transition-all duration-300 ${
-              isCompleted
-                ? "border-green-400 bg-gradient-to-br from-green-50 to-emerald-100 shadow-green-200/50"
-                : "border-gray-200 bg-gradient-to-br from-white to-gray-50 hover:shadow-2xl"
-            }`}
-            style={{
-              backfaceVisibility: "hidden",
-              transform: "rotateY(0deg)",
-            }}
-          >
-            <CardContent className="p-4 sm:p-6 h-full flex flex-col justify-between relative overflow-hidden">
-              {/* Decorative background elements */}
-              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full opacity-20 transform translate-x-8 -translate-y-8"></div>
-              <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-indigo-100 to-pink-100 rounded-full opacity-20 transform -translate-x-6 translate-y-6"></div>
-
-              <div className="flex items-center justify-between mb-3 sm:mb-4 relative z-10">
-                <Badge
-                  variant="outline"
-                  className={`text-xs font-medium shadow-sm ${
-                    card.difficulty === "EASY"
-                      ? "bg-green-100 text-green-800 border-green-300"
-                      : card.difficulty === "HARD"
-                      ? "bg-red-100 text-red-800 border-red-300"
-                      : "bg-yellow-100 text-yellow-800 border-yellow-300"
-                  }`}
-                >
-                  {card.difficulty || "MEDIUM"}
-                </Badge>
-                <div className="flex items-center gap-2">
-                  {isCompleted && (
-                    <div className="animate-bounce">
-                      <CheckCircle2 size={16} className="text-green-600" />
-                    </div>
-                  )}
-                  <div className="flex items-center gap-1 text-sm text-gray-500">
-                    <EyeOff size={14} className="animate-pulse" />
-                    <span className="text-xs hidden sm:inline font-medium">
-                      Question
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex-1 flex items-center justify-center text-center px-2 relative z-10">
-                <div className="space-y-3 w-full">
-                  <div className="text-base sm:text-lg font-semibold text-gray-800 leading-relaxed">
-                    {card.question}
-                  </div>
-                  <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mx-auto"></div>
-                </div>
-              </div>
-
-              <div className="mt-4 text-center relative z-10">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-full border border-blue-200">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                  <p className="text-xs text-blue-700 font-medium">
-                    <span className="hidden sm:inline">
-                      Click to reveal answer
-                    </span>
-                    <span className="sm:hidden">Tap for answer</span>
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Back of card (Answer) */}
-          <Card
-            className={`absolute inset-0 w-full h-full backface-hidden shadow-xl border-2 transition-all duration-300 ${
-              isCompleted
-                ? "border-green-400 bg-gradient-to-br from-green-50 to-emerald-100 shadow-green-200/50"
-                : "border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-100 hover:shadow-2xl"
-            }`}
-            style={{
-              backfaceVisibility: "hidden",
-              transform: "rotateY(180deg)",
-            }}
-          >
-            <CardContent className="p-4 sm:p-6 h-full flex flex-col justify-between relative overflow-hidden">
-              {/* Decorative background elements */}
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full opacity-20 transform translate-x-10 -translate-y-10"></div>
-              <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr from-blue-100 to-cyan-100 rounded-full opacity-20 transform -translate-x-8 translate-y-8"></div>
-
-              <div className="flex items-center justify-between mb-3 sm:mb-4 relative z-10">
-                <Badge
-                  variant="outline"
-                  className="text-xs font-medium bg-blue-100 text-blue-800 border-blue-300 shadow-sm"
-                >
-                  Answer
-                </Badge>
-                <div className="flex items-center gap-2">
-                  {isCompleted && (
-                    <div className="animate-bounce">
-                      <CheckCircle2 size={16} className="text-green-600" />
-                    </div>
-                  )}
-                  <div className="flex items-center gap-1 text-sm text-blue-600">
-                    <Eye size={14} />
-                    <span className="text-xs hidden sm:inline font-medium">
-                      Revealed
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex-1 flex items-center justify-center text-center px-2 relative z-10">
-                <div className="space-y-3 w-full">
-                  <div className="text-base sm:text-lg font-semibold text-gray-800 leading-relaxed">
-                    {card.answer}
-                  </div>
-
-                  {card.explanation && (
-                    <div className="mt-3 p-3 bg-white/80 backdrop-blur-sm rounded-lg border border-blue-200 shadow-sm">
-                      <p className="text-sm text-gray-700 leading-relaxed">
-                        <span className="font-semibold text-blue-700">
-                          💡 Explanation:
-                        </span>{" "}
-                        {card.explanation}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* <div className="flex gap-2 mt-4 relative z-10">
-                                <Button 
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleMarkAsUnknown(index);
-                                    }}
-                                    className="flex-1 text-orange-600 border-orange-300 bg-orange-50 hover:bg-orange-100 text-xs sm:text-sm font-medium transition-all duration-200 hover:scale-105"
-                                >
-                                    <RotateCcw size={14} className="mr-1" />
-                                    <span className="hidden sm:inline">Need Practice</span>
-                                    <span className="sm:hidden">Practice</span>
-                                </Button>
-                                <Button 
-                                    size="sm"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleMarkAsKnown(index);
-                                    }}
-                                    className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-xs sm:text-sm font-medium transition-all duration-200 hover:scale-105 shadow-lg"
-                                >
-                                    <Check size={14} className="mr-1" />
-                                    <span className="hidden sm:inline">I Know This</span>
-                                    <span className="sm:hidden">Know It</span>
-                                </Button>
-                            </div> */}
-
-              <div className="mt-3 text-center relative z-10">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/80 backdrop-blur-sm rounded-full border border-gray-200">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <p className="text-xs text-gray-600 font-medium">
-                    <span className="hidden sm:inline">
-                      Click to show question
-                    </span>
-                    <span className="sm:hidden">Tap for question</span>
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  };
-
 
 
   return (
@@ -489,10 +428,6 @@ function CourseFlashcard() {
           <Separator orientation="vertical" className="mr-2 h-4" />
           <Breadcrumb className="flex-1">
             <BreadcrumbList>
-              {/* <BreadcrumbItem className="hidden md:block">
-                <Link to={`/course/${CourseId}`}>Course</Link>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" /> */}
               <BreadcrumbItem>
                 <BreadcrumbPage className="flex items-center gap-2">
                   <Zap size={16} />
@@ -503,6 +438,28 @@ function CourseFlashcard() {
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
+          <div className="ml-auto flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!prevContent}
+              onClick={() => onNavigate(prevContent)}
+              className="flex items-center gap-2"
+            >
+              <CircleArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Previous</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!nextContent}
+              onClick={() => onNavigate(nextContent)}
+              className="flex items-center gap-2"
+            >
+              <span className="hidden sm:inline">Next</span>
+              <CircleArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -626,7 +583,13 @@ function CourseFlashcard() {
                     animationFillMode: "both",
                   }}
                 >
-                  <FlashcardItem card={card} index={index} />
+                  <FlashcardItem
+                    card={card}
+                    index={index}
+                    isFlipped={flippedCards.has(index)}
+                    isCompleted={completedCards.has(index)}
+                    onFlip={handleFlipCard}
+                  />
                 </div>
               ))}
             </div>

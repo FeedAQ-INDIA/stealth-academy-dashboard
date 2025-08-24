@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { useAuthStore } from "@/zustland/store.js";
 import { useCourseState } from "@/hooks/useCourseState";
 import { CourseContext } from "./CourseContext.jsx";
-import { Video, Book, HelpCircle, Zap } from "lucide-react";
+import { Video, Book, HelpCircle, Zap, Award } from "lucide-react";
 import { CourseLoadingSkeleton } from "@/components/CourseLoadingSkeleton";
 import CourseSidebar from "@/components-xm/Course/CourseSidebar.jsx";
 
@@ -40,6 +40,7 @@ export function CourseDetail() {
         else if(type === 'CourseWritten') return <Book />;
         else if(type === 'CourseQuiz') return <HelpCircle />;
         else if(type === 'CourseFlashcard') return <Zap />;
+        else if(type === 'CourseCertificate') return <Award />;
         return null;
     }
 
