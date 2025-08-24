@@ -26,7 +26,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="flex h-16 items-center justify-between bg-white px-4 shadow-md border-b">
+    <header className="flex h-14 items-center justify-between bg-white px-4 shadow-md border-b">
       <div className="flex gap-2 items-center">
         <div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -80,7 +80,7 @@ export default function Header() {
           {/*<Button variant="secondary">*/}
           {/*    {userDetail?.nameInitial}*/}
           {/*</Button> */}
-          <Avatar className="w-12 h-12   bg-orange-400   shadow-sm hover:shadow-xl">
+          <Avatar className="w-10 h-10   bg-orange-400   shadow-sm hover:shadow-xl">
             <AvatarFallback className="text-lg sm:text-lg  bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold">
               {userDetail?.nameInitial}
             </AvatarFallback>

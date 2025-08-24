@@ -95,8 +95,8 @@ export function Explore() {
     <>
       {userDetail ? <Header /> : <PublicHeader />}
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        <div className="p-3 lg:p-6 overflow-y-auto h-[calc(100svh-4em)]">
-          <div className="  mx-auto space-y-6">
+        <div className="p-4 overflow-y-auto h-[calc(100svh-4em)]">
+          <div className="  mx-auto space-y-4">
             
             {/* Hero Section with Enhanced Gradient */}
             <div className="relative overflow-hidden">

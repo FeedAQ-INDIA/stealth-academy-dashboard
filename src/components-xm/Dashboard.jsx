@@ -87,59 +87,12 @@ export function Dashboard() {
       
                 </Card>
 
-            {/*<Card className="rounded-sm  border-0   py-8 shadow-2xl mb-8 overflow-hidden relative">*/}
-            {/*    <CardHeader>*/}
-            {/*        <CardTitle className="text-center tracking-wide">*/}
-            {/*            What would you like to learn today ?*/}
-            {/*        </CardTitle>*/}
-            
-            
-            {/*    </CardHeader>*/}
-            {/*    <CardContent>*/}
-            {/*        <div className="my-2">*/}
-            {/*            <div className="flex gap-2 w-full md:w-3/4 lg:w-1/2 mx-auto items-center">*/}
-            {/*                <Input type="text" value={exploreCourseText}*/}
-            {/*                       onChange={(e) => setExploreCourseText(e.target.value)}*/}
-            {/*                       placeholder="What do you want to learn today ?"/>*/}
-            {/*                <Button type="submit"*/}
-            {/*                        onClick={() => navigate('/explore?search=' + exploreCourseText)}><Search/></Button>*/}
-            {/*            </div>*/}
-            {/*        </div>*/}
-            {/*    </CardContent>*/}
-            {/*</Card>*/}
+   
 
             <section className="my-6 grid grid-cols-1  lg:grid-cols-2  gap-6">
-                {/*<Card className="border-0 bg-muted/50    ">*/}
-                {/*    <CardHeader className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">*/}
-                {/*        <img*/}
-                {/*            src={mockinterview}*/}
-                {/*            alt="Compass"*/}
-                {/*            className="w-16 h-16 md:w-20 md:h-20 object-contain"*/}
-                {/*        />*/}
-                {/*        <div> <CardTitle className="text-lg sm:text-2xl font-semibold  tracking-widest text-cyan-700">*/}
-                {/*            <strong>  MOCK INTERVIEW VAULT</strong>*/}
-                {/*        </CardTitle>*/}
-                {/*            <CardDescription>*/}
-                {/*                <Link to={`/mock-interview`} className="text-blue-700">*/}
-                {/*                    Click Here*/}
-                {/*                </Link> to know More.*/}
-                {/*            </CardDescription>*/}
-                {/*        </div>*/}
+              
 
-                {/*        <div className="md:ml-auto">*/}
-
-                {/*            <Link to={`/schedule-mock-interview`}>*/}
-                {/*            <Button*/}
-                {/*                className="h-8 gap-1 "*/}
-                {/*            >SCHEDULE NOW</Button>*/}
-                {/*            </Link>*/}
-                {/*         </div>*/}
-                {/*    </CardHeader>*/}
-
-
-                {/*</Card>*/}
-
-                <Card className="border-0 bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg overflow-hidden relative">
+                {/* <Card className="border-0 bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg overflow-hidden relative">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
                     <CardHeader className="relative z-10">
                         <div className="flex items-center gap-4">
@@ -162,67 +115,11 @@ export function Dashboard() {
                             Coming Soon
                         </Button>
                     </CardContent>
-                </Card>
+                </Card> */}
             </section>
 
 
-            {/*<section className="my-6 grid grid-cols-1  lg:grid-cols-2  gap-6">*/}
-            {/*    <Card className="border-0 bg-muted/50 ">*/}
-            {/*        <CardHeader className="flex flex-col md:flex-row md:items-center gap-4">*/}
-            {/*            <img*/}
-            {/*                src={compass}*/}
-            {/*                alt="Compass"*/}
-            {/*                className="w-16 h-16 md:w-20 md:h-20 object-contain"*/}
-            {/*            />*/}
-            
-            {/*            <div className="flex-1">*/}
-            {/*                <CardTitle className="text-lg sm:text-2xl font-semibold tracking-widest text-yellow-600">*/}
-            {/*                    <strong>COUNSELLING COMPASS</strong>*/}
-            {/*                </CardTitle>*/}
-            {/*                <CardDescription>*/}
-            {/*                    <Link to={`/counselling-compass`} className="text-blue-700">*/}
-            {/*                        Click Here*/}
-            {/*                    </Link>{" "}*/}
-            {/*                    to know More.*/}
-            {/*                </CardDescription>*/}
-            {/*            </div>*/}
-            
-            {/*            <div className="md:ml-auto">*/}
-            {/*                <Link to={`/schedule-counselling-compass`}>*/}
-            {/*                    <Button className="h-8 gap-1">SCHEDULE NOW</Button>*/}
-            {/*                </Link>*/}
-            {/*            </div>*/}
-            {/*        </CardHeader>*/}
-            {/*    </Card>*/}
-            {/*    <Card className="border-0 bg-muted/50 ">*/}
-            {/*        <CardHeader className="flex flex-col md:flex-row md:items-center gap-4">*/}
-            {/*            <img*/}
-            {/*                src={companiontalks}*/}
-            {/*                alt="Compass"*/}
-            {/*                className="w-16 h-16 md:w-20 md:h-20 object-contain"*/}
-            {/*            />*/}
-            
-            {/*            <div className="flex-1">*/}
-            {/*                <CardTitle className="text-lg sm:text-2xl font-semibold tracking-widest text-red-600">*/}
-            {/*                    <strong>COMPANION CONNECT</strong>*/}
-            {/*                </CardTitle>*/}
-            {/*                <CardDescription>*/}
-            
-            {/*                </CardDescription>*/}
-            {/*            </div>*/}
-            
-            {/*            <div className="md:ml-auto">*/}
-            {/*                /!*<Link to={`/schedule-counselling-compass`}>*!/*/}
-            {/*                    <Button*/}
-            {/*                        className="h-8 gap-1 bg-[#ffdd00] animate-blink" disabled*/}
-            {/*                    >COMING SOON</Button>*/}
-            {/*            /!*</Link>*!/*/}
-            {/*            </div>*/}
-            {/*        </CardHeader>*/}
-            {/*    </Card>*/}
-            
-            {/*</section>*/}
-
+        
 
 
         </div>

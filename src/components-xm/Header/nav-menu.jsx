@@ -80,7 +80,7 @@ function NavigationMenuDemo({ orientation }) {
             <Button
               className="w-full justify-center"
               variant={
-                location.pathname.includes("bring-your-own-course") ? "secondary" : "ghost"
+                location.pathname == ("/explore/bring-your-own-course") ? "secondary" : "ghost"
               }
             >
               CONTENT LIBRARY

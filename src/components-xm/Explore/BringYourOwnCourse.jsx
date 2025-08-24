@@ -248,7 +248,7 @@ export function BringYourOwnCourse() {
   }, [exploreCourseText]);
 
   return (
-    <div className="space-y-6">
+    <div className=" space-y-4">
       {/* Header Section */}
       {/* <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between"> */}
         {/* <div>
