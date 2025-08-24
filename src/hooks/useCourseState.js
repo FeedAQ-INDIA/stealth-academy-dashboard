@@ -45,7 +45,7 @@ export const useCourseState = (courseId) => {
     try {
       setLoading(true);
       const response = await axiosConn.post(import.meta.env.VITE_API_URL + "/searchCourse", {
-        limit: 10,
+        limit: 2000,
         offset: 0,
         getThisData: {
           datasource: "UserCourseContentProgress",
@@ -77,7 +77,7 @@ export const useCourseState = (courseId) => {
     try {
       setLoading(true);
       const response = await axiosConn.post(import.meta.env.VITE_API_URL + "/searchCourse", {
-        limit: 10,
+        limit: 2000,
         offset: 0,
         getThisData: {
           datasource: "UserCourseEnrollment",
