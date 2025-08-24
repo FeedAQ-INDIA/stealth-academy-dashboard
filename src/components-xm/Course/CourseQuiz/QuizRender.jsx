@@ -28,14 +28,14 @@ import {useCourse} from "@/components-xm/Course/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
 import {toast} from "@/components/hooks/use-toast.js";
 import {Checkbox} from "@/components/ui/checkbox.jsx";
-import QuizQuestionCard from "@/components-xm/Course/QuizQuestionCard.jsx";
+import QuizQuestionCard from "@/components-xm/Course/CourseQuiz/QuizQuestionCard.jsx";
 import QuizResultReview from "@/components-xm/Course/QuizResultReview.jsx";
 import {useAuthStore} from "@/zustland/store.js";
 import {Progress} from "@/components/ui/progress.jsx";
 import {Alert, AlertDescription} from "@/components/ui/alert.jsx";
 import {Skeleton} from "@/components/ui/skeleton.jsx";
 
-function QuizRender({saveUserEnrollmentData, deleteUserEnrollmentData, fetchCourseVideo}) {
+function QuizRender({saveUserEnrollmentData, deleteUserEnrollmentData, fetchCourseVideo, courseQuizDetail}) {
     const {CourseId, CourseQuizId} = useParams();
     const {
         userEnrollmentObj,
@@ -74,7 +74,7 @@ function QuizRender({saveUserEnrollmentData, deleteUserEnrollmentData, fetchCour
                 getThisData: {
                     datasource: "QuizQuestion",
                     attributes: [],
-                    where: {courseQuizId: CourseQuizId}
+                    where: {courseQuizId: courseQuizDetail.courseQuizId}
                 },
             });
 
@@ -100,7 +100,7 @@ function QuizRender({saveUserEnrollmentData, deleteUserEnrollmentData, fetchCour
                 getThisData: {
                     datasource: "QuizResultLog",
                     attributes: [],
-                    where: {courseQuizId: CourseQuizId, userId: userDetail.userId}
+                    where: {courseQuizId: courseQuizDetail.courseQuizId, userId: userDetail.userId}
                 },
             });
 
@@ -163,7 +163,7 @@ function QuizRender({saveUserEnrollmentData, deleteUserEnrollmentData, fetchCour
             const res = await axiosConn.post(import.meta.env.VITE_API_URL + "/submitQuiz", {
                 userId: userDetail.userId,
                 courseId: CourseId,
-                courseQuizId: CourseQuizId,
+                courseQuizId: courseQuizDetail.courseQuizId,
                 submissionList
             });
 
@@ -191,7 +191,7 @@ function QuizRender({saveUserEnrollmentData, deleteUserEnrollmentData, fetchCour
             await axiosConn.post(import.meta.env.VITE_API_URL + "/clearQuizResult", {
                 userId: userDetail.userId,
                 courseId: CourseId,
-                courseQuizId: CourseQuizId,
+                courseQuizId: courseQuizDetail.courseQuizId,
             });
 
             fetchCourseVideo();

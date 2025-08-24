@@ -36,7 +36,7 @@ import {
 import Notifications from "@/components-xm/AccountSettings/Notifications.jsx";
 import CourseWritten from "@/components-xm/Course/CourseWritten.jsx";
 import CourseDocThirdParty from "@/components-xm/Course/CourseDocThirdParty.jsx";
-import CourseQuiz from "@/components-xm/Course/CourseQuiz.jsx";
+import CourseQuiz from "@/components-xm/Course/CourseQuiz/CourseQuiz.jsx";
 import CourseFlashcard from "@/components-xm/Course/CourseFlashcard.jsx";
 import { useAuthStore, useProtectedURIStore } from "@/zustland/store";
 import HomePage from "@/components-xm/HomeFiles/HomePage.jsx";

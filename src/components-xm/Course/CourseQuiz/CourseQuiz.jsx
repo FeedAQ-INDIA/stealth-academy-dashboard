@@ -18,7 +18,7 @@ import {useCourse} from "@/components-xm/Course/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
 import {toast} from "@/components/hooks/use-toast.js";
 import {Checkbox} from "@/components/ui/checkbox.jsx";
-import QuizRender from "@/components-xm/Course/QuizRender.jsx";
+import QuizRender from "@/components-xm/Course/CourseQuiz/QuizRender.jsx";
 import {useAuthStore} from "@/zustland/store.js";
 import {Progress} from "@/components/ui/progress.jsx";
 import {Skeleton} from "@/components/ui/skeleton.jsx";
@@ -355,6 +355,7 @@ function CourseQuiz() {
                                 saveUserEnrollmentData={saveUserEnrollmentData}
                                 fetchCourseVideo={fetchCourseVideo}
                                 deleteUserEnrollmentData={deleteUserEnrollmentData}
+                                courseQuizDetail={courseQuizDetail}
                             />
                         </CardContent>
                     </Card>
