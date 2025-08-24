@@ -11,7 +11,7 @@ import {Card, CardHeader, CardTitle, CardContent} from "@/components/ui/card.jsx
 import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
  
-import {Zap, Check, CircleArrowLeft, CircleArrowRight, Clock, PlayCircle, BookOpen, FileText, Trophy} from "lucide-react";
+import {CheckCircle2, Undo2, Zap, Check, CircleArrowLeft, CircleArrowRight, Clock, PlayCircle, BookOpen, FileText, Trophy} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {useCourse} from "@/components-xm/Course/CourseContext.jsx";
@@ -57,7 +57,7 @@ function CourseQuiz() {
                 getThisData: {
                     datasource: "CourseQuiz",
                     attributes: [],
-                    where: {courseQuizId: CourseQuizId}
+                    where: {courseContentId: CourseQuizId}
                 },
             });
 
@@ -309,58 +309,39 @@ function CourseQuiz() {
             </header>
 
             <div className="p-4  mx-auto">
-                <Card className="border-none shadow-sm bg-white">
+    <Card className="border-0  bg-gradient-to-r from-blue-50 to-indigo-50 rounded-sm  shadow-md  overflow-hidden relative">
                     <CardHeader className="space-y-4">
-                        <div className="flex flex-wrap gap-2">
-                            <Badge variant="secondary" className="gap-1">
-                                <Trophy className="w-3 h-3" />
-                                Quiz
-                            </Badge>
-                            <Badge variant="outline" className="gap-1">
-                                <Clock className="w-3 h-3" />
-                                {formatDuration(courseTopicContent?.courseContentDuration)}
-                            </Badge>
-                            {isCompleted && (
-                                <Badge variant="default" className="gap-1 bg-green-100 text-green-800 border-green-200">
-                                    <Check className="w-3 h-3" />
-                                    Completed
-                                </Badge>
-                            )}
-                        </div>
-
-                        <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
-                                <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
-                                    {courseQuizDetail?.courseQuizTitle || 'Loading...'}
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                    <Trophy size={20} className="text-white" />
+                                </div>
+                                <CardTitle className="text-lg sm:text-xl font-semibold text-gray-800">
+                                    {courseQuizDetail?.courseQuizTitle || 'Quiz'}
                                 </CardTitle>
-                                <p className="text-sm text-muted-foreground mt-2">
-                                    Test your knowledge with this interactive quiz
-                                </p>
                             </div>
-
-                            <div className="flex flex-col items-end gap-2">
+                            <div className="flex items-center gap-2">
                                 {isCompleted ? (
-                                    <div className="text-right">
-                                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm font-medium">
-                                            <Check className="w-4 h-4" />
-                                            Completed
-                                        </div>
-                                        {/*<button*/}
-                                        {/*    onClick={deleteUserEnrollmentData}*/}
-                                        {/*    className="block text-xs text-muted-foreground hover:text-blue-600 hover:underline mt-1 transition-colors"*/}
-                                        {/*>*/}
-                                        {/*    Mark as incomplete*/}
-                                        {/*</button>*/}
-                                    </div>
-                                ) : (<></>
-                                    // <Button
-                                    //     onClick={saveUserEnrollmentData}
-                                    //     className="gap-2"
-                                    //     variant="outline"
-                                    // >
-                                    //     <Check className="w-4 h-4" />
-                                    //     Mark Complete
-                                    // </Button>
+                                    <Button 
+                                        variant="outline" 
+                                        size="sm" 
+                                        onClick={deleteUserEnrollmentData}
+                                        className="flex items-center gap-2 text-orange-600 border-orange-300 hover:bg-orange-50"
+                                    >
+                                        <Undo2 size={16} />
+                                        <span className="hidden sm:inline">Mark as Incomplete</span>
+                                        <span className="sm:hidden">Incomplete</span>
+                                    </Button>
+                                ) : (
+                                    <Button 
+                                        size="sm" 
+                                        onClick={saveUserEnrollmentData}
+                                        className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                                    >
+                                        <CheckCircle2 size={16} />
+                                        <span className="hidden sm:inline">Mark as Complete</span>
+                                        <span className="sm:hidden">Complete</span>
+                                    </Button>
                                 )}
                             </div>
                         </div>

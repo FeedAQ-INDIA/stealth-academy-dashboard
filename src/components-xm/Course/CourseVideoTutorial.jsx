@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { SidebarTrigger } from "@/components/ui/sidebar.jsx";
 import { Separator } from "@/components/ui/separator.jsx";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb.jsx";
 import { Badge } from "@/components/ui/badge.jsx";
-import { CircleArrowLeft, CircleArrowRight, Clock, Play, BookOpen, Lock } from "lucide-react";
+import { CheckCircle2 , Undo2, CircleArrowLeft, CircleArrowRight, Clock, Play, BookOpen, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button.jsx";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.jsx";
 import { useCourse } from "@/components-xm/Course/CourseContext.jsx";
@@ -45,7 +45,7 @@ const useVideoData = (CourseVideoId, courseList) => {
                 getThisData: {
                     datasource: "CourseVideo",
                     attributes: [],
-                    where: { courseVideoId: CourseVideoId },
+                    where: { courseContentId: CourseVideoId },
                 },
             });
 
@@ -218,44 +218,36 @@ const VideoHeader = React.memo(({
                                 }) => (
     <Card className="border-0  bg-gradient-to-r from-blue-50 to-indigo-50 rounded-sm  shadow-md  overflow-hidden relative">
         <CardHeader className=" ">
-            {/*<div className="flex flex-wrap items-center gap-2 mb-3">*/}
-            {/*    <Badge variant="secondary" className="flex items-center gap-1">*/}
-            {/*        <Play className="h-3 w-3" />*/}
-            {/*        Video*/}
-            {/*    </Badge>*/}
-            {/*    <Badge variant="outline" className="flex items-center gap-1">*/}
-            {/*        <Clock className="h-3 w-3" />*/}
-            {/*        {formatDuration(courseContent?.courseContentDuration)}*/}
-            {/*    </Badge>*/}
-            {/*</div>*/}
-
-            <div className="flex flex-col md:flex-row md:items-center gap-4">
-                <div className="flex-1">
-                    <CardTitle className="text-xl md:text-2xl font-bold text-gray-900 leading-tight line-clamp-1">
-                        {courseVideoDetail?.courseVideoTitle || 'Loading...'}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <Play className="text-white" size={20} />
+                    </div>
+                    <CardTitle className="text-lg sm:text-xl font-semibold text-gray-800">
+                        {courseVideoDetail?.courseVideoTitle || 'Video Lesson'}
                     </CardTitle>
                 </div>
-
-                <div className="flex flex-col items-start md:items-end gap-2">
+                <div className="flex items-center gap-2">
                     {isCompleted ? (
-                        <div className="flex flex-col items-start md:items-end gap-1">
-              <span className="completed-stamp text-sm font-medium">
-                ✓ Completed
-              </span>
-                            <button
-                                onClick={onUndoComplete}
-                                className="text-xs text-muted-foreground hover:text-blue-600 hover:underline cursor-pointer transition-colors"
-                            >
-                                Undo completion
-                            </button>
-                        </div>
-                    ) : (
-                        <Button
-                            onClick={onMarkComplete}
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                            size="sm"
+                        <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={onUndoComplete}
+                            className="flex items-center gap-2 text-orange-600 border-orange-300 hover:bg-orange-50"
                         >
-                            Mark as Complete
+                            <Undo2 size={16} />
+                            <span className="hidden sm:inline">Mark as Incomplete</span>
+                            <span className="sm:hidden">Incomplete</span>
+                        </Button>
+                    ) : (
+                        <Button 
+                            size="sm" 
+                            onClick={onMarkComplete}
+                            className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                        >
+                            <CheckCircle2 size={16} />
+                            <span className="hidden sm:inline">Mark as Complete</span>
+                            <span className="sm:hidden">Complete</span>
                         </Button>
                     )}
                 </div>
@@ -521,6 +513,8 @@ function CourseVideoTutorial() {
                         )}
                     </div>
                 </div>
+
+       
 
                 {/*{notesProps.courseId && notesProps.userId && (*/}
                 {/*    <NotesModule*/}
