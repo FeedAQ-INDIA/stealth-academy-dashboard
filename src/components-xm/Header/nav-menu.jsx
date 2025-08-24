@@ -76,11 +76,11 @@ function NavigationMenuDemo({ orientation }) {
             orientation === "vertical" ? "w-full" : "flex-1 sm:flex-none"
           }
         >
-          <Link to="/explore" className="w-full block">
+          <Link to="/explore/bring-your-own-course" className="w-full block">
             <Button
               className="w-full justify-center"
               variant={
-                location.pathname.includes("explore") ? "secondary" : "ghost"
+                location.pathname.includes("bring-your-own-course") ? "secondary" : "ghost"
               }
             >
               CONTENT LIBRARY

@@ -347,34 +347,7 @@ function CourseQuiz() {
                         </div>
                     </CardHeader>
                 </Card>
-
-                {/* Navigation hints */}
-                <div className="flex justify-between items-center mt-4 px-4">
-                    {/*<div className="flex items-center gap-2 text-sm text-muted-foreground">*/}
-                    {/*    {prevContent && (*/}
-                    {/*        <div className="flex items-center gap-1">*/}
-                    {/*            <span>Previous:</span>*/}
-                    {/*            {getContentIcon(prevContent.courseTopicContentType)}*/}
-                    {/*            <span className="truncate max-w-[200px]">*/}
-                    {/*                {prevContent.courseTopicContentTitle}*/}
-                    {/*            </span>*/}
-                    {/*        </div>*/}
-                    {/*    )}*/}
-                    {/*</div>*/}
-
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        {nextContent && (
-                            <div className="flex items-center gap-1">
-                                <span>Next:</span>
-                                {getContentIcon(nextContent.courseContentType)}
-                                <span className="truncate max-w-[200px]">
-                                    {courseTopicContent?.courseContentTitle || nextContent.courseContentId}
-                                </span>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
+ 
                 <section className="mt-6">
                     <Card className="border-none shadow-sm">
                         <CardContent className="p-6">

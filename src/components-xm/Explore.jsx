@@ -145,7 +145,7 @@ export function Explore() {
                       </button>
                     )}
                     
-                    <div 
+                    {/* <div 
                       ref={scrollContainerRef}
                       className="overflow-x-auto scrollbar-hide"
                       onScroll={checkScrollPosition}
@@ -173,13 +173,11 @@ export function Explore() {
                               }}
                               aria-label={`Navigate to ${item.label}`}
                             >
-                              {/* Animated background for active state */}
-                              {isActive && (
+                               {isActive && (
                                 <div className="absolute inset-0 bg-gradient-to-r from-white to-blue-50 rounded-lg"></div>
                               )}
                               
-                              {/* Hover effect background */}
-                              <div className={`absolute inset-0 bg-gradient-to-br from-white/20 to-white/10 rounded-lg transition-opacity duration-300 ${isHovered && !isActive ? 'opacity-100' : 'opacity-0'}`}></div>
+                               <div className={`absolute inset-0 bg-gradient-to-br from-white/20 to-white/10 rounded-lg transition-opacity duration-300 ${isHovered && !isActive ? 'opacity-100' : 'opacity-0'}`}></div>
                               
                               <div className="relative z-10 flex items-center gap-1.5 sm:gap-2">
                                 <div className={`p-1 sm:p-1.5 rounded transition-all duration-300 ${
@@ -203,15 +201,14 @@ export function Explore() {
                                 </span>
                               </div>
                               
-                              {/* Animated border for active state */}
-                              {isActive && (
+                               {isActive && (
                                 <div className="absolute inset-0 rounded-lg border border-purple-300 animate-pulse-subtle"></div>
                               )}
                             </button>
                           );
                         })}
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </CardContent>
               </Card>
