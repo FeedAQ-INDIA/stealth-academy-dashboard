@@ -256,6 +256,13 @@ function CourseSidebar() {
                 isActive:
                   location.pathname === `/course/${courseList?.courseId}`,
               },
+              {
+                title: "COURSE NOTES",
+                url: `/course/${courseList?.courseId}/notes`,
+                isClickable: true,
+                isActive:
+                  location.pathname === `/course/${courseList?.courseId}/notes`,
+              },
               ...(courseList?.courseContent?.map((m) => {
                 const contentUrl = `/course/${courseList?.courseId}/${
                   contentUrlMap[m?.courseContentType]

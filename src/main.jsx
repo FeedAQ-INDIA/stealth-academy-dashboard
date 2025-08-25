@@ -57,6 +57,7 @@ import EmailWritingSkillsSession from "./components-xm/LangStudio/SkillSession/E
 import WritingSkillsSession from "./components-xm/LangStudio/SkillSession/WritingSkillsSession.jsx";
 import { MyJourney as LangStudioMyJourney} from "./components-xm/LangStudio/MyJourney.jsx";
 import CourseCertificate from "./components-xm/Course/CourseCertificate.jsx";
+import CourseNotes from "./components-xm/Course/CourseNotes.jsx";
 
 const router = createBrowserRouter([
   // {
@@ -176,6 +177,10 @@ const router = createBrowserRouter([
           {
             path: "/course/:CourseId",
             element: <CourseOverview />,
+          },
+          {
+            path: "/course/:CourseId/notes",
+            element: <CourseNotes />,
           },
           {
             path: "/course/:CourseId/schedule",
