@@ -315,7 +315,7 @@ function CourseSidebar() {
 
   return (
     <Sidebar
-      className="top-[4rem] h-[calc(100svh-4em)] shadow-lg px-0 border-r"
+      className="top-[3.5rem] h-[calc(100svh-3.5em)] shadow-lg px-0 border-r"
       style={{ borderRadius: "0px", overflowY: "auto" }}
     >
       {isScrolling && (

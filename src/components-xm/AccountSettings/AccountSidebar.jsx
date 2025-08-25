@@ -63,12 +63,12 @@ function AccountSidebar({...props}) {
                         isActive: location.pathname?.includes('/account-settings/orders'),
                         icon: ShoppingBag,
                     },
-                    {
-                        title: "Notifications",
-                        url: `/account-settings/notifications`,
-                        isActive: location.pathname === '/account-settings/notifications',
-                        icon: Bell,
-                    },
+                    // {
+                    //     title: "Notifications",
+                    //     url: `/account-settings/notifications`,
+                    //     isActive: location.pathname === '/account-settings/notifications',
+                    //     icon: Bell,
+                    // },
                 ],
             },
             {
