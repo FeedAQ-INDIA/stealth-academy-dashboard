@@ -100,7 +100,7 @@ export function Explore() {
             
             {/* Hero Section with Enhanced Gradient */}
             <div className="relative overflow-hidden">
-              <Card className="w-full rounded-2xl border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 text-white shadow-2xl backdrop-blur-sm">
+              <Card className="w-full rounded-xl border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 text-white shadow-2xl  ">
                 {/* Background Pattern */}
                 <div className="absolute inset-0 opacity-20">
                   <div className="absolute inset-0" style={{

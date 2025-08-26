@@ -20,11 +20,11 @@ export function CourseCard({ course, viewMode = 'grid' }) {
                             className="w-32 h-24 object-cover rounded-lg"
                             alt={course.courseTitle}
                         />
-                        <div className="absolute top-1 right-1">
+                     {course.enrollments && <div className="absolute top-1 right-1">
                             <Badge variant="secondary" className="text-xs">
-                                {course.enrollmentStatus}
+                                {course.enrollments?.[0]?.enrollmentStatus || "URS"}CVSF
                             </Badge>
-                        </div>
+                        </div>}
                     </div>
 
                     {/* Content */}
@@ -99,11 +99,11 @@ export function CourseCard({ course, viewMode = 'grid' }) {
                         className="w-full h-40 object-cover rounded-lg"
                         alt={course.courseTitle}
                     />
-                    <div className="absolute top-2 right-2">
+                    {course.enrollments &&  <div className="absolute top-2 right-2">
                         <Badge variant="secondary">
-                            {course.enrollmentStatus}
+                            {course.enrollments[0]?.enrollmentStatus || "URS"}
                         </Badge>
-                    </div>
+                    </div>}
                 </div>
 
                 <CardTitle className="text-md font-semibold line-clamp-2">

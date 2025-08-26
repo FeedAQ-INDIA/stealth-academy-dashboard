@@ -87,6 +87,14 @@ export function BringYourOwnCourse() {
           },
           required: true,
         },
+        {
+          datasource: "UserCourseEnrollment",
+          as: "enrollments",
+          where: {
+            userId: userDetail.id,
+          },
+          required: false,
+        },
       ],
     },
   });
@@ -241,6 +249,14 @@ export function BringYourOwnCourse() {
           },
           required: true,
         },
+         {
+          datasource: "UserCourseEnrollment",
+          as: "enrollments",
+          where: {
+            userId: userDetail.id,
+          },
+          required: false,
+        },
       ],
       },
     });
@@ -274,10 +290,9 @@ export function BringYourOwnCourse() {
       {/* </div> */}
 
       {/* Search and Filters */}
-      <Card className="border-0 shadow-sm">
+      {/* <Card className="border-0 shadow-sm">
         <CardContent className="p-4">
           <div className="flex flex-col lg:flex-row gap-4 items-center">
-            {/* Search */}
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
@@ -291,7 +306,6 @@ export function BringYourOwnCourse() {
               />
             </div>
 
-            {/* Filters */}
             <div className="flex gap-2 items-center">
               <Select value={filterBy} onValueChange={handleFilterChange}>
                 <SelectTrigger className="w-32">
@@ -318,7 +332,6 @@ export function BringYourOwnCourse() {
                 </SelectContent>
               </Select>
 
-              {/* View Mode Toggle */}
               <div className="flex border rounded-lg p-1">
                 <Button
                   variant={viewMode === 'grid' ? 'default' : 'ghost'}
@@ -340,7 +353,7 @@ export function BringYourOwnCourse() {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Content */}
       <div className="min-h-[400px] mt-6">
