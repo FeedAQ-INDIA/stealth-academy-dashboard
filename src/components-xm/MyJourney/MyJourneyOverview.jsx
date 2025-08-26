@@ -3,6 +3,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { BookOpen, TrendingUp } from "lucide-react";
 import React from "react";
 
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu"
+import { Link } from "react-router-dom";
+
+
 export default function MyJourneyOverview() {
   const journeyData = {
     totalCourses: 5,
@@ -19,6 +31,8 @@ export default function MyJourneyOverview() {
   return (
     <Card className="border-2 border-dashed border-gray-200">
       <CardContent className="text-center py-16">
+ 
+
         <div className="w-20 h-20 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <BookOpen className="w-10 h-10 text-orange-500" />
         </div>

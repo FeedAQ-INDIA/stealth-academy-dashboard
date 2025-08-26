@@ -80,13 +80,16 @@ function NavigationMenuDemo({ orientation }) {
             <Button
               className="w-full justify-center"
               variant={
-                location.pathname == ("/explore/bring-your-own-course") ? "secondary" : "ghost"
+                location.pathname == "/explore/bring-your-own-course"
+                  ? "secondary"
+                  : "ghost"
               }
             >
               CONTENT LIBRARY
             </Button>
           </Link>
         </NavigationMenuItem>
+
 
         {/* <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : 'flex-1 sm:flex-none'}>
                     <Link to="/explore" className="w-full block">
@@ -124,7 +127,7 @@ function NavigationMenuDemo({ orientation }) {
             <Button
               className="w-full justify-center px-2"
               variant={
-                location.pathname === ("/bring-your-own-course")
+                location.pathname === "/bring-your-own-course"
                   ? "secondary"
                   : "ghost"
               }
