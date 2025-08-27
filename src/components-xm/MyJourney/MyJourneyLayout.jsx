@@ -92,13 +92,13 @@ export function MyLearningLayout() {
 
   // Navigation items for tabs
   const navigationItems = [
-    {
-      id: "overview",
-      label: "OVERVIEW",
-      icon: GraduationCap,
-      path: "/my-journey",
-      description: "Track your enrolled courses and progress",
-    },
+    // {
+    //   id: "overview",
+    //   label: "OVERVIEW",
+    //   icon: GraduationCap,
+    //   path: "/my-journey",
+    //   description: "Track your enrolled courses and progress",
+    // },
     {
       id: "courses",
       label: "MY COURSES",

@@ -53,28 +53,13 @@ function SignInPage() {
                 <Card className="w-full p-4 sm:p-8 rounded-md shadow-3xl  border-none md:border ">
                     <CardHeader>
                         <CardTitle className="mb-4 text-center">
-                            <a
-                                className="text-2xl sm:text-3xl font-medium text-black"
-                                href="#"
-                                style={{ fontFamily: "Anta" }}
-                            >
-                                Fee
-                                <span className="text-[#ffdd00]">d</span>AQ{" "}
-                                <span
-                                    className="font-normal"
-                                    style={{
-                                        fontFamily: [
-                                            "Lucida Sans",
-                                            "Lucida Sans Regular",
-                                            "Lucida Grande",
-                                            "Lucida Sans Unicode",
-                                            "Geneva",
-                                        ],
-                                    }}
-                                >
-          Academy
-        </span>
-                            </a>                        </CardTitle>
+                           <a
+          className="text-2xl sm:text-3xl font-medium text-black"
+          href="/dashboard"
+          style={{ fontFamily: "Anta" }}
+        >
+          STEALTH
+        </a>                     </CardTitle>
                     </CardHeader>
 
                     <CardContent>

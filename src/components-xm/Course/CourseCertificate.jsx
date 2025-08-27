@@ -502,7 +502,7 @@ const CourseCertificate = ({ courseTitle, userName, date }) => {
                 <Button
                   size="sm"
                   onClick={saveUserEnrollmentData}
-                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700 mx-auto text-white"
                 >
                   <CheckCircle2 size={16} />
                   Complete Now
@@ -514,7 +514,7 @@ const CourseCertificate = ({ courseTitle, userName, date }) => {
           <Card 
             ref={certificateRef}
             data-certificate="true"
-            className={`certificate-container w-full max-w-4xl mx-auto my-12 bg-white shadow-2xl transition-all duration-300 overflow-hidden ${
+            className={`certificate-container w-full max-w-4xl mx-auto my-8 bg-white shadow-2xl transition-all duration-300 overflow-hidden ${
               !isCompleted ? 'blur-sm' : ''
             }`}
             style={{ 

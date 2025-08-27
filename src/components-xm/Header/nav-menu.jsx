@@ -107,7 +107,7 @@ function NavigationMenuDemo({ orientation }) {
             orientation === "vertical" ? "w-full" : "flex-1 sm:flex-none"
           }
         >
-          <Link to="/my-journey" className="w-full block">
+          <Link to="/my-journey/courses" className="w-full block">
             <Button
               className="w-full justify-center  px-2"
               variant={
