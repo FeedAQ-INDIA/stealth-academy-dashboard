@@ -52,7 +52,7 @@ function AccountSidebar({...props}) {
                     //     icon: Shield,
                     // },
                     {
-                        title: "Billing",
+                        title: "Credit & Billing",
                         url: `/account-settings/billing`,
                         isActive: location.pathname?.includes('/account-settings/billing'),
                         icon: CreditCard,

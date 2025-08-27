@@ -411,7 +411,7 @@ function CourseVideoTutorial() {
 
   const handleGetCurrentTime = () => {
     const time = playerRef.current?.getCurrentTime();
-    console.log("Current time:", time);
+    return time ;
   };
 
   // useEffect(() => {
@@ -591,6 +591,7 @@ function CourseVideoTutorial() {
                 handleNotesSave={handleNotesSave}
                 courseId={notesProps.courseId}
                 courseContentId={notesProps.courseContentId}
+                handleGetCurrentTime={handleGetCurrentTime}
               />
             )}
 
