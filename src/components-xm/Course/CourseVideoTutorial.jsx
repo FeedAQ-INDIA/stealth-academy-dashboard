@@ -578,8 +578,7 @@ function CourseVideoTutorial() {
 
               </div>
             </Card>
-      <Button onClick={handleGetCurrentTime}>Get Current Time</Button>
-
+ 
             <VideoDescription
               description={courseVideoDetail?.courseVideoDescription}
             />

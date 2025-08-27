@@ -425,7 +425,7 @@ function CourseOverview() {
 
         {/* Phone Number Alert */}
         {!userDetail?.number && (
-          <section className="my-6 animate-slide-in">
+          <section className="my-4 animate-slide-in">
             <Alert
               variant="destructive"
               className="border-red-200 bg-red-50 rounded-sm"
@@ -457,7 +457,7 @@ function CourseOverview() {
         )}
 
         {/* Description Section */}
-        <section className="my-8 animate-slide-in">
+        <section className="my-4 animate-slide-in">
           <Card className="border-0 bg-white shadow-md hover:shadow-lg transition-all duration-300 rounded-sm">
             <CardHeader className="pb-3">
               <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
@@ -476,7 +476,7 @@ function CourseOverview() {
         </section>
 
         {/* Course Structure */}
-        <section className="my-8 animate-slide-in">
+        <section className="my-4 animate-slide-in">
           <Card className="border-0 bg-white shadow-md hover:shadow-lg transition-all duration-300 rounded-sm">
             <CardHeader className="pb-3">
               <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
