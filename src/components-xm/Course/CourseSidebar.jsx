@@ -42,7 +42,14 @@ import {
 function CourseSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { CourseId, CourseVideoId, CourseDocId, CourseQuizId, CourseFlashcardId, CourseCertificateId } = useParams();
+  const {
+    CourseId,
+    CourseVideoId,
+    CourseDocId,
+    CourseQuizId,
+    CourseFlashcardId,
+    CourseCertificateId,
+  } = useParams();
 
   const [data, setData] = useState(null);
   const activeItemRef = useRef(null);
@@ -234,16 +241,16 @@ function CourseSidebar() {
 
   useEffect(() => {
     if (courseList && location.pathname) {
-        console.log("CourseSidebar: Updating sidebar data", {
-          pathname: location.pathname,
-          CourseVideoId,
-          CourseCertificateId,
-          CourseDocId,
-          CourseQuizId,
-          CourseFlashcardId,
-          courseContent: courseList?.courseContent,
-        });      
-        setData({
+      console.log("CourseSidebar: Updating sidebar data", {
+        pathname: location.pathname,
+        CourseVideoId,
+        CourseCertificateId,
+        CourseDocId,
+        CourseQuizId,
+        CourseFlashcardId,
+        courseContent: courseList?.courseContent,
+      });
+      setData({
         navMain: [
           {
             title: "",
@@ -552,6 +559,11 @@ function CourseSidebar() {
                         >
                           <Link to={item?.url} className="w-full">
                             <div className="flex items-center gap-2 w-full">
+                              <Avatar className="border shadow-md">
+                                <AvatarFallback>
+                                  {identifyContentTypeIcons(item?.title)}
+                                </AvatarFallback>
+                              </Avatar>
                               <div
                                 className={`flex-1 text-left ${
                                   isActive

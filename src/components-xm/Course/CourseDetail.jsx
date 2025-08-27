@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { useAuthStore } from "@/zustland/store.js";
 import { useCourseState } from "@/hooks/useCourseState";
 import { CourseContext } from "./CourseContext.jsx";
-import { Video, Book, HelpCircle, Zap, Award } from "lucide-react";
+import { Video, Book, HelpCircle, Zap, Award, Notebook, Info } from "lucide-react";
 import { CourseLoadingSkeleton } from "@/components/CourseLoadingSkeleton";
 import CourseSidebar from "@/components-xm/Course/CourseSidebar.jsx";
 
@@ -36,11 +36,13 @@ export function CourseDetail() {
     }, [CourseId, userDetail?.userId, fetchCourseDetail, fetchUserCourseContentProgress, fetchUserCourseEnrollment]);
 
     const identifyContentTypeIcons = (type) => {
-        if(type === 'CourseVideo') return <Video/>;
-        else if(type === 'CourseWritten') return <Book />;
-        else if(type === 'CourseQuiz') return <HelpCircle />;
-        else if(type === 'CourseFlashcard') return <Zap />;
-        else if(type === 'CourseCertificate') return <Award />;
+        if(type === 'CourseVideo') return <Video  size={20}/>;
+        else if(type === 'CourseWritten') return <Book  size={20}/>;
+        else if(type === 'CourseQuiz') return <HelpCircle  size={20}/>;
+        else if(type === 'CourseFlashcard') return <Zap  size={20}/>;
+        else if(type === 'CourseCertificate') return <Award  size={20}/>;
+        else if(type === 'OVERVIEW') return <Info  size={20}/>;
+        else if(type === 'COURSE NOTES') return <Notebook  size={20}/>;
         return null;
     }
 
