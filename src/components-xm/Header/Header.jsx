@@ -80,8 +80,8 @@ export default function Header() {
           {/*<Button variant="secondary">*/}
           {/*    {userDetail?.nameInitial}*/}
           {/*</Button> */}
-          <Avatar className="w-10 h-10   bg-orange-400   shadow-sm hover:shadow-xl">
-            <AvatarFallback className="text-lg sm:text-lg  bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold">
+          <Avatar className="w-10 h-10   shadow-sm hover:shadow-xl">
+            <AvatarFallback className="text-lg sm:text-lg  bg-black text-white font-bold">
               {userDetail?.nameInitial}
             </AvatarFallback>
           </Avatar>

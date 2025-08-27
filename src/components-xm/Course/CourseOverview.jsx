@@ -44,6 +44,9 @@ function CourseOverview() {
     const [expandedTopics, setExpandedTopics] = useState(new Set());
     const [enrollmentLoading, setEnrollmentLoading] = useState(false);
 
+        // Unenroll (disroll) state
+        const [unenrollLoading, setUnenrollLoading] = useState(false);
+
 
 
     useEffect(() => {
@@ -124,6 +127,48 @@ function CourseOverview() {
             setEnrollmentLoading(false);
         }
     };
+
+        // Unenroll (disroll) user from course
+        const handleUnenroll = async () => {
+            if (!userDetail?.userId || !CourseId) {
+                toast({
+                    title: "Error",
+                    description: "User or course information is missing",
+                    variant: "destructive",
+                });
+                return;
+            }
+            setUnenrollLoading(true);
+            try {
+                const response = await axiosConn.post(
+                    import.meta.env.VITE_API_URL + "/userCourseDisrollment",
+                    {
+                        courseId: CourseId
+                    }
+                );
+                if (response.data.status === 200) {
+                    toast({
+                        title: "Success",
+                        description: "Successfully unenrolled from the course!",
+                        variant: "default",
+                    });
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    throw new Error(response.data.message || "Unenrollment failed");
+                }
+            } catch (error) {
+                console.error("Unenrollment error:", error);
+                toast({
+                    title: "Unenrollment Failed",
+                    description: error.response?.data?.message || error.message || "Failed to unenroll from the course",
+                    variant: "destructive",
+                });
+            } finally {
+                setUnenrollLoading(false);
+            }
+        };
 
     // Calculate progress
     const calculateProgress = () => {
@@ -257,7 +302,7 @@ function CourseOverview() {
                              </div>
 
                             <div className="flex flex-col items-center gap-2">
-                                    {/* Show status badge only when user is enrolled */}
+                                {/* Show status badge only when user is enrolled */}
                                     {enrollmentInfo.status !== 'NOT_ENROLLED' && (
                                         <div className="text-center">
                                             <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm ${
@@ -298,6 +343,8 @@ function CourseOverview() {
                                             )}
                                         </Button>
                                     )}
+
+                                   
                             </div>
                         </div>
                     </CardHeader>
@@ -429,6 +476,26 @@ function CourseOverview() {
                     </Card>
                 </section>
 
+
+                <div className="flex justify-end my-4">
+
+                  {enrollmentInfo.status !== 'NOT_ENROLLED'   ? (
+                                                    <Button
+                                                        onClick={handleUnenroll}
+                                                        disabled={unenrollLoading}
+                                                        className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed  "
+                                                    >
+                                                        {unenrollLoading ? (
+                                                            <>
+                                                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                                                Leaving Course...
+                                                            </>
+                                                        ) : (
+                                                            'LEAVE COURSE'
+                                                        )}
+                                                    </Button>
+                                                ) : null}
+</div>
 
             </div>
 
