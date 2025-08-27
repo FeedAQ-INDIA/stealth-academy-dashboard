@@ -1,6 +1,16 @@
-import {useEffect, useRef, useState} from "react";
+import { Button } from "@/components/ui/button";
+import {useEffect, useRef, useState, forwardRef, useImperativeHandle} from "react";
 
-const YouTubePlayer = ({ videoUrl, playerId = "player", playerRefresh, saveUserEnrollmentData }) => {
+const YouTubePlayer = forwardRef(({ videoUrl, playerId = "player", playerRefresh, saveUserEnrollmentData }, ref) => {
+    // Expose getCurrentTime to parent via ref
+    useImperativeHandle(ref, () => ({
+        getCurrentTime: () => {
+            if (playerRef.current && typeof playerRef.current.getCurrentTime === "function") {
+                return playerRef.current.getCurrentTime();
+            }
+            return null;
+        }
+    }), []);
     const playerRef = useRef(null);
     const intervalRef = useRef(null);
     const watchedRef = useRef(false);
@@ -18,11 +28,15 @@ const YouTubePlayer = ({ videoUrl, playerId = "player", playerRefresh, saveUserE
         }
     },[videoUrl])
 
-    // Initialize the YouTube Player
-    useEffect(() => {
-        if(videoId) {
-            const initializePlayer = () => {
-                if (!playerRef.current) {
+        // Initialize or re-initialize the YouTube Player when videoId changes
+        useEffect(() => {
+            if (videoId) {
+                const initializePlayer = () => {
+                    // Destroy previous player if exists
+                    if (playerRef.current && playerRef.current.destroy) {
+                        playerRef.current.destroy();
+                        playerRef.current = null;
+                    }
                     playerRef.current = new window.YT.Player(playerId, {
                         videoId,
                         events: {
@@ -36,29 +50,28 @@ const YouTubePlayer = ({ videoUrl, playerId = "player", playerRefresh, saveUserE
                             showinfo: 0,
                         },
                     });
-                }
-            };
+                };
 
-            if (!window.YT) {
-                const tag = document.createElement("script");
-                tag.src = "https://www.youtube.com/iframe_api";
-                document.body.appendChild(tag);
-                window.onYouTubeIframeAPIReady = initializePlayer;
-            } else if (window.YT && window.YT.Player) {
-                initializePlayer();
+                if (!window.YT) {
+                    const tag = document.createElement("script");
+                    tag.src = "https://www.youtube.com/iframe_api";
+                    document.body.appendChild(tag);
+                    window.onYouTubeIframeAPIReady = initializePlayer;
+                } else if (window.YT && window.YT.Player) {
+                    initializePlayer();
+                }
+
+                return () => {
+                    clearInterval(intervalRef.current);
+                    if (playerRef.current?.destroy) {
+                        playerRef.current.destroy();
+                        playerRef.current = null;
+                    }
+                };
+            } else {
+                console.log("YouTubePlayer :: VideoId is invalid");
             }
-
-            return () => {
-                clearInterval(intervalRef.current);
-                if (playerRef.current?.destroy) {
-                    playerRef.current.destroy();
-                    playerRef.current = null;
-                }
-            };
-        }else{
-            console.log("YouTubePlayer :: VideoId is invalid");
-        }
-    }, [playerId]);
+        }, [videoId, playerId]);
 
     // Load new video if videoId changes
     useEffect(() => {
@@ -98,11 +111,13 @@ const YouTubePlayer = ({ videoUrl, playerId = "player", playerRefresh, saveUserE
     };
 
     return (
+        <>
         <div
             id={playerId}
             className="w-full h-full shadow-md aspect-video"
         />
+        </>
     );
-};
+});
 
 export default YouTubePlayer;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useRef, useEffect, useState, useMemo, useCallback } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { SidebarTrigger } from "@/components/ui/sidebar.jsx";
 import { Separator } from "@/components/ui/separator.jsx";
@@ -407,6 +407,13 @@ function CourseVideoTutorial() {
     courseVideoDetail
   );
 
+      const playerRef = useRef();
+
+  const handleGetCurrentTime = () => {
+    const time = playerRef.current?.getCurrentTime();
+    console.log("Current time:", time);
+  };
+
   // useEffect(() => {
   //     if(courseVideoDetail){
   //         loadYoutubePlayerComponent(courseVideoDetail);
@@ -536,6 +543,8 @@ function CourseVideoTutorial() {
     );
   }
 
+
+
   return (
     <div className="min-h-screen ">
       <NavigationHeader
@@ -560,13 +569,16 @@ function CourseVideoTutorial() {
             <Card className="border-0 shadow-md overflow-hidden">
               <div className="aspect-video bg-black rounded-lg overflow-hidden">
                 <YouTubePlayer
+                 ref={playerRef}
                   saveUserCourseContentProgress={saveUserCourseContentProgress}
                   playerRefresh={playerRefresh}
                   videoUrl={courseVideoDetail?.courseVideoUrl}
                   playerId={`player-${courseVideoDetail?.courseVideoId}`}
                 />
+
               </div>
             </Card>
+      <Button onClick={handleGetCurrentTime}>Get Current Time</Button>
 
             <VideoDescription
               description={courseVideoDetail?.courseVideoDescription}
