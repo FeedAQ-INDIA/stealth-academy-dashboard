@@ -4,6 +4,7 @@ import {
   CardContent,
   CardTitle,
   CardDescription,
+  CardFooter,
 } from "@/components/ui/card.jsx";
 import React, { useState, useEffect } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -339,11 +340,7 @@ function BillingOverview() {
                 <TrendingUp className="w-5 h-5" />
                Credit Usage - Expense
               </CardTitle>   
-              <CardDescription className=" ">
-                  You've used {creditsUsedThisMonth} credits this month.{" "}
-                  {1000 - creditsUsedThisMonth} credits remaining for optimal
-                  usage.
-                </CardDescription>
+           
           </CardHeader>
           <CardContent>
             {dailyExpense && dailyExpense.length > 0 ? (
@@ -360,6 +357,13 @@ function BillingOverview() {
               <div className="text-gray-500 text-center py-8">No expense data for this month.</div>
             )}
           </CardContent>
+
+             <CardFooter className=" ">
+                <CardDescription className="text-center mx-auto">
+                  You've used {creditsUsedThisMonth} credits this month.{" "}
+                  {currentCredits} credits remaining for optimal
+                  usage.</CardDescription>
+                </CardFooter>
         </Card>
 
         <BillingHistory />

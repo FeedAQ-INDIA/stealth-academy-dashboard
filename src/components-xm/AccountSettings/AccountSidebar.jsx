@@ -57,12 +57,12 @@ function AccountSidebar({...props}) {
                         isActive: location.pathname?.includes('/account-settings/billing'),
                         icon: CreditCard,
                     },
-                    {
-                        title: "Orders",
-                        url: `/account-settings/orders`,
-                        isActive: location.pathname?.includes('/account-settings/orders'),
-                        icon: ShoppingBag,
-                    },
+                    // {
+                    //     title: "Orders",
+                    //     url: `/account-settings/orders`,
+                    //     isActive: location.pathname?.includes('/account-settings/orders'),
+                    //     icon: ShoppingBag,
+                    // },
                     // {
                     //     title: "Notifications",
                     //     url: `/account-settings/notifications`,

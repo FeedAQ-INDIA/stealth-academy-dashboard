@@ -313,7 +313,7 @@ function BillingHistory() {
                         </TableRow>
                       ))}
                     </TableBody>
-                    <TableFooter className="w-full">
+                    <TableFooter className="w-full bg-white">
                       <TableRow>
                         <TableCell colSpan={7} className="p-0 border-0">
                           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full px-4 py-3">
