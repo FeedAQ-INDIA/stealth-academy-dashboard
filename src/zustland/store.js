@@ -27,7 +27,7 @@ export const useAuthStore = create((set) => ({
 
 export const useCreditStore = create((set, get) => ({
     // Credit balance and info
-    currentCredits: 1250,
+    currentCredits: 0,
     totalCreditsEverPurchased: 5000,
     creditsUsedThisMonth: 350,
     creditsExpiringSoon: 200,
@@ -84,12 +84,12 @@ export const useCreditStore = create((set, get) => ({
         set({ loading: true });
         try {
             // Replace with your actual API endpoint
-            const res = await axiosConn.post(import.meta.env.VITE_API_URL+"/getUserCredits", {});
+            const res = await axiosConn.post(import.meta.env.VITE_API_URL+"/getUser", {});
             set({ 
-                currentCredits: res.data?.data?.currentCredits || 0,
-                totalCreditsEverPurchased: res.data?.data?.totalPurchased || 0,
-                creditsUsedThisMonth: res.data?.data?.usedThisMonth || 0,
-                creditsExpiringSoon: res.data?.data?.expiringSoon || 0,
+                currentCredits: res.data?.data?.data?.creditBalance || 0,
+                totalCreditsEverPurchased: res.data?.data?.data?.totalPurchased || 0,
+                creditsUsedThisMonth: res.data?.data?.data?.usedThisMonth || 0,
+                creditsExpiringSoon: res.data?.data?.data?.expiringSoon || 0,
                 loading: false 
             });
         } catch (error) {

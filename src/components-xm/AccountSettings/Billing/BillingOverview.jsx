@@ -116,12 +116,16 @@ function BillingOverview() {
         }
     };
 
+    useEffect(() => {
+        const fetchData = async () => {
+            await fetchCreditBalance();
+            console.log(currentCredits);
+        };
+        fetchData();
+    }, [fetchCreditBalance]);
+
     return (
         <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-  
-
-            
-
                 <div className="space-y-8">
                     {/* Credit Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
