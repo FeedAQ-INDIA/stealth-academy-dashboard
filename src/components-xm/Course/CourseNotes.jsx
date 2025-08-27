@@ -81,6 +81,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "postcss";
+import NotesCard from "../Modules/NotesCard";
 
 function CourseNotes() {
   const { userDetail } = useAuthStore();
@@ -306,198 +307,199 @@ function CourseNotes() {
             {courseNotesDetail?.length > 0 ? (
               <div className="space-y-4">
                 {courseNotesDetail?.map((a, index) => (
-                  <div
-                    key={a.noteId}
-                    className="group relative space-y-2 bg-white/80 backdrop-blur-sm border border-gray-200/60 rounded-sm p-3 hover:border-violet-300/60  hover:shadow-violet-100/20 transition-all duration-300 transform hover:-translate-y-1"
-                    style={{
-                      animationDelay: `${index * 100}ms`,
-                      animation: "slideInUp 0.5s ease-out forwards",
-                    }}
-                  >
-                    <div className=" ">
-                      <div className="relative">
-                        <div className="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-violet-500 to-purple-500 rounded-full"></div>
-                        <p className="ml-2 text-black leading-relaxed whitespace-pre-wrap break-words text-base font-bold">
-                          {a?.courseContent?.courseContentTitle}
-                        </p>
-                      </div>
-                    </div>
+                  <NotesCard a={a} index={index} fetchCourseNotes={fetchCourseNotes} />
+                  // <div
+                  //   key={a.noteId}
+                  //   className="group relative space-y-2 bg-white/80 backdrop-blur-sm border border-gray-200/60 rounded-sm p-3 hover:border-violet-300/60  hover:shadow-violet-100/20 transition-all duration-300 transform hover:-translate-y-1"
+                  //   style={{
+                  //     animationDelay: `${index * 100}ms`,
+                  //     animation: "slideInUp 0.5s ease-out forwards",
+                  //   }}
+                  // >
+                  //   <div className=" ">
+                  //     <div className="relative">
+                  //       <div className="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-violet-500 to-purple-500 rounded-full"></div>
+                  //       <p className="ml-2 text-black leading-relaxed whitespace-pre-wrap break-words text-base font-bold">
+                  //         {a?.courseContent?.courseContentTitle}
+                  //       </p>
+                  //     </div>
+                  //   </div>
 
-                    {/* Note Header */}
-                    <div className="flex items-center justify-between  ">
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Calendar className="h-4 w-4 text-violet-500" />
-                        <span className="font-medium">{a?.v_created_date}</span>
-                        <Clock className="h-4 w-4 text-violet-500 ml-2" />
-                        <span>{a?.v_created_time}</span>
-                        {a.v_note_ref_timestamp && (
-                          <>
-                            <Clock className="h-4 w-4 text-violet-500 ml-2" />
-                            <span>{a?.v_note_ref_timestamp}</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
+                  //   {/* Note Header */}
+                  //   <div className="flex items-center justify-between  ">
+                  //     <div className="flex items-center gap-2 text-sm text-gray-500">
+                  //       <Calendar className="h-4 w-4 text-violet-500" />
+                  //       <span className="font-medium">{a?.v_created_date}</span>
+                  //       <Clock className="h-4 w-4 text-violet-500 ml-2" />
+                  //       <span>{a?.v_created_time}</span>
+                  //       {a.v_note_ref_timestamp && (
+                  //         <>
+                  //           <Clock className="h-4 w-4 text-violet-500 ml-2" />
+                  //           <span>{a?.v_note_ref_timestamp}</span>
+                  //         </>
+                  //       )}
+                  //     </div>
+                  //   </div>
 
-                    {/* Note Content */}
+                  //   {/* Note Content */}
 
-                    <div className="mb-3">
-                      <div className="relative">
-                        <div className="absolute left-0 top-0 w-0.5 h-full bg-gradient-to-b from-gray-100 to-gray-100 rounded-full"></div>
-                        <p className="ml-2 text-black-400 leading-relaxed whitespace-pre-wrap break-words text-base ">
-                          {a?.noteContent}
-                        </p>
-                      </div>
-                    </div>
+                  //   <div className="mb-3">
+                  //     <div className="relative">
+                  //       <div className="absolute left-0 top-0 w-0.5 h-full bg-gradient-to-b from-gray-100 to-gray-100 rounded-full"></div>
+                  //       <p className="ml-2 text-black-400 leading-relaxed whitespace-pre-wrap break-words text-base ">
+                  //         {a?.noteContent}
+                  //       </p>
+                  //     </div>
+                  //   </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex gap-3 pt-3 border-t border-gray-100">
-                      <Dialog
-                        open={editDialogOpen}
-                        onOpenChange={setEditDialogOpen}
-                      >
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              editNotesForm.reset({
-                                id: a?.noteId,
-                                noteContent: a?.noteContent,
-                              });
-                            }}
-                            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-colors duration-200"
-                          >
-                            <Edit3 className="h-4 w-4" />
-                            <span className="font-medium">Edit</span>
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
-                          <DialogHeader>
-                            <DialogTitle className="flex items-center gap-2 text-xl text-blue-800">
-                              <Edit3 className="h-5 w-5 text-blue-600" />
-                              Edit Your Note
-                            </DialogTitle>
-                            <DialogDescription className="text-blue-600/70">
-                              Make changes to your note below. Click save when
-                              you're done.
-                            </DialogDescription>
-                          </DialogHeader>
+                  //   {/* Action Buttons */}
+                  //   <div className="flex gap-3 pt-3 border-t border-gray-100">
+                  //     <Dialog
+                  //       open={editDialogOpen}
+                  //       onOpenChange={setEditDialogOpen}
+                  //     >
+                  //       <DialogTrigger asChild>
+                  //         <Button
+                  //           variant="ghost"
+                  //           size="sm"
+                  //           onClick={() => {
+                  //             editNotesForm.reset({
+                  //               id: a?.noteId,
+                  //               noteContent: a?.noteContent,
+                  //             });
+                  //           }}
+                  //           className="flex items-center gap-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-colors duration-200"
+                  //         >
+                  //           <Edit3 className="h-4 w-4" />
+                  //           <span className="font-medium">Edit</span>
+                  //         </Button>
+                  //       </DialogTrigger>
+                  //       <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+                  //         <DialogHeader>
+                  //           <DialogTitle className="flex items-center gap-2 text-xl text-blue-800">
+                  //             <Edit3 className="h-5 w-5 text-blue-600" />
+                  //             Edit Your Note
+                  //           </DialogTitle>
+                  //           <DialogDescription className="text-blue-600/70">
+                  //             Make changes to your note below. Click save when
+                  //             you're done.
+                  //           </DialogDescription>
+                  //         </DialogHeader>
 
-                          <Form {...editNotesForm}>
-                            <form
-                              onSubmit={editNotesForm.handleSubmit(
-                                onCommentUpdate,
-                                (errors) => {
-                                  console.error(
-                                    "Form validation errors:",
-                                    errors
-                                  );
-                                }
-                              )}
-                              className="w-full space-y-6"
-                            >
-                              <div>
-                                <FormField
-                                  control={editNotesForm.control}
-                                  name="noteContent"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormControl>
-                                        <Textarea
-                                          placeholder="Type your note here..."
-                                          className="min-h-[120px] resize-none border-blue-200 focus:border-blue-400 focus:ring-blue-400/20"
-                                          {...field}
-                                        />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
+                  //         <Form {...editNotesForm}>
+                  //           <form
+                  //             onSubmit={editNotesForm.handleSubmit(
+                  //               onCommentUpdate,
+                  //               (errors) => {
+                  //                 console.error(
+                  //                   "Form validation errors:",
+                  //                   errors
+                  //                 );
+                  //               }
+                  //             )}
+                  //             className="w-full space-y-6"
+                  //           >
+                  //             <div>
+                  //               <FormField
+                  //                 control={editNotesForm.control}
+                  //                 name="noteContent"
+                  //                 render={({ field }) => (
+                  //                   <FormItem>
+                  //                     <FormControl>
+                  //                       <Textarea
+                  //                         placeholder="Type your note here..."
+                  //                         className="min-h-[120px] resize-none border-blue-200 focus:border-blue-400 focus:ring-blue-400/20"
+                  //                         {...field}
+                  //                       />
+                  //                     </FormControl>
+                  //                     <FormMessage />
+                  //                   </FormItem>
+                  //                 )}
+                  //               />
 
-                                {/* <FormField
-                                        control={editNotesForm.control}
-                                        name="id"
-                                        render={({ field }) => (
-                                          <input
-                                            type="number"
-                                            hidden
-                                            value={field.value ?? 0}
-                                            onChange={field.onChange}
-                                            name={field.name}
-                                            ref={field.ref}
-                                          />
-                                        )}
-                                      /> */}
-                              </div>
+                  //               {/* <FormField
+                  //                       control={editNotesForm.control}
+                  //                       name="id"
+                  //                       render={({ field }) => (
+                  //                         <input
+                  //                           type="number"
+                  //                           hidden
+                  //                           value={field.value ?? 0}
+                  //                           onChange={field.onChange}
+                  //                           name={field.name}
+                  //                           ref={field.ref}
+                  //                         />
+                  //                       )}
+                  //                     /> */}
+                  //             </div>
 
-                              <DialogFooter className="gap-2">
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  onClick={() => editNotesForm.reset()}
-                                  className="border-blue-200 text-blue-600 hover:bg-blue-50"
-                                >
-                                  Reset
-                                </Button>
-                                <DialogClose asChild>
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    className="border-gray-300"
-                                  >
-                                    Cancel
-                                  </Button>
-                                </DialogClose>
-                                <Button
-                                  type="submit"
-                                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                                >
-                                  Save Changes
-                                </Button>
-                              </DialogFooter>
-                            </form>
-                          </Form>
-                        </DialogContent>
-                      </Dialog>
+                  //             <DialogFooter className="gap-2">
+                  //               <Button
+                  //                 type="button"
+                  //                 variant="outline"
+                  //                 onClick={() => editNotesForm.reset()}
+                  //                 className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                  //               >
+                  //                 Reset
+                  //               </Button>
+                  //               <DialogClose asChild>
+                  //                 <Button
+                  //                   type="button"
+                  //                   variant="outline"
+                  //                   className="border-gray-300"
+                  //                 >
+                  //                   Cancel
+                  //                 </Button>
+                  //               </DialogClose>
+                  //               <Button
+                  //                 type="submit"
+                  //                 className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  //               >
+                  //                 Save Changes
+                  //               </Button>
+                  //             </DialogFooter>
+                  //           </form>
+                  //         </Form>
+                  //       </DialogContent>
+                  //     </Dialog>
 
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors duration-200"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            <span className="font-medium">Delete</span>
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="bg-gradient-to-br from-red-50 to-pink-50 border-red-200">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle className="flex items-center gap-2 text-red-800">
-                              <Trash2 className="h-5 w-5 text-red-600" />
-                              Delete Note
-                            </AlertDialogTitle>
-                            <AlertDialogDescription className="text-red-700/80">
-                              This action cannot be undone. This will
-                              permanently delete your note from our servers.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel className="border-gray-300">
-                              Cancel
-                            </AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => deleteComment(a?.noteId)}
-                              className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700"
-                            >
-                              Delete Forever
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
+                  //     <AlertDialog>
+                  //       <AlertDialogTrigger asChild>
+                  //         <Button
+                  //           variant="ghost"
+                  //           size="sm"
+                  //           className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors duration-200"
+                  //         >
+                  //           <Trash2 className="h-4 w-4" />
+                  //           <span className="font-medium">Delete</span>
+                  //         </Button>
+                  //       </AlertDialogTrigger>
+                  //       <AlertDialogContent className="bg-gradient-to-br from-red-50 to-pink-50 border-red-200">
+                  //         <AlertDialogHeader>
+                  //           <AlertDialogTitle className="flex items-center gap-2 text-red-800">
+                  //             <Trash2 className="h-5 w-5 text-red-600" />
+                  //             Delete Note
+                  //           </AlertDialogTitle>
+                  //           <AlertDialogDescription className="text-red-700/80">
+                  //             This action cannot be undone. This will
+                  //             permanently delete your note from our servers.
+                  //           </AlertDialogDescription>
+                  //         </AlertDialogHeader>
+                  //         <AlertDialogFooter>
+                  //           <AlertDialogCancel className="border-gray-300">
+                  //             Cancel
+                  //           </AlertDialogCancel>
+                  //           <AlertDialogAction
+                  //             onClick={() => deleteComment(a?.noteId)}
+                  //             className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700"
+                  //           >
+                  //             Delete Forever
+                  //           </AlertDialogAction>
+                  //         </AlertDialogFooter>
+                  //       </AlertDialogContent>
+                  //     </AlertDialog>
+                  //   </div>
+                  // </div>
                 ))}
               </div>
             ) : (

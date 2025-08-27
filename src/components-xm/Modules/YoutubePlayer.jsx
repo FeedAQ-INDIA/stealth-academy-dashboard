@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import {useEffect, useRef, useState, forwardRef, useImperativeHandle} from "react";
 
-const YouTubePlayer = forwardRef(({ videoUrl, playerId = "player", playerRefresh, saveUserEnrollmentData }, ref) => {
+const YouTubePlayer = forwardRef(({ videoUrl, playerId = "player", playerRefresh, saveUserCourseContentProgress }, ref) => {
     // Expose getCurrentTime to parent via ref
     useImperativeHandle(ref, () => ({
         getCurrentTime: () => {
@@ -96,7 +96,7 @@ const YouTubePlayer = forwardRef(({ videoUrl, playerId = "player", playerRefresh
                 if (percentage >= 90 && !watchedRef.current) {
                     watchedRef.current = true;
                     console.log(`🎯 Video (${videoId}) hit 90% watched`);
-                    saveUserEnrollmentData();
+                    saveUserCourseContentProgress();
                     clearInterval(intervalRef.current);
                 }
             }, 1000);
