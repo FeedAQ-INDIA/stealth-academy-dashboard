@@ -313,34 +313,7 @@ function CourseOverview() {
       <div className=" p-3 animate-fade-in">
         <Card className="rounded-sm bg-gradient-to-br from-blue-50 to-indigo-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
           <CardHeader className=" ">
-            {/* <div className="flex flex-wrap gap-2 w-full mb-4">
-
-                            <Badge variant="outline" className="hover:bg-gray-100 transition-colors flex items-center gap-1">
-                                <Clock className="h-3 w-3"/>
-                                {`${Math.floor(+(courseList?.courseDuration) / 60)}hr ${+(courseList?.courseDuration) % 60}min`}
-                            </Badge>
-                            {courseList?.courseSource && (
-                                <Badge variant="outline" className="hover:bg-gray-100 transition-colors">
-                                    {courseList?.courseSource}
-                                </Badge>
-                            )}
-                            {courseList?.courseLevel && (
-                                <Badge variant="outline" className="hover:bg-gray-100 transition-colors flex items-center gap-1">
-                                    <Star className="h-3 w-3"/>
-                                    {courseList?.courseLevel}
-                                </Badge>
-                            )}
-                            {courseList?.courseMode && (
-                                <Badge variant="outline" className="hover:bg-gray-100 transition-colors">
-                                    {courseList?.courseMode}
-                                </Badge>
-                            )}
-                            {courseList?.deliveryMode && (
-                                <Badge variant="outline" className="hover:bg-gray-100 transition-colors">
-                                    {courseList?.deliveryMode}
-                                </Badge>
-                            )}
-                        </div> */}
+       
 
             <div className="flex flex-col lg:flex-row gap-4 w-full items-start lg:items-center">
               <div className="flex-1">
@@ -365,7 +338,7 @@ function CourseOverview() {
                 {enrollmentInfo.status !== "NOT_ENROLLED" && (
                   <div className="text-center">
                     <div
-                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm ${
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg  font-semibold text-sm ${
                         enrollmentInfo.color === "green"
                           ? "bg-green-100 text-green-800 animate-bounce"
                           : enrollmentInfo.color === "blue"
@@ -497,21 +470,24 @@ function CourseOverview() {
                         value="item-1"
                         className="border border-gray-200 rounded-lg overflow-hidden hover:border-blue-300 transition-colors"
                       >
-                        <AccordionTrigger className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors [&>svg]:h-5 [&>svg]:w-5">
+                        <AccordionTrigger className="flex gap-3 items-center px-4 py-3 hover:bg-gray-50 transition-colors [&>svg]:h-5 [&>svg]:w-5">
                           <div className="flex items-center gap-3 flex-1">
                             <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
                               {(() => {
-                                const totalMinutes =
+                                const totalSeconds =
                                   +topic?.courseContentDuration || 0;
-                                const hours = Math.floor(totalMinutes / 60);
-                                const minutes = totalMinutes % 60;
-                                return `${String(hours).padStart(
-                                  2,
-                                  "0"
-                                )}:${String(minutes).padStart(2, "0")}`;
+                                const hours = Math.floor(totalSeconds / 3600);
+                                const minutes = Math.floor(
+                                  (totalSeconds % 3600) / 60
+                                );
+                                const seconds = totalSeconds % 60;
+                                const pad = (n) => String(n).padStart(2, "0");
+                                return `${pad(hours)}:${pad(minutes)}:${pad(
+                                  seconds
+                                )}`;
                               })()}
                             </Badge>
-                            <span className="font-semibold text-gray-800">
+                            <span className="font-semibold text-gray-800 text-left">
                               {topic?.courseContentTitle}
                             </span>
                           </div>
@@ -586,7 +562,7 @@ function CourseOverview() {
               <DialogTrigger asChild>
                 <Button
                   variant="destructive"
-                  className="hover:bg-red-600 transition-colors rounded-full px-6"
+                  className="hover:bg-red-600 transition-colors rounded-lg px-6"
                 >
                   LEAVE COURSE
                 </Button>
@@ -609,9 +585,7 @@ function CourseOverview() {
                   <Input
                     placeholder="Type course title to confirm..."
                     value={deleteConfirmation}
-                    onChange={(e) =>
-                      setDeleteConfirmation(e.target.value)
-                    }
+                    onChange={(e) => setDeleteConfirmation(e.target.value)}
                     className="rounded-lg"
                   />
                 </div>

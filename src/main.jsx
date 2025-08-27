@@ -130,7 +130,7 @@ const router = createBrowserRouter([
             element: <Security />,
           },
           {
-            path: "/account-settings/billing",
+            path: "/account-settings/credit-and-order",
             element: <Billing />,
             children: [
               {
@@ -285,7 +285,7 @@ const router = createBrowserRouter([
         path: "/lang-studio/learning-arena/email-writing/:sessionId",
         element: <EmailWritingSkillsSession />,
       },
-               {
+      {
         path: "/lang-studio/learning-arena/writing-skills/:sessionId",
         element: <WritingSkillsSession />,
       },

@@ -216,7 +216,7 @@ function BillingHistory() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Clock className="w-5 h-5" />
-                Credit Transaction History
+                Credit & Orders History
               </CardTitle>
               <Badge
                 variant="outline"

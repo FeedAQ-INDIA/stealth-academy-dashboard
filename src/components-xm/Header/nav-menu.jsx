@@ -78,7 +78,7 @@ function NavigationMenuDemo({ orientation }) {
         >
           <Link to="/explore/bring-your-own-course" className="w-full block">
             <Button
-              className="w-full justify-center"
+              className="w-full justify-center px-2"
               variant={
                 location.pathname == "/explore/bring-your-own-course"
                   ? "secondary"

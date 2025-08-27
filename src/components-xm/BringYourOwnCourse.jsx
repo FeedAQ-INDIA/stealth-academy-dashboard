@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { toast } from "@/components/hooks/use-toast.js";
 import axiosConn from "@/axioscon";
+import byoc1 from "@/assets/byoc_1.png";
 
 export default function BringYourOwnCourse() {
   const [urls, setUrls] = useState([""]);
@@ -96,8 +97,8 @@ export default function BringYourOwnCourse() {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 md:p-4">
-      <div className="bg-white mb-0 rounded-0 h-[calc(100svh-4em)] md:h-[calc(100svh-6em)] overflow-y-scroll">
+    <div className="grid grid-cols-1 md:grid-cols-5 md:p-4 gap-6">
+      <Card className="bg-white md:col-span-3 mb-0 shadow-lg rounded-lg h-[calc(100svh-4em)] md:h-[calc(100svh-6em)] overflow-y-scroll">
         <CardHeader>
           <h2 className="text-2xl font-bold">Bring Your Own Course</h2>
           <p className="text-muted-foreground mt-2">
@@ -185,9 +186,15 @@ export default function BringYourOwnCourse() {
             </Button>
           </form>
         </CardContent>
-      </div>
+      </Card>
 
-      <div></div>
+      <div className="hidden md:block bg-white md:col-span-2 mb-0 md:h-[calc(100svh-6em)] ">
+        <img
+          src={byoc1}
+          alt="Bring Your Own Course"
+          className="w-full md:h-[calc(100svh-6em)] rounded-lg shadow-lg"
+        />
+      </div>
     </div>
   );
 }

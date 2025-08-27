@@ -52,9 +52,9 @@ function AccountSidebar({...props}) {
                     //     icon: Shield,
                     // },
                     {
-                        title: "Credit & Billing",
-                        url: `/account-settings/billing`,
-                        isActive: location.pathname?.includes('/account-settings/billing'),
+                        title: "Credit & Orders",
+                        url: `/account-settings/credit-and-order`,
+                        isActive: location.pathname?.includes('/account-settings/credit-and-order'),
                         icon: CreditCard,
                     },
                     // {
