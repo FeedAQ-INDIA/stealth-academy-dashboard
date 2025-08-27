@@ -58,6 +58,9 @@ import WritingSkillsSession from "./components-xm/LangStudio/SkillSession/Writin
 import { MyJourney as LangStudioMyJourney} from "./components-xm/LangStudio/MyJourney.jsx";
 import CourseCertificate from "./components-xm/Course/CourseCertificate.jsx";
 import CourseNotes from "./components-xm/Course/CourseNotes.jsx";
+import MyAchievement from "./components-xm/MyJourney/MyAchievement.jsx";
+import MyStudyGroup from "./components-xm/MyJourney/MyStudyGroup.jsx";
+import MyLearningSchedule from "./components-xm/MyJourney/MyLearningSchedule.jsx";
 
 const router = createBrowserRouter([
   // {
@@ -225,6 +228,23 @@ const router = createBrowserRouter([
             path: "/my-journey/courses",
             element: <MyCourse />,
           },
+          {
+            path: "/my-journey/my-achievement",
+            element: <MyAchievement />,
+          },
+
+          {
+            path: "/my-journey/my-study-group",
+            element: <MyStudyGroup />,
+          },
+
+
+          {
+            path: "/my-journey/my-learning-schedule",
+            element: <MyLearningSchedule />,
+          },
+
+          
           {
             path: "/my-journey/wishlist",
             element: <MyWishlist />,

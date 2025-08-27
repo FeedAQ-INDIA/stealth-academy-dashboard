@@ -99,9 +99,9 @@ export function CourseCard({ course, viewMode = 'grid' }) {
                         className="w-full h-40 object-cover rounded-lg"
                         alt={course.courseTitle}
                     />
-                    {course.enrollments &&  <div className="absolute top-2 right-2">
+                    {course.enrollments  && course.enrollments?.length>0 &&  <div className="absolute top-2 right-2">
                         <Badge variant="secondary">
-                            {course.enrollments[0]?.enrollmentStatus || "URS"}
+                            {course.enrollments[0]?.enrollmentStatus?.replaceAll("_", " ") }
                         </Badge>
                     </div>}
                 </div>

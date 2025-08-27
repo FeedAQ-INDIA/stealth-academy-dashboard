@@ -231,6 +231,16 @@ export function MyCourse() {
         datasource: "Course",
         // order: [["courseIsLocked", "ASC"]],
         attributes: [],
+        include: [
+        {
+          datasource: "UserCourseEnrollment",
+          as: "enrollments",
+          where: {
+            userId: userDetail.id,
+          },
+          required: true,
+        },
+      ],
       },
     });
     handleSearchChange(exploreCourseText);

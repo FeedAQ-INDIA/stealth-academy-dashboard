@@ -106,13 +106,29 @@ export function MyLearningLayout() {
       path: "/my-journey/courses",
       description: "Track your enrolled courses and progress",
     },
-    // {
-    //   id: "wishlist",
-    //   label: "WISHLIST",
-    //   icon: Heart,
-    //   path: "/my-journey/wishlist",
-    //   description: "Courses you want to take later",
-    // },
+    {
+      id: "achievement",
+      label: "MY ACHIEVEMENT",
+      icon: Heart,
+      path: "/my-journey/my-achievement",
+      description: "Courses you want to take later",
+    },
+     {
+      id: "study-group",
+      label: "MY STUDY GROUP",
+      icon: Users,
+      path: "/my-journey/my-study-group",
+      description: "Collaborate with peers and enhance your learning",
+    },
+
+       {
+      id: "learning-schedule",
+      label: "MY LEARNING SCHEDULE",
+      icon: Calendar,
+      path: "/my-journey/my-learning-schedule",
+      description: "Organize your study sessions and stay on track",
+    },
+  
   ];
 
   // Check scroll position and update arrow visibility
@@ -282,12 +298,12 @@ export function MyLearningLayout() {
                                          : "text-white"
                                      }`}
                               >
-                                <span className="hidden xs:inline">
+                                <span className=" inline">
                                   {item.label}
                                 </span>
-                                <span className="xs:hidden">
+                                {/* <span className="xs:hidden">
                                   {item.label.split(" ")[0]}
-                                </span>
+                                </span> */}
                               </span>
                             </div>
 
