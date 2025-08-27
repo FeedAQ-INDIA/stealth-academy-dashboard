@@ -116,12 +116,10 @@ function Billing() {
                     Discover thousands of courses from beginner to advanced levels
                   </p> */}
                 </CardHeader>
-                
+{/*                 
                 <CardContent className="relative z-10 pb-6">
-                  {/* Mobile: Horizontal scroll with arrows, Desktop: Flex wrap */}
-                  <div className="relative">
-                    {/* Left Arrow */}
-                    {showLeftArrow && (
+                   <div className="relative">
+                     {showLeftArrow && (
                       <button
                         onClick={scrollLeft}
                         className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-purple-700 rounded-full p-1 shadow-lg transition-all duration-300 sm:hidden"
@@ -131,8 +129,7 @@ function Billing() {
                       </button>
                     )}
                     
-                    {/* Right Arrow */}
-                    {showRightArrow && (
+                     {showRightArrow && (
                       <button
                         onClick={scrollRight}
                         className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-purple-700 rounded-full p-1 shadow-lg transition-all duration-300 sm:hidden"
@@ -171,13 +168,11 @@ function Billing() {
                               }}
                               aria-label={`Navigate to ${item.label}`}
                             >
-                              {/* Animated background for active state */}
-                              {isActive && (
+                               {isActive && (
                                 <div className="absolute inset-0 bg-gradient-to-r from-white to-blue-50 rounded-lg"></div>
                               )}
                               
-                              {/* Hover effect background */}
-                              <div className={`absolute inset-0 bg-gradient-to-br from-white/20 to-white/10 rounded-lg transition-opacity duration-300 ${isHovered && !isActive ? 'opacity-100' : 'opacity-0'}`}></div>
+                               <div className={`absolute inset-0 bg-gradient-to-br from-white/20 to-white/10 rounded-lg transition-opacity duration-300 ${isHovered && !isActive ? 'opacity-100' : 'opacity-0'}`}></div>
                               
                               <div className="relative z-10 flex items-center gap-1.5 sm:gap-2">
                                 <div className={`p-1 sm:p-1.5 rounded transition-all duration-300 ${
@@ -201,8 +196,7 @@ function Billing() {
                                 </span>
                               </div>
                               
-                              {/* Animated border for active state */}
-                              {isActive && (
+                               {isActive && (
                                 <div className="absolute inset-0 rounded-lg border border-purple-300 animate-pulse-subtle"></div>
                               )}
                             </button>
@@ -211,7 +205,7 @@ function Billing() {
                       </div>
                     </div>
                   </div>
-                </CardContent>
+                </CardContent> */}
               </Card>
             </div>
 
