@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useCreditStore } from "@/zustland/store.js";
 import CreditWidget from "@/components/CreditWidget.jsx";
 import { useToast } from "@/components/hooks/use-toast.js";
+import BillingHistory from "./BillingHistory";
 
 function BillingOverview() {
     const { toast } = useToast();
@@ -126,7 +127,7 @@ function BillingOverview() {
 
     return (
         <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-                <div className="space-y-8">
+                <div className="space-y-4">
                     {/* Credit Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {/* Available Credits Card */}
@@ -252,9 +253,11 @@ function BillingOverview() {
                         </Card>
                     </div>
 
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
                     {/* Credit Widget for Quick Overview */}
                     <CreditWidget 
-                        className="mb-6"
+                        className=""
                         showBalance={true}
                         showQuickPurchase={true}
                         compact={false}
@@ -282,28 +285,12 @@ function BillingOverview() {
                         </CardContent>
                     </Card>
 
-                    {/* Quick Actions */}
-                    <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
-                        <CardHeader>
-                            <CardTitle>Quick Actions</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <Button className="h-16 flex flex-col gap-2" onClick={() => setIsPurchaseModalOpen(true)}>
-                                    <Plus className="w-5 h-5" />
-                                    Buy More Credits
-                                </Button>
-                                <Button variant="outline" className="h-16 flex flex-col gap-2">
-                                    <Download className="w-5 h-5" />
-                                    Download Report
-                                </Button>
-                                <Button variant="outline" className="h-16 flex flex-col gap-2">
-                                    <CreditCard className="w-5 h-5" />
-                                    Payment Methods
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
+
+
+                        </div>
+
+<BillingHistory/>
+        
                 </div>
 
                 {/* Purchase Confirmation Modal */}
