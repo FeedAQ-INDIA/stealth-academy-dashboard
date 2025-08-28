@@ -162,7 +162,7 @@ export function Dashboard() {
       </Card>
 
       <section className="my-4 animate-slide-in">
-        <Card className="border-0 bg-white shadow-md hover:shadow-lg transition-all duration-300 rounded-sm">
+        <Card className="border-0 shadow-md rounded-md">
           <CardHeader className=" ">
             <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2 tracking-wide">
               <BookOpen className="h-5 w-5 text-purple-600" />
@@ -175,7 +175,7 @@ export function Dashboard() {
                 {courseList?.map((course) => (
                   <Card
                     key={course.id}
-                    className="group relative overflow-hidden border shadow-md hover:shadow-2xl transition-all duration-300 p-3 bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-xl"
+                    className="hover:scale-105 group relative overflow-hidden border shadow-md hover:shadow-lg transition-all duration-300 p-3 bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-lg"
                   >
                     <CardContent className="p-0">
                       <div className="flex flex-col md:flex-row gap-4">

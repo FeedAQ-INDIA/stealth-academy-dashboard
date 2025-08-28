@@ -7,8 +7,7 @@ import {
   CardFooter,
 } from "@/components/ui/card.jsx";
 import React, { useState, useEffect } from "react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import axios from "axios";
+ import axios from "axios";
 import { Button } from "@/components/ui/button.jsx";
 import { SidebarTrigger } from "@/components/ui/sidebar.jsx";
 import { Separator } from "@/components/ui/separator.jsx";
@@ -32,6 +31,7 @@ import {
   TrendingUp,
   Clock,
   CheckCircle,
+  DollarSign,
   UserCircle,
   Shield,
   Bell,
@@ -50,11 +50,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog.jsx";
 
-import CreditWidget from "@/components/CreditWidget.jsx";
-import { useToast } from "@/components/hooks/use-toast.js";
+ import { useToast } from "@/components/hooks/use-toast.js";
 import BillingHistory from "./BillingHistory";
-
-
+  import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+ 
 function BillingOverview() {
   const { toast } = useToast();
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
@@ -70,6 +70,19 @@ function BillingOverview() {
   // Set a max credits value for progress bar (can be changed as needed)
   const maxCredits = 2000;
   const creditsProgress = Math.min((currentCredits / maxCredits) * 100, 100);
+
+
+  const chartConfig = {
+  totalExpense: {
+    label: "Daily Expense",
+    color: "hsl(var(--chart-1))",
+  },
+};
+ 
+const totalExpense = dailyExpense?.reduce((sum, day) => sum + day.totalExpense, 0);
+  const avgExpense = dailyExpense?.length > 0 ? totalExpense / dailyExpense.length : 0;
+
+
 
   // Fetch credit stats from API
   const fetchCreditStats = async () => {
@@ -333,39 +346,80 @@ function BillingOverview() {
 
    
 
-        {/* Daily Expense Graph */}
-        <Card className="mt-4 border-0 shadow-lg bg-white/80  ">
-          <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5" />
-               Credit Usage - Expense
-              </CardTitle>   
-           
-          </CardHeader>
-          <CardContent>
-            {dailyExpense && dailyExpense.length > 0 ? (
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={dailyExpense} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" tickFormatter={d => `Day ${d}`} />
-                  <YAxis />
-                  <Tooltip formatter={(value, name) => [value, name === 'totalExpense' ? 'Expense' : name]} />
-                  <Line type="monotone" dataKey="totalExpense" stroke="#6366f1" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 7 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="text-gray-500 text-center py-8">No expense data for this month.</div>
-            )}
-          </CardContent>
-
+    <Card className="border-0 shadow-lg bg-gradient-to-br from-white/90 to-blue-50/80 backdrop-blur-sm">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-slate-800 text-lg">
+            <div className="p-2 rounded-lg bg-blue-100">
+              <TrendingUp className="w-4 h-4 text-blue-600" />
+            </div>
+            Credit Usage - Expense
+          </CardTitle>
+       
+        </div>
+      </CardHeader>
+      
+      <CardContent className="pt-0">
+        {dailyExpense && dailyExpense.length > 0 ? (
+          <ChartContainer config={chartConfig} className="h-[140px] w-full">
+            <LineChart data={dailyExpense} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
+              <XAxis 
+                dataKey="day" 
+                tickFormatter={(d) => `${d}`}
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 11, fill: '#64748b' }}
+              />
+              <YAxis hide />
+              <ChartTooltip
+                content={
+                  <ChartTooltipContent
+                    formatter={(value) => [`${Number(value).toFixed(2)}`, " Credits Used"]}
+                    labelFormatter={(day) => `Day ${day}`}
+                  />
+                }
+              />
+              <Line
+                type="monotone"
+                dataKey="totalExpense"
+                stroke="var(--color-totalExpense)"
+                strokeWidth={2.5}
+                dot={{ r: 3, strokeWidth: 2, fill: "var(--color-totalExpense)" }}
+                activeDot={{ 
+                  r: 5, 
+                  strokeWidth: 2, 
+                  fill: "var(--color-totalExpense)",
+                  className: "drop-shadow-sm"
+                }}
+              />
+            </LineChart>
+          </ChartContainer>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-8 text-slate-500">
+            <TrendingUp className="w-8 h-8 mb-2 text-slate-300" />
+            <p className="text-sm font-medium">No expense data available</p>
+            <p className="text-xs text-slate-400">Data will appear once expenses are recorded</p>
+          </div>
+        )}
+        
+        {dailyExpense && dailyExpense.length > 0 && (
+          <div className="mt-2 flex items-center justify-between text-xs text-slate-600 ">
+            <span>Total: <span className="font-semibold">{totalExpense.toFixed(2)}</span></span>
+            <span>Days: <span className="font-semibold">{dailyExpense.length}</span></span>
+            <span>Peak: <span className="font-semibold">{Math.max(...dailyExpense.map(d => d.totalExpense)).toFixed(2)}</span></span>
+            <span>Avg: <span className="font-semibold">{avgExpense.toFixed(2)}</span></span>
+          </div>
+        )}
+      </CardContent>
              <CardFooter className=" ">
                 <CardDescription className="text-center mx-auto">
                   You've used {creditsUsedThisMonth} credits this month.{" "}
                   {currentCredits} credits remaining for optimal
                   usage.</CardDescription>
                 </CardFooter>
-        </Card>
+    </Card>
 
+ 
         <BillingHistory />
       </div>
 
