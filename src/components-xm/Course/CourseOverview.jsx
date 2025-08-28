@@ -432,10 +432,10 @@ function CourseOverview() {
         {/* Description Section */}
         <section className="my-4 animate-slide-in">
           <Card className="border-0 bg-white shadow-md hover:shadow-lg transition-all duration-300 rounded-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                <BookOpen className="h-6 w-6 text-blue-600" />
-                Description
+            <CardHeader className=" ">
+              <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-blue-600" />
+                <span>Description</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -451,9 +451,9 @@ function CourseOverview() {
         {/* Course Structure */}
         <section className="my-4 animate-slide-in">
           <Card className="border-0 bg-white shadow-md hover:shadow-lg transition-all duration-300 rounded-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                <Terminal className="h-6 w-6 text-purple-600" />
+            <CardHeader className=" ">
+              <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <Terminal className="h-5 w-5 text-purple-600" />
                 Course Structure
               </CardTitle>
             </CardHeader>
