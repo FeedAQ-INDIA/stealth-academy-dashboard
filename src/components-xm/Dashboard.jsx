@@ -68,7 +68,7 @@ export function Dashboard() {
           where: {
             userId: userDetail.id,
           },
-          required: true,
+          required: false,
         },
         {
           datasource: "UserCourseEnrollment",
@@ -175,7 +175,7 @@ export function Dashboard() {
                 {courseList?.map((course) => (
                   <Card
                     key={course.id}
-                    className="hover:scale-105 group relative overflow-hidden border shadow-md hover:shadow-lg transition-all duration-300 p-3 bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-lg"
+                    className=" group relative overflow-hidden border shadow-md hover:shadow-lg transition-all duration-300 p-3 bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-lg"
                   >
                     <CardContent className="p-0">
                       <div className="flex flex-col md:flex-row gap-4">
@@ -285,7 +285,7 @@ export function Dashboard() {
                               onClick={() => navigate(`/course/${course.courseId}`)}
                               aria-label={`View details for ${course.courseTitle}`}
                             >
-                              Continue Leanring
+                              Continue Learning
                             </Button>
                           </div>
                         </div>
