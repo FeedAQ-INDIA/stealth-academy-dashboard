@@ -163,7 +163,7 @@ export function Dashboard() {
 
       <section className="my-4 animate-slide-in">
         <Card className="border-0 shadow-md rounded-md">
-          <CardHeader className="flex  justify-between">
+          <CardHeader className="flex flex-row gap-2 items-center">
             <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2 tracking-wide">
               <BookOpen className="h-5 w-5 text-purple-600" />
               <span>Continue Learning</span>
