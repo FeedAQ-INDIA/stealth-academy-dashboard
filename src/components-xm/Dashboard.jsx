@@ -163,11 +163,16 @@ export function Dashboard() {
 
       <section className="my-4 animate-slide-in">
         <Card className="border-0 shadow-md rounded-md">
-          <CardHeader className=" ">
+          <CardHeader className="flex  justify-between">
             <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2 tracking-wide">
               <BookOpen className="h-5 w-5 text-purple-600" />
               <span>Continue Learning</span>
             </CardTitle>
+            <div className="ml-auto ">
+              <Button variant="outline" className="text-gray-800">
+                View All
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="">
@@ -298,6 +303,8 @@ export function Dashboard() {
           </CardContent>
         </Card>
       </section>
+
+      
     </div>
   );
 }
