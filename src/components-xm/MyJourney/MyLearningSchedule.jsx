@@ -119,6 +119,7 @@ export default function MyLearningSchedule() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
@@ -338,9 +339,39 @@ export default function MyLearningSchedule() {
                   <Form {...form} className="flex-1 flex flex-col h-full">
                     <form
                       onSubmit={form.handleSubmit(onSubmit)}
-                      className="space-y-4 flex-1 overflow-y-auto  px-2"
+                      className="space-y-4 flex-1 overflow-y-auto px-2"
                     >
-                      {" "}
+                      {isEditMode && selectedEvent && (
+                        <div className="bg-muted p-4 rounded-lg mb-4">
+                          <h4 className="font-medium mb-2">Event Details</h4>
+                          <div className="space-y-2 text-sm">
+                            <div>
+                              <span className="text-muted-foreground">Created:</span>{" "}
+                              {new Date(selectedEvent.createdAt).toLocaleString()}
+                            </div>
+                            {selectedEvent.updatedAt && (
+                              <div>
+                                <span className="text-muted-foreground">Last Updated:</span>{" "}
+                                {new Date(selectedEvent.updatedAt).toLocaleString()}
+                              </div>
+                            )}
+                            {selectedEvent.overlappingCount > 0 && (
+                              <div className="bg-yellow-50 p-2 rounded mt-2">
+                                <div className="text-yellow-800 font-medium mb-1">
+                                  {selectedEvent.overlappingCount} Scheduling Conflict{selectedEvent.overlappingCount > 1 ? 's' : ''}
+                                </div>
+                                <ul className="list-disc list-inside space-y-1">
+                                  {selectedEvent.overlappingMeetings?.map(overlap => (
+                                    <li key={overlap.id} className="text-gray-600">
+                                      {overlap.title} ({formatEventTime(overlap.scheduledStartDate)} - {formatEventTime(overlap.scheduledEndDate)})
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
                       <FormField
                         control={form.control}
                         name="title"
@@ -470,6 +501,119 @@ export default function MyLearningSchedule() {
                   </Form>
                 </SheetContent>
               </Sheet>
+
+              {/* Event Details Sheet */}
+              <Sheet open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+                <SheetContent>
+                  <SheetHeader>
+                    <SheetTitle>Event Details</SheetTitle>
+                  </SheetHeader>
+                  {selectedEvent && (
+                    <div className="mt-6 space-y-6">
+                      {/* Title and Type Section */}
+                      <div className="space-y-2">
+                        <h3 className="text-lg font-semibold">{selectedEvent.title}</h3>
+                        <div className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+                          {selectedEvent.learningItemType}
+                        </div>
+                      </div>
+
+                      {/* Time Section */}
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium text-muted-foreground">Schedule</h4>
+                        <div className="rounded-lg border p-4">
+                          <div className="space-y-1">
+                            <div className="text-sm">
+                              <span className="font-medium">Start:</span>{" "}
+                              {new Date(selectedEvent.scheduledStartDate).toLocaleString()}
+                            </div>
+                            <div className="text-sm">
+                              <span className="font-medium">End:</span>{" "}
+                              {new Date(selectedEvent.scheduledEndDate).toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Description Section */}
+                      {selectedEvent.description && (
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-medium text-muted-foreground">Description</h4>
+                          <div className="rounded-lg border p-4">
+                            <p className="text-sm">{selectedEvent.description}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Link Section */}
+                      {selectedEvent.scheduledLink && (
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-medium text-muted-foreground">Learning Resource</h4>
+                          <div className="rounded-lg border p-4">
+                            <Button 
+                              className="w-full"
+                              onClick={() => window.open(selectedEvent.scheduledLink, "_blank")}
+                            >
+                              Join Learning Session
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Conflicts Section */}
+                      {selectedEvent.overlappingCount > 0 && (
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-medium text-yellow-800">
+                            Scheduling Conflicts ({selectedEvent.overlappingCount})
+                          </h4>
+                          <div className="rounded-lg bg-yellow-50 p-4">
+                            <ul className="space-y-2">
+                              {selectedEvent.overlappingMeetings?.map(overlap => (
+                                <li key={overlap.id} className="text-sm">
+                                  <span className="font-medium">{overlap.title}</span>
+                                  <br />
+                                  <span className="text-muted-foreground">
+                                    {formatEventTime(overlap.scheduledStartDate)} - {formatEventTime(overlap.scheduledEndDate)}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Metadata Section */}
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium text-muted-foreground">Additional Information</h4>
+                        <div className="rounded-lg border p-4 space-y-1">
+                          <div className="text-sm">
+                            <span className="font-medium">Created:</span>{" "}
+                            {new Date(selectedEvent.createdAt).toLocaleString()}
+                          </div>
+                          {selectedEvent.updatedAt && (
+                            <div className="text-sm">
+                              <span className="font-medium">Last Updated:</span>{" "}
+                              {new Date(selectedEvent.updatedAt).toLocaleString()}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <SheetFooter>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            handleEditSchedule(selectedEvent);
+                            setIsDetailsOpen(false);
+                          }}
+                        >
+                          Edit Schedule
+                        </Button>
+                      </SheetFooter>
+                    </div>
+                  )}
+                </SheetContent>
+              </Sheet>
             </div>
             <div className="flex w-full flex-col gap-2  ">
               {loading ? (
@@ -517,7 +661,21 @@ export default function MyLearningSchedule() {
                           size="sm"
                           variant="ghost"
                           className="size-8 p-0"
+                          onClick={() => {
+                            setSelectedEvent(event);
+                            setIsDetailsOpen(true);
+                          }}
+                          title="View Details"
+                        >
+                          <BookOpen className="h-4 w-4" />
+                          <span className="sr-only">View Details</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="size-8 p-0"
                           onClick={() => handleEditSchedule(event)}
+                          title="Edit Schedule"
                         >
                           <Pencil className="h-4 w-4" />
                           <span className="sr-only">Edit Schedule</span>
