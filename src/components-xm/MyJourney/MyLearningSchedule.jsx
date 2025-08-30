@@ -149,8 +149,10 @@ export default function MyLearningSchedule() {
         endDate: endOfDay.toISOString(),
       });
 
-      if (response.data.success) {
+      if (response.data.success && Array.isArray(response.data.data)) {
         setEvents(response.data.data);
+      } else {
+        setEvents([]);
       }
     } catch (error) {
       toast({
@@ -469,7 +471,7 @@ export default function MyLearningSchedule() {
                 </SheetContent>
               </Sheet>
             </div>
-            <div className="flex w-full flex-col gap-2 overflow-y-auto max-h-[400px]">
+            <div className="flex w-full flex-col gap-2  ">
               {loading ? (
                 <div className="flex items-center justify-center p-4">
                   <Loader2 className="h-6 w-6 animate-spin" />
@@ -489,41 +491,62 @@ export default function MyLearningSchedule() {
                 events.map((event) => (
                   <div
                     key={event.userLearningScheduleId}
-                    className="bg-muted after:bg-primary/70 relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full flex items-center"
+                    className={`bg-muted after:bg-primary/70 relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full flex flex-col ${event.overlappingCount > 0 ? 'border border-yellow-400/50' : ''}`}
                   >
-                    <div className="flex-1">
-                      <div className="font-medium">{event.title}</div>
-                      <div className="text-muted-foreground text-xs">
-                        {formatEventDateRange(event.scheduledStartDate, event.scheduledEndDate)}
-                      </div>
-                      {event.description && (
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {event.description}
+                    <div className="flex items-center">
+                      <div className="flex-1">
+                        <div className="font-medium flex items-center gap-2">
+                          {event.title}
+                          {event.overlappingCount > 0 && (
+                            <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800">
+                              {event.overlappingCount} overlap{event.overlappingCount > 1 ? 's' : ''}
+                            </span>
+                          )}
                         </div>
-                      )}
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="size-8 p-0"
-                        onClick={() => handleEditSchedule(event)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                        <span className="sr-only">Edit Schedule</span>
-                      </Button>
-                      {event.scheduledLink && (
+                        <div className="text-muted-foreground text-xs">
+                          {formatEventDateRange(event.scheduledStartDate, event.scheduledEndDate)}
+                        </div>
+                        {event.description && (
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {event.description}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
                         <Button
                           size="sm"
-                          variant="outline"
-                          onClick={() =>
-                            window.open(event.scheduledLink, "_blank")
-                          }
+                          variant="ghost"
+                          className="size-8 p-0"
+                          onClick={() => handleEditSchedule(event)}
                         >
-                          Join
+                          <Pencil className="h-4 w-4" />
+                          <span className="sr-only">Edit Schedule</span>
                         </Button>
-                      )}
+                        {event.scheduledLink && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              window.open(event.scheduledLink, "_blank")
+                            }
+                          >
+                            Join
+                          </Button>
+                        )}
+                      </div>
                     </div>
+                    {event.overlappingCount > 0 && (
+                      <div className="mt-2 text-xs bg-yellow-50 rounded p-2">
+                        <div className="font-medium text-yellow-800 mb-1">Overlapping with:</div>
+                        <ul className="list-disc list-inside space-y-1">
+                          {event.overlappingMeetings.map(overlap => (
+                            <li key={overlap.id} className="text-gray-600">
+                              {overlap.title} ({formatEventTime(overlap.scheduledStartDate)} - {formatEventTime(overlap.scheduledEndDate)})
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 ))
               )}
