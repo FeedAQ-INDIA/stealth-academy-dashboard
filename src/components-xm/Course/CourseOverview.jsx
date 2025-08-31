@@ -211,23 +211,32 @@ function CourseOverview() {
   };
 
   // Calculate progress
-  const calculateProgress = () => {
-    if (!courseList?.courseTopic) return 0;
+  // const calculateProgress = () => {
+  //   if (!courseList?.courseTopic) return 0;
 
-    const totalContent = courseList.courseTopic.reduce(
-      (acc, topic) => acc + (topic.courseTopicContent?.length || 0),
-      0
-    );
+  //   const totalContent = courseList.courseTopic.reduce(
+  //     (acc, topic) => acc + (topic.courseTopicContent?.length || 0),
+  //     0
+  //   );
+
+  //   const completedContent =
+  //     userCourseContentProgress?.filter(
+  //       (log) => log.courseId == CourseId && log.progressStatus == "COMPLETED"
+  //     ).length || 0;
+
+  //   return totalContent > 0
+  //     ? Math.round((completedContent / totalContent) * 100)
+  //     : 0;
+  // };
 
     const completedContent =
-      userCourseContentProgress?.filter(
-        (log) => log.courseId == CourseId && log.progressStatus == "COMPLETED"
-      ).length || 0;
+    userCourseContentProgress?.filter(
+      (p) => p.courseId == CourseId && p.progressStatus === "COMPLETED"
+    )?.length || 0;
+  const totalContent = courseList?.courseContent?.length || 0;
+  const progressPercentage =
+    totalContent > 0 ? Math.round((completedContent / totalContent) * 100) : 0;
 
-    return totalContent > 0
-      ? Math.round((completedContent / totalContent) * 100)
-      : 0;
-  };
 
   // Get enrollment status
   const getEnrollmentStatus = () => {
@@ -274,8 +283,7 @@ function CourseOverview() {
 
   const enrollmentInfo = getEnrollmentStatus();
 
-  const progress = calculateProgress();
-
+ 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -304,7 +312,7 @@ function CourseOverview() {
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <Award className="h-4 w-4" />
-              <span>{progress}% Complete</span>
+              <span>{progressPercentage}% Complete</span>
             </div>
           </div>
         </div>
@@ -321,14 +329,38 @@ function CourseOverview() {
                   {courseList?.courseTitle}
                 </CardTitle>
                 <div className="flex items-center gap-2 mt-4">
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="w-full bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded-full h-3 overflow-hidden relative group border border-gray-300"
+                    aria-label={`Progress: ${progressPercentage}%`}
+                    role="progressbar"
+                    aria-valuenow={progressPercentage}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                  >
                     <div
-                      className="bg-green-600 h-2 rounded-full transition-all duration-500 ease-out"
-                      style={{ width: `${progress}%` }}
+                      className={
+                        `h-full rounded-full transition-all duration-700 ease-out shadow-sm ` +
+                        (progressPercentage === 100
+                          ? "bg-gradient-to-r from-green-400 to-green-600"
+                          : progressPercentage >= 70
+                          ? "bg-gradient-to-r from-blue-500 to-purple-500"
+                          : progressPercentage >= 40
+                          ? "bg-gradient-to-r from-yellow-400 to-yellow-600"
+                          : "bg-gradient-to-r from-red-400 to-orange-500")
+                      }
+                      style={{ width: `${progressPercentage}%` }}
                     ></div>
                   </div>
-                  <span className="text-sm text-gray-600 min-w-fit">
-                    {progress}%
+                  <span className="text-sm font-medium" style={{
+                    color: progressPercentage === 100
+                      ? '#16a34a'
+                      : progressPercentage >= 70
+                      ? '#3b82f6'
+                      : progressPercentage >= 40
+                      ? '#ca8a04'
+                      : '#f97316'
+                  }}>
+                    {progressPercentage}%
                   </span>
                 </div>
               </div>

@@ -395,9 +395,25 @@ function CourseSidebar() {
                   </div>
                 </div>
 
-                <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                <div
+                  className="w-full bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded-full h-2 overflow-hidden relative group border border-gray-300"
+                  aria-label={`Progress: ${progressPercentage}%`}
+                  role="progressbar"
+                  aria-valuenow={progressPercentage}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                >
                   <div
-                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500 ease-out"
+                    className={
+                      `h-full rounded-full transition-all duration-700 ease-out shadow-sm ` +
+                      (progressPercentage === 100
+                        ? "bg-gradient-to-r from-green-400 to-green-600"
+                        : progressPercentage >= 70
+                        ? "bg-gradient-to-r from-blue-500 to-purple-500"
+                        : progressPercentage >= 40
+                        ? "bg-gradient-to-r from-yellow-400 to-yellow-600"
+                        : "bg-gradient-to-r from-red-400 to-orange-500")
+                    }
                     style={{ width: `${progressPercentage}%` }}
                   ></div>
                 </div>

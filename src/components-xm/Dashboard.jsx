@@ -56,7 +56,7 @@ export function Dashboard() {
   const loginStreak = 3; // Example static value
 
   const [totalCount, setTotalCount] = useState(0);
-  const [limit, setLimit] = useState(2);
+  const [limit, setLimit] = useState(4);
   const [offset, setOffset] = useState(0);
   const [courseList, setCourseList] = useState(null);
   const [apiQuery, setApiQuery] = useState({
@@ -426,7 +426,7 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {courseList?.map((course) => (
                   <ProgressCourseCard key={course.id} course={course} />
                 ))}
