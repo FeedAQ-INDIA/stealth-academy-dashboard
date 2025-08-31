@@ -44,6 +44,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ProgressCourseCard2 } from "../Modules/ProgressCourseCard2";
 
 export function MyCourse() {
   const navigate = useNavigate();
@@ -85,6 +86,14 @@ export function MyCourse() {
             userId: userDetail.id,
           },
           required: true,
+        },
+        {
+          datasource: "UserCourseContentProgress",
+          as: "activityLogs",
+          where: {
+            userId: userDetail.id,
+          },
+          required: false,
         },
       ],
     },
@@ -164,12 +173,33 @@ export function MyCourse() {
         setTotalCount(res.data.data.totalCount);
         setOffset(res.data.data.offset);
         setLimit(res.data.data.limit);
+        res.data.data?.results?.forEach((a) => {
+          calculateProgress(a);
+        });
         setLoading(false);
+        
       })
       .catch((err) => {
         console.log(err);
         setLoading(false);
       });
+  };
+
+    // Calculate progress
+  const calculateProgress = (a) => {
+    if (!a?.courseContent) return 0;
+
+    const completedContent =
+      a?.activityLogs?.filter((p) => p.progressStatus === "COMPLETED")
+        ?.length || 0;
+
+    const totalContent = a?.courseContent?.length || 0;
+    const progressPercentage =
+      totalContent > 0
+        ? Math.round((completedContent / totalContent) * 100)
+        : 0;
+
+    a["progress"] = progressPercentage;
   };
 
   const handleSearchChange = (value) => {
@@ -229,18 +259,30 @@ export function MyCourse() {
       offset: offset,
       getThisData: {
         datasource: "Course",
-        // order: [["courseIsLocked", "ASC"]],
         attributes: [],
         include: [
-        {
-          datasource: "UserCourseEnrollment",
-          as: "enrollments",
-          where: {
-            userId: userDetail.id,
+          {
+            datasource: "UserCourseEnrollment",
+            as: "enrollments",
+            where: {
+              userId: userDetail.id,
+            },
+            required: true,
           },
-          required: true,
-        },
-      ],
+          {
+            datasource: "CourseContent",
+            as: "courseContent",
+            required: false,
+          },
+          {
+            datasource: "UserCourseContentProgress",
+            as: "activityLogs",
+            where: {
+              userId: userDetail.id,
+            },
+            required: false,
+          }
+        ],
       },
     });
     handleSearchChange(exploreCourseText);
@@ -356,7 +398,7 @@ export function MyCourse() {
                 : 'flex flex-col space-y-4'
             }`}>
               {courseList?.map((course) => (
-                <CourseCard key={course.id} course={course} viewMode={viewMode} />
+                <ProgressCourseCard2 key={course.id} course={course} viewMode={viewMode} />
               ))}
             </div>
 

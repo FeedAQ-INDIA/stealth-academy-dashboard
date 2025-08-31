@@ -113,13 +113,13 @@ export function MyLearningLayout() {
       path: "/my-journey/my-achievement",
       description: "Courses you want to take later",
     },
-     {
-      id: "study-group",
-      label: "MY STUDY GROUP",
-      icon: Users,
-      path: "/my-journey/my-study-group",
-      description: "Collaborate with peers and enhance your learning",
-    },
+    //  {
+    //   id: "study-group",
+    //   label: "MY STUDY GROUP",
+    //   icon: Users,
+    //   path: "/my-journey/my-study-group",
+    //   description: "Collaborate with peers and enhance your learning",
+    // },
 
        {
       id: "learning-schedule",

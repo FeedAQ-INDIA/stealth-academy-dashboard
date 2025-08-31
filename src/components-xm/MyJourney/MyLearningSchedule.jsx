@@ -513,7 +513,7 @@ export default function MyLearningSchedule() {
                       {/* Title and Type Section */}
                       <div className="space-y-2">
                         <h3 className="text-lg font-semibold">{selectedEvent.title}</h3>
-                        <div className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+                        <div className=" text-sm font-medium text-primary">
                           {selectedEvent.learningItemType}
                         </div>
                       </div>
@@ -521,7 +521,7 @@ export default function MyLearningSchedule() {
                       {/* Time Section */}
                       <div className="space-y-2">
                         <h4 className="text-sm font-medium text-muted-foreground">Schedule</h4>
-                        <div className="rounded-lg border p-4">
+                        <div className=" s">
                           <div className="space-y-1">
                             <div className="text-sm">
                               <span className="font-medium">Start:</span>{" "}
@@ -588,12 +588,12 @@ export default function MyLearningSchedule() {
                         <div className="rounded-lg border p-4 space-y-1">
                           <div className="text-sm">
                             <span className="font-medium">Created:</span>{" "}
-                            {new Date(selectedEvent.createdAt).toLocaleString()}
+                            {selectedEvent.v_created_date }  {selectedEvent.v_created_time }
                           </div>
                           {selectedEvent.updatedAt && (
                             <div className="text-sm">
                               <span className="font-medium">Last Updated:</span>{" "}
-                              {new Date(selectedEvent.updatedAt).toLocaleString()}
+                              {selectedEvent.v_updated_date }  {selectedEvent.v_updated_time }
                             </div>
                           )}
                         </div>
