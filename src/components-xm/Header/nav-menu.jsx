@@ -101,23 +101,6 @@ function NavigationMenuDemo({ orientation }) {
                         </Button>
                     </Link>
                 </NavigationMenuItem> */}
-
-        <NavigationMenuItem
-          className={
-            orientation === "vertical" ? "w-full" : "flex-1 sm:flex-none"
-          }
-        >
-          <Link to="/my-journey/courses" className="w-full block">
-            <Button
-              className="w-full justify-center  px-2"
-              variant={
-                location.pathname.includes("my-journey") ? "secondary" : "ghost"
-              }
-            >
-              MY JOURNEY
-            </Button>
-          </Link>
-        </NavigationMenuItem>
         <NavigationMenuItem
           className={
             orientation === "vertical" ? "w-full" : "flex-1 sm:flex-none"
@@ -136,6 +119,23 @@ function NavigationMenuDemo({ orientation }) {
             </Button>
           </Link>
         </NavigationMenuItem>
+        <NavigationMenuItem
+          className={
+            orientation === "vertical" ? "w-full" : "flex-1 sm:flex-none"
+          }
+        >
+          <Link to="/my-journey/courses" className="w-full block">
+            <Button
+              className="w-full justify-center  px-2"
+              variant={
+                location.pathname.includes("my-journey") ? "secondary" : "ghost"
+              }
+            >
+              MY JOURNEY
+            </Button>
+          </Link>
+        </NavigationMenuItem>
+
       </NavigationMenuList>
     </NavigationMenu>
   );

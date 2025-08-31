@@ -1,0 +1,788 @@
+import { useState, useEffect, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
+import * as z from "zod";
+import { 
+  BarChart3, 
+  Clock, 
+  Target, 
+  TrendingUp, 
+  CheckCircle,
+  AlertCircle,
+  Timer as Timeline
+} from "lucide-react";
+
+import axiosConn from "@/axioscon";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetDescription,
+  SheetFooter,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, Area, AreaChart } from 'recharts';
+import { Calendar } from 'lucide-react';
+
+// Schema for goal validation
+const goalSchema = z.object({
+  title: z
+    .string()
+    .min(3, "Title must be at least 3 characters")
+    .max(200, "Title must not exceed 200 characters"),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  targetDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
+    message: "Please enter a valid target date",
+  }),
+  startDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
+    message: "Please enter a valid start date",
+  }),
+  actualStartDate: z.string().optional(),
+  actualEndDate: z.string().optional(),
+  status: z.enum(["NOT_STARTED", "IN_PROGRESS", "COMPLETED", "ABANDONED"]),
+  progress: z.number().min(0).max(100).default(0),
+});
+
+const MyGoals = () => {
+  const [goals, setGoals] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState(null);
+  const [editingGoal, setEditingGoal] = useState(null);
+
+  const form = useForm({
+    resolver: zodResolver(goalSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      startDate: format(new Date(), "yyyy-MM-dd"),
+      targetDate: format(new Date(), "yyyy-MM-dd"),
+      actualStartDate: "",
+      actualEndDate: "",
+      status: "NOT_STARTED",
+      progress: 0,
+    },
+  });
+
+  useEffect(() => {
+    fetchGoals();
+  }, []);
+
+  const fetchGoals = () => {
+    axiosConn
+      .post("/goal/search", {})
+      .then(({ data }) => {
+        if (data.success) {
+          const formattedGoals = data.data.map((goal) => ({
+            id: goal.userGoalId,
+            title: goal.title,
+            description: goal.description,
+            startDate: goal.startDate,
+            targetDate: goal.endDate,
+            actualStartDate: goal.actualStartDate,
+            actualEndDate: goal.actualEndDate,
+            status: goal.status,
+            progress: goal.progress || 0,
+            createdAt: goal.createdAt,
+          }));
+          setGoals(formattedGoals);
+        }
+      })
+      .catch((error) => {
+        console.error("Error loading goals:", error);
+      });
+  };
+
+  const onSubmit = (data) => {
+    let progress = data.progress;
+
+    // Automatically adjust progress based on status
+    if (data.status === "COMPLETED") {
+      progress = 100;
+    } else if (data.status === "NOT_STARTED") {
+      progress = 0;
+    }
+
+    const requestBody = {
+      title: data.title,
+      description: data.description,
+      startDate: new Date(data.startDate).toISOString(),
+      endDate: new Date(data.targetDate).toISOString(),
+      actualStartDate: data.actualStartDate
+        ? new Date(data.actualStartDate).toISOString()
+        : null,
+      actualEndDate: data.actualEndDate
+        ? new Date(data.actualEndDate).toISOString()
+        : null,
+      status: data.status,
+      progress: progress,
+    };
+
+    if (editingGoal) {
+      requestBody.userGoalId = editingGoal.id;
+    }
+
+    axiosConn
+      .post("/goal/createOrUpdate", requestBody)
+      .then((res) => {
+        fetchGoals();
+         setIsOpen(false);
+          setEditingGoal(null);
+          form.reset();
+      })
+      .catch((error) => {
+        console.error("Error saving goal:", error);
+      });
+  };
+
+  const handleEdit = (goal) => {
+    setEditingGoal(goal);
+    form.reset({
+      title: goal.title,
+      description: goal.description,
+      startDate: format(new Date(goal.startDate), "yyyy-MM-dd"),
+      targetDate: format(new Date(goal.targetDate), "yyyy-MM-dd"),
+      actualStartDate: goal.actualStartDate
+        ? format(new Date(goal.actualStartDate), "yyyy-MM-dd")
+        : "",
+      actualEndDate: goal.actualEndDate
+        ? format(new Date(goal.actualEndDate), "yyyy-MM-dd")
+        : "",
+      status: goal.status,
+      progress: goal.progress,
+    });
+    setIsOpen(true);
+  };
+
+  const handleDelete = (goalId) => {
+    const requestBody = {
+      userGoalId: goalId,
+      status: "ABANDONED",
+    };
+
+    axiosConn
+      .post("/goal/createOrUpdate", requestBody)
+      .then((res) => {
+ fetchGoals();
+       })
+      .catch((error) => {
+        console.error("Error deleting goal:", error);
+      });
+  };
+
+  return (
+    <div className=" ">
+      <GoalsAnalyticsDashboard goalsData={goals} />
+      <div className="flex justify-between items-center my-6">
+        <h2 className="text-2xl font-bold">My Goals</h2>
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+          <SheetTrigger asChild>
+            <Button
+              onClick={() => {
+                setEditingGoal(null);
+                form.reset();
+              }}
+            >
+              Add New Goal
+            </Button>
+          </SheetTrigger>
+          <SheetContent className="flex flex-col h-full p-0">
+            <div className="px-6 py-6 h-full flex flex-col">
+              <SheetHeader className="px-0">
+                <SheetTitle>
+                  {editingGoal ? "Edit Goal" : "Create New Goal"}
+                </SheetTitle>
+                <SheetDescription>
+                  {editingGoal
+                    ? "Update your existing goal"
+                    : "Add a new goal to track your progress"}
+                </SheetDescription>
+              </SheetHeader>
+
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="flex-1 overflow-y-auto space-y-4 py-4 px-2  h-[calc(100svh-5em)]"
+                >
+                  <div className="">
+                    <FormField
+                      control={form.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Title</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter goal title" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Description</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Enter goal description"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="startDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Start Date</FormLabel>
+                          <FormControl>
+                            <Input type="date" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="targetDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Target Date</FormLabel>
+                          <FormControl>
+                            <Input type="date" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="progress"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Progress (%)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min="0"
+                              max="100"
+                              {...field}
+                              onChange={(e) =>
+                                field.onChange(parseInt(e.target.value))
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="actualStartDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Actual Start Date</FormLabel>
+                          <FormControl>
+                            <Input type="date" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="actualEndDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Actual End Date</FormLabel>
+                          <FormControl>
+                            <Input type="date" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="status"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Status</FormLabel>
+                          <FormControl>
+                            <select
+                              {...field}
+                              className="w-full p-2 border rounded-md"
+                            >
+                              <option value="NOT_STARTED">Not Started</option>
+                              <option value="IN_PROGRESS">In Progress</option>
+                              <option value="COMPLETED">Completed</option>
+                              <option value="ABANDONED">Abandoned</option>
+                            </select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="flex-shrink-0 py-4 mt-auto border-t sticky bottom-0 bg-white">
+                    <SheetFooter className="w-full">
+                      <Button type="submit" className="w-full">
+                        {editingGoal ? "Update Goal" : "Create Goal"}
+                      </Button>
+                    </SheetFooter>
+                  </div>
+                </form>
+              </Form>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {goals.map((goal) => (
+          <Card key={goal.id} className="relative overflow-hidden">
+            <div
+              className={`absolute top-0 left-0 w-1 h-full ${
+                goal.status === "COMPLETED"
+                  ? "bg-green-500"
+                  : goal.status === "IN_PROGRESS"
+                  ? "bg-blue-500"
+                  : goal.status === "ABANDONED"
+                  ? "bg-red-500"
+                  : "bg-gray-400"
+              }`}
+            />
+            <CardHeader className="pb-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle className="text-lg">{goal.title}</CardTitle>
+                  <CardDescription className="mt-1.5 line-clamp-2">
+                    {goal.description}
+                  </CardDescription>
+                </div>
+        
+              </div>
+            </CardHeader>
+
+            <CardContent className="pb-3">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="space-y-2">
+                    <p className="text-gray-500">Planned Start</p>
+                    <p className="font-medium">
+                      {format(new Date(goal.startDate), "MMM dd, yyyy")}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-gray-500">Target Date</p>
+                    <p className="font-medium">
+                      {format(new Date(goal.targetDate), "MMM dd, yyyy")}
+                    </p>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Progress section */}
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-sm">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        goal.status === "COMPLETED"
+                          ? "bg-green-100 text-green-800"
+                          : goal.status === "IN_PROGRESS"
+                          ? "bg-blue-100 text-blue-800"
+                          : goal.status === "ABANDONED"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {goal.status.replace("_", " ")}
+                    </span>
+                    <span className="font-medium">{goal.progress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-100 rounded-full h-2.5">
+                    <div
+                      className={`h-2.5 rounded-full transition-all duration-300 ${
+                        goal.status === "COMPLETED"
+                          ? "bg-green-500"
+                          : goal.status === "IN_PROGRESS"
+                          ? "bg-blue-500"
+                          : goal.status === "ABANDONED"
+                          ? "bg-red-500"
+                          : "bg-gray-400"
+                      }`}
+                      style={{ width: `${goal.progress}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Actual dates section */}
+                {(goal.actualStartDate || goal.actualEndDate) && (
+                  <>
+                    <Separator />
+                    <div className="space-y-2 text-sm">
+                      {goal.actualStartDate && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">
+                            Actually Started
+                          </span>
+                          <span className="font-medium">
+                            {format(
+                              new Date(goal.actualStartDate),
+                              "MMM dd, yyyy"
+                            )}
+                          </span>
+                        </div>
+                      )}
+                      {goal.actualEndDate && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">
+                            {goal.status === "COMPLETED"
+                              ? "Completed"
+                              : "Ended"}
+                          </span>
+                          <span className="font-medium">
+                            {format(
+                              new Date(goal.actualEndDate),
+                              "MMM dd, yyyy"
+                            )}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            </CardContent>
+
+            <CardFooter className="pt-3">
+              <div className="flex justify-end space-x-2 w-full">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setSelectedGoal(goal);
+                    setIsDetailsOpen(true);
+                  }}
+                  className="w-24"
+                >
+                  View Details
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleEdit(goal)}
+                  className="w-24"
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleDelete(goal.id)}
+                  className="w-24"
+                >
+                  Delete
+                </Button>
+              </div>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+
+      {/* Details Sheet */}
+      <Sheet open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+        <SheetContent className="overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Goal Details</SheetTitle>
+          </SheetHeader>
+          {selectedGoal && (
+            <div className="mt-6 space-y-6">
+              <div className="space-y-2">
+                <h3 className="font-semibold text-lg">{selectedGoal.title}</h3>
+                <p className="text-gray-600 whitespace-pre-wrap">{selectedGoal.description}</p>
+              </div>
+
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-500">Status</p>
+                    <p className={`mt-1 font-medium ${
+                      selectedGoal.status === "COMPLETED"
+                        ? "text-green-600"
+                        : selectedGoal.status === "IN_PROGRESS"
+                        ? "text-blue-600"
+                        : selectedGoal.status === "ABANDONED"
+                        ? "text-red-600"
+                        : "text-gray-600"
+                    }`}>
+                      {selectedGoal.status.replace("_", " ")}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Progress</p>
+                    <p className="mt-1 font-medium">{selectedGoal.progress}%</p>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-3">
+                  <h4 className="font-medium">Planned Timeline</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Start Date</p>
+                      <p className="mt-1">{format(new Date(selectedGoal.startDate), "MMM dd, yyyy")}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Target Date</p>
+                      <p className="mt-1">{format(new Date(selectedGoal.targetDate), "MMM dd, yyyy")}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {(selectedGoal.actualStartDate || selectedGoal.actualEndDate) && (
+                  <>
+                    <Separator />
+                    <div className="space-y-3">
+                      <h4 className="font-medium">Actual Timeline</h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        {selectedGoal.actualStartDate && (
+                          <div>
+                            <p className="text-sm text-gray-500">Started On</p>
+                            <p className="mt-1">{format(new Date(selectedGoal.actualStartDate), "MMM dd, yyyy")}</p>
+                          </div>
+                        )}
+                        {selectedGoal.actualEndDate && (
+                          <div>
+                            <p className="text-sm text-gray-500">
+                              {selectedGoal.status === "COMPLETED" ? "Completed On" : "Ended On"}
+                            </p>
+                            <p className="mt-1">{format(new Date(selectedGoal.actualEndDate), "MMM dd, yyyy")}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <Separator />
+
+                <div className="space-y-3">
+                  <h4 className="font-medium">Additional Information</h4>
+                  <div>
+                    <p className="text-sm text-gray-500">Created On</p>
+                    <p className="mt-1">{format(new Date(selectedGoal.createdAt), "MMM dd, yyyy")}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-6">
+                <Button 
+                  className="w-full" 
+                  variant="outline" 
+                  onClick={() => setIsDetailsOpen(false)}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+};
+
+export default MyGoals;
+
+
+
+
+const GoalsAnalyticsDashboard = ({goalsData}) => {
+  const [activeTab, setActiveTab] = useState('overview');
+  
+ 
+  // Analytics calculations
+  const analytics = useMemo(() => {
+    const totalGoals = goalsData.length;
+    const inProgressGoals = goalsData.filter(g => g.status === 'IN_PROGRESS').length;
+    const notStartedGoals = goalsData.filter(g => g.status === 'NOT_STARTED').length;
+    const averageProgress = Math.round(goalsData.reduce((sum, g) => sum + g.progress, 0) / totalGoals);
+    
+    // Progress distribution
+    const progressDistribution = [
+      { range: '0%', count: goalsData.filter(g => g.progress === 0).length },
+      { range: '1-25%', count: goalsData.filter(g => g.progress > 0 && g.progress <= 25).length },
+      { range: '26-50%', count: goalsData.filter(g => g.progress > 25 && g.progress <= 50).length },
+      { range: '51-75%', count: goalsData.filter(g => g.progress > 50 && g.progress <= 75).length },
+      { range: '76-100%', count: goalsData.filter(g => g.progress > 75).length },
+    ];
+
+    // Timeline data
+    const timelineData = goalsData
+      .filter(g => g.actualStartDate)
+      .map(g => ({
+        date: new Date(g.actualStartDate).toLocaleDateString(),
+        goalId: g.userGoalId,
+        title: g.title,
+        progress: g.progress,
+        status: g.status
+      }))
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // Status distribution
+    const statusData = [
+      { name: 'In Progress', value: inProgressGoals, color: '#3b82f6' },
+      { name: 'Not Started', value: notStartedGoals, color: '#ef4444' },
+      { name: 'Completed', value: 0, color: '#10b981' }
+    ];
+
+    return {
+      totalGoals,
+      inProgressGoals,
+      notStartedGoals,
+      averageProgress,
+      progressDistribution,
+      timelineData,
+      statusData
+    };
+  }, [goalsData]);
+
+  const StatCard = ({ title, value, icon: Icon, color, subtitle }) => (
+    <div className="bg-white rounded-md shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-gray-600">{title}</p>
+          <p className={`text-3xl font-bold ${color}`}>{value}</p>
+          {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
+        </div>
+        <Icon className={`h-8 w-8 ${color}`} />
+      </div>
+    </div>
+  );
+
+  const TimelineItem = ({ goal, index }) => (
+    <div className="flex items-start space-x-4 pb-8">
+      <div className="flex-shrink-0">
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+          goal.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'
+        }`}>
+          {goal.status === 'IN_PROGRESS' ? <Target className="w-5 h-5" /> : <Clock className="w-5 h-5" />}
+        </div>
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-sm font-semibold text-gray-900 truncate">{goal.title}</h4>
+            <span className={`px-2 py-1 text-xs rounded-full ${
+              goal.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
+            }`}>
+              {goal.status.replace('_', ' ')}
+            </span>
+          </div>
+          <p className="text-xs text-gray-600 mb-3">{goal.description}</p>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-500">{goal.date}</span>
+            <div className="flex items-center space-x-2">
+              <div className="w-16 bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
+                  style={{ width: `${goal.progress}%` }}
+                ></div>
+              </div>
+              <span className="text-xs font-medium text-gray-700">{goal.progress}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-3">
+      {/* Key Metrics */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <StatCard title="Total Goals" value={analytics.totalGoals} icon={Target} color="text-purple-600"/>
+        <StatCard title="In Progress" value={analytics.inProgressGoals} icon={TrendingUp} color="text-blue-600"/>
+        <StatCard title="Not Started" value={analytics.notStartedGoals} icon={Clock} color="text-orange-600"/>
+        <StatCard title="Average Progress" value={`${analytics.averageProgress}%`} icon={CheckCircle} color="text-green-600"/>
+      </div>
+
+      {/* Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        {/* Status Distribution */}
+        <div className="bg-white rounded-md shadow-sm border p-4">
+          <h3 className="text-base font-semibold text-gray-900 mb-2">Goal Status</h3>
+          <ResponsiveContainer width="100%" height={250}>
+            <PieChart>
+              <Pie data={analytics.statusData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={5} dataKey="value">
+                {analytics.statusData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Progress Trend */}
+        <div className="bg-white rounded-md shadow-sm border p-4">
+          <h3 className="text-base font-semibold text-gray-900 mb-2">Progress Trend</h3>
+          <ResponsiveContainer width="100%" height={250}>
+            <AreaChart data={goalsData.map(g => ({ 
+              name: `Goal ${g.id}`, 
+              progress: g.progress,
+              title: g.title.substring(0, 20) + '...'
+            }))}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis domain={[0, 100]} />
+              <Tooltip formatter={(value, name) => [`${value}%`, 'Progress']} labelFormatter={(label) => `Goal: ${label}`} />
+              <Area type="monotone" dataKey="progress" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+ 

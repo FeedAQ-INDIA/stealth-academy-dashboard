@@ -128,6 +128,13 @@ export function MyLearningLayout() {
       path: "/my-journey/my-learning-schedule",
       description: "Organize your study sessions and stay on track",
     },
+           {
+      id: "my-goals",
+      label: "MY GOALS",
+      icon: Target,
+      path: "/my-journey/my-goals",
+      description: "Set and track your personal learning goals",
+    },
   
   ];
 
