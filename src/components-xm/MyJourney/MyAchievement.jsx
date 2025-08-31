@@ -46,7 +46,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ProgressCourseCard2 } from "../Modules/ProgressCourseCard2";
 
-export function MyAchievement() {
+export default function MyAchievement() {
   const navigate = useNavigate();
   const [totalCount, setTotalCount] = useState(0);
   const [limit, setLimit] = useState(12);
@@ -83,7 +83,7 @@ export function MyAchievement() {
           datasource: "UserCourseEnrollment",
           as: "enrollments",
           where: {
-            userId: userDetail.id,
+            userId: userDetail.userId,
             enrollmentStatus: "COMPLETED"
           },
           required: true,
@@ -92,7 +92,7 @@ export function MyAchievement() {
           datasource: "UserCourseContentProgress",
           as: "activityLogs",
           where: {
-            userId: userDetail.id,
+            userId: userDetail.userId,
           },
           required: false,
         },
@@ -266,7 +266,8 @@ export function MyAchievement() {
             datasource: "UserCourseEnrollment",
             as: "enrollments",
             where: {
-              userId: userDetail.id,
+              userId: userDetail.userId,
+              enrollmentStatus: "COMPLETED"
             },
             required: true,
           },
@@ -279,7 +280,7 @@ export function MyAchievement() {
             datasource: "UserCourseContentProgress",
             as: "activityLogs",
             where: {
-              userId: userDetail.id,
+              userId: userDetail.userId,
             },
             required: false,
           }

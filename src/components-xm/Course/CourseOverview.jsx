@@ -36,7 +36,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion.jsx";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { toast } from "@/components/hooks/use-toast.js";
 import { useCourse } from "@/components-xm/Course/CourseContext.jsx";
 import { useAuthStore } from "@/zustland/store.js";
@@ -59,6 +59,7 @@ function CourseOverview() {
   const { courseList, userCourseContentProgress, userCourseEnrollment } =
     useCourse();
   const { userDetail } = useAuthStore();
+  const navigate = useNavigate();
 
   const {
     state,
@@ -77,6 +78,9 @@ function CourseOverview() {
 
   // Unenroll (disroll) state
   const [unenrollLoading, setUnenrollLoading] = useState(false);
+  // Delete course state
+  const [deleteCourseLoading, setDeleteCourseLoading] = useState(false);
+  const [deleteCourseConfirmation, setDeleteCourseConfirmation] = useState("");
 
   useEffect(() => {
     fetchNotes();
@@ -165,6 +169,51 @@ function CourseOverview() {
   };
 
   // Unenroll (disroll) user from course
+  // Delete course handler
+  const handleDeleteCourse = async () => {
+    if (!userDetail?.userId || !CourseId) {
+      toast({
+        title: "Error",
+        description: "User or course information is missing",
+        variant: "destructive",
+      });
+      setDeleteCourseConfirmation("");
+      return;
+    }
+    setDeleteCourseLoading(true);
+    try {
+      const response = await axiosConn.post(
+        `${import.meta.env.VITE_API_URL}/deleteCourse`,
+        {
+          courseId: CourseId
+        }
+      );
+      if (response.data.status === 200) {
+        toast({
+          title: "Success",
+          description: "Course successfully deleted!",
+          variant: "default",
+        });
+        navigate("/explore/bring-your-own-course");
+      } else {
+        throw new Error(response.data.message || "Course deletion failed");
+      }
+    } catch (error) {
+      console.error("Course deletion error:", error);
+      toast({
+        title: "Deletion Failed",
+        description:
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to delete the course",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleteCourseLoading(false);
+      setDeleteCourseConfirmation("");
+    }
+  };
+
   const handleUnenroll = async () => {
     if (!userDetail?.userId || !CourseId) {
       toast({
@@ -588,7 +637,7 @@ function CourseOverview() {
           </Card>
         </section>
 
-        <div className="flex justify-end my-4">
+        <div className="flex justify-end gap-4 my-4">
           {enrollmentInfo.status !== "NOT_ENROLLED" ? (
             <Dialog>
               <DialogTrigger asChild>
@@ -639,7 +688,7 @@ function CourseOverview() {
                       courseList?.courseTitle?.trim() !==
                         deleteConfirmation?.trim()
                     }
-                    className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed  "
+                    className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {unenrollLoading ? (
                       <>
@@ -653,7 +702,71 @@ function CourseOverview() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-          ) : null}
+          ) : (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  variant="destructive"
+                  className="hover:bg-red-600 transition-colors rounded-lg px-6"
+                >
+                  DELETE COURSE
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md rounded-xl">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-bold text-gray-800">
+                    Are You Sure You Want To Delete This Course?
+                  </DialogTitle>
+                  <DialogDescription className="text-gray-600">
+                    This action cannot be undone. Type in{" "}
+                    <span className="font-semibold text-red-600 italic">
+                      "{courseList?.courseTitle}"
+                    </span>{" "}
+                    in the input field below and click confirm to delete the
+                    course permanently.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="flex items-center space-y-2">
+                  <Input
+                    placeholder="Type course title to confirm deletion..."
+                    value={deleteCourseConfirmation}
+                    onChange={(e) => setDeleteCourseConfirmation(e.target.value)}
+                    className="rounded-lg"
+                  />
+                </div>
+                <DialogFooter className="sm:justify-start gap-2">
+                  <DialogClose asChild>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className="rounded-full"
+                    >
+                      Cancel
+                    </Button>
+                  </DialogClose>
+
+                  <Button
+                    onClick={handleDeleteCourse}
+                    disabled={
+                      deleteCourseLoading ||
+                      courseList?.courseTitle?.trim() !==
+                        deleteCourseConfirmation?.trim()
+                    }
+                    className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {deleteCourseLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        Deleting Course...
+                      </>
+                    ) : (
+                      "Delete Course"
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
 
