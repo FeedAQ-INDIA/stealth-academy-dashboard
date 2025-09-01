@@ -86,7 +86,8 @@ function CreateNotesModule({courseId, courseContentId, handleNotesSave, handleGe
                     <h3 className="font-medium text-gray-900">Create Notes</h3>
                 </div>
                 <div className="text-sm text-gray-500">
-                    {wordCount} words • {charCount} characters
+                    {wordCount} words 
+                    {/* • {charCount} characters */}
                 </div>
             </div>
 
