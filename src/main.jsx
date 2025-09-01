@@ -62,6 +62,7 @@ import MyAchievement from "./components-xm/MyJourney/MyAchievement.jsx";
 import MyStudyGroup from "./components-xm/MyJourney/MyStudyGroup.jsx";
 import MyLearningSchedule from "./components-xm/MyJourney/MyLearningSchedule.jsx";
 import MyGoals from "./components-xm/MyJourney/MyGoals.jsx";
+import CourseEmbedder from "./components-xm/Course/CourseEmbedder.jsx";
 
 const router = createBrowserRouter([
   // {
@@ -181,6 +182,10 @@ const router = createBrowserRouter([
           {
             path: "/course/:CourseId",
             element: <CourseOverview />,
+          },
+          {
+            path: "/course/:CourseId/embed",
+            element: <CourseEmbedder />,
           },
           {
             path: "/course/:CourseId/notes",
