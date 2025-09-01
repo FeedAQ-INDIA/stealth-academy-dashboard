@@ -277,7 +277,6 @@ function CourseEmbedder() {
         </Breadcrumb>
         <div className="ml-auto sm:flex-initial">
           <div className="flex gap-2">
-            
             <Button
               variant="outline"
               size="sm"
@@ -299,14 +298,27 @@ function CourseEmbedder() {
           </div>
         </div>
       </header>
-
       {/* Enhanced Content */}
-      <div className={isFullscreen ? "fixed inset-0 z-50 bg-white" : ""}>
-        <div className={`space-y-4 ${isFullscreen ? "h-full p-0" : "p-4"}`}>
+      {isFullscreen ? (
+        <FullScreenView
+          courseVideoDetail={courseVideoDetail}
+          isCompleted={isCompleted}
+          deleteUserEnrollmentData={deleteUserEnrollmentData}
+          saveUserEnrollmentData={saveUserEnrollmentData}
+          toggleFullscreen={toggleFullscreen}
+          iframeLoading={iframeLoading}
+          setIframeLoading={setIframeLoading}
+          iframeError={iframeError}
+          setIframeError={setIframeError}
+          handleNotesSave={handleNotesSave}
+          courseList={courseList}
+          triggerNotesRefresh={triggerNotesRefresh}
+          userDetail={userDetail}
+        />
+      ) : (
+        <div className="space-y-4 p-4">
           {/* Enhanced Header Card */}
-          <Card className={`border-0 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-sm shadow-md overflow-hidden relative ${
-            isFullscreen ? "hidden" : ""
-          }`}>
+          <Card className="border-0 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-sm shadow-md overflow-hidden relative">
             <CardHeader className="">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
@@ -347,14 +359,12 @@ function CourseEmbedder() {
             </CardHeader>
           </Card>
 
-          <div className={`grid grid-cols-1 lg:grid-cols-4 h-full gap-4 `}>
-            <div className={"lg:col-span-3 space-y-4 h-full"}>
+          <div className="grid grid-cols-1 lg:grid-cols-4 h-full gap-4">
+            <div className="lg:col-span-3 space-y-4 h-full">
               {/* Enhanced Content Section */}
-              <Card className={`shadow-lg bg-white/70 backdrop-blur-sm ${
-                isFullscreen ? "h-full border-0 rounded-none" : "border-0"
-              }`}>
-                <CardContent className={`${isFullscreen ? "h-full p-0" : "px-0"}`}>
-                  <div className={`w-full relative ${isFullscreen ? "h-full" : ""}`}>
+              <Card className="shadow-lg bg-white/70 backdrop-blur-sm border-0">
+                <CardContent className="px-0">
+                  <div className="w-full relative">
                     {/* Fullscreen Toggle Button */}
                     <Button
                       variant="outline"
@@ -362,19 +372,10 @@ function CourseEmbedder() {
                       onClick={toggleFullscreen}
                       className="absolute top-2 right-2 z-20 bg-white/90 hover:bg-white shadow-sm"
                     >
-                      {isFullscreen ? (
-                        <>
-                          <Minimize className="h-4 w-4 mr-1" />
-                          Exit Fullscreen
-                        </>
-                      ) : (
-                        <>
-                          <Maximize className="h-4 w-4 mr-1" />
-                          Fullscreen
-                        </>
-                      )}
+                      <Maximize className="h-4 w-4 mr-1" />
+                      Fullscreen
                     </Button>
-                    
+
                     {iframeLoading && (
                       <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-lg z-10">
                         <div className="flex items-center gap-2 text-gray-600">
@@ -406,9 +407,7 @@ function CourseEmbedder() {
                           courseVideoDetail?.courseWrittenTitle ||
                           "Course Content"
                         }
-                        className={`w-full border-0 rounded-lg shadow-inner ${
-                          isFullscreen ? "h-full" : "h-[600px]"
-                        }`}
+                        className="w-full border-0 rounded-sm shadow-inner h-[600px]"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
                         loading="lazy"
@@ -422,10 +421,8 @@ function CourseEmbedder() {
                   </div>
                 </CardContent>
               </Card>
-
- 
             </div>
-            <div className={"lg:col-span-1 overflow-y-auto   my-4 space-y-4"}>
+            <div className="lg:col-span-1 overflow-y-auto my-4 space-y-4">
               {/* Enhanced Notes Creation Section */}
               <CreateNotesModule
                 handleNotesSave={handleNotesSave}
@@ -443,9 +440,121 @@ function CourseEmbedder() {
             </div>
           </div>
         </div>
-      </div>
+      )}{" "}
     </>
   );
 }
 
 export default CourseEmbedder;
+
+function FullScreenView({
+  courseVideoDetail,
+  isCompleted,
+  deleteUserEnrollmentData,
+  saveUserEnrollmentData,
+  toggleFullscreen,
+  iframeLoading,
+  setIframeLoading,
+  iframeError,
+  setIframeError,
+  handleNotesSave,
+  courseList,
+  triggerNotesRefresh,
+  userDetail,
+}) {
+  return (
+    <div className="fixed inset-0 z-50 bg-white">
+      <div className="space-y-4 h-full p-0">
+        <div className="grid grid-cols-1 lg:grid-cols-4 h-full gap-4">
+          <div className="lg:col-span-3 space-y-4 h-full">
+            {/* Enhanced Content Section */}
+            <Card className="shadow-lg bg-white/70 backdrop-blur-sm h-full border-0 rounded-none">
+              <CardContent className="h-full p-0">
+                <div className="w-full relative h-full">
+                  {/* Fullscreen Toggle Button */}
+                  {/* <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={toggleFullscreen}
+                    className="absolute top-2 right-2 z-20 bg-white/90 hover:bg-white shadow-sm"
+                  >
+                    <Minimize className="h-4 w-4 mr-1" />
+                    Exit Fullscreen
+                  </Button> */}
+
+                  {iframeLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-lg z-10">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                        <span>Loading content...</span>
+                      </div>
+                    </div>
+                  )}
+                  {iframeError ? (
+                    <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg border border-red-200">
+                      <div className="text-center text-red-600">
+                        <p className="mb-2">Failed to load content</p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setIframeError(false);
+                            setIframeLoading(true);
+                          }}
+                        >
+                          Retry
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <iframe
+                      src={"https://ocpj21.javastudyguide.com"}
+                      title={
+                        courseVideoDetail?.courseWrittenTitle ||
+                        "Course Content"
+                      }
+                      className="w-full border-0 rounded-sm shadow-inner h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      loading="lazy"
+                      onLoad={() => setIframeLoading(false)}
+                      onError={() => {
+                        setIframeLoading(false);
+                        setIframeError(true);
+                      }}
+                    />
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="lg:col-span-1 overflow-y-auto my-4 space-y-4">
+            {/* Enhanced Notes Creation Section */}
+            <CreateNotesModule
+              handleNotesSave={handleNotesSave}
+              courseId={courseList.courseId}
+              courseContentId={courseVideoDetail?.courseContentId}
+            />
+
+            {/* Enhanced Notes Module */}
+            <NotesModule
+              refreshTrigger={triggerNotesRefresh}
+              courseId={courseList.courseId}
+              userId={userDetail.userId}
+              courseContentId={courseVideoDetail?.courseContentId}
+            />
+          </div>
+        </div>
+
+        <Button
+          size="sm"
+          onClick={toggleFullscreen}
+          className="absolute bottom-2 left-2 z-20  shadow-sm"
+        >
+          <Minimize className="h-4 w-4 mr-1" />
+          Exit Fullscreen
+        </Button>
+      </div>
+    </div>
+  );
+}
