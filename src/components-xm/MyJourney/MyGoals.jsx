@@ -196,10 +196,11 @@ const MyGoals = () => {
     <div className=" ">
       <GoalsAnalyticsDashboard goalsData={goals} />
       <div className="flex justify-between items-center my-6">
-        <h2 className="text-2xl font-bold">My Goals</h2>
+        {/* <h2 className="text-2xl font-bold">My Goals</h2> */}
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
             <Button
+            className="ml-auto"
               onClick={() => {
                 setEditingGoal(null);
                 form.reset();
@@ -745,42 +746,7 @@ const GoalsAnalyticsDashboard = ({goalsData}) => {
         <StatCard title="Average Progress" value={`${analytics.averageProgress}%`} icon={CheckCircle} color="text-green-600"/>
       </div>
 
-      {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        {/* Status Distribution */}
-        <div className="bg-white rounded-md shadow-sm border p-4">
-          <h3 className="text-base font-semibold text-gray-900 mb-2">Goal Status</h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <PieChart>
-              <Pie data={analytics.statusData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={5} dataKey="value">
-                {analytics.statusData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Progress Trend */}
-        <div className="bg-white rounded-md shadow-sm border p-4">
-          <h3 className="text-base font-semibold text-gray-900 mb-2">Progress Trend</h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <AreaChart data={goalsData.map(g => ({ 
-              name: `Goal ${g.id}`, 
-              progress: g.progress,
-              title: g.title.substring(0, 20) + '...'
-            }))}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis domain={[0, 100]} />
-              <Tooltip formatter={(value, name) => [`${value}%`, 'Progress']} labelFormatter={(label) => `Goal: ${label}`} />
-              <Area type="monotone" dataKey="progress" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
+ 
     </div>
   );
 };
