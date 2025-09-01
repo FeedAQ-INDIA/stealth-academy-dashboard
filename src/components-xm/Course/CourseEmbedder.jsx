@@ -347,12 +347,8 @@ function CourseEmbedder() {
             </CardHeader>
           </Card>
 
-          <div className={`grid grid-cols-1 ${
-            isFullscreen ? "lg:grid-cols-4 h-full gap-0" : "lg:grid-cols-6 gap-4"
-          }`}>
-            <div className={`${
-              isFullscreen ? "lg:col-span-3 h-full" : "lg:col-span-4 space-y-4"
-            }`}>
+          <div className={`grid grid-cols-1 lg:grid-cols-4 h-full gap-4 `}>
+            <div className={"lg:col-span-3 space-y-4 h-full"}>
               {/* Enhanced Content Section */}
               <Card className={`shadow-lg bg-white/70 backdrop-blur-sm ${
                 isFullscreen ? "h-full border-0 rounded-none" : "border-0"
@@ -429,9 +425,7 @@ function CourseEmbedder() {
 
  
             </div>
-            <div className={`${
-              isFullscreen ? "lg:col-span-1 overflow-y-auto p-2 my-4 space-y-4" : "lg:col-span-2 space-y-4"
-            }`}>
+            <div className={"lg:col-span-1 overflow-y-auto   my-4 space-y-4"}>
               {/* Enhanced Notes Creation Section */}
               <CreateNotesModule
                 handleNotesSave={handleNotesSave}

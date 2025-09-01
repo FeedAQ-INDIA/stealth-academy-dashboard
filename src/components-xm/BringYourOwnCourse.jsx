@@ -97,7 +97,7 @@ export default function BringYourOwnCourse() {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-5 md:p-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-5 md:p-4 gap-4">
       <Card className="bg-white md:col-span-3 mb-0 shadow-lg rounded-lg h-[calc(100svh-4em)] md:h-[calc(100svh-6em)] overflow-y-scroll">
         <CardHeader>
           <h2 className="text-2xl font-bold">Bring Your Own Course</h2>
