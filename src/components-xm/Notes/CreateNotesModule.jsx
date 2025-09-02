@@ -10,7 +10,7 @@ import {Form, FormControl, FormField, FormItem, FormMessage} from "@/components/
 import {toast} from "@/components/hooks/use-toast.js";
 import {Save, RotateCcw, FileText, Loader2} from "lucide-react";
 
-function CreateNotesModule({courseId, courseContentId, handleNotesSave, handleGetCurrentTime}) {
+function CreateNotesModule({courseId, courseContentId, handleNotesSave, handleGetCurrentTime=null}) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [wordCount, setWordCount] = useState(0);
     const [charCount, setCharCount] = useState(0);
@@ -47,7 +47,7 @@ function CreateNotesModule({courseId, courseContentId, handleNotesSave, handleGe
                     courseId,
                     courseContentId,
                     noteContent: data.noteContent,
-                    noteRefTimestamp: handleGetCurrentTime()
+                    noteRefTimestamp: (handleGetCurrentTime !== null) ? handleGetCurrentTime() : null
                 }
             );
 
