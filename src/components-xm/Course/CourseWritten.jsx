@@ -364,73 +364,84 @@ function CourseWritten() {
               {/* Enhanced Content Section */}
               <Card className="shadow-lg bg-white/70 backdrop-blur-sm border-0">
                 <CardContent className="px-0">
-                                  <div className="w-full relative ">
+                  <div className="w-full relative ">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={toggleFullscreen}
+                      className="absolute top-2 right-2 z-20 bg-white/90 hover:bg-white shadow-sm"
+                    >
+                      <Maximize className="h-4 w-4 mr-1" />
+                      Fullscreen
+                    </Button>
+                    {courseVideoDetail.courseWrittenEmbedUrl ? (
+                      courseVideoDetail.courseWrittenUrlIsEmbeddable == null ||
+                      courseVideoDetail.courseWrittenUrlIsEmbeddable ===
+                        false ? (
+                        <div
+                          className="whitespace-pre-wrap break-words text-gray-800 leading-relaxed p-4"
+                       >
+                        <div className="mb-4">
 
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={toggleFullscreen}
-                    className="absolute top-2 right-2 z-20 bg-white/90 hover:bg-white shadow-sm"
-                  >
-                    <Maximize className="h-4 w-4 mr-1" />
-                    Fullscreen
-                  </Button>
-                  {courseVideoDetail.courseWrittenUrlIsEmbeddable == null ||
-                  courseVideoDetail.courseWrittenUrlIsEmbeddable === false ? (
-                    <div
-                      className="whitespace-pre-wrap break-words text-gray-800 leading-relaxed p-4"
-                      dangerouslySetInnerHTML={{
-                        __html: courseVideoDetail?.courseWrittenContent,
-                      }}
-                    />
-                  ) : (
-                <>
-
-                      {iframeLoading && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-lg z-10">
-                          <div className="flex items-center gap-2 text-gray-600">
-                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                            <span>Loading content...</span>
-                          </div>
-                        </div>
-                      )}
-                      {iframeError ? (
-                        <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg border border-red-200">
-                          <div className="text-center text-red-600">
-                            <p className="mb-2">Failed to load content</p>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                setIframeError(false);
-                                setIframeLoading(true);
-                              }}
-                            >
-                              Retry
-                            </Button>
-                          </div>
-                        </div>
+                        <h2 className="text-lg font-semibold ">Navigate to this url for the content</h2>
+                        <p className="italic text-muted-foreground text-xs text-red-900">*This url does not allow embedding</p>
+                        </div><a href={courseVideoDetail?.courseWrittenEmbedUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{courseVideoDetail?.courseWrittenEmbedUrl}</a>
+                       </div>    
                       ) : (
-                        <iframe
-                          src={courseVideoDetail?.courseWrittenEmbedUrl}
-                          title={
-                            courseVideoDetail?.courseWrittenTitle ||
-                            "Course Content"
-                          }
-                          className="w-full border-0 rounded-sm shadow-inner h-[600px]"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          loading="lazy"
-                          onLoad={() => setIframeLoading(false)}
-                          onError={() => {
-                            setIframeLoading(false);
-                            setIframeError(true);
-                          }}
-                        />
-                      )}
-                      </>
-                   )}
-                   </div>
+                        <>
+                          {iframeLoading && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-lg z-10">
+                              <div className="flex items-center gap-2 text-gray-600">
+                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                                <span>Loading content...</span>
+                              </div>
+                            </div>
+                          )}
+                          {iframeError ? (
+                            <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg border border-red-200">
+                              <div className="text-center text-red-600">
+                                <p className="mb-2">Failed to load content</p>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    setIframeError(false);
+                                    setIframeLoading(true);
+                                  }}
+                                >
+                                  Retry
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <iframe
+                              src={courseVideoDetail?.courseWrittenEmbedUrl}
+                              title={
+                                courseVideoDetail?.courseWrittenTitle ||
+                                "Course Content"
+                              }
+                              className="w-full border-0 rounded-sm shadow-inner h-[600px]"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              loading="lazy"
+                              onLoad={() => setIframeLoading(false)}
+                              onError={() => {
+                                setIframeLoading(false);
+                                setIframeError(true);
+                              }}
+                            />
+                          )}
+                        </>
+                      )
+                    ) : (
+                      <div
+                        className="whitespace-pre-wrap break-words text-gray-800 leading-relaxed p-4"
+                        dangerouslySetInnerHTML={{
+                          __html: courseVideoDetail?.courseWrittenContent,
+                        }}
+                      />
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             </div>

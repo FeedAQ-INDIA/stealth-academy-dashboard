@@ -195,20 +195,27 @@ export default function MyLearningSchedule() {
 
   return (
  
+        <div className="flex flex-col md:flex-row gap-4">
 
-    <Card className="min-h-[600px]">
+    <Card className="flex-1/2">
       <CardHeader>
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Calendar Section */}
+           {/* Calendar Section */}
           <Calendar
             mode="single"
             selected={date}
             onSelect={handleDateChange}
-            className="bg-transparent p-0 flex-1/2"
+            className="bg-transparent p-0 "
             required
           />
+          
+       </CardHeader>
+    </Card>
+
+     <Card className="flex-1">
+      <CardHeader>
+       
           {/* Event Section */}
-          <div className="flex flex-col items-start gap-3 flex-1">
+          <div className="flex flex-col items-start gap-3 ">
             <div className="flex w-full items-center justify-between">
               <div className="text-sm font-medium">
                 {date?.toLocaleDateString("en-US", {
@@ -415,8 +422,9 @@ export default function MyLearningSchedule() {
               )}
             </div>
           </div>
-        </div>
-      </CardHeader>
+       </CardHeader>
     </Card>
+
+    </div>
   );
 }
