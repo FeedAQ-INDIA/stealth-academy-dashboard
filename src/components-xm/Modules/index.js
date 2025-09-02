@@ -7,6 +7,9 @@ export { default as WishlistCourseCard } from './WishlistCourseCard.jsx';
 // Goal Card Components
 export { default as GoalCard } from './GoalCard.jsx';
 
+// Event Card Components
+export { default as EventCard } from './EventCard.jsx';
+
 /**
  * Course Card Components Documentation
  * 
