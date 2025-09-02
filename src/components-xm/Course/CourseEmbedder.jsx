@@ -538,7 +538,7 @@ function FullScreenView({
               </CardContent>
             </Card>
           </div>
-          <div className="lg:col-span-1 overflow-y-auto my-4 space-y-4">
+          <div className="lg:col-span-1 overflow-y-auto  space-y-4">
             {/* Enhanced Notes Creation Section */}
             <CreateNotesModule
               handleNotesSave={handleNotesSave}

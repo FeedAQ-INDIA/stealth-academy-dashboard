@@ -13,6 +13,8 @@ import {
   Timer as Timeline
 } from "lucide-react";
 
+import { GoalCard } from "../Modules";
+
 import axiosConn from "@/axioscon";
 import {
   Sheet,
@@ -23,14 +25,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
   Form,
@@ -68,8 +62,6 @@ const goalSchema = z.object({
 const MyGoals = () => {
   const [goals, setGoals] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [selectedGoal, setSelectedGoal] = useState(null);
   const [editingGoal, setEditingGoal] = useState(null);
 
   const form = useForm({
@@ -174,22 +166,6 @@ const MyGoals = () => {
       progress: goal.progress,
     });
     setIsOpen(true);
-  };
-
-  const handleDelete = (goalId) => {
-    const requestBody = {
-      userGoalId: goalId,
-      status: "ABANDONED",
-    };
-
-    axiosConn
-      .post("/goal/createOrUpdate", requestBody)
-      .then((res) => {
- fetchGoals();
-       })
-      .catch((error) => {
-        console.error("Error deleting goal:", error);
-      });
   };
 
   return (
@@ -376,257 +352,16 @@ const MyGoals = () => {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {goals.map((goal) => (
-          <Card key={goal.id} className="relative overflow-hidden">
-            <div
-              className={`absolute top-0 left-0 w-1 h-full ${
-                goal.status === "COMPLETED"
-                  ? "bg-green-500"
-                  : goal.status === "IN_PROGRESS"
-                  ? "bg-blue-500"
-                  : goal.status === "ABANDONED"
-                  ? "bg-red-500"
-                  : "bg-gray-400"
-              }`}
-            />
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-lg">{goal.title}</CardTitle>
-                  <CardDescription className="mt-1.5 line-clamp-2">
-                    {goal.description}
-                  </CardDescription>
-                </div>
-        
-              </div>
-            </CardHeader>
-
-            <CardContent className="pb-3">
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="space-y-2">
-                    <p className="text-gray-500">Planned Start</p>
-                    <p className="font-medium">
-                      {format(new Date(goal.startDate), "MMM dd, yyyy")}
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-gray-500">Target Date</p>
-                    <p className="font-medium">
-                      {format(new Date(goal.targetDate), "MMM dd, yyyy")}
-                    </p>
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Progress section */}
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center text-sm">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        goal.status === "COMPLETED"
-                          ? "bg-green-100 text-green-800"
-                          : goal.status === "IN_PROGRESS"
-                          ? "bg-blue-100 text-blue-800"
-                          : goal.status === "ABANDONED"
-                          ? "bg-red-100 text-red-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {goal.status.replace("_", " ")}
-                    </span>
-                    <span className="font-medium">{goal.progress}%</span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2.5">
-                    <div
-                      className={`h-2.5 rounded-full transition-all duration-300 ${
-                        goal.status === "COMPLETED"
-                          ? "bg-green-500"
-                          : goal.status === "IN_PROGRESS"
-                          ? "bg-blue-500"
-                          : goal.status === "ABANDONED"
-                          ? "bg-red-500"
-                          : "bg-gray-400"
-                      }`}
-                      style={{ width: `${goal.progress}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Actual dates section */}
-                {(goal.actualStartDate || goal.actualEndDate) && (
-                  <>
-                    <Separator />
-                    <div className="space-y-2 text-sm">
-                      {goal.actualStartDate && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">
-                            Actually Started
-                          </span>
-                          <span className="font-medium">
-                            {format(
-                              new Date(goal.actualStartDate),
-                              "MMM dd, yyyy"
-                            )}
-                          </span>
-                        </div>
-                      )}
-                      {goal.actualEndDate && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">
-                            {goal.status === "COMPLETED"
-                              ? "Completed"
-                              : "Ended"}
-                          </span>
-                          <span className="font-medium">
-                            {format(
-                              new Date(goal.actualEndDate),
-                              "MMM dd, yyyy"
-                            )}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
-            </CardContent>
-
-            <CardFooter className="pt-3">
-              <div className="flex justify-end space-x-2 w-full">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setSelectedGoal(goal);
-                    setIsDetailsOpen(true);
-                  }}
-                  className="w-24"
-                >
-                  View Details
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => handleEdit(goal)}
-                  className="w-24"
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDelete(goal.id)}
-                  className="w-24"
-                >
-                  Delete
-                </Button>
-              </div>
-            </CardFooter>
-          </Card>
+          <GoalCard
+            key={goal.id}
+            goal={goal}
+            onGoalUpdate={fetchGoals}
+            onEditGoal={handleEdit}
+          />
         ))}
       </div>
 
-      {/* Details Sheet */}
-      <Sheet open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <SheetContent className="overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>Goal Details</SheetTitle>
-          </SheetHeader>
-          {selectedGoal && (
-            <div className="mt-6 space-y-6">
-              <div className="space-y-2">
-                <h3 className="font-semibold text-lg">{selectedGoal.title}</h3>
-                <p className="text-gray-600 whitespace-pre-wrap">{selectedGoal.description}</p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-500">Status</p>
-                    <p className={`mt-1 font-medium ${
-                      selectedGoal.status === "COMPLETED"
-                        ? "text-green-600"
-                        : selectedGoal.status === "IN_PROGRESS"
-                        ? "text-blue-600"
-                        : selectedGoal.status === "ABANDONED"
-                        ? "text-red-600"
-                        : "text-gray-600"
-                    }`}>
-                      {selectedGoal.status.replace("_", " ")}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Progress</p>
-                    <p className="mt-1 font-medium">{selectedGoal.progress}%</p>
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div className="space-y-3">
-                  <h4 className="font-medium">Planned Timeline</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Start Date</p>
-                      <p className="mt-1">{format(new Date(selectedGoal.startDate), "MMM dd, yyyy")}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Target Date</p>
-                      <p className="mt-1">{format(new Date(selectedGoal.targetDate), "MMM dd, yyyy")}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {(selectedGoal.actualStartDate || selectedGoal.actualEndDate) && (
-                  <>
-                    <Separator />
-                    <div className="space-y-3">
-                      <h4 className="font-medium">Actual Timeline</h4>
-                      <div className="grid grid-cols-2 gap-4">
-                        {selectedGoal.actualStartDate && (
-                          <div>
-                            <p className="text-sm text-gray-500">Started On</p>
-                            <p className="mt-1">{format(new Date(selectedGoal.actualStartDate), "MMM dd, yyyy")}</p>
-                          </div>
-                        )}
-                        {selectedGoal.actualEndDate && (
-                          <div>
-                            <p className="text-sm text-gray-500">
-                              {selectedGoal.status === "COMPLETED" ? "Completed On" : "Ended On"}
-                            </p>
-                            <p className="mt-1">{format(new Date(selectedGoal.actualEndDate), "MMM dd, yyyy")}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                <Separator />
-
-                <div className="space-y-3">
-                  <h4 className="font-medium">Additional Information</h4>
-                  <div>
-                    <p className="text-sm text-gray-500">Created On</p>
-                    <p className="mt-1">{format(new Date(selectedGoal.createdAt), "MMM dd, yyyy")}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-6">
-                <Button 
-                  className="w-full" 
-                  variant="outline" 
-                  onClick={() => setIsDetailsOpen(false)}
-                >
-                  Close
-                </Button>
-              </div>
-            </div>
-          )}
-        </SheetContent>
-      </Sheet>
+      {/* Details Sheet has been moved to GoalCard component */}
     </div>
   );
 };

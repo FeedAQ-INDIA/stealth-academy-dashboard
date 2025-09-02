@@ -4,6 +4,9 @@ export { default as EnhancedCourseCard } from './EnhancedCourseCard.jsx';
 export { default as CompactCourseCard } from './CompactCourseCard.jsx';
 export { default as WishlistCourseCard } from './WishlistCourseCard.jsx';
 
+// Goal Card Components
+export { default as GoalCard } from './GoalCard.jsx';
+
 /**
  * Course Card Components Documentation
  * 
