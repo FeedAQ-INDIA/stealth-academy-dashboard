@@ -359,11 +359,14 @@ function CourseEmbedder() {
             </CardHeader>
           </Card>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 h-full gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-5 h-full gap-4">
             <div className="lg:col-span-3 space-y-4 h-full">
               {/* Enhanced Content Section */}
               <Card className="shadow-lg bg-white/70 backdrop-blur-sm border-0">
                 <CardContent className="px-0">
+
+{courseVideoDetail?.course}
+
                   <div className="w-full relative">
                     {/* Fullscreen Toggle Button */}
                     <Button
@@ -419,10 +422,12 @@ function CourseEmbedder() {
                       />
                     )}
                   </div>
+
+
                 </CardContent>
               </Card>
             </div>
-            <div className="lg:col-span-1 overflow-y-auto my-4 space-y-4">
+            <div className="lg:col-span-2 overflow-y-auto my-4 space-y-4">
               {/* Enhanced Notes Creation Section */}
               <CreateNotesModule
                 handleNotesSave={handleNotesSave}

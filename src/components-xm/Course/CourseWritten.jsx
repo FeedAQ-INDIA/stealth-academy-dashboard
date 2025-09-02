@@ -339,7 +339,7 @@ function CourseWritten() {
                 <div
                   className="whitespace-pre-wrap break-words text-gray-800 leading-relaxed"
                   dangerouslySetInnerHTML={{
-                    __html: courseVideoDetail?.courseWrittenHtmlContent,
+                    __html: courseVideoDetail?.courseWrittenContent,
                   }}
                 />
               </div>
