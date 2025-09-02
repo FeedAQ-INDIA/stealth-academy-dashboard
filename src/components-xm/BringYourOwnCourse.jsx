@@ -14,6 +14,16 @@ export default function BringYourOwnCourse() {
   const [courseDescription, setCourseDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // Helpers
+  const isValidHttpUrl = (value) => {
+    try {
+      const u = new URL(value);
+      return u.protocol === "http:" || u.protocol === "https:";
+    } catch {
+      return false;
+    }
+  };
+
   const handleUrlChange = (index, value) => {
     const newUrls = [...urls];
     newUrls[index] = value;
@@ -32,10 +42,13 @@ export default function BringYourOwnCourse() {
     e.preventDefault();
 
     // Validate inputs
-    const validUrls = urls.filter((url) => url.trim() !== "");
+    const deduped = Array.from(
+      new Set(urls.map((u) => u.trim()).filter((u) => u !== ""))
+    );
+    const validUrls = deduped;
     if (validUrls.length === 0) {
       toast({
-        title: "Please enter at least one YouTube URL",
+        title: "Please enter at least one URL",
         variant: "destructive",
       });
       return;
@@ -49,14 +62,14 @@ export default function BringYourOwnCourse() {
       return;
     }
 
-    // Validate YouTube URLs
-    const youtubeUrlRegex =
-      /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+/;
-    const invalidUrls = validUrls.filter((url) => !youtubeUrlRegex.test(url));
-
+    // Generic URL validation (allow both YouTube and non-YouTube http/https links)
+    const invalidUrls = validUrls.filter((url) => !isValidHttpUrl(url));
     if (invalidUrls.length > 0) {
       toast({
-        title: "Please enter valid YouTube URLs",
+        title: "Please enter valid http(s) URLs",
+        description: `Invalid: ${invalidUrls.slice(0, 3).join(", ")}${
+          invalidUrls.length > 3 ? " …" : ""
+        }`,
         variant: "destructive",
       });
       return;
@@ -102,9 +115,8 @@ export default function BringYourOwnCourse() {
         <CardHeader>
           <h2 className="text-2xl font-bold">Bring Your Own Course</h2>
           <p className="text-muted-foreground mt-2">
-            Enter YouTube video or playlist URLs. We'll analyze and build a
-            structured course with quizzes for each topic, subtopic, and the
-            entire course.
+            Enter YouTube video/playlist URLs or any other embeddable URLs. We'll analyze and build a
+            structured course.
           </p>
         </CardHeader>
         <CardContent>
@@ -134,13 +146,13 @@ export default function BringYourOwnCourse() {
             </div>
             <div>
               <label className="block font-medium mb-2">
-                YouTube URLs (Videos or Playlists) *
+        Content URLs (YouTube Videos/Playlists or Other Embeddable URLs) *
               </label>
               {urls.map((url, idx) => (
                 <div key={idx} className="flex items-center gap-2 mb-2">
                   <Input
                     type="url"
-                    placeholder={`Enter YouTube video or playlist URL #${
+          placeholder={`Enter YouTube or embeddable URL #${
                       idx + 1
                     }`}
                     value={url}
