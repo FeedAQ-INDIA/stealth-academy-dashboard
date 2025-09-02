@@ -232,43 +232,49 @@ const EventCard = ({
   };
   return (
     <>
-    <Card className="relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-violet-500 to-purple-500" />
+    <Card className="relative overflow-hidden hover:shadow-lg transition-all duration-300 group border-0 bg-gradient-to-br from-white to-gray-50/50">
+      {/* Compact gradient accent */}
+      <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-violet-500 via-purple-500 to-indigo-500" />
       
-      <div className="p-4">
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 bg-gradient-to-br from-violet-50/20 to-purple-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      
+      <div className="p-3 relative z-10">
         <CardHeader className="p-0">
           <div className="flex justify-between items-start">
             <div className="flex-1">
-              <CardTitle className="text-base font-semibold flex items-center gap-2">
+              <CardTitle className="text-sm font-semibold flex items-center gap-2 text-gray-800 group-hover:text-violet-800 transition-colors">
                 {event.title}
                 {event.overlappingCount > 0 && (
-                  <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800">
-                    {event.overlappingCount} overlap{event.overlappingCount > 1 ? 's' : ''}
+                  <span className="inline-flex items-center rounded-full bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-800 border border-amber-200">
+                    {event.overlappingCount}
                   </span>
                 )}
               </CardTitle>
               
-              <div className="space-y-2 mt-2">
-                {/* Event Header */}
-                <div className="flex items-center gap-2 text-xs text-gray-500">
-                  <Calendar className="h-3 w-3 text-violet-500" />
-                  <span className="font-medium">
-                    {formatEventDateRange(event.scheduledStartDate, event.scheduledEndDate)}
-                  </span>
+              <div className="space-y-1.5 mt-1.5">
+                {/* Ultra Compact Event Header */}
+                <div className="flex items-center justify-between text-xs text-gray-600 bg-violet-50 rounded p-1.5">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-3 w-3 text-violet-600" />
+                    <span className="font-medium text-gray-700 text-xs">
+                      {formatEventDateRange(event.scheduledStartDate, event.scheduledEndDate)}
+                    </span>
+                  </div>
                   {event.learningItemType && (
-                    <>
-                      <Clock className="h-3 w-3 text-violet-500 ml-1" />
-                      <span>{event.learningItemType}</span>
-                    </>
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-3 w-3 text-purple-600" />
+                      <span className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent font-medium text-xs">
+                        {event.learningItemType}
+                      </span>
+                    </div>
                   )}
                 </div>
 
-                <Separator />
-
-                {/* Event Description */}
+                {/* Ultra Compact Event Description */}
                 {event.description && (
-                  <div className="mb-2">
-                    <p className="text-black leading-snug whitespace-pre-wrap break-words text-sm">
+                  <div className="bg-gray-50 rounded p-1.5">
+                    <p className="text-gray-700 text-xs leading-tight line-clamp-1">
                       {event.description}
                     </p>
                   </div>
@@ -279,55 +285,64 @@ const EventCard = ({
         </CardHeader>
 
         {event.overlappingCount > 0 && (
-          <div className="mt-2 text-xs bg-yellow-50 rounded p-2">
-            <div className="font-medium text-yellow-800 mb-1">Overlapping with:</div>
-            <ul className="list-disc list-inside space-y-1">
-              {event.overlappingMeetings.map(overlap => (
-                <li key={overlap.id} className="text-gray-600">
-                  {overlap.title} ({formatEventTime(overlap.scheduledStartDate)} - {formatEventTime(overlap.scheduledEndDate)})
-                </li>
-              ))}
-            </ul>
+          <div className="mt-2">
+            <details className="group/details">
+              <summary className="flex items-center gap-1.5 cursor-pointer text-xs font-medium text-amber-700 hover:text-amber-800 transition-colors">
+                <span className="flex items-center gap-1">
+                  <span className="text-sm">⚠️</span>
+                  <span>{event.overlappingCount} conflict{event.overlappingCount > 1 ? 's' : ''}</span>
+                </span>
+                <svg className="w-3 h-3 transition-transform group-open/details:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div className="mt-1.5 space-y-1 border-l-2 border-amber-200 pl-2">
+                {event.overlappingMeetings.map(overlap => (
+                  <div key={overlap.id} className="text-xs bg-amber-50 rounded p-1.5 border border-amber-100">
+                    <div className="font-medium text-amber-800 truncate text-xs">{overlap.title}</div>
+                    <div className="text-amber-600 font-mono text-xs">
+                      {formatEventTime(overlap.scheduledStartDate)} - {formatEventTime(overlap.scheduledEndDate)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </details>
           </div>
         )}
 
-        <CardFooter className="p-0 pt-3">
+        <CardFooter className="p-0 pt-2">
           <div className="flex justify-end space-x-1 w-full">
             <Button
               variant="outline"
               size="xs"
-              className="h-7 px-3 text-xs"
+              className="h-6 px-2 text-xs border-violet-200 text-violet-700 hover:bg-violet-50 hover:border-violet-300 transition-all duration-200"
               onClick={() => setIsDetailsOpen(true)}
               title="View Details"
             >
-              <BookOpen className="h-3 w-3 mr-1" />
-              Details
+              <BookOpen className="h-3 w-3" />
             </Button>
             <Button
               variant="outline"
               size="xs"
-              className="h-7 px-3 text-xs"
+              className="h-6 px-2 text-xs border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
               onClick={handleEditSchedule}
               title="Edit Schedule"
             >
-              <Pencil className="h-3 w-3 mr-1" />
-              Edit
+              <Pencil className="h-3 w-3" />
             </Button>
             <Button
-              variant="destructive"
+              variant="outline"
               size="xs"
-              className="h-7 px-3 text-xs"
+              className="h-6 px-2 text-xs border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300 transition-all duration-200"
               onClick={() => setIsDeleteDialogOpen(true)}
               title="Delete Schedule"
             >
-              <Trash2 className="h-3 w-3 mr-1" />
-              Delete
+              <Trash2 className="h-3 w-3" />
             </Button>
             {event.scheduledLink && (
               <Button
                 size="xs"
-                variant="outline"
-                className="h-7 px-3 text-xs bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white border-violet-600"
+                className="h-6 px-2 text-xs bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200"
                 onClick={() => onJoinLink(event.scheduledLink)}
               >
                 Join
@@ -340,99 +355,111 @@ const EventCard = ({
 
       {/* Event Details Sheet */}
       <Sheet open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>Event Details</SheetTitle>
+        <SheetContent className="flex flex-col">
+          <SheetHeader className="flex-shrink-0">
+            <SheetTitle className="text-xl font-semibold">Event Details</SheetTitle>
           </SheetHeader>
-          <div className="mt-6 space-y-6">
+          <div className="flex-1 overflow-y-auto mt-6">
+            <div className="space-y-6 pr-4">
             {/* Title and Type Section */}
             <div className="space-y-2">
               <h3 className="text-lg font-semibold">{event.title}</h3>
-              <div className="text-sm font-medium text-primary">
-                {event.learningItemType}
-              </div>
+              {event.learningItemType && (
+                <div className="inline-flex items-center px-3 py-1 bg-violet-100 text-violet-800 text-sm font-medium rounded-full">
+                  {event.learningItemType}
+                </div>
+              )}
             </div>
 
             {/* Time Section */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <h4 className="text-sm font-medium text-muted-foreground">Schedule</h4>
-              <div className="space-y-1">
-                <div className="text-sm">
-                  <span className="font-medium">Start:</span>{" "}
-                  {new Date(event.scheduledStartDate).toLocaleString()}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <div className="text-sm font-medium">Start</div>
+                    <div className="text-sm text-muted-foreground">
+                      {new Date(event.scheduledStartDate).toLocaleString()}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-sm">
-                  <span className="font-medium">End:</span>{" "}
-                  {new Date(event.scheduledEndDate).toLocaleString()}
+                <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <div className="text-sm font-medium">End</div>
+                    <div className="text-sm text-muted-foreground">
+                      {new Date(event.scheduledEndDate).toLocaleString()}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Description Section */}
             {event.description && (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <h4 className="text-sm font-medium text-muted-foreground">Description</h4>
-                <div className="rounded-lg border p-4">
-                  <p className="text-sm">{event.description}</p>
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <p className="text-sm leading-relaxed">{event.description}</p>
                 </div>
               </div>
             )}
 
             {/* Link Section */}
             {event.scheduledLink && (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <h4 className="text-sm font-medium text-muted-foreground">Learning Resource</h4>
-                <div className="rounded-lg border p-4">
-                  <Button 
-                    className="w-full"
-                    onClick={() => window.open(event.scheduledLink, "_blank")}
-                  >
-                    Join Learning Session
-                  </Button>
-                </div>
+                <Button 
+                  className="w-full"
+                  onClick={() => window.open(event.scheduledLink, "_blank")}
+                >
+                  Join Learning Session
+                </Button>
               </div>
             )}
 
             {/* Conflicts Section */}
             {event.overlappingCount > 0 && (
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium text-yellow-800">
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium text-muted-foreground">
                   Scheduling Conflicts ({event.overlappingCount})
                 </h4>
-                <div className="rounded-lg bg-yellow-50 p-4">
-                  <ul className="space-y-2">
-                    {event.overlappingMeetings?.map(overlap => (
-                      <li key={overlap.id} className="text-sm">
-                        <span className="font-medium">{overlap.title}</span>
-                        <br />
-                        <span className="text-muted-foreground">
-                          {formatEventTime(overlap.scheduledStartDate)} - {formatEventTime(overlap.scheduledEndDate)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                <div className="space-y-2">
+                  {event.overlappingMeetings?.map(overlap => (
+                    <div key={overlap.id} className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <div className="font-medium text-sm">{overlap.title}</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {formatEventTime(overlap.scheduledStartDate)} - {formatEventTime(overlap.scheduledEndDate)}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
 
             {/* Metadata Section */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <h4 className="text-sm font-medium text-muted-foreground">Additional Information</h4>
-              <div className="rounded-lg border p-4 space-y-1">
-                <div className="text-sm">
-                  <span className="font-medium">Created:</span>{" "}
-                  {event.v_created_date} {event.v_created_time}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                  <span className="text-sm font-medium">Created</span>
+                  <span className="text-sm text-muted-foreground">
+                    {event.v_created_date} {event.v_created_time}
+                  </span>
                 </div>
                 {event.updatedAt && (
-                  <div className="text-sm">
-                    <span className="font-medium">Last Updated:</span>{" "}
-                    {event.v_updated_date} {event.v_updated_time}
+                  <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                    <span className="text-sm font-medium">Last Updated</span>
+                    <span className="text-sm text-muted-foreground">
+                      {event.v_updated_date} {event.v_updated_time}
+                    </span>
                   </div>
                 )}
               </div>
             </div>
 
-            <SheetFooter>
+            <SheetFooter className="flex-shrink-0">
               <Button
                 variant="outline"
                 onClick={() => {
@@ -440,31 +467,34 @@ const EventCard = ({
                   setIsDetailsOpen(false);
                 }}
               >
+                <Pencil className="h-4 w-4 mr-2" />
                 Edit Schedule
               </Button>
             </SheetFooter>
+            </div>
           </div>
         </SheetContent>
       </Sheet>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent className="bg-gradient-to-br from-red-50 to-pink-50 border-red-200">
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2 text-red-800">
-              <Trash2 className="h-5 w-5 text-red-600" />
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-destructive" />
               Delete Schedule
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-red-700/80">
-              Are you sure you want to delete "{event.title}"? This action cannot be undone.
+            <AlertDialogDescription>
+              Are you sure you want to delete <span className="font-medium">"{event.title}"</span>? 
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-gray-300">Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteSchedule}
               disabled={isDeleting}
-              className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeleting ? (
                 <>
@@ -472,7 +502,10 @@ const EventCard = ({
                   Deleting...
                 </>
               ) : (
-                "Delete Forever"
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </>
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -486,33 +519,37 @@ const EventCard = ({
         }
         setIsEditOpen(open);
       }}>
-        <SheetContent className="h-full flex flex-col bg-gradient-to-br from-violet-50 to-purple-50 border-violet-200">
+        <SheetContent className="flex flex-col">
           <SheetHeader>
-            <SheetTitle className="flex items-center gap-2 text-xl text-violet-800">
-              <Pencil className="h-5 w-5 text-violet-600" />
+            <SheetTitle className="flex items-center gap-2">
+              <Pencil className="h-5 w-5" />
               Edit Learning Schedule
             </SheetTitle>
-            <SheetDescription className="text-violet-600/70">
-              Update your existing learning schedule.
+            <SheetDescription>
+              Update your learning schedule details.
             </SheetDescription>
           </SheetHeader>
-          <Form {...form} className="flex-1 flex flex-col h-full">
+          <Form {...form} className="flex-1 flex flex-col ">
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-4 flex-1 overflow-y-auto px-2"
+              className="space-y-4 flex-1 overflow-y-auto py-4 px-2"
             >
               {event.overlappingCount > 0 && (
-                <div className="bg-yellow-50 p-2 rounded mt-2">
-                  <div className="text-yellow-800 font-medium mb-1">
-                    {event.overlappingCount} Scheduling Conflict{event.overlappingCount > 1 ? 's' : ''}
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <div className="flex items-center gap-2 text-amber-800 font-medium mb-2 text-sm">
+                    <span>⚠️</span>
+                    <span>{event.overlappingCount} Scheduling Conflict{event.overlappingCount > 1 ? 's' : ''}</span>
                   </div>
-                  <ul className="list-disc list-inside space-y-1">
+                  <div className="space-y-2">
                     {event.overlappingMeetings?.map(overlap => (
-                      <li key={overlap.id} className="text-gray-600">
-                        {overlap.title} ({formatEventTime(overlap.scheduledStartDate)} - {formatEventTime(overlap.scheduledEndDate)})
-                      </li>
+                      <div key={overlap.id} className="text-sm bg-white rounded p-2 border border-amber-100">
+                        <div className="font-medium text-gray-700 truncate">{overlap.title}</div>
+                        <div className="text-amber-700 text-xs">
+                          {formatEventTime(overlap.scheduledStartDate)} - {formatEventTime(overlap.scheduledEndDate)}
+                        </div>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               )}
               
@@ -525,7 +562,7 @@ const EventCard = ({
                     <FormControl>
                       <Input 
                         {...field} 
-                        className="border-violet-200 focus:border-violet-400 focus:ring-violet-400/20"
+                        placeholder="Enter event title..."
                       />
                     </FormControl>
                     <FormMessage />
@@ -545,7 +582,7 @@ const EventCard = ({
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select type" />
+                          <SelectValue placeholder="Select learning type" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -561,41 +598,41 @@ const EventCard = ({
                 )}
               />
               
-              <FormField
-                control={form.control}
-                name="scheduledStartDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Start Time</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="datetime-local" 
-                        {...field} 
-                        className="border-violet-200 focus:border-violet-400 focus:ring-violet-400/20"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="scheduledEndDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>End Time</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="datetime-local" 
-                        {...field} 
-                        className="border-violet-200 focus:border-violet-400 focus:ring-violet-400/20"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-1 gap-4">
+                <FormField
+                  control={form.control}
+                  name="scheduledStartDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Start Time</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="datetime-local" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="scheduledEndDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>End Time</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="datetime-local" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               
               <FormField
                 control={form.control}
@@ -606,9 +643,8 @@ const EventCard = ({
                     <FormControl>
                       <Input
                         type="url"
-                        placeholder="https://..."
+                        placeholder="https://example.com/learning-resource"
                         {...field}
-                        className="border-violet-200 focus:border-violet-400 focus:ring-violet-400/20"
                       />
                     </FormControl>
                     <FormMessage />
@@ -625,7 +661,7 @@ const EventCard = ({
                     <FormControl>
                       <Input 
                         {...field} 
-                        className="border-violet-200 focus:border-violet-400 focus:ring-violet-400/20"
+                        placeholder="Add a description for your learning session..."
                       />
                     </FormControl>
                     <FormMessage />
@@ -633,40 +669,35 @@ const EventCard = ({
                 )}
               />
 
-              <div className="sticky bottom-0 bg-background pt-4">
-                <SheetFooter className="gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => form.reset()}
-                    className="border-violet-200 text-violet-600 hover:bg-violet-50"
-                  >
-                    Reset
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="border-gray-300"
-                    onClick={() => setIsEditOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={isEditing}
-                    className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
-                  >
-                    {isEditing ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Updating...
-                      </>
-                    ) : (
-                      "Save Changes"
-                    )}
-                  </Button>
-                </SheetFooter>
-              </div>
+              <SheetFooter className="border-t pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => form.reset()}
+                >
+                  Reset
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isEditing}
+                >
+                  {isEditing ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Updating...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </Button>
+              </SheetFooter>
             </form>
           </Form>
         </SheetContent>
