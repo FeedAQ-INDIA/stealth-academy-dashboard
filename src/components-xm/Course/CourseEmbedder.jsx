@@ -365,9 +365,12 @@ function CourseEmbedder() {
               <Card className="shadow-lg bg-white/70 backdrop-blur-sm border-0">
                 <CardContent className="px-0">
 
-{courseVideoDetail?.course}
-
-                  <div className="w-full relative">
+                {courseVideoDetail?.courseWrittenUrlIsEmbeddable  ?  <div
+                  className="whitespace-pre-wrap break-words text-gray-800 leading-relaxed"
+                  dangerouslySetInnerHTML={{
+                    __html: courseVideoDetail?.courseWrittenContent,
+                  }}
+                />  :   <div className="w-full relative">
                     {/* Fullscreen Toggle Button */}
                     <Button
                       variant="outline"
@@ -421,7 +424,9 @@ function CourseEmbedder() {
                         }}
                       />
                     )}
-                  </div>
+                  </div>  }
+
+               
 
 
                 </CardContent>

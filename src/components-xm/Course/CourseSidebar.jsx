@@ -264,13 +264,6 @@ function CourseSidebar() {
                   location.pathname === `/course/${courseList?.courseId}`,
               },
               {
-                title: "OVERVIEW",
-                url: `/course/${courseList?.courseId}/embed`,
-                isClickable: true,
-                isActive:
-                  location.pathname === `/course/${courseList?.courseId}/embed`,
-              },
-              {
                 title: "COURSE NOTES",
                 url: `/course/${courseList?.courseId}/notes`,
                 isClickable: true,
