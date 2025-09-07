@@ -176,6 +176,7 @@ const MyGoals = () => {
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
             <Button
+            size="sm"
             className="ml-auto"
               onClick={() => {
                 setEditingGoal(null);

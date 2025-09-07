@@ -70,7 +70,7 @@ function SignInPage() {
                             {/*</Alert>*/}
                         </CardDescription>
 
-                        <div className="mt-8 space-y-4">
+                        <div className="mt-8 space-y-4  ">
                             {/* Google Login */}
                             <Link   to={`${import.meta.env.VITE_API_URL}/auth/google${redirectUri? '?redirectUri='+redirectUri : ''}`}>
                                 <Button
