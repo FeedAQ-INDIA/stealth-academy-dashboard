@@ -232,12 +232,14 @@ const EventCard = ({
   };
   return (
     <>
-    <Card className="relative overflow-hidden hover:shadow-lg transition-all duration-300 group border-0 bg-gradient-to-br from-white to-gray-50/50">
+    <Card className="relative overflow-hidden rounded-sm">
       {/* Compact gradient accent */}
-      <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-violet-500 via-purple-500 to-indigo-500" />
-      
+      {/* <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-violet-500 via-purple-500 to-indigo-500" /> */}
+              <div
+          className={`absolute top-0 left-0 w-1 h-full  bg-blue-500`}
+        />
       {/* Subtle background pattern */}
-      <div className="absolute inset-0 bg-gradient-to-br from-violet-50/20 to-purple-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      {/* <div className="absolute inset-0 bg-gradient-to-br from-violet-50/20 to-purple-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" /> */}
       
       <div className="p-3 relative z-10">
         <CardHeader className="p-0">

@@ -10,6 +10,7 @@ import {
 import { Link } from "react-router-dom";
 import { useAuthStore } from "@/zustland/store.js";
 import PropTypes from "prop-types";
+import byoc2 from "@/assets/byoc_2.png";
 
 export function CourseCard({ course, viewMode = "grid" }) {
   const { userDetail } = useAuthStore();
@@ -21,14 +22,14 @@ export function CourseCard({ course, viewMode = "grid" }) {
           {/* Image */}
           <div className="relative flex-shrink-0">
             <img
-              src={course.courseImageUrl}
+              src={course.courseImageUrl || byoc2}
               className="w-32 h-24 object-cover rounded-lg"
               alt={course.courseTitle}
             />
             {course.enrollments && (
               <div className="absolute top-1 right-1">
                 <Badge variant="secondary" className="text-xs">
-                  {course.enrollments?.[0]?.enrollmentStatus || "URS"}CVSF
+                  {course.enrollments?.[0]?.enrollmentStatus || "URS"}
                 </Badge>
               </div>
             )}
@@ -45,21 +46,7 @@ export function CourseCard({ course, viewMode = "grid" }) {
                       {course.courseSource}
                     </Badge>
                   )}
-                  {course.courseLevel && (
-                    <Badge variant="outline" className="text-xs">
-                      {course.courseLevel}
-                    </Badge>
-                  )}
-                  {course.courseMode && (
-                    <Badge variant="outline" className="text-xs">
-                      {course.courseMode}
-                    </Badge>
-                  )}
-                  {course.deliveryMode && (
-                    <Badge variant="outline" className="text-xs">
-                      {course.deliveryMode}
-                    </Badge>
-                  )}
+              
                   {course.courseDuration && (
                     <Badge variant="outline" className="text-xs">
                       <Clock size={12} className="mr-1 inline" />
@@ -79,7 +66,7 @@ export function CourseCard({ course, viewMode = "grid" }) {
               {/* Action Button */}
               <div className="mt-auto">
                 {course.courseIsLocked ? (
-                  <Button variant="secondary" disabled className="w-auto">
+                  <Button  size="sm"  variant="secondary" disabled className="w-auto">
                     <Lock className="mr-2 h-4 w-4" />
                     COMING SOON
                   </Button>
@@ -89,7 +76,7 @@ export function CourseCard({ course, viewMode = "grid" }) {
                       course.courseId
                     }`}
                   >
-                    <Button className="w-auto">
+                    <Button  size="sm"  className="w-auto">
                       <ExternalLink className="mr-2 h-4 w-4" />
                       EXPLORE COURSE
                     </Button>
@@ -109,15 +96,8 @@ export function CourseCard({ course, viewMode = "grid" }) {
       <CardHeader className="p-0">
         <div className="overflow-x-auto mb-2">
           <div className="flex gap-2">
-            {course.courseSource && (
-              <Badge variant="outline">{course.courseSource}</Badge>
-            )}
-            {course.courseLevel && (
-              <Badge variant="outline">{course.courseLevel}</Badge>
-            )}
-            {course.courseMode && (
-              <Badge variant="outline">{course.courseMode}</Badge>
-            )}
+        
+        
             {course.deliveryMode && (
               <Badge variant="outline">{course.deliveryMode}</Badge>
             )}
@@ -139,7 +119,7 @@ export function CourseCard({ course, viewMode = "grid" }) {
 
         <div className="relative mb-2">
           <img
-            src={course.courseImageUrl}
+            src={course.courseImageUrl || byoc2}
             className="w-full h-40 object-cover rounded-lg"
             alt={course.courseTitle}
           />
@@ -159,7 +139,7 @@ export function CourseCard({ course, viewMode = "grid" }) {
 
       <CardFooter className="mt-2 p-0">
         {course.courseIsLocked ? (
-          <Button className="w-full" variant="secondary" disabled>
+          <Button size="sm" className="w-full" variant="secondary" disabled>
             <Lock className="mr-2 h-4 w-4" />
             COMING SOON
           </Button>
@@ -168,7 +148,7 @@ export function CourseCard({ course, viewMode = "grid" }) {
             to={`/${userDetail ? "course" : "explore"}/${course.courseId}`}
             className="w-full"
           >
-            <Button className="w-full">
+            <Button size="sm" className="w-full">
               <ExternalLink className="mr-2 h-4 w-4" />
               EXPLORE COURSE
             </Button>
