@@ -30,6 +30,8 @@ import {
 import { toast } from "@/components/hooks/use-toast.js";
 import { Alert, AlertDescription } from "@/components/ui/alert.jsx";
 import axiosConn from "@/axioscon.js";
+import { useOrganizationStore } from "@/zustland/store.js";
+import { useNavigate } from "react-router-dom";
 
 function OrgProfile() {
     const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +40,14 @@ function OrgProfile() {
     const [selectedOrgId, setSelectedOrgId] = useState("");
     const [selectedOrg, setSelectedOrg] = useState(null);
     const [isEditMode, setIsEditMode] = useState(false);
+    const navigate = useNavigate();
+    
+    // Organization store to check registration status
+    const { 
+        canCreateOrganization,
+        fetchOrganizationStatus,
+        loading: orgStatusLoading
+    } = useOrganizationStore();
 
     // Form validation schema
     const profileSchema = z.object({
@@ -69,18 +79,25 @@ function OrgProfile() {
         },
     });
 
+    // Check organization status on component mount
+    useEffect(() => {
+        fetchOrganizationStatus();
+    }, [fetchOrganizationStatus]);
+
     // Fetch user's organizations
     useEffect(() => {
-        fetchOrganizations();
-    }, []);
+        if (!canCreateOrganization) {
+            fetchOrganizations();
+        }
+    }, [canCreateOrganization]);
 
     // Load selected organization data into form
     useEffect(() => {
         if (selectedOrg) {
             form.reset({
-                name: selectedOrg.name || "",
-                description: selectedOrg.description || "",
-                type: selectedOrg.type || "",
+                name: selectedOrg.orgName || "",
+                description: selectedOrg.orgDescription || "",
+                type: selectedOrg.orgType || "",
                 industry: selectedOrg.industry || "",
                 size: selectedOrg.size || "",
                 website: selectedOrg.website || "",
@@ -91,6 +108,20 @@ function OrgProfile() {
         }
     }, [selectedOrg, form]);
 
+    // Redirect if user hasn't registered an organization yet
+    useEffect(() => {
+        if (!orgStatusLoading && canCreateOrganization) {
+            toast({
+                title: "No Organization Found",
+                description: "You need to register an organization first. Redirecting to registration page...",
+                variant: "default",
+            });
+            setTimeout(() => {
+                navigate("/account-settings/organization");
+            }, 2000);
+        }
+    }, [canCreateOrganization, orgStatusLoading, navigate]);
+
     const fetchOrganizations = async () => {
         try {
             setIsFetching(true);
@@ -99,8 +130,9 @@ function OrgProfile() {
             
             // Auto-select first organization if available
             if (response.data.data && response.data.data.length > 0) {
-                const firstOrg = response.data.data[0];
-                setSelectedOrgId(firstOrg.id);
+                const firstOrgData = response.data.data[0];
+                const firstOrg = firstOrgData.organization;
+                setSelectedOrgId(firstOrg.orgId);
                 setSelectedOrg(firstOrg);
             }
         } catch (error) {
@@ -117,15 +149,28 @@ function OrgProfile() {
 
     const handleOrgChange = (orgId) => {
         setSelectedOrgId(orgId);
-        const org = organizations.find(o => o.id === orgId);
-        setSelectedOrg(org);
+        const orgData = organizations.find(o => o.organization?.orgId === orgId);
+        setSelectedOrg(orgData?.organization);
         setIsEditMode(false);
     };
 
     const onSubmit = async (data) => {
         setIsLoading(true);
         try {
-            const response = await axiosConn.put(`/org/${selectedOrgId}`, data);
+            // Map form fields to API expected fields
+            const apiData = {
+                orgName: data.name,
+                orgDescription: data.description,
+                orgType: data.type,
+                industry: data.industry,
+                size: data.size,
+                website: data.website,
+                address: data.address,
+                contactEmail: data.contactEmail,
+                contactPhone: data.contactPhone,
+            };
+            
+            const response = await axiosConn.put(`/organization/${selectedOrgId}`, apiData);
             
             toast({
                 title: "Success!",
@@ -134,7 +179,7 @@ function OrgProfile() {
             });
             
             // Update local state
-            setSelectedOrg({ ...selectedOrg, ...data });
+            setSelectedOrg({ ...selectedOrg, ...apiData });
             setIsEditMode(false);
             
             // Refresh organizations list
@@ -143,7 +188,7 @@ function OrgProfile() {
             console.error("Error updating organization:", error);
             toast({
                 title: "Error",
-                description: error.response?.data?.message || "Failed to update organization profile",
+                description: error.response?.data?.message || "Failed to update organization. Please try again.",
                 variant: "destructive",
             });
         } finally {
@@ -151,17 +196,38 @@ function OrgProfile() {
         }
     };
 
+    const formatDate = (dateString) => {
+        if (!dateString) return "N/A";
+        return new Date(dateString).toLocaleDateString();
+    };
+
     const getInitials = (name) => {
         return name?.split(' ').map(word => word[0]).join('').toUpperCase() || '?';
     };
 
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    };
+    // Show loading if checking organization status
+    if (orgStatusLoading) {
+        return (
+            <div className="flex items-center justify-center p-8">
+                <div className="text-center">
+                    <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+                    <p className="text-gray-600">Checking organization status...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Don't render the form if user doesn't have an organization
+    if (canCreateOrganization) {
+        return (
+            <div className="flex items-center justify-center p-8">
+                <div className="text-center">
+                    <Building2 className="h-8 w-8 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600">No organization found. Redirecting to registration...</p>
+                </div>
+            </div>
+        );
+    }
 
     if (isFetching) {
         return (
@@ -201,17 +267,17 @@ function OrgProfile() {
                             <SelectValue placeholder="Select an organization to view profile" />
                         </SelectTrigger>
                         <SelectContent>
-                            {organizations.map((org) => (
-                                <SelectItem key={org.id} value={org.id}>
+                            {organizations.map((orgData) => (
+                                <SelectItem key={orgData.organization.orgId} value={orgData.organization.orgId}>
                                     <div className="flex items-center gap-2">
                                         <Avatar className="h-6 w-6">
                                             <AvatarFallback className="text-xs">
-                                                {getInitials(org.name)}
+                                                {getInitials(orgData.organization.orgName)}
                                             </AvatarFallback>
                                         </Avatar>
-                                        <span>{org.name}</span>
+                                        <span>{orgData.organization.orgName}</span>
                                         <Badge variant="outline" className="ml-2">
-                                            {org.type}
+                                            {orgData.organization.orgType}
                                         </Badge>
                                     </div>
                                 </SelectItem>
@@ -229,10 +295,10 @@ function OrgProfile() {
                             <CardTitle className="flex items-center gap-2">
                                 <Avatar className="h-10 w-10">
                                     <AvatarFallback>
-                                        {getInitials(selectedOrg.name)}
+                                        {getInitials(selectedOrg.orgName)}
                                     </AvatarFallback>
                                 </Avatar>
-                                {selectedOrg.name}
+                                {selectedOrg.orgName}
                             </CardTitle>
                             {!isEditMode ? (
                                 <Button
@@ -274,14 +340,14 @@ function OrgProfile() {
                                             <Label className="text-sm font-medium text-muted-foreground">Organization Type</Label>
                                             <div className="mt-1">
                                                 <Badge variant="secondary" className="capitalize">
-                                                    {selectedOrg.type?.replace('_', ' ')}
+                                                    {selectedOrg.orgType?.replace('_', ' ')}
                                                 </Badge>
                                             </div>
                                         </div>
                                         
                                         <div>
                                             <Label className="text-sm font-medium text-muted-foreground">Industry</Label>
-                                            <p className="mt-1 text-sm">{selectedOrg.industry}</p>
+                                            <p className="mt-1 text-sm">{selectedOrg.industry || 'Not specified'}</p>
                                         </div>
                                         
                                         <div>
@@ -289,7 +355,7 @@ function OrgProfile() {
                                                 <Users className="h-4 w-4" />
                                                 Organization Size
                                             </Label>
-                                            <p className="mt-1 text-sm">{selectedOrg.size}</p>
+                                            <p className="mt-1 text-sm">{selectedOrg.size || 'Not specified'}</p>
                                         </div>
                                     </div>
                                     
@@ -316,7 +382,7 @@ function OrgProfile() {
                                                 <Mail className="h-4 w-4" />
                                                 Contact Email
                                             </Label>
-                                            <p className="mt-1 text-sm">{selectedOrg.contactEmail}</p>
+                                            <p className="mt-1 text-sm">{selectedOrg.contactEmail || 'Not specified'}</p>
                                         </div>
                                         
                                         {selectedOrg.contactPhone && (
@@ -334,7 +400,7 @@ function OrgProfile() {
                                 {/* Description */}
                                 <div>
                                     <Label className="text-sm font-medium text-muted-foreground">Description</Label>
-                                    <p className="mt-1 text-sm text-gray-700 leading-relaxed">{selectedOrg.description}</p>
+                                    <p className="mt-1 text-sm text-gray-700 leading-relaxed">{selectedOrg.orgDescription}</p>
                                 </div>
 
                                 {/* Address */}
@@ -343,7 +409,7 @@ function OrgProfile() {
                                         <MapPin className="h-4 w-4" />
                                         Address
                                     </Label>
-                                    <p className="mt-1 text-sm text-gray-700">{selectedOrg.address}</p>
+                                    <p className="mt-1 text-sm text-gray-700">{selectedOrg.address || 'Not specified'}</p>
                                 </div>
 
                                 {/* Metadata */}
@@ -352,17 +418,20 @@ function OrgProfile() {
                                         <div>
                                             <Label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
                                                 <Calendar className="h-4 w-4" />
-                                                Created
+                                                Organization ID
                                             </Label>
-                                            <p className="mt-1 text-sm">{formatDate(selectedOrg.createdAt)}</p>
+                                            <p className="mt-1 text-sm">{selectedOrg.orgId}</p>
                                         </div>
                                         
                                         <div>
                                             <Label className="text-sm font-medium text-muted-foreground">Status</Label>
                                             <div className="mt-1">
-                                                <Badge variant="success" className="flex items-center gap-1 w-fit">
+                                                <Badge 
+                                                    variant={selectedOrg.orgStatus === 'ACTIVE' ? 'success' : 'secondary'} 
+                                                    className="flex items-center gap-1 w-fit"
+                                                >
                                                     <CheckCircle className="h-3 w-3" />
-                                                    Active
+                                                    {selectedOrg.orgStatus || 'Active'}
                                                 </Badge>
                                             </div>
                                         </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card.jsx";
 import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input.jsx";
@@ -23,10 +23,21 @@ import {
 } from "lucide-react";
 import { toast } from "@/components/hooks/use-toast.js";
 import axiosConn from "@/axioscon.js";
-
+import { useOrganizationStore } from "@/zustland/store.js";
+import { useNavigate } from "react-router-dom";
+ 
 function RegisterAsOrg() {
     const [isLoading, setIsLoading] = useState(false);
     const [isRegistered, setIsRegistered] = useState(false);
+    const navigate = useNavigate();
+    
+    // Organization store for updating status after registration
+    const { 
+        resetOrganizationStatus, 
+        fetchOrganizationStatus,
+        canCreateOrganization,
+        loading: orgLoading
+    } = useOrganizationStore();
 
     // Form validation schema
     const registrationSchema = z.object({
@@ -70,6 +81,25 @@ function RegisterAsOrg() {
         },
     });
 
+    // Check organization status on component mount
+    useEffect(() => {
+        fetchOrganizationStatus();
+    }, [fetchOrganizationStatus]);
+
+    // Redirect if user already has an organization
+    useEffect(() => {
+        if (!orgLoading && !canCreateOrganization) {
+            toast({
+                title: "Already Registered",
+                description: "You have already registered an organization. Redirecting to organization profile...",
+                variant: "default",
+            });
+            setTimeout(() => {
+                navigate("/account-settings/organization/profile");
+            }, 2000);
+        }
+    }, [canCreateOrganization, orgLoading, navigate]);
+
     const onSubmit = async (data) => {
         setIsLoading(true);
         try {
@@ -101,6 +131,15 @@ function RegisterAsOrg() {
                 variant: "default",
             });
             
+            // Update organization status in the store
+            resetOrganizationStatus();
+            await fetchOrganizationStatus();
+            
+            // Navigate to org profile page
+            setTimeout(() => {
+                navigate("/account-settings/organization/profile");
+            }, 2000);
+            
             setIsRegistered(true);
             form.reset();
         } catch (error) {
@@ -114,6 +153,30 @@ function RegisterAsOrg() {
             setIsLoading(false);
         }
     };
+
+    // Show loading if checking organization status
+    if (orgLoading) {
+        return (
+            <div className="flex items-center justify-center p-8">
+                <div className="text-center">
+                    <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+                    <p className="text-gray-600">Checking organization status...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Don't render the form if user already has an organization
+    if (!canCreateOrganization) {
+        return (
+            <div className="flex items-center justify-center p-8">
+                <div className="text-center">
+                    <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-4" />
+                    <p className="text-gray-600">You already have an organization. Redirecting...</p>
+                </div>
+            </div>
+        );
+    }
 
     if (isRegistered) {
         return (
@@ -146,7 +209,7 @@ function RegisterAsOrg() {
 
     return (
         <div className="space-y-6">
-                       <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 text-white shadow-2xl mb-8">
+                       <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 text-white shadow-2xl mb-6">
                     <CardHeader>
                         <CardTitle className="text-center text-2xl sm:text-3xl font-bold tracking-wide flex items-center justify-center gap-3">
                             <Building className="w-8 h-8" />

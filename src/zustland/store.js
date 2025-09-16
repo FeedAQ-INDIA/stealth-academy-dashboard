@@ -25,6 +25,49 @@ export const useAuthStore = create((set) => ({
     },
 }))
 
+export const useOrganizationStore = create((set, get) => ({
+    // Organization status
+    canCreateOrganization: true,
+    hasOrganization: false,
+    existingOrganization: null,
+    loading: false,
+    
+    // Actions
+    setCanCreateOrganization: (canCreate) => set({ canCreateOrganization: canCreate }),
+    setHasOrganization: (hasOrg) => set({ hasOrganization: hasOrg }),
+    setExistingOrganization: (organization) => set({ existingOrganization: organization }),
+    
+    // Fetch organization status
+    fetchOrganizationStatus: async () => {
+        try {
+            set({ loading: true });
+            const response = await axiosConn.get("/canCreateOrganization");
+            
+            if (response.data.success) {
+                const { canCreate, existingOrganization } = response.data;
+                set({
+                    canCreateOrganization: canCreate,
+                    hasOrganization: !canCreate,
+                    existingOrganization: existingOrganization || null,
+                    loading: false
+                });
+            }
+        } catch (error) {
+            console.error("Error fetching organization status:", error);
+            set({ loading: false });
+        }
+    },
+    
+    // Reset organization status (call after successful registration)
+    resetOrganizationStatus: () => {
+        set({
+            canCreateOrganization: false,
+            hasOrganization: true,
+            existingOrganization: null
+        });
+    }
+}))
+
 export const useCreditStore = create((set, get) => ({
     // Credit balance and info
     currentCredits: 0,
