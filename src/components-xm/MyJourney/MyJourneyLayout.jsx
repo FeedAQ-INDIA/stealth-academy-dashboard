@@ -121,20 +121,20 @@ export function MyLearningLayout() {
     //   description: "Collaborate with peers and enhance your learning",
     // },
 
-       {
-      id: "learning-schedule",
-      label: "MY LEARNING SCHEDULE",
-      icon: Calendar,
-      path: "/my-journey/my-learning-schedule",
-      description: "Organize your study sessions and stay on track",
-    },
-           {
-      id: "my-goals",
-      label: "MY GOALS",
-      icon: Target,
-      path: "/my-journey/my-goals",
-      description: "Set and track your personal learning goals",
-    },
+    //    {
+    //   id: "learning-schedule",
+    //   label: "MY LEARNING SCHEDULE",
+    //   icon: Calendar,
+    //   path: "/my-journey/my-learning-schedule",
+    //   description: "Organize your study sessions and stay on track",
+    // },
+    //        {
+    //   id: "my-goals",
+    //   label: "MY GOALS",
+    //   icon: Target,
+    //   path: "/my-journey/my-goals",
+    //   description: "Set and track your personal learning goals",
+    // },
   
   ];
 

@@ -33,6 +33,14 @@ import {
   PendingOrders,
   CancelledOrders,
 } from "@/components-xm/AccountSettings/Orders/index.js";
+import {
+  OrganizationLayout,
+  RegisterAsOrg,
+  OrgProfile,
+  AddMembersToOrg,
+  CreateGroup,
+  AddMembersToGroup,
+} from "@/components-xm/AccountSettings/Organization/index.js";
 import Notifications from "@/components-xm/AccountSettings/Notifications.jsx";
 import CourseWritten from "@/components-xm/Course/CourseWritten.jsx";
 import CourseDocThirdParty from "@/components-xm/Course/CourseDocThirdParty.jsx";
@@ -60,8 +68,8 @@ import CourseCertificate from "./components-xm/Course/CourseCertificate.jsx";
 import CourseNotes from "./components-xm/Course/CourseNotes.jsx";
 import MyAchievement from "./components-xm/MyJourney/MyAchievement.jsx";
 import MyStudyGroup from "./components-xm/MyJourney/MyStudyGroup.jsx";
-import MyLearningSchedule from "./components-xm/MyJourney/MyLearningSchedule.jsx";
-import MyGoals from "./components-xm/MyJourney/MyGoals.jsx";
+import MyLearningSchedule from "./components-xm/AccountSettings/MyLearningSchedule.jsx";
+import MyGoals from "./components-xm/AccountSettings/MyGoals.jsx";
 import CourseEmbedder from "./components-xm/Course/CourseEmbedder.jsx";
 
 const router = createBrowserRouter([
@@ -166,11 +174,52 @@ const router = createBrowserRouter([
                 path: "cancelled",
                 element: <CancelledOrders />,
               },
+
             ],
           },
           {
             path: "/account-settings/notifications",
             element: <Notifications />,
+          },
+            {
+            path: "/account-settings/my-goals",
+            element: <MyGoals />,
+          },
+          {
+            path: "/account-settings/my-study-group",
+            element: <MyStudyGroup />,
+          },
+
+          {
+            path: "/account-settings/my-learning-schedule",
+            element: <MyLearningSchedule />,
+          },
+          
+          {
+            path: "/account-settings/organization",
+            element: <OrganizationLayout />,
+            children: [
+              {
+                index: true,
+                element: <RegisterAsOrg />,
+              },
+              {
+                path: "profile",
+                element: <OrgProfile />,
+              },
+              {
+                path: "add-members",
+                element: <AddMembersToOrg />,
+              },
+              {
+                path: "create-group",
+                element: <CreateGroup />,
+              },
+              {
+                path: "add-to-group",
+                element: <AddMembersToGroup />,
+              },
+            ],
           },
         ],
       },

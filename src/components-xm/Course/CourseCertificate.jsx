@@ -415,7 +415,41 @@ const CourseCertificate = ({ courseTitle, userName, date }) => {
           }
         }
       `}</style>
-
+    <header className="sticky top-0 z-50 flex h-14 shrink-0 items-center gap-2 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 px-4 shadow-sm">
+        <SidebarTrigger className="-ml-1" />
+        <Separator orientation="vertical" className="mr-2 h-4" />
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbPage className="truncate max-w-[30ch] font-medium text-muted-foreground">
+                 Course Certificate
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        {/* <div className="ml-auto sm:flex-initial">
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={prevContent == null}
+              onClick={() => navigateToNextModule(prevContent)}
+              className="hover:bg-muted/50 transition-colors"
+            >
+              <CircleArrowLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={nextContent == null}
+              onClick={() => navigateToNextModule(nextContent)}
+              className="hover:bg-muted/50 transition-colors"
+            >
+              <CircleArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div> */}
+      </header>
       <div className="p-3 space-y-4">
         {/* Enhanced Header Card */}
         <Card className="border-0 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-sm shadow-md overflow-hidden relative">
@@ -514,7 +548,7 @@ const CourseCertificate = ({ courseTitle, userName, date }) => {
           <Card 
             ref={certificateRef}
             data-certificate="true"
-            className={`certificate-container w-full max-w-4xl mx-auto my-8 bg-white shadow-2xl transition-all duration-300 overflow-hidden ${
+            className={`certificate-container w-full max-w-4xl mx-auto my-6 bg-white shadow-2xl transition-all duration-300 overflow-hidden ${
               !isCompleted ? 'blur-sm' : ''
             }`}
             style={{ 

@@ -18,7 +18,7 @@ import {
 import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible.jsx";
-import {ArrowLeft, ChevronRight, Clock, Loader, UserCircle, Shield, CreditCard, Bell, LogOut, ShoppingBag} from "lucide-react";
+import {ArrowLeft, ChevronRight, Clock, Loader, UserCircle, Shield, CreditCard, Bell, LogOut, ShoppingBag, Building, Users, UserPlus, Settings as SettingsIcon, UserCog, UsersIcon} from "lucide-react";
 import {Separator} from "@/components/ui/separator.jsx";
 
 
@@ -57,6 +57,24 @@ function AccountSidebar({...props}) {
                         isActive: location.pathname?.includes('/account-settings/credit-and-order'),
                         icon: CreditCard,
                     },
+                                        {
+                        title: "My Goals",
+                        url: `/account-settings/my-goals`,
+                        isActive: location.pathname?.includes('/account-settings/my-goals'),
+                        icon: CreditCard,
+                    },
+                                        {
+                        title: "My Learning Schedule",
+                        url: `/account-settings/my-learning-schedule`,
+                        isActive: location.pathname?.includes('/account-settings/my-learning-schedule'),
+                        icon: CreditCard,
+                    },
+                                          {
+                        title: "My Study Group",
+                        url: `/account-settings/my-study-group`,
+                        isActive: location.pathname?.includes('/account-settings/my-study-group'),
+                        icon: CreditCard,
+                    },
                     // {
                     //     title: "Orders",
                     //     url: `/account-settings/orders`,
@@ -69,6 +87,42 @@ function AccountSidebar({...props}) {
                     //     isActive: location.pathname === '/account-settings/notifications',
                     //     icon: Bell,
                     // },
+                ],
+            },
+            {
+                title: "Organization",
+                url: "#",
+                items: [
+                    {
+                        title: "Register as Org",
+                        url: `/account-settings/organization`,
+                        isActive: location.pathname === '/account-settings/organization',
+                        icon: Building,
+                    },
+                    {
+                        title: "Org Profile",
+                        url: `/account-settings/organization/profile`,
+                        isActive: location.pathname === '/account-settings/organization/profile',
+                        icon: SettingsIcon,
+                    },
+                    {
+                        title: "Add Members to Org",
+                        url: `/account-settings/organization/add-members`,
+                        isActive: location.pathname === '/account-settings/organization/add-members',
+                        icon: UserPlus,
+                    },
+                    {
+                        title: "Create Group",
+                        url: `/account-settings/organization/create-group`,
+                        isActive: location.pathname === '/account-settings/organization/create-group',
+                        icon: UsersIcon,
+                    },
+                    {
+                        title: "Add Members to Group",
+                        url: `/account-settings/organization/add-to-group`,
+                        isActive: location.pathname === '/account-settings/organization/add-to-group',
+                        icon: UserCog,
+                    },
                 ],
             },
             {

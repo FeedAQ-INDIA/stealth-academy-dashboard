@@ -51,7 +51,7 @@ export function ProgressCourseCard2({ course  }) {
 
         <div className="relative mb-2">
           <img
-            src={course.courseImageUrl}
+            src={course.courseImageUrl || 'http://localhost:5174/src/assets/byoc_2.png'}
             className="w-full h-40 object-cover rounded-lg"
             alt={course.courseTitle}
           />

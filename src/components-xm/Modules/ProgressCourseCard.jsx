@@ -33,7 +33,7 @@ export function ProgressCourseCard({ course }) {
               <span className="text-gray-300">Image</span>
             </div>
             <img
-              src={course.courseImageUrl}
+              src={course.courseImageUrl || 'http://localhost:5174/src/assets/byoc_2.png'}
               className="w-full h-full object-cover rounded-lg z-10 transition-transform duration-300 group-hover:scale-105 group-hover:shadow-lg"
               alt={course.courseTitle || "Course image"}
               onError={(e) => {

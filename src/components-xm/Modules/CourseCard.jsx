@@ -119,7 +119,7 @@ export function CourseCard({ course, viewMode = "grid" }) {
 
         <div className="relative mb-2">
           <img
-            src={course.courseImageUrl || byoc2}
+            src={course.courseImageUrl || 'http://localhost:5174/src/assets/byoc_2.png'}
             className="w-full h-40 object-cover rounded-lg"
             alt={course.courseTitle}
           />

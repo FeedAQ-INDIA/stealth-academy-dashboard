@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { BookOpen, Loader2, Pencil } from "lucide-react";
+import { BookOpen, Loader2, Pencil, ShoppingBag } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { PlusIcon } from "lucide-react";
@@ -20,6 +20,7 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import axios from "@/axioscon";
@@ -43,6 +44,9 @@ import {
 } from "@/components/ui/select";
 import axiosConn from "@/axioscon";
 import { EventCard } from "@/components-xm/Modules";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -194,7 +198,33 @@ export default function MyLearningSchedule() {
   }, []);
 
   return (
- 
+    <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
+        <SidebarTrigger className="-ml-1" />
+        <Separator orientation="vertical" className="mr-2 h-4" />
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbPage className="truncate max-w-[30ch]">
+                 My Learning Calendar
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <div className="ml-auto sm:flex-initial"></div>
+      </header>
+
+      <div className="p-4 mx-auto  ">
+        {/* Header Section */}
+        <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 text-white shadow-2xl mb-6">
+          <CardHeader>
+            <CardTitle className="text-center text-2xl sm:text-3xl font-bold tracking-wide flex items-center justify-center gap-3">
+              <ShoppingBag className="w-8 h-8" />
+              My Learning Calendar
+            </CardTitle>
+          </CardHeader>
+        </Card>
+        
         <div className="flex flex-col md:flex-row gap-4">
 
     <Card className="flex-1/2">
@@ -425,6 +455,6 @@ export default function MyLearningSchedule() {
        </CardHeader>
     </Card>
 
-    </div>
+    </div></div></div>
   );
 }

@@ -74,7 +74,7 @@ export function PrivilegedAccess() {
           datasource: "CourseAccess",
           as: "accessControls",
           where: {
-            userId: userDetail.id,
+            userId: userDetail.userId,
             accessLevel: "SHARED",
           },
           required: true,
@@ -228,7 +228,7 @@ export function PrivilegedAccess() {
           datasource: "CourseAccess",
           as: "accessControls",
           where: {
-            userId: userDetail.id,
+            userId: userDetail.userId,
             accessLevel: "SHARED",
           },
           required: true,

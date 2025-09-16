@@ -83,7 +83,7 @@ export function MyCourse() {
           datasource: "UserCourseEnrollment",
           as: "enrollments",
           where: {
-            userId: userDetail.id,
+            userId: userDetail.userId,
             enrollmentStatus: { $ne: "COMPLETED" },
           },
           required: true,
@@ -92,7 +92,7 @@ export function MyCourse() {
           datasource: "UserCourseContentProgress",
           as: "activityLogs",
           where: {
-            userId: userDetail.id,
+            userId: userDetail.userId,
           },
           required: false,
         },
@@ -266,7 +266,7 @@ export function MyCourse() {
             datasource: "UserCourseEnrollment",
             as: "enrollments",
             where: {
-              userId: userDetail.id,
+              userId: userDetail.userId,
               enrollmentStatus: { $ne: "COMPLETED" },
             },
             required: true,
@@ -280,7 +280,7 @@ export function MyCourse() {
             datasource: "UserCourseContentProgress",
             as: "activityLogs",
             where: {
-              userId: userDetail.id,
+              userId: userDetail.userId,
             },
             required: false,
           }

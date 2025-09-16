@@ -79,7 +79,7 @@ export function BringYourOwnCourse() {
           datasource: "CourseAccess",
           as: "accessControls",
           where: {
-            userId: userDetail.id,
+            userId: userDetail.userId,
             accessLevel: "OWN",
           },
           required: true,
@@ -88,7 +88,7 @@ export function BringYourOwnCourse() {
           datasource: "UserCourseEnrollment",
           as: "enrollments",
           where: {
-            userId: userDetail.id,
+            userId: userDetail.userId,
           },
           required: false,
         },
@@ -241,7 +241,7 @@ export function BringYourOwnCourse() {
           datasource: "CourseAccess",
           as: "accessControls",
           where: {
-            userId: userDetail.id,
+            userId: userDetail.userId,
             accessLevel: "OWN",
           },
           required: true,
@@ -250,7 +250,7 @@ export function BringYourOwnCourse() {
           datasource: "UserCourseEnrollment",
           as: "enrollments",
           where: {
-            userId: userDetail.id,
+            userId: userDetail.userId,
           },
           required: false,
         },

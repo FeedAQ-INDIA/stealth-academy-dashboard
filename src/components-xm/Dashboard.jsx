@@ -70,7 +70,7 @@ export function Dashboard() {
           datasource: "CourseAccess",
           as: "accessControls",
           where: {
-            userId: userDetail.id,
+            userId: userDetail.userId,
             accessLevel: "OWN",
           },
           required: true,
@@ -79,7 +79,7 @@ export function Dashboard() {
           datasource: "UserCourseContentProgress",
           as: "activityLogs",
           where: {
-            userId: userDetail.id,
+            userId: userDetail.userId,
           },
           required: false,
         },
@@ -88,16 +88,13 @@ export function Dashboard() {
           as: "enrollments",
           where: {
             enrollmentStatus: { $ne: "COMPLETED" },
-             userId: userDetail.id,
+             userId: userDetail.userId,
           },
           required: true,
         },
         {
           datasource: "CourseContent",
           as: "courseContent",
-          where: {
-            userId: userDetail.id,
-          },
           required: true,
         },
       ],
@@ -139,7 +136,7 @@ export function Dashboard() {
           attributes: [],
           where: {
             enrollmentStatus: "COMPLETED",
-            userId: userDetail.id,
+            userId: userDetail.userId,
           },
         },
       })
