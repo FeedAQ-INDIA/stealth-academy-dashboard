@@ -16,6 +16,13 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar.jsx";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select.jsx";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import {
@@ -38,8 +45,6 @@ import {
   Users,
   UserPlus,
   Settings as SettingsIcon,
-  UserCog,
-  UsersIcon,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator.jsx";
 import { useOrganizationStore } from "@/zustland/store.js";
@@ -53,7 +58,10 @@ function AccountSidebar({ ...props }) {
     canCreateOrganization, 
     hasOrganization, 
     fetchOrganizationStatus, 
-    loading: orgLoading 
+    loading: orgLoading,
+    organizations,
+    setSelectedOrganization,
+    selectedOrganization
   } = useOrganizationStore();
 
   // Fetch organization status on component mount
@@ -80,45 +88,32 @@ function AccountSidebar({ ...props }) {
       ];
     }
 
-    if (canCreateOrganization) {
-      // User hasn't registered an organization yet
-      return [
+    // Always show the main organization dashboard
+    const items = [
+      {
+        title: "Organization Dashboard",
+        url: `/account-settings/organization`,
+        isActive: location.pathname === "/account-settings/organization",
+        icon: Building,
+      },
+
+
+    ];
+
+    // If user has organizations, show additional management options
+    if (hasOrganization && organizations && organizations.length > 0) {
+      items.push(
         {
-          title: "Register as Org",
-          url: `/account-settings/organization`,
-          isActive: location.pathname === "/account-settings/organization",
-          icon: Building,
-        }
-      ];
-    } else {
-      // User has already registered an organization
-      return [
-        {
-          title: "Org Profile",
-          url: `/account-settings/organization/profile`,
-          isActive: location.pathname === "/account-settings/organization/profile",
-          icon: SettingsIcon,
-        },
-        {
-          title: "Add Members to Org",
+          title: "Manage Members",
           url: `/account-settings/organization/add-members`,
           isActive: location.pathname === "/account-settings/organization/add-members",
           icon: UserPlus,
         },
-        {
-          title: "Create Group",
-          url: `/account-settings/organization/create-group`,
-          isActive: location.pathname === "/account-settings/organization/create-group",
-          icon: UsersIcon,
-        },
-        {
-          title: "Add Members to Group",
-          url: `/account-settings/organization/add-to-group`,
-          isActive: location.pathname === "/account-settings/organization/add-to-group",
-          icon: UserCog,
-        },
-      ];
+
+      );
     }
+
+    return items;
   };
 
   const data = {
@@ -163,32 +158,47 @@ function AccountSidebar({ ...props }) {
             ),
             icon: CreditCard,
           },
-        //   {
-        //     title: "My Study Group",
-        //     url: `/account-settings/my-study-group`,
-        //     isActive: location.pathname?.includes(
-        //       "/account-settings/my-study-group"
-        //     ),
-        //     icon: CreditCard,
-        //   },
-          // {
-          //     title: "Orders",
-          //     url: `/account-settings/orders`,
-          //     isActive: location.pathname?.includes('/account-settings/orders'),
-          //     icon: ShoppingBag,
-          // },
-          // {
-          //     title: "Notifications",
-          //     url: `/account-settings/notifications`,
-          //     isActive: location.pathname === '/account-settings/notifications',
-          //     icon: Bell,
-          // },
+           {
+        title: "Register Organization",
+        url: `/account-settings/register-organization`,
+        isActive: location.pathname === "/account-settings/register-organization",
+        icon: Building,
+      },
         ],
       },
       {
         title: "Organization",
         url: "#",
         items: getOrganizationItems(),
+        // Add organization selector for organizations section
+        hasSelector: hasOrganization && organizations && organizations.length > 0,
+        selectorComponent: hasOrganization && organizations && organizations.length > 0 ? (
+          <div className="px-2 py-2">
+            <Select 
+              value={selectedOrganization?.orgId?.toString() || ""} 
+              onValueChange={(orgId) => {
+                const org = organizations.find(o => o.organization.orgId.toString() === orgId);
+                if (org) {
+                  setSelectedOrganization(org.organization);
+                }
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Organization" />
+              </SelectTrigger>
+              <SelectContent>
+                {organizations.map((orgUser) => (
+                  <SelectItem 
+                    key={orgUser.organization.orgId} 
+                    value={orgUser.organization.orgId.toString()}
+                  >
+                    {orgUser.organization.orgName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        ) : null,
       },
       {
         title: "Actions",
@@ -227,6 +237,8 @@ function AccountSidebar({ ...props }) {
           {data.navMain.map((item) => (
             <SidebarGroup key={item.title}>
               <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+              {/* Render organization selector if it exists */}
+              {item.selectorComponent && item.selectorComponent}
               <SidebarGroupContent>
                 <SidebarMenu>
                   {item.items.map((item) =>

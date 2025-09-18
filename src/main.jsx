@@ -38,8 +38,6 @@ import {
   RegisterAsOrg,
   OrgProfile,
   AddMembersToOrg,
-  CreateGroup,
-  AddMembersToGroup,
 } from "@/components-xm/AccountSettings/Organization/index.js";
 import Notifications from "@/components-xm/AccountSettings/Notifications.jsx";
 import CourseWritten from "@/components-xm/Course/CourseWritten.jsx";
@@ -194,6 +192,11 @@ const router = createBrowserRouter([
             path: "/account-settings/my-learning-schedule",
             element: <MyLearningSchedule />,
           },
+
+                    {
+            path: "/account-settings/register-organization",
+            element: <RegisterAsOrg />,
+          },
           
           {
             path: "/account-settings/organization",
@@ -210,14 +213,6 @@ const router = createBrowserRouter([
               {
                 path: "add-members",
                 element: <AddMembersToOrg />,
-              },
-              {
-                path: "create-group",
-                element: <CreateGroup />,
-              },
-              {
-                path: "add-to-group",
-                element: <AddMembersToGroup />,
               },
             ],
           },

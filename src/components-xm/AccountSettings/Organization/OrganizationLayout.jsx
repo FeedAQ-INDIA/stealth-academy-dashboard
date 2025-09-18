@@ -5,7 +5,7 @@ import {Button} from "@/components/ui/button.jsx";
 import {SidebarTrigger} from "@/components/ui/sidebar.jsx";
 import {Separator} from "@/components/ui/separator.jsx";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
-import {Building, Users, UserPlus, Settings, ChevronLeft, ChevronRight, UserCog, UsersIcon} from "lucide-react";
+import {Building, Users, UserPlus, Settings, ChevronLeft, ChevronRight} from "lucide-react";
 
 function OrganizationLayout() {
     const navigate = useNavigate();
@@ -37,20 +37,6 @@ function OrganizationLayout() {
             icon: UserPlus, 
             description: "Add members to organization",
             path: "/account-settings/organization/add-members"
-        },
-        { 
-            id: "create-group", 
-            label: "Create Group", 
-            icon: UsersIcon, 
-            description: "Create groups within organization",
-            path: "/account-settings/organization/create-group"
-        },
-        { 
-            id: "add-to-group", 
-            label: "Add Members to Group", 
-            icon: UserCog, 
-            description: "Add members to specific groups",
-            path: "/account-settings/organization/add-to-group"
         }
     ];
 

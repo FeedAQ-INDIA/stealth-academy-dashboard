@@ -26,7 +26,6 @@ import axiosConn from "@/axioscon.js";
 // Import other organization components
 import RegisterAsOrg from "./RegisterAsOrg.jsx";
 import AddMembersToOrg from "./AddMembersToOrg.jsx";
-import CreateGroup from "./CreateGroup.jsx";
 import OrgProfile from "./OrgProfile.jsx";
 
 function OrganizationDashboard() {
@@ -211,9 +210,9 @@ function OrganizationDashboard() {
                                                     </div>
                                                     <div className="bg-green-50 p-3 rounded-lg">
                                                         <div className="text-2xl font-bold text-green-600">
-                                                            {orgStats.groupCount || 0}
+                                                            {orgStats.totalMembers || 0}
                                                         </div>
-                                                        <div className="text-sm text-green-800">Groups</div>
+                                                        <div className="text-sm text-green-800">Active Members</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -233,7 +232,7 @@ function OrganizationDashboard() {
                         <CardTitle>Quick Actions</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Button 
                                 variant="outline" 
                                 onClick={() => setActiveTab("members")}
@@ -241,14 +240,6 @@ function OrganizationDashboard() {
                             >
                                 <UserPlus className="h-6 w-6" />
                                 <span>Manage Members</span>
-                            </Button>
-                            <Button 
-                                variant="outline" 
-                                onClick={() => setActiveTab("groups")}
-                                className="h-auto p-4 flex flex-col items-center gap-2"
-                            >
-                                <Users className="h-6 w-6" />
-                                <span>Manage Groups</span>
                             </Button>
                             <Button 
                                 variant="outline" 
@@ -279,12 +270,11 @@ function OrganizationDashboard() {
     return (
         <div className="space-y-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-5">
+                <TabsList className="grid w-full grid-cols-4">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="register">Register Org</TabsTrigger>
                     <TabsTrigger value="profile">Profile</TabsTrigger>
                     <TabsTrigger value="members">Members</TabsTrigger>
-                    <TabsTrigger value="groups">Groups</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="overview">
@@ -301,10 +291,6 @@ function OrganizationDashboard() {
 
                 <TabsContent value="members">
                     <AddMembersToOrg />
-                </TabsContent>
-
-                <TabsContent value="groups">
-                    <CreateGroup />
                 </TabsContent>
             </Tabs>
         </div>

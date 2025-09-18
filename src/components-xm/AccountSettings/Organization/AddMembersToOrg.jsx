@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label.jsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.jsx";
 import { Badge } from "@/components/ui/badge.jsx";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar.jsx";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog.jsx";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet.jsx";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form.jsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.jsx";
 import { useForm } from "react-hook-form";
@@ -42,8 +42,8 @@ function AddMembersToOrg() {
     const [members, setMembers] = useState([]);
     const [pendingInvitations, setPendingInvitations] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [isBulkAddModalOpen, setIsBulkAddModalOpen] = useState(false);
+    const [isAddSheetOpen, setIsAddSheetOpen] = useState(false);
+    const [isBulkAddSheetOpen, setIsBulkAddSheetOpen] = useState(false);
 
     // Form validation schema for adding single member
     const addMemberSchema = z.object({
@@ -153,7 +153,7 @@ function AddMembersToOrg() {
                 variant: "default",
             });
             
-            setIsAddModalOpen(false);
+            setIsAddSheetOpen(false);
             addMemberForm.reset();
             fetchPendingInvitations();
         } catch (error) {
@@ -196,7 +196,7 @@ function AddMembersToOrg() {
                 variant: "default",
             });
             
-            setIsBulkAddModalOpen(false);
+            setIsBulkAddSheetOpen(false);
             bulkAddForm.reset();
             fetchPendingInvitations();
         } catch (error) {
@@ -398,19 +398,22 @@ function AddMembersToOrg() {
                                     />
                                 </div>
                                 <div className="flex gap-2">
-                                    <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-                                        <DialogTrigger asChild>
+                                    <Sheet open={isAddSheetOpen} onOpenChange={setIsAddSheetOpen}>
+                                        <SheetTrigger asChild>
                                             <Button className="flex items-center gap-2">
                                                 <UserPlus className="h-4 w-4" />
                                                 Add Member
                                             </Button>
-                                        </DialogTrigger>
-                                        <DialogContent className="sm:max-w-md">
-                                            <DialogHeader>
-                                                <DialogTitle>Add New Member</DialogTitle>
-                                            </DialogHeader>
+                                        </SheetTrigger>
+                                        <SheetContent className="sm:max-w-md">
+                                            <SheetHeader>
+                                                <SheetTitle>Add New Member</SheetTitle>
+                                                <SheetDescription>
+                                                    Send an invitation to add a new member to your organization.
+                                                </SheetDescription>
+                                            </SheetHeader>
                                             <Form {...addMemberForm}>
-                                                <form onSubmit={addMemberForm.handleSubmit(onSubmitAddMember)} className="space-y-4">
+                                                <form onSubmit={addMemberForm.handleSubmit(onSubmitAddMember)} className="space-y-4 mt-6">
                                                     <div className="grid grid-cols-2 gap-4">
                                                         <FormField
                                                             control={addMemberForm.control}
@@ -478,7 +481,7 @@ function AddMembersToOrg() {
                                                         <Button
                                                             type="button"
                                                             variant="outline"
-                                                            onClick={() => setIsAddModalOpen(false)}
+                                                            onClick={() => setIsAddSheetOpen(false)}
                                                         >
                                                             Cancel
                                                         </Button>
@@ -490,22 +493,25 @@ function AddMembersToOrg() {
                                                     </div>
                                                 </form>
                                             </Form>
-                                        </DialogContent>
-                                    </Dialog>
+                                        </SheetContent>
+                                    </Sheet>
 
-                                    <Dialog open={isBulkAddModalOpen} onOpenChange={setIsBulkAddModalOpen}>
-                                        <DialogTrigger asChild>
+                                    <Sheet open={isBulkAddSheetOpen} onOpenChange={setIsBulkAddSheetOpen}>
+                                        <SheetTrigger asChild>
                                             <Button variant="outline" className="flex items-center gap-2">
                                                 <Mail className="h-4 w-4" />
                                                 Bulk Add
                                             </Button>
-                                        </DialogTrigger>
-                                        <DialogContent className="sm:max-w-md">
-                                            <DialogHeader>
-                                                <DialogTitle>Bulk Add Members</DialogTitle>
-                                            </DialogHeader>
+                                        </SheetTrigger>
+                                        <SheetContent className="sm:max-w-md">
+                                            <SheetHeader>
+                                                <SheetTitle>Bulk Add Members</SheetTitle>
+                                                <SheetDescription>
+                                                    Add multiple members at once by entering their email addresses.
+                                                </SheetDescription>
+                                            </SheetHeader>
                                             <Form {...bulkAddForm}>
-                                                <form onSubmit={bulkAddForm.handleSubmit(onSubmitBulkAdd)} className="space-y-4">
+                                                <form onSubmit={bulkAddForm.handleSubmit(onSubmitBulkAdd)} className="space-y-4 mt-6">
                                                     <FormField
                                                         control={bulkAddForm.control}
                                                         name="emails"
@@ -550,7 +556,7 @@ function AddMembersToOrg() {
                                                         <Button
                                                             type="button"
                                                             variant="outline"
-                                                            onClick={() => setIsBulkAddModalOpen(false)}
+                                                            onClick={() => setIsBulkAddSheetOpen(false)}
                                                         >
                                                             Cancel
                                                         </Button>
@@ -562,8 +568,8 @@ function AddMembersToOrg() {
                                                     </div>
                                                 </form>
                                             </Form>
-                                        </DialogContent>
-                                    </Dialog>
+                                        </SheetContent>
+                                    </Sheet>
                                 </div>
                             </div>
                         </CardContent>

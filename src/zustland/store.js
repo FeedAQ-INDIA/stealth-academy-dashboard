@@ -32,10 +32,17 @@ export const useOrganizationStore = create((set, get) => ({
     existingOrganization: null,
     loading: false,
     
+    // Multiple organizations support
+    organizations: [],
+    selectedOrganization: null,
+    organizationsLoading: false,
+    
     // Actions
     setCanCreateOrganization: (canCreate) => set({ canCreateOrganization: canCreate }),
     setHasOrganization: (hasOrg) => set({ hasOrganization: hasOrg }),
     setExistingOrganization: (organization) => set({ existingOrganization: organization }),
+    setOrganizations: (organizations) => set({ organizations }),
+    setSelectedOrganization: (organization) => set({ selectedOrganization: organization }),
     
     // Fetch organization status
     fetchOrganizationStatus: async () => {
@@ -51,10 +58,38 @@ export const useOrganizationStore = create((set, get) => ({
                     existingOrganization: existingOrganization || null,
                     loading: false
                 });
+                
+                // If user has organizations, also fetch the full list
+                if (!canCreate) {
+                    get().fetchUserOrganizations();
+                }
             }
         } catch (error) {
             console.error("Error fetching organization status:", error);
             set({ loading: false });
+        }
+    },
+    
+    // Fetch all organizations for the user
+    fetchUserOrganizations: async () => {
+        try {
+            set({ organizationsLoading: true });
+            const response = await axiosConn.get("/user/organizations");
+            
+            if (response.data.success) {
+                const organizations = response.data.data || [];
+                set({ 
+                    organizations,
+                    organizationsLoading: false,
+                    // Set first organization as selected if none selected
+                    selectedOrganization: organizations.length > 0 && !get().selectedOrganization 
+                        ? organizations[0].organization 
+                        : get().selectedOrganization
+                });
+            }
+        } catch (error) {
+            console.error("Error fetching user organizations:", error);
+            set({ organizationsLoading: false });
         }
     },
     
@@ -65,6 +100,8 @@ export const useOrganizationStore = create((set, get) => ({
             hasOrganization: true,
             existingOrganization: null
         });
+        // Refresh organizations list
+        get().fetchUserOrganizations();
     }
 }))
 
