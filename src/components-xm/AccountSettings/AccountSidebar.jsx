@@ -90,19 +90,19 @@ function AccountSidebar({ ...props }) {
 
     // Always show the main organization dashboard
     const items = [
-      {
-        title: "Organization Dashboard",
-        url: `/account-settings/organization`,
-        isActive: location.pathname === "/account-settings/organization",
-        icon: Building,
-      },
-
+  
 
     ];
 
     // If user has organizations, show additional management options
     if (hasOrganization && organizations && organizations.length > 0) {
       items.push(
+        {
+          title: "Organization Profile",
+          url: `/account-settings/organization/profile`,
+          isActive: location.pathname === "/account-settings/organization/profile",
+          icon: SettingsIcon,
+        },
         {
           title: "Manage Members",
           url: `/account-settings/organization/add-members`,

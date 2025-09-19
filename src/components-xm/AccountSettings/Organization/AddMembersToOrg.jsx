@@ -27,38 +27,47 @@ import {
     Building2,
     Send,
     CheckCircle,
-    X
+    X,
+    Users,
+    Calendar,
+    Activity
 } from "lucide-react";
 import { toast } from "@/components/hooks/use-toast.js";
 import { Alert, AlertDescription } from "@/components/ui/alert.jsx";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu.jsx";
+import { useOrganizationStore } from "@/zustland/store.js";
 import axiosConn from "@/axioscon.js";
 
 function AddMembersToOrg() {
     const [isLoading, setIsLoading] = useState(false);
-    const [isFetching, setIsFetching] = useState(true);
-    const [organizations, setOrganizations] = useState([]);
-    const [selectedOrgId, setSelectedOrgId] = useState("");
     const [members, setMembers] = useState([]);
     const [pendingInvitations, setPendingInvitations] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [isAddSheetOpen, setIsAddSheetOpen] = useState(false);
     const [isBulkAddSheetOpen, setIsBulkAddSheetOpen] = useState(false);
+    
+    // Get organization data from Zustand store
+    const { 
+        selectedOrganization,
+        organizations,
+        organizationsLoading,
+        hasOrganization 
+    } = useOrganizationStore();
 
     // Form validation schema for adding single member
     const addMemberSchema = z.object({
         email: z.string().email("Please enter a valid email address"),
-        role: z.enum(["member", "admin", "moderator"], {
+        role: z.enum(["MEMBER", "ADMIN", "MANAGER", "INSTRUCTOR"], {
             required_error: "Please select a role",
         }),
-        firstName: z.string().min(2, "First name must be at least 2 characters"),
-        lastName: z.string().min(2, "Last name must be at least 2 characters"),
+        firstName: z.string().min(2, "First name must be at least 2 characters").optional(),
+        lastName: z.string().min(2, "Last name must be at least 2 characters").optional(),
     });
 
     // Form validation schema for bulk adding members
     const bulkAddSchema = z.object({
         emails: z.string().min(1, "Please enter at least one email address"),
-        defaultRole: z.enum(["member", "admin", "moderator"], {
+        defaultRole: z.enum(["MEMBER", "ADMIN", "MANAGER", "INSTRUCTOR"], {
             required_error: "Please select a default role",
         }),
     });
@@ -67,7 +76,7 @@ function AddMembersToOrg() {
         resolver: zodResolver(addMemberSchema),
         defaultValues: {
             email: "",
-            role: "member",
+            role: "MEMBER",
             firstName: "",
             lastName: "",
         },
@@ -77,49 +86,28 @@ function AddMembersToOrg() {
         resolver: zodResolver(bulkAddSchema),
         defaultValues: {
             emails: "",
-            defaultRole: "member",
+            defaultRole: "MEMBER",
         },
     });
 
-    // Fetch user's organizations
-    useEffect(() => {
-        fetchOrganizations();
-    }, []);
-
     // Fetch members when organization is selected
     useEffect(() => {
-        if (selectedOrgId) {
+        if (selectedOrganization?.orgId) {
             fetchMembers();
-            fetchPendingInvitations();
         }
-    }, [selectedOrgId]);
-
-    const fetchOrganizations = async () => {
-        try {
-            setIsFetching(true);
-            const response = await axiosConn.get("/user/organizations");
-            setOrganizations(response.data.data || []);
-            
-            // Auto-select first organization if available
-            if (response.data.data && response.data.data.length > 0) {
-                setSelectedOrgId(response.data.data[0].id);
-            }
-        } catch (error) {
-            console.error("Error fetching organizations:", error);
-            toast({
-                title: "Error",
-                description: "Failed to fetch organizations",
-                variant: "destructive",
-            });
-        } finally {
-            setIsFetching(false);
-        }
-    };
+    }, [selectedOrganization]);
 
     const fetchMembers = async () => {
         try {
-            const response = await axiosConn.get(`/organization/${selectedOrgId}/users`);
-            setMembers(response.data.data || []);
+            setIsLoading(true);
+            const response = await axiosConn.get(`/organization/${selectedOrganization.orgId}/users`);
+            
+            if (response.data.success) {
+                // Parse the response according to the backend structure
+                const allUsers = response.data.data.users || [];
+                setMembers(allUsers.filter(user => user.status === 'ACTIVE'));
+                setPendingInvitations(allUsers.filter(user => user.status === 'PENDING'));
+            }
         } catch (error) {
             console.error("Error fetching members:", error);
             toast({
@@ -127,24 +115,17 @@ function AddMembersToOrg() {
                 description: "Failed to fetch organization members",
                 variant: "destructive",
             });
-        }
-    };
-
-    const fetchPendingInvitations = async () => {
-        try {
-            const response = await axiosConn.get(`/org/${selectedOrgId}/invitations/pending`);
-            setPendingInvitations(response.data.data || []);
-        } catch (error) {
-            console.error("Error fetching pending invitations:", error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const onSubmitAddMember = async (data) => {
         setIsLoading(true);
         try {
-            await axiosConn.post(`/organization/${selectedOrgId}/invite`, {
+            await axiosConn.post(`/organization/${selectedOrganization.orgId}/invite`, {
                 email: data.email,
-                userRole: data.role.toUpperCase()
+                userRole: data.role // Already uppercase from the form
             });
             
             toast({
@@ -155,7 +136,7 @@ function AddMembersToOrg() {
             
             setIsAddSheetOpen(false);
             addMemberForm.reset();
-            fetchPendingInvitations();
+            fetchMembers(); // This will now fetch both active and pending users
         } catch (error) {
             console.error("Error inviting member:", error);
             toast({
@@ -185,8 +166,11 @@ function AddMembersToOrg() {
                 return;
             }
 
-            await axiosConn.post(`/org/${selectedOrgId}/invite-members-bulk`, {
-                emails: emails,
+            // Create users array as expected by backend
+            const users = emails.map(email => ({ email }));
+
+            await axiosConn.post(`/organization/${selectedOrganization.orgId}/bulk-invite`, {
+                users: users,
                 defaultRole: data.defaultRole
             });
             
@@ -198,7 +182,7 @@ function AddMembersToOrg() {
             
             setIsBulkAddSheetOpen(false);
             bulkAddForm.reset();
-            fetchPendingInvitations();
+            fetchMembers(); // This will now fetch both active and pending users
         } catch (error) {
             console.error("Error sending bulk invitations:", error);
             toast({
@@ -213,7 +197,7 @@ function AddMembersToOrg() {
 
     const removeMember = async (memberId) => {
         try {
-            await axiosConn.delete(`/org/${selectedOrgId}/members/${memberId}`);
+            await axiosConn.delete(`/organization/${selectedOrganization.orgId}/users/${memberId}`);
             
             toast({
                 title: "Success!",
@@ -226,7 +210,7 @@ function AddMembersToOrg() {
             console.error("Error removing member:", error);
             toast({
                 title: "Error",
-                description: "Failed to remove member",
+                description: error.response?.data?.message || "Failed to remove member",
                 variant: "destructive",
             });
         }
@@ -234,8 +218,8 @@ function AddMembersToOrg() {
 
     const updateMemberRole = async (memberId, newRole) => {
         try {
-            await axiosConn.put(`/org/${selectedOrgId}/members/${memberId}/role`, {
-                role: newRole
+            await axiosConn.put(`/organization/${selectedOrganization.orgId}/users/${memberId}/role`, {
+                userRole: newRole
             });
             
             toast({
@@ -249,15 +233,16 @@ function AddMembersToOrg() {
             console.error("Error updating member role:", error);
             toast({
                 title: "Error",
-                description: "Failed to update member role",
+                description: error.response?.data?.message || "Failed to update member role",
                 variant: "destructive",
             });
         }
     };
 
-    const cancelInvitation = async (invitationId) => {
+    const cancelInvitation = async (userId) => {
         try {
-            await axiosConn.delete(`/org/${selectedOrgId}/invitations/${invitationId}`);
+            // Cancel invitation by removing the user from organization
+            await axiosConn.delete(`/organization/${selectedOrganization.orgId}/users/${userId}`);
             
             toast({
                 title: "Success!",
@@ -265,20 +250,34 @@ function AddMembersToOrg() {
                 variant: "default",
             });
             
-            fetchPendingInvitations();
+            fetchMembers(); // Refresh the list
         } catch (error) {
             console.error("Error cancelling invitation:", error);
             toast({
                 title: "Error",
-                description: "Failed to cancel invitation",
+                description: error.response?.data?.message || "Failed to cancel invitation",
                 variant: "destructive",
             });
         }
     };
 
-    const resendInvitation = async (invitationId) => {
+    const resendInvitation = async (email) => {
         try {
-            await axiosConn.post(`/org/${selectedOrgId}/invitations/${invitationId}/resend`);
+            // Find the user's role from the pending invitations
+            const pendingUser = pendingInvitations.find(inv => inv.user?.email === email);
+            if (!pendingUser) {
+                toast({
+                    title: "Error",
+                    description: "User not found in pending invitations",
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            await axiosConn.post(`/organization/${selectedOrganization.orgId}/invite`, {
+                email: email,
+                userRole: pendingUser.userRole
+            });
             
             toast({
                 title: "Success!",
@@ -289,17 +288,18 @@ function AddMembersToOrg() {
             console.error("Error resending invitation:", error);
             toast({
                 title: "Error",
-                description: "Failed to resend invitation",
+                description: error.response?.data?.message || "Failed to resend invitation",
                 variant: "destructive",
             });
         }
     };
 
     const getRoleIcon = (role) => {
-        switch (role) {
+        switch (role?.toLowerCase()) {
             case 'admin':
                 return <Crown className="h-4 w-4" />;
-            case 'moderator':
+            case 'manager':
+            case 'instructor':
                 return <Shield className="h-4 w-4" />;
             default:
                 return <User className="h-4 w-4" />;
@@ -307,10 +307,11 @@ function AddMembersToOrg() {
     };
 
     const getRoleBadgeVariant = (role) => {
-        switch (role) {
+        switch (role?.toLowerCase()) {
             case 'admin':
                 return 'destructive';
-            case 'moderator':
+            case 'manager':
+            case 'instructor':
                 return 'secondary';
             default:
                 return 'outline';
@@ -318,72 +319,78 @@ function AddMembersToOrg() {
     };
 
     const filteredMembers = members.filter(member =>
-        member.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        member.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        member.email?.toLowerCase().includes(searchTerm.toLowerCase())
+        member.user?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        member.user?.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        member.user?.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const filteredInvitations = pendingInvitations.filter(invitation =>
-        invitation.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        invitation.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        invitation.lastName?.toLowerCase().includes(searchTerm.toLowerCase())
+        invitation.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        invitation.user?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        invitation.user?.lastName?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    if (isFetching) {
+    if (organizationsLoading || isLoading) {
         return (
             <div className="flex items-center justify-center h-64">
                 <Loader2 className="h-8 w-8 animate-spin" />
-                <span className="ml-2">Loading organizations...</span>
+                <span className="ml-2">Loading member management...</span>
             </div>
         );
     }
 
-    if (organizations.length === 0) {
+    if (!hasOrganization || !selectedOrganization) {
         return (
             <div className="space-y-6">
                 <Alert>
                     <Building2 className="h-4 w-4" />
                     <AlertDescription>
-                        You don't have any organizations yet. Register your organization to start adding members.
+                        {!hasOrganization 
+                            ? "You don't have any organizations yet. Register your organization to start adding members."
+                            : "Please select an organization from the sidebar to manage members."
+                        }
                     </AlertDescription>
                 </Alert>
             </div>
         );
     }
 
+    const currentUserRole = organizations.find(
+        org => org.organization.orgId === selectedOrganization.orgId
+    )?.userRole;
+
     return (
         <div className="space-y-6">
-            {/* Organization Selector */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <UserCog className="h-6 w-6 text-blue-600" />
-                        Add Members to Organization
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="flex-1">
-                            <Label htmlFor="org-select">Select Organization</Label>
-                            <Select value={selectedOrgId} onValueChange={setSelectedOrgId}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select an organization" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {organizations.map((org) => (
-                                        <SelectItem key={org.id} value={org.id}>
-                                            {org.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+      {/* Organization Header */}
+      <Card className="border-l-4 border-l-blue-500">
+        <CardContent className="pt-6">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start space-x-4">
+              <Avatar className="h-16 w-16">
+                <AvatarFallback className="bg-blue-100 text-blue-600 text-xl font-bold">
+                  {selectedOrganization.orgName?.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {selectedOrganization.orgName}
+                </h1>
 
-            {selectedOrgId && (
-                <>
+                <div className="flex items-center gap-3 mt-3">
+                  <Badge>{selectedOrganization.orgStatus || "Active"}</Badge>
+                  <Badge variant="secondary">
+                    {selectedOrganization.orgType}
+                  </Badge>
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    {currentUserRole}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          
+          </div>
+        </CardContent>
+      </Card>
                     {/* Actions */}
                     <Card>
                         <CardContent className="pt-6">
@@ -468,9 +475,10 @@ function AddMembersToOrg() {
                                                                         </SelectTrigger>
                                                                     </FormControl>
                                                                     <SelectContent>
-                                                                        <SelectItem value="member">Member</SelectItem>
-                                                                        <SelectItem value="moderator">Moderator</SelectItem>
-                                                                        <SelectItem value="admin">Admin</SelectItem>
+                                                                        <SelectItem value="MEMBER">Member</SelectItem>
+                                                                        <SelectItem value="INSTRUCTOR">Instructor</SelectItem>
+                                                                        <SelectItem value="MANAGER">Manager</SelectItem>
+                                                                        <SelectItem value="ADMIN">Admin</SelectItem>
                                                                     </SelectContent>
                                                                 </Select>
                                                                 <FormMessage />
@@ -543,9 +551,10 @@ function AddMembersToOrg() {
                                                                         </SelectTrigger>
                                                                     </FormControl>
                                                                     <SelectContent>
-                                                                        <SelectItem value="member">Member</SelectItem>
-                                                                        <SelectItem value="moderator">Moderator</SelectItem>
-                                                                        <SelectItem value="admin">Admin</SelectItem>
+                                                                        <SelectItem value="MEMBER">Member</SelectItem>
+                                                                        <SelectItem value="INSTRUCTOR">Instructor</SelectItem>
+                                                                        <SelectItem value="MANAGER">Manager</SelectItem>
+                                                                        <SelectItem value="ADMIN">Admin</SelectItem>
                                                                     </SelectContent>
                                                                 </Select>
                                                                 <FormMessage />
@@ -602,29 +611,29 @@ function AddMembersToOrg() {
                                         </TableHeader>
                                         <TableBody>
                                             {filteredMembers.map((member) => (
-                                                <TableRow key={member.id}>
+                                                <TableRow key={member.userId}>
                                                     <TableCell>
                                                         <div className="flex items-center gap-3">
                                                             <Avatar className="h-8 w-8">
-                                                                <AvatarImage src={member.avatar} />
+                                                                <AvatarImage src={member.user?.profilePicture} />
                                                                 <AvatarFallback>
-                                                                    {member.firstName?.[0]}{member.lastName?.[0]}
+                                                                    {member.user?.firstName?.[0]}{member.user?.lastName?.[0]}
                                                                 </AvatarFallback>
                                                             </Avatar>
                                                             <div>
-                                                                <p className="font-medium">{member.firstName} {member.lastName}</p>
-                                                                <p className="text-sm text-gray-500">{member.email}</p>
+                                                                <p className="font-medium">{member.user?.firstName} {member.user?.lastName}</p>
+                                                                <p className="text-sm text-gray-500">{member.user?.email}</p>
                                                             </div>
                                                         </div>
                                                     </TableCell>
                                                     <TableCell>
-                                                        <Badge variant={getRoleBadgeVariant(member.role)} className="flex items-center gap-1 w-fit">
-                                                            {getRoleIcon(member.role)}
-                                                            {member.role}
+                                                        <Badge variant={getRoleBadgeVariant(member.userRole)} className="flex items-center gap-1 w-fit">
+                                                            {getRoleIcon(member.userRole)}
+                                                            {member.userRole}
                                                         </Badge>
                                                     </TableCell>
                                                     <TableCell>
-                                                        {new Date(member.joinedAt).toLocaleDateString()}
+                                                        {new Date(member.orgUserCreatedAt).toLocaleDateString()}
                                                     </TableCell>
                                                     <TableCell className="text-right">
                                                         <DropdownMenu>
@@ -634,17 +643,20 @@ function AddMembersToOrg() {
                                                                 </Button>
                                                             </DropdownMenuTrigger>
                                                             <DropdownMenuContent align="end">
-                                                                <DropdownMenuItem onClick={() => updateMemberRole(member.id, 'member')}>
+                                                                <DropdownMenuItem onClick={() => updateMemberRole(member.userId, 'MEMBER')}>
                                                                     Change to Member
                                                                 </DropdownMenuItem>
-                                                                <DropdownMenuItem onClick={() => updateMemberRole(member.id, 'moderator')}>
-                                                                    Change to Moderator
+                                                                <DropdownMenuItem onClick={() => updateMemberRole(member.userId, 'INSTRUCTOR')}>
+                                                                    Change to Instructor
                                                                 </DropdownMenuItem>
-                                                                <DropdownMenuItem onClick={() => updateMemberRole(member.id, 'admin')}>
+                                                                <DropdownMenuItem onClick={() => updateMemberRole(member.userId, 'MANAGER')}>
+                                                                    Change to Manager
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => updateMemberRole(member.userId, 'ADMIN')}>
                                                                     Change to Admin
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem 
-                                                                    onClick={() => removeMember(member.id)}
+                                                                    onClick={() => removeMember(member.userId)}
                                                                     className="text-red-600"
                                                                 >
                                                                     Remove Member
@@ -683,7 +695,7 @@ function AddMembersToOrg() {
                                         </TableHeader>
                                         <TableBody>
                                             {filteredInvitations.map((invitation) => (
-                                                <TableRow key={invitation.id}>
+                                                <TableRow key={invitation.userId}>
                                                     <TableCell>
                                                         <div className="flex items-center gap-3">
                                                             <Avatar className="h-8 w-8">
@@ -692,26 +704,26 @@ function AddMembersToOrg() {
                                                                 </AvatarFallback>
                                                             </Avatar>
                                                             <div>
-                                                                <p className="font-medium">{invitation.firstName} {invitation.lastName}</p>
-                                                                <p className="text-sm text-gray-500">{invitation.email}</p>
+                                                                <p className="font-medium">{invitation.user?.firstName} {invitation.user?.lastName}</p>
+                                                                <p className="text-sm text-gray-500">{invitation.user?.email}</p>
                                                             </div>
                                                         </div>
                                                     </TableCell>
                                                     <TableCell>
-                                                        <Badge variant={getRoleBadgeVariant(invitation.role)} className="flex items-center gap-1 w-fit">
-                                                            {getRoleIcon(invitation.role)}
-                                                            {invitation.role}
+                                                        <Badge variant={getRoleBadgeVariant(invitation.userRole)} className="flex items-center gap-1 w-fit">
+                                                            {getRoleIcon(invitation.userRole)}
+                                                            {invitation.userRole}
                                                         </Badge>
                                                     </TableCell>
                                                     <TableCell>
-                                                        {new Date(invitation.sentAt).toLocaleDateString()}
+                                                        {new Date(invitation.orgUserCreatedAt).toLocaleDateString()}
                                                     </TableCell>
                                                     <TableCell className="text-right">
                                                         <div className="flex gap-1 justify-end">
                                                             <Button
                                                                 variant="ghost"
                                                                 size="sm"
-                                                                onClick={() => resendInvitation(invitation.id)}
+                                                                onClick={() => resendInvitation(invitation.user?.email)}
                                                                 className="text-blue-600 hover:text-blue-700"
                                                             >
                                                                 <Send className="h-4 w-4" />
@@ -719,7 +731,7 @@ function AddMembersToOrg() {
                                                             <Button
                                                                 variant="ghost"
                                                                 size="sm"
-                                                                onClick={() => cancelInvitation(invitation.id)}
+                                                                onClick={() => cancelInvitation(invitation.userId)}
                                                                 className="text-red-600 hover:text-red-700"
                                                             >
                                                                 <X className="h-4 w-4" />
@@ -734,8 +746,6 @@ function AddMembersToOrg() {
                             </CardContent>
                         </Card>
                     )}
-                </>
-            )}
         </div>
     );
 }

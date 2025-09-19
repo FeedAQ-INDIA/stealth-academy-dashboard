@@ -202,10 +202,7 @@ const router = createBrowserRouter([
             path: "/account-settings/organization",
             element: <OrganizationLayout />,
             children: [
-              {
-                index: true,
-                element: <RegisterAsOrg />,
-              },
+        
               {
                 path: "profile",
                 element: <OrgProfile />,
