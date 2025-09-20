@@ -61,7 +61,7 @@ export const useOrganizationStore = create((set, get) => ({
                     organizationsLoading: false,
                     // Set first organization as selected if none selected
                     selectedOrganization: organizations.length > 0 && !get().selectedOrganization 
-                        ? organizations[0].organization 
+                        ? organizations[0] 
                         : get().selectedOrganization
                 });
                 

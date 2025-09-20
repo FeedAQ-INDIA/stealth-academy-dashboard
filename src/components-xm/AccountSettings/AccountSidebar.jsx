@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 import {
   Sidebar,
@@ -66,7 +66,7 @@ function AccountSidebar({ ...props }) {
   useEffect(() => {
     console.log("AccountSidebar: Fetching organizations on mount");
     fetchUserOrganizations();
-  }, []); // Empty dependency array since fetchUserOrganizations should be stable
+  }, [fetchUserOrganizations]); // Include fetchUserOrganizations in dependencies
 
   // Debug logging
   useEffect(() => {
@@ -82,7 +82,7 @@ function AccountSidebar({ ...props }) {
   };
 
   // Dynamic organization menu items based on organization status
-  const getOrganizationItems = () => {
+  const getOrganizationItems = useCallback(() => {
     console.log("getOrganizationItems called - organizationsLoading:", organizationsLoading, "organizations:", organizations);
     
     // Always show the main organization dashboard
@@ -126,7 +126,7 @@ function AccountSidebar({ ...props }) {
     }
 
     return items;
-  };
+  }, [organizationsLoading, organizations, location.pathname]);
 
   // Memoized data object that updates when dependencies change
   const data = React.useMemo(() => ({
@@ -184,15 +184,15 @@ function AccountSidebar({ ...props }) {
         url: "#",
         items: getOrganizationItems(),
         // Add organization selector for organizations section
-        hasSelector: organizations && organizations.length > 0,
-        selectorComponent: organizations && organizations.length > 0 ? (
+        hasSelector: organizations && organizations.length > 0 && organizations.some(org => org && org.orgId),
+        selectorComponent: organizations && organizations.length > 0 && organizations.some(org => org && org.orgId) ? (
           <div className="px-2 py-2">
             <Select 
               value={selectedOrganization?.orgId?.toString() || ""} 
               onValueChange={(orgId) => {
-                const org = organizations.find(o => o.organization.orgId.toString() === orgId);
+                const org = organizations.find(o => o.orgId.toString() === orgId);
                 if (org) {
-                  setSelectedOrganization(org.organization);
+                  setSelectedOrganization(org);
                 }
               }}
             >
@@ -200,14 +200,22 @@ function AccountSidebar({ ...props }) {
                 <SelectValue placeholder="Select Organization" />
               </SelectTrigger>
               <SelectContent>
-                {organizations.map((orgUser) => (
-                  <SelectItem 
-                    key={orgUser.organization.orgId} 
-                    value={orgUser.organization.orgId.toString()}
-                  >
-                    {orgUser.organization.orgName}
-                  </SelectItem>
-                ))}
+                {organizations.map((org) => {
+                  // Add null checks to prevent undefined errors
+                  // Now organizations is a flat array of organization objects
+                  if (!org || !org.orgId) {
+                    return null;
+                  }
+                  
+                  return (
+                    <SelectItem 
+                      key={org.orgId} 
+                      value={org.orgId.toString()}
+                    >
+                      {org.orgName}
+                    </SelectItem>
+                  );
+                }).filter(Boolean)}
               </SelectContent>
             </Select>
           </div>
@@ -226,7 +234,7 @@ function AccountSidebar({ ...props }) {
         ],
       },
     ],
-  }), [organizations, organizationsLoading, selectedOrganization, location.pathname]);
+  }), [organizations, organizationsLoading, selectedOrganization, location.pathname, getOrganizationItems, setSelectedOrganization]);
 
   const [urlEndpoint, setUrlEndpoint] = React.useState("");
 

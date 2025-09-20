@@ -247,7 +247,7 @@ function OrgProfile() {
   }
 
   const currentUserRole = organizations.find(
-    (org) => org.organization.orgId === selectedOrganization.orgId
+    (org) => org.orgId === selectedOrganization.orgId
   )?.userRole;
 
   return (
