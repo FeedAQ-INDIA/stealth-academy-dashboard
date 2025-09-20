@@ -6,7 +6,6 @@ import {SidebarTrigger} from "@/components/ui/sidebar.jsx";
 import {Separator} from "@/components/ui/separator.jsx";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
 import {ShoppingBag, CheckCircle, Clock, XCircle, ChevronLeft, ChevronRight} from "lucide-react";
-import { useOrderStore } from "@/zustland/store.js";
 
 function OrdersLayout() {
     const navigate = useNavigate();
@@ -15,14 +14,7 @@ function OrdersLayout() {
     const scrollContainerRef = useRef(null);
     const [showLeftArrow, setShowLeftArrow] = useState(false);
     const [showRightArrow, setShowRightArrow] = useState(false);
-    
-    // Get orders data from Zustand store
-    const { 
-        totalOrders,
-        completedOrders,
-        pendingOrders,
-        cancelledOrders,
-    } = useOrderStore();
+
 
     // Content tabs for orders section
     const navigationItems = [

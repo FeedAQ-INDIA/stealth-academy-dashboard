@@ -18,27 +18,191 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.jsx";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog.jsx";
-import { useOrderStore } from "@/zustland/store.js";
 import { useToast } from "@/components/hooks/use-toast.js";
+import axiosConn from "@/axioscon.js";
 
 function AllOrders() {
     const { toast } = useToast();
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [isOrderDetailsOpen, setIsOrderDetailsOpen] = useState(false);
+    
+    // Local state for orders
+    const [orders, setOrders] = useState([
+        {
+            id: 'ORD-2024-001',
+            date: '2024-08-10',
+            status: 'completed',
+            total: 2499,
+            paymentMethod: 'Credit Card',
+            items: [
+                {
+                    name: 'Professional Credit Pack',
+                    description: '1500 Credits for course access and services',
+                    price: 2499,
+                    quantity: 1,
+                    type: 'credits'
+                }
+            ]
+        },
+        {
+            id: 'ORD-2024-002',
+            date: '2024-08-08',
+            status: 'completed',
+            total: 1299,
+            paymentMethod: 'UPI',
+            items: [
+                {
+                    name: 'React Development Course',
+                    description: 'Complete React.js course with hands-on projects',
+                    price: 1299,
+                    quantity: 1,
+                    type: 'course'
+                }
+            ]
+        },
+        {
+            id: 'ORD-2024-003',
+            date: '2024-08-05',
+            status: 'pending',
+            total: 999,
+            paymentMethod: 'Credit Card',
+            items: [
+                {
+                    name: 'Starter Credit Pack',
+                    description: '500 Credits for beginners',
+                    price: 999,
+                    quantity: 1,
+                    type: 'credits'
+                }
+            ]
+        },
+        {
+            id: 'ORD-2024-004',
+            date: '2024-08-03',
+            status: 'processing',
+            total: 1899,
+            paymentMethod: 'Net Banking',
+            items: [
+                {
+                    name: 'Python for Data Science',
+                    description: 'Complete Python course with data science projects',
+                    price: 1299,
+                    quantity: 1,
+                    type: 'course'
+                },
+                {
+                    name: 'Mock Interview Pack',
+                    description: '10 AI-powered mock interviews',
+                    price: 600,
+                    quantity: 1,
+                    type: 'service'
+                }
+            ]
+        },
+        {
+            id: 'ORD-2024-005',
+            date: '2024-07-28',
+            status: 'cancelled',
+            total: 4999,
+            paymentMethod: 'Credit Card',
+            items: [
+                {
+                    name: 'Enterprise Credit Pack',
+                    description: '3000 Credits with premium features',
+                    price: 4999,
+                    quantity: 1,
+                    type: 'credits'
+                }
+            ]
+        },
+        {
+            id: 'ORD-2024-006',
+            date: '2024-07-25',
+            status: 'completed',
+            total: 2199,
+            paymentMethod: 'UPI',
+            items: [
+                {
+                    name: 'Full Stack Development Bundle',
+                    description: 'Frontend + Backend development courses',
+                    price: 2199,
+                    quantity: 1,
+                    type: 'course'
+                }
+            ]
+        }
+    ]);
+    const [loading, setLoading] = useState(false);
 
-    // Get orders data from Zustand store
-    const { 
-        orders,
-        loading,
-        fetchOrders,
-        cancelOrder,
-        downloadInvoice
-    } = useOrderStore();
+    // Fetch orders from API
+    const fetchOrders = async () => {
+        setLoading(true);
+        try {
+            const res = await axiosConn.post(import.meta.env.VITE_API_URL+"/getUserOrders", {});
+            if (res.data?.data?.orders) {
+                setOrders(res.data.data.orders);
+            }
+        } catch (error) {
+            console.error("Error fetching orders:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Cancel order
+    const cancelOrder = async (orderId) => {
+        try {
+            const res = await axiosConn.post(import.meta.env.VITE_API_URL+"/cancelOrder", {
+                orderId
+            });
+            
+            if (res.data?.success) {
+                // Update order status locally
+                setOrders(prevOrders => 
+                    prevOrders.map(order => 
+                        order.id === orderId 
+                            ? { ...order, status: 'cancelled' }
+                            : order
+                    )
+                );
+                return { success: true };
+            }
+            return { success: false, error: res.data?.message };
+        } catch (error) {
+            console.error("Error cancelling order:", error);
+            return { success: false, error: error.message };
+        }
+    };
+
+    // Download invoice
+    const downloadInvoice = async (orderId) => {
+        try {
+            const res = await axiosConn.post(import.meta.env.VITE_API_URL+"/downloadInvoice", {
+                orderId
+            }, {
+                responseType: 'blob'
+            });
+            
+            // Create blob link to download the invoice
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `invoice-${orderId}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            
+            return { success: true };
+        } catch (error) {
+            console.error("Error downloading invoice:", error);
+            return { success: false, error: error.message };
+        }
+    };
 
     // Fetch orders data on component mount
     useEffect(() => {
         fetchOrders();
-    }, [fetchOrders]);
+    }, []);
 
     const getStatusIcon = (status) => {
         switch (status) {

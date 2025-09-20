@@ -30,13 +30,17 @@ import {
     X,
     Users,
     Calendar,
-    Activity
+    Activity,
+    Settings
 } from "lucide-react";
 import { toast } from "@/components/hooks/use-toast.js";
 import { Alert, AlertDescription } from "@/components/ui/alert.jsx";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu.jsx";
 import { useOrganizationStore } from "@/zustland/store.js";
 import axiosConn from "@/axioscon.js";
+import { SidebarTrigger } from "@/components/ui/sidebar.jsx";
+import { Separator } from "@/components/ui/separator.jsx";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb.jsx";
 
 function AddMembersToOrg() {
     const [isLoading, setIsLoading] = useState(false);
@@ -330,27 +334,64 @@ function AddMembersToOrg() {
         invitation.user?.lastName?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const getInitials = (name) => {
+        return (
+            name
+                ?.split(" ")
+                .map((word) => word[0])
+                .join("")
+                .toUpperCase() || "ORG"
+        );
+    };
+
     if (organizationsLoading || isLoading) {
         return (
-            <div className="flex items-center justify-center h-64">
-                <Loader2 className="h-8 w-8 animate-spin" />
-                <span className="ml-2">Loading member management...</span>
+            <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+                <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
+                    <SidebarTrigger className="-ml-1"/>
+                    <Separator orientation="vertical" className="mr-2 h-4"/>
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            <BreadcrumbItem>
+                                <BreadcrumbPage className="truncate max-w-[30ch]">Member Management</BreadcrumbPage>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
+                    <div className="ml-auto sm:flex-initial"></div>
+                </header>
+                <div className="flex items-center justify-center p-8">
+                    <div className="text-center">
+                        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+                        <p className="text-gray-600">Loading member management...</p>
+                    </div>
+                </div>
             </div>
         );
     }
 
-    if (!hasOrganization || !selectedOrganization) {
+    if (!selectedOrganization) {
         return (
-            <div className="space-y-6">
-                <Alert>
-                    <Building2 className="h-4 w-4" />
-                    <AlertDescription>
-                        {!hasOrganization 
-                            ? "You don't have any organizations yet. Register your organization to start adding members."
-                            : "Please select an organization from the sidebar to manage members."
-                        }
-                    </AlertDescription>
-                </Alert>
+            <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+                <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
+                    <SidebarTrigger className="-ml-1"/>
+                    <Separator orientation="vertical" className="mr-2 h-4"/>
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            <BreadcrumbItem>
+                                <BreadcrumbPage className="truncate max-w-[30ch]">Member Management</BreadcrumbPage>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
+                    <div className="ml-auto sm:flex-initial"></div>
+                </header>
+                <div className="p-4 mx-auto">
+                    <Alert>
+                        <Building2 className="h-4 w-4" />
+                        <AlertDescription>
+                            Please select an organization from the sidebar to manage members.
+                        </AlertDescription>
+                    </Alert>
+                </div>
             </div>
         );
     }
@@ -360,40 +401,70 @@ function AddMembersToOrg() {
     )?.userRole;
 
     return (
-        <div className="space-y-6">
-      {/* Organization Header */}
-      <Card className="border-l-4 border-l-blue-500">
-        <CardContent className="pt-6">
-          <div className="flex items-start justify-between">
-            <div className="flex items-start space-x-4">
-              <Avatar className="h-16 w-16">
-                <AvatarFallback className="bg-blue-100 text-blue-600 text-xl font-bold">
-                  {selectedOrganization.orgName?.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  {selectedOrganization.orgName}
-                </h1>
+        <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+            <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
+                <SidebarTrigger className="-ml-1"/>
+                <Separator orientation="vertical" className="mr-2 h-4"/>
+                <Breadcrumb>
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbPage className="truncate max-w-[30ch]">Member Management</BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
+                <div className="ml-auto sm:flex-initial"></div>
+            </header>
 
-                <div className="flex items-center gap-3 mt-3">
-                  <Badge>{selectedOrganization.orgStatus || "Active"}</Badge>
-                  <Badge variant="secondary">
-                    {selectedOrganization.orgType}
-                  </Badge>
-                  <Badge variant="outline" className="flex items-center gap-1">
-                    {currentUserRole}
-                  </Badge>
-                </div>
-              </div>
-            </div>
-          
-          </div>
-        </CardContent>
-      </Card>
+            <div className="p-4 mx-auto">
+                {/* Organization Header Card */}
+                <Card className="mb-6 border-0 shadow-lg bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700">
+                    <CardHeader className="p-6">
+                        <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full lg:w-auto">
+                                <div className="relative flex-shrink-0">
+                                    <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-blue-200 shadow-xl">
+                                        <AvatarFallback className="text-xl sm:text-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold">
+                                            {getInitials(selectedOrganization.orgName)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-5 h-5 sm:w-6 sm:h-6 bg-green-400 rounded-full border-2 border-white"></div>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <h1 className="text-2xl sm:text-3xl font-bold mb-2 leading-tight text-white">
+                                        {selectedOrganization.orgName}
+                                    </h1>
+                                    <p className="text-white text-base sm:text-lg flex items-center gap-2 flex-wrap">
+                                        <Users className="w-4 h-4 flex-shrink-0" />
+                                        <span className="break-words">Manage organization members and permissions</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex gap-3 flex-wrap">
+                                <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30">
+                                    {selectedOrganization.orgStatus || "Active"}
+                                </Badge>
+                                <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30 capitalize">
+                                    {selectedOrganization.orgType?.replace("_", " ")}
+                                </Badge>
+                                <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30 flex items-center gap-1">
+                                    <Shield className="w-3 h-3" />
+                                    {currentUserRole}
+                                </Badge>
+                            </div>
+                        </div>
+                    </CardHeader>
+                </Card>
+
+                <div className="space-y-6">
                     {/* Actions */}
-                    <Card>
-                        <CardContent className="pt-6">
+                    <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
+                        <CardHeader>
+                            <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                                <Settings className="w-5 h-5" />
+                                Member Management
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
                             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
                                 <div className="relative flex-1 max-w-sm">
                                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -407,7 +478,7 @@ function AddMembersToOrg() {
                                 <div className="flex gap-2">
                                     <Sheet open={isAddSheetOpen} onOpenChange={setIsAddSheetOpen}>
                                         <SheetTrigger asChild>
-                                            <Button className="flex items-center gap-2">
+                                            <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                                                 <UserPlus className="h-4 w-4" />
                                                 Add Member
                                             </Button>
@@ -493,7 +564,7 @@ function AddMembersToOrg() {
                                                         >
                                                             Cancel
                                                         </Button>
-                                                        <Button type="submit" disabled={isLoading}>
+                                                        <Button type="submit" disabled={isLoading} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                                                             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                                             <Send className="mr-2 h-4 w-4" />
                                                             Send Invitation
@@ -506,7 +577,7 @@ function AddMembersToOrg() {
 
                                     <Sheet open={isBulkAddSheetOpen} onOpenChange={setIsBulkAddSheetOpen}>
                                         <SheetTrigger asChild>
-                                            <Button variant="outline" className="flex items-center gap-2">
+                                            <Button variant="outline" className="flex items-center gap-2 border-gray-300">
                                                 <Mail className="h-4 w-4" />
                                                 Bulk Add
                                             </Button>
@@ -569,7 +640,7 @@ function AddMembersToOrg() {
                                                         >
                                                             Cancel
                                                         </Button>
-                                                        <Button type="submit" disabled={isLoading}>
+                                                        <Button type="submit" disabled={isLoading} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                                                             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                                             <Send className="mr-2 h-4 w-4" />
                                                             Send Invitations
@@ -585,9 +656,9 @@ function AddMembersToOrg() {
                     </Card>
 
                     {/* Current Members */}
-                    <Card>
+                    <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
+                            <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
                                 <User className="h-5 w-5" />
                                 Current Members ({filteredMembers.length})
                             </CardTitle>
@@ -675,9 +746,9 @@ function AddMembersToOrg() {
 
                     {/* Pending Invitations */}
                     {filteredInvitations.length > 0 && (
-                        <Card>
+                        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
+                                <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
                                     <Mail className="h-5 w-5" />
                                     Pending Invitations ({filteredInvitations.length})
                                 </CardTitle>
@@ -746,6 +817,8 @@ function AddMembersToOrg() {
                             </CardContent>
                         </Card>
                     )}
+                </div>
+            </div>
         </div>
     );
 }

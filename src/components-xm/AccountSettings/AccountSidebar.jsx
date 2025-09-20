@@ -55,10 +55,8 @@ function AccountSidebar({ ...props }) {
   
   // Organization status from zustand store
   const { 
-    canCreateOrganization, 
-    hasOrganization, 
-    fetchOrganizationStatus, 
-    loading: orgLoading,
+    fetchUserOrganizations, 
+    organizationsLoading,
     organizations,
     setSelectedOrganization,
     selectedOrganization
@@ -66,8 +64,16 @@ function AccountSidebar({ ...props }) {
 
   // Fetch organization status on component mount
   useEffect(() => {
-    fetchOrganizationStatus();
-  }, [fetchOrganizationStatus]);
+    console.log("AccountSidebar: Fetching organizations on mount");
+    fetchUserOrganizations();
+  }, []); // Empty dependency array since fetchUserOrganizations should be stable
+
+  // Debug logging
+  useEffect(() => {
+    console.log("AccountSidebar Debug - organizationsLoading:", organizationsLoading);
+    console.log("AccountSidebar Debug - organizations:", organizations);
+    console.log("AccountSidebar Debug - selectedOrganization:", selectedOrganization);
+  }, [organizationsLoading, organizations, selectedOrganization]);
 
   // Helper function to get the current tab from the URL query params
   const getTabFromURL = () => {
@@ -77,25 +83,24 @@ function AccountSidebar({ ...props }) {
 
   // Dynamic organization menu items based on organization status
   const getOrganizationItems = () => {
-    if (orgLoading) {
-      return [
-        {
-          title: "Loading...",
-          url: "#",
-          isActive: false,
-          icon: Loader,
-        }
-      ];
+    console.log("getOrganizationItems called - organizationsLoading:", organizationsLoading, "organizations:", organizations);
+    
+    // Always show the main organization dashboard
+    const items = [];
+
+    // Check if we're still loading
+    if (organizationsLoading) {
+      items.push({
+        title: "Loading organizations...",
+        url: "#",
+        isActive: false,
+        icon: Loader,
+      });
+      return items;
     }
 
-    // Always show the main organization dashboard
-    const items = [
-  
-
-    ];
-
     // If user has organizations, show additional management options
-    if (hasOrganization && organizations && organizations.length > 0) {
+    if (organizations && organizations.length > 0) {
       items.push(
         {
           title: "Organization Profile",
@@ -109,14 +114,22 @@ function AccountSidebar({ ...props }) {
           isActive: location.pathname === "/account-settings/organization/add-members",
           icon: UserPlus,
         },
-
       );
+    } else {
+      // No organizations found
+      items.push({
+        title: "No organizations found",
+        url: `/account-settings/register-organization`,
+        isActive: false,
+        icon: Building,
+      });
     }
 
     return items;
   };
 
-  const data = {
+  // Memoized data object that updates when dependencies change
+  const data = React.useMemo(() => ({
     navMain: [
       {
         title: "Account",
@@ -171,8 +184,8 @@ function AccountSidebar({ ...props }) {
         url: "#",
         items: getOrganizationItems(),
         // Add organization selector for organizations section
-        hasSelector: hasOrganization && organizations && organizations.length > 0,
-        selectorComponent: hasOrganization && organizations && organizations.length > 0 ? (
+        hasSelector: organizations && organizations.length > 0,
+        selectorComponent: organizations && organizations.length > 0 ? (
           <div className="px-2 py-2">
             <Select 
               value={selectedOrganization?.orgId?.toString() || ""} 
@@ -213,7 +226,7 @@ function AccountSidebar({ ...props }) {
         ],
       },
     ],
-  };
+  }), [organizations, organizationsLoading, selectedOrganization, location.pathname]);
 
   const [urlEndpoint, setUrlEndpoint] = React.useState("");
 

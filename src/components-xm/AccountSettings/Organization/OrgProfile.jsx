@@ -49,21 +49,20 @@ import { toast } from "@/components/hooks/use-toast.js";
 import { Alert, AlertDescription } from "@/components/ui/alert.jsx";
 import axiosConn from "@/axioscon.js";
 import { useOrganizationStore } from "@/zustland/store.js";
-import { useNavigate } from "react-router-dom";
+import { SidebarTrigger } from "@/components/ui/sidebar.jsx";
+import { Separator } from "@/components/ui/separator.jsx";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb.jsx";
 
 function OrgProfile() {
   const [isLoading, setIsLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const navigate = useNavigate();
 
   // Organization store to get selected organization and status
   const {
-    canCreateOrganization,
-    fetchOrganizationStatus,
-    loading: orgStatusLoading,
+    fetchUserOrganizations,
+    organizationsLoading,
     selectedOrganization,
     organizations,
-    organizationsLoading,
     hasOrganization,
     setSelectedOrganization,
   } = useOrganizationStore();
@@ -114,8 +113,8 @@ function OrgProfile() {
 
   // Check organization status on component mount
   useEffect(() => {
-    fetchOrganizationStatus();
-  }, [fetchOrganizationStatus]);
+    fetchUserOrganizations();
+  }, [fetchUserOrganizations]);
 
   // Load selected organization data into form
   useEffect(() => {
@@ -133,53 +132,6 @@ function OrgProfile() {
       });
     }
   }, [selectedOrganization, form]);
-
-  // Redirect if user hasn't registered an organization yet
-  useEffect(() => {
-    if (!orgStatusLoading && canCreateOrganization) {
-      toast({
-        title: "No Organization Found",
-        description:
-          "You need to register an organization first. Redirecting to registration page...",
-        variant: "default",
-      });
-      setTimeout(() => {
-        navigate("/account-settings/organization");
-      }, 2000);
-    }
-  }, [canCreateOrganization, orgStatusLoading, navigate]);
-
-  const fetchOrganizations = async () => {
-    try {
-      setIsFetching(true);
-      const response = await axiosConn.get("/user/organizations");
-      setOrganizations(response.data.data || []);
-
-      // Auto-select first organization if available
-      if (response.data.data && response.data.data.length > 0) {
-        const firstOrgData = response.data.data[0];
-        const firstOrg = firstOrgData.organization;
-        setSelectedOrgId(firstOrg.orgId);
-        setSelectedOrganization(firstOrg);
-      }
-    } catch (error) {
-      console.error("Error fetching organizations:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch organizations",
-        variant: "destructive",
-      });
-    } finally {
-      setIsFetching(false);
-    }
-  };
-
-  const handleOrgChange = (orgId) => {
-    setSelectedOrgId(orgId);
-    const orgData = organizations.find((o) => o.organization?.orgId === orgId);
-    setSelectedOrganization(orgData?.organization);
-    setIsEditMode(false);
-  };
 
   const onSubmit = async (data) => {
     setIsLoading(true);
@@ -236,46 +188,60 @@ function OrgProfile() {
         ?.split(" ")
         .map((word) => word[0])
         .join("")
-        .toUpperCase() || "?"
+        .toUpperCase() || "ORG"
     );
   };
 
   // Show loading if checking organization status
-  if (orgStatusLoading || organizationsLoading) {
+  if (organizationsLoading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading organization profile...</p>
+      <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
+          <SidebarTrigger className="-ml-1"/>
+          <Separator orientation="vertical" className="mr-2 h-4"/>
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbPage className="truncate max-w-[30ch]">Organization Profile</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <div className="ml-auto sm:flex-initial"></div>
+        </header>
+        <div className="flex items-center justify-center p-8">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">Loading organization profile...</p>
+          </div>
         </div>
       </div>
     );
   }
 
-  // Don't render the form if user doesn't have an organization
-  if (canCreateOrganization || !hasOrganization) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-center">
-          <Building2 className="h-8 w-8 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600">
-            No organization found. Redirecting to registration...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
+  // Show message if no organization is selected
   if (!selectedOrganization) {
     return (
-      <div className="space-y-6">
-        <Alert>
-          <Building2 className="h-4 w-4" />
-          <AlertDescription>
-            Please select an organization from the sidebar to view and edit its
-            profile.
-          </AlertDescription>
-        </Alert>
+      <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
+          <SidebarTrigger className="-ml-1"/>
+          <Separator orientation="vertical" className="mr-2 h-4"/>
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbPage className="truncate max-w-[30ch]">Organization Profile</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <div className="ml-auto sm:flex-initial"></div>
+        </header>
+        <div className="p-4 mx-auto">
+          <Alert>
+            <Building2 className="h-4 w-4" />
+            <AlertDescription>
+              Please select an organization from the sidebar to view and edit its profile.
+            </AlertDescription>
+          </Alert>
+        </div>
       </div>
     );
   }
@@ -285,182 +251,129 @@ function OrgProfile() {
   )?.userRole;
 
   return (
-    <div className="space-y-6">
-      {/* Organization Header */}
-      <Card className="border-l-4 border-l-blue-500">
-        <CardContent className="pt-6">
-          <div className="flex items-start justify-between">
-            <div className="flex items-start space-x-4">
-              <Avatar className="h-16 w-16">
-                <AvatarFallback className="bg-blue-100 text-blue-600 text-xl font-bold">
-                  {selectedOrganization.orgName?.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  {selectedOrganization.orgName}
-                </h1>
+    <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
+        <SidebarTrigger className="-ml-1"/>
+        <Separator orientation="vertical" className="mr-2 h-4"/>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbPage className="truncate max-w-[30ch]">Organization Profile</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <div className="ml-auto sm:flex-initial"></div>
+      </header>
 
-                <div className="flex items-center gap-3 mt-3">
-                  <Badge>{selectedOrganization.orgStatus || "Active"}</Badge>
-                  <Badge variant="secondary">
-                    {selectedOrganization.orgType}
-                  </Badge>
-                  <Badge variant="outline" className="flex items-center gap-1">
-                    {currentUserRole}
-                  </Badge>
+      <div className="p-4 mx-auto">
+        {/* Organization Header Card */}
+        <Card className="mb-6 border-0 shadow-lg bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700">
+          <CardHeader className="p-6">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full lg:w-auto">
+                <div className="relative flex-shrink-0">
+                  <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-blue-200 shadow-xl">
+                    <AvatarFallback className="text-xl sm:text-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold">
+                      {getInitials(selectedOrganization.orgName)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-5 h-5 sm:w-6 sm:h-6 bg-green-400 rounded-full border-2 border-white"></div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-2xl sm:text-3xl font-bold mb-2 leading-tight text-white">
+                    {selectedOrganization.orgName}
+                  </h1>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30">
+                      {selectedOrganization.orgStatus || "Active"}
+                    </Badge>
+                    <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30 capitalize">
+                      {selectedOrganization.orgType?.replace("_", " ")}
+                    </Badge>
+                    <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30 flex items-center gap-1">
+                      <Users className="w-3 h-3" />
+                      {currentUserRole}
+                    </Badge>
+                  </div>
                 </div>
               </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsEditMode(!isEditMode)}
+                  className="border-white/30 text-white bg-white/10 hover:bg-white/20 hover:text-white"
+                >
+                  {isEditMode ? (
+                    <>
+                      <X className="h-4 w-4 mr-2" />
+                      Cancel
+                    </>
+                  ) : (
+                    <>
+                      <Edit className="h-4 w-4 mr-2" />
+                      Edit Profile
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/account-settings/organization/profile")}
-              className="flex items-center gap-2"
-            >
-              <Edit className="h-4 w-4" />
-              Edit Profile
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </CardHeader>
+        </Card>
 
-      {/* Organization Profile */}
-      <Card>
- 
-        <CardHeader>
-          {!isEditMode ? (
-            // View Mode
-            <div className="space-y-6">
-              {/* Basic Info */}
+        {/* Organization Profile */}
+        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+              <Settings className="w-5 h-5" />
+              {isEditMode ? "Edit Organization Information" : "Organization Information"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!isEditMode ? (
+              // View Mode
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
-                      Organization Type
-                    </Label>
-                    <div className="mt-1">
-                      <Badge variant="secondary" className="capitalize">
-                        {selectedOrganization.orgType?.replace("_", " ")}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
-                      Industry
-                    </Label>
-                    <p className="mt-1 text-sm">
-                      {selectedOrganization.industry || "Not specified"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <Label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                      <Users className="h-4 w-4" />
-                      Organization Size
-                    </Label>
-                    <p className="mt-1 text-sm">
-                      {selectedOrganization.size || "Not specified"}
-                    </p>
-                  </div>
+                <div className="grid w-full items-center gap-1.5">
+                  <Label>Organization Name</Label>
+                  <Input value={selectedOrganization.orgName || ""} readOnly className="bg-gray-50"/>
                 </div>
-
-                <div className="space-y-4">
-                  {selectedOrganization.website && (
-                    <div>
-                      <Label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                        <Globe className="h-4 w-4" />
-                        Website
-                      </Label>
-                      <a
-                        href={selectedOrganization.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-1 text-sm text-blue-600 hover:underline"
-                      >
-                        {selectedOrganization.website}
-                      </a>
-                    </div>
-                  )}
-
-                  <div>
-                    <Label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                      <Mail className="h-4 w-4" />
-                      Contact Email
-                    </Label>
-                    <p className="mt-1 text-sm">
-                      {selectedOrganization.contactEmail || "Not specified"}
-                    </p>
-                  </div>
-
-                  {selectedOrganization.contactPhone && (
-                    <div>
-                      <Label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                        <Phone className="h-4 w-4" />
-                        Contact Phone
-                      </Label>
-                      <p className="mt-1 text-sm">
-                        {selectedOrganization.contactPhone}
-                      </p>
-                    </div>
-                  )}
+                <div className="grid w-full items-center gap-1.5">
+                  <Label>Organization Type</Label>
+                  <Input value={selectedOrganization.orgType?.replace("_", " ") || ""} readOnly className="bg-gray-50 capitalize"/>
+                </div>
+                <div className="grid w-full items-center gap-1.5">
+                  <Label>Industry</Label>
+                  <Input value={selectedOrganization.orgIndustry || "Not specified"} readOnly className="bg-gray-50"/>
+                </div>
+                <div className="grid w-full items-center gap-1.5">
+                  <Label>Organization Size</Label>
+                  <Input value={selectedOrganization.orgSize || "Not specified"} readOnly className="bg-gray-50"/>
+                </div>
+                <div className="grid w-full items-center gap-1.5">
+                  <Label>Website</Label>
+                  <Input value={selectedOrganization.orgWebsite || "Not specified"} readOnly className="bg-gray-50"/>
+                </div>
+                <div className="grid w-full items-center gap-1.5">
+                  <Label>Contact Email</Label>
+                  <Input value={selectedOrganization.orgEmail || "Not specified"} readOnly className="bg-gray-50"/>
+                </div>
+                <div className="grid w-full items-center gap-1.5">
+                  <Label>Contact Phone</Label>
+                  <Input value={selectedOrganization.orgContactNo || "Not specified"} readOnly className="bg-gray-50"/>
+                </div>
+                <div className="grid w-full items-center gap-1.5">
+                  <Label>Status</Label>
+                  <Input value={selectedOrganization.orgStatus || "Active"} readOnly className="bg-gray-50"/>
+                </div>
+                <div className="col-span-full grid w-full items-center gap-1.5">
+                  <Label>Description</Label>
+                  <Textarea value={selectedOrganization.orgDescription || "No description provided"} readOnly className="bg-gray-50" rows={3}/>
+                </div>
+                <div className="col-span-full grid w-full items-center gap-1.5">
+                  <Label>Address</Label>
+                  <Textarea value={selectedOrganization.orgAddress || "Not specified"} readOnly className="bg-gray-50" rows={2}/>
                 </div>
               </div>
-
-              {/* Description */}
-              <div>
-                <Label className="text-sm font-medium text-muted-foreground">
-                  Description
-                </Label>
-                <p className="mt-1 text-sm text-gray-700 leading-relaxed">
-                  {selectedOrganization.orgDescription}
-                </p>
-              </div>
-
-              {/* Address */}
-              <div>
-                <Label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                  <MapPin className="h-4 w-4" />
-                  Address
-                </Label>
-                <p className="mt-1 text-sm text-gray-700">
-                  {selectedOrganization.address || "Not specified"}
-                </p>
-              </div>
-
-              {/* Metadata */}
-              <div className="pt-4 border-t">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      Organization ID
-                    </Label>
-                    <p className="mt-1 text-sm">{selectedOrganization.orgId}</p>
-                  </div>
-
-                  <div>
-                    <Label className="text-sm font-medium text-muted-foreground">
-                      Status
-                    </Label>
-                    <div className="mt-1">
-                      <Badge
-                        variant={
-                          selectedOrganization.orgStatus === "ACTIVE"
-                            ? "success"
-                            : "secondary"
-                        }
-                        className="flex items-center gap-1 w-fit"
-                      >
-                        <CheckCircle className="h-3 w-3" />
-                        {selectedOrganization.orgStatus || "Active"}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
+            ) : (
             // Edit Mode
             <Form {...form}>
               <form
@@ -644,8 +557,11 @@ function OrgProfile() {
                   )}
                 />
 
-                <div className="flex justify-end">
-                  <Button type="submit" disabled={isLoading}>
+                <div className="flex gap-4 pt-6">
+                  <Button onClick={() => form.reset()} variant="outline" className="border-gray-300">
+                    Reset
+                  </Button>
+                  <Button type="submit" disabled={isLoading} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                     {isLoading && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
@@ -655,9 +571,10 @@ function OrgProfile() {
                 </div>
               </form>
             </Form>
-          )}
-        </CardHeader>
-      </Card>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

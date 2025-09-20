@@ -26,15 +26,8 @@ import Security from "@/components-xm/AccountSettings/Security.jsx";
 import Billing from "@/components-xm/AccountSettings/Billing/Billing.jsx";
 import BillingOverview from "@/components-xm/AccountSettings/Billing/BillingOverview.jsx";
 import BillingHistory from "@/components-xm/AccountSettings/Billing/BillingHistory.jsx";
+
 import {
-  OrdersLayout,
-  AllOrders,
-  CompletedOrders,
-  PendingOrders,
-  CancelledOrders,
-} from "@/components-xm/AccountSettings/Orders/index.js";
-import {
-  OrganizationLayout,
   RegisterAsOrg,
   OrgProfile,
   AddMembersToOrg,
@@ -152,29 +145,18 @@ const router = createBrowserRouter([
             ],
           },
 
-          {
-            path: "/account-settings/orders",
-            element: <OrdersLayout />,
-            children: [
-              {
-                index: true,
-                element: <AllOrders />,
-              },
-              {
-                path: "completed",
-                element: <CompletedOrders />,
-              },
-              {
-                path: "pending",
-                element: <PendingOrders />,
-              },
-              {
-                path: "cancelled",
-                element: <CancelledOrders />,
-              },
+          // {
+          //   path: "/account-settings/orders",
+          //   element: <OrdersLayout />,
+          //   children: [
+          //     {
+          //       index: true,
+          //       element: <AllOrders />,
+          //     },
+             
 
-            ],
-          },
+          //   ],
+          // },
           {
             path: "/account-settings/notifications",
             element: <Notifications />,
@@ -199,8 +181,8 @@ const router = createBrowserRouter([
           },
           
           {
-            path: "/account-settings/organization",
-            element: <OrganizationLayout />,
+            path: "/account-settings/organization/profile",
+            element: <OrgProfile />,
             children: [
         
               {
@@ -212,6 +194,12 @@ const router = createBrowserRouter([
                 element: <AddMembersToOrg />,
               },
             ],
+          },
+
+                    {
+            path: "/account-settings/organization/add-members",
+            element: <AddMembersToOrg />,
+  
           },
         ],
       },
