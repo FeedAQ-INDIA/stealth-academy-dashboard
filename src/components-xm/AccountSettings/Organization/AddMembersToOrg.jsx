@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card.jsx";
 import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input.jsx";
@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar.jsx"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet.jsx";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form.jsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.jsx";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs.jsx";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -30,8 +31,7 @@ import {
     X,
     Users,
     Calendar,
-    Activity,
-    Settings
+    Activity
 } from "lucide-react";
 import { toast } from "@/components/hooks/use-toast.js";
 import { Alert, AlertDescription } from "@/components/ui/alert.jsx";
@@ -46,9 +46,11 @@ function AddMembersToOrg() {
     const [isLoading, setIsLoading] = useState(false);
     const [members, setMembers] = useState([]);
     const [pendingInvitations, setPendingInvitations] = useState([]);
+    const [invitedUsers, setInvitedUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [isAddSheetOpen, setIsAddSheetOpen] = useState(false);
     const [isBulkAddSheetOpen, setIsBulkAddSheetOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState("members");
     
     // Get organization data from Zustand store
     const { 
@@ -95,13 +97,7 @@ function AddMembersToOrg() {
     });
 
     // Fetch members when organization is selected
-    useEffect(() => {
-        if (selectedOrganization?.orgId) {
-            fetchMembers();
-        }
-    }, [selectedOrganization]);
-
-    const fetchMembers = async () => {
+    const fetchMembers = useCallback(async () => {
         try {
             setIsLoading(true);
             const response = await axiosConn.get(`/organization/${selectedOrganization.orgId}/users`);
@@ -109,8 +105,12 @@ function AddMembersToOrg() {
             if (response.data.success) {
                 // Parse the response according to the backend structure
                 const allUsers = response.data.data.users || [];
-                setMembers(allUsers.filter(user => user.status === 'ACTIVE'));
-                setPendingInvitations(allUsers.filter(user => user.status === 'PENDING'));
+                const activeMembers = allUsers.filter(user => user.status === 'ACTIVE');
+                const pendingUsers = allUsers.filter(user => user.status === 'PENDING');
+                
+                setMembers(activeMembers);
+                setPendingInvitations(pendingUsers);
+                setInvitedUsers(pendingUsers); // Set invited users same as pending for now
             }
         } catch (error) {
             console.error("Error fetching members:", error);
@@ -122,7 +122,13 @@ function AddMembersToOrg() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [selectedOrganization?.orgId]);
+
+    useEffect(() => {
+        if (selectedOrganization?.orgId) {
+            fetchMembers();
+        }
+    }, [selectedOrganization, fetchMembers]);
 
     const onSubmitAddMember = async (data) => {
         setIsLoading(true);
@@ -328,10 +334,10 @@ function AddMembersToOrg() {
         member.user?.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const filteredInvitations = pendingInvitations.filter(invitation =>
-        invitation.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        invitation.user?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        invitation.user?.lastName?.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredInvitedUsers = invitedUsers.filter(user =>
+        user.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.user?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.user?.lastName?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const getInitials = (name) => {
@@ -401,7 +407,7 @@ function AddMembersToOrg() {
     )?.userRole;
 
     return (
-        <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="  bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
             <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
                 <SidebarTrigger className="-ml-1"/>
                 <Separator orientation="vertical" className="mr-2 h-4"/>
@@ -415,7 +421,7 @@ function AddMembersToOrg() {
                 <div className="ml-auto sm:flex-initial"></div>
             </header>
 
-            <div className="p-4 mx-auto">
+            <div className="p-4 mx-auto ">
                 {/* Organization Header Card */}
                 <Card className="mb-6 border-0 shadow-lg bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700">
                     <CardHeader className="p-6">
@@ -456,367 +462,411 @@ function AddMembersToOrg() {
                 </Card>
 
                 <div className="space-y-6">
-                    {/* Actions */}
-                    <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
-                        <CardHeader>
-                            <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-                                <Settings className="w-5 h-5" />
-                                Member Management
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-                                <div className="relative flex-1 max-w-sm">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                                    <Input
-                                        placeholder="Search members..."
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="pl-9"
-                                    />
-                                </div>
-                                <div className="flex gap-2">
-                                    <Sheet open={isAddSheetOpen} onOpenChange={setIsAddSheetOpen}>
-                                        <SheetTrigger asChild>
-                                            <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                                                <UserPlus className="h-4 w-4" />
-                                                Add Member
-                                            </Button>
-                                        </SheetTrigger>
-                                        <SheetContent className="sm:max-w-md">
-                                            <SheetHeader>
-                                                <SheetTitle>Add New Member</SheetTitle>
-                                                <SheetDescription>
-                                                    Send an invitation to add a new member to your organization.
-                                                </SheetDescription>
-                                            </SheetHeader>
-                                            <Form {...addMemberForm}>
-                                                <form onSubmit={addMemberForm.handleSubmit(onSubmitAddMember)} className="space-y-4 mt-6">
-                                                    <div className="grid grid-cols-2 gap-4">
-                                                        <FormField
-                                                            control={addMemberForm.control}
-                                                            name="firstName"
-                                                            render={({ field }) => (
-                                                                <FormItem>
-                                                                    <FormLabel>First Name</FormLabel>
-                                                                    <FormControl>
-                                                                        <Input placeholder="John" {...field} />
-                                                                    </FormControl>
-                                                                    <FormMessage />
-                                                                </FormItem>
-                                                            )}
-                                                        />
-                                                        <FormField
-                                                            control={addMemberForm.control}
-                                                            name="lastName"
-                                                            render={({ field }) => (
-                                                                <FormItem>
-                                                                    <FormLabel>Last Name</FormLabel>
-                                                                    <FormControl>
-                                                                        <Input placeholder="Doe" {...field} />
-                                                                    </FormControl>
-                                                                    <FormMessage />
-                                                                </FormItem>
-                                                            )}
-                                                        />
-                                                    </div>
-                                                    <FormField
-                                                        control={addMemberForm.control}
-                                                        name="email"
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormLabel>Email Address</FormLabel>
-                                                                <FormControl>
-                                                                    <Input placeholder="john.doe@example.com" {...field} />
-                                                                </FormControl>
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                        )}
-                                                    />
-                                                    <FormField
-                                                        control={addMemberForm.control}
-                                                        name="role"
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormLabel>Role</FormLabel>
-                                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                                    <FormControl>
-                                                                        <SelectTrigger>
-                                                                            <SelectValue />
-                                                                        </SelectTrigger>
-                                                                    </FormControl>
-                                                                    <SelectContent>
-                                                                        <SelectItem value="MEMBER">Member</SelectItem>
-                                                                        <SelectItem value="INSTRUCTOR">Instructor</SelectItem>
-                                                                        <SelectItem value="MANAGER">Manager</SelectItem>
-                                                                        <SelectItem value="ADMIN">Admin</SelectItem>
-                                                                    </SelectContent>
-                                                                </Select>
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                        )}
-                                                    />
-                                                    <div className="flex justify-end gap-2 pt-4">
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            onClick={() => setIsAddSheetOpen(false)}
-                                                        >
-                                                            Cancel
-                                                        </Button>
-                                                        <Button type="submit" disabled={isLoading} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                                                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                                            <Send className="mr-2 h-4 w-4" />
-                                                            Send Invitation
-                                                        </Button>
-                                                    </div>
-                                                </form>
-                                            </Form>
-                                        </SheetContent>
-                                    </Sheet>
-
-                                    <Sheet open={isBulkAddSheetOpen} onOpenChange={setIsBulkAddSheetOpen}>
-                                        <SheetTrigger asChild>
-                                            <Button variant="outline" className="flex items-center gap-2 border-gray-300">
-                                                <Mail className="h-4 w-4" />
-                                                Bulk Add
-                                            </Button>
-                                        </SheetTrigger>
-                                        <SheetContent className="sm:max-w-md">
-                                            <SheetHeader>
-                                                <SheetTitle>Bulk Add Members</SheetTitle>
-                                                <SheetDescription>
-                                                    Add multiple members at once by entering their email addresses.
-                                                </SheetDescription>
-                                            </SheetHeader>
-                                            <Form {...bulkAddForm}>
-                                                <form onSubmit={bulkAddForm.handleSubmit(onSubmitBulkAdd)} className="space-y-4 mt-6">
-                                                    <FormField
-                                                        control={bulkAddForm.control}
-                                                        name="emails"
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormLabel>Email Addresses</FormLabel>
-                                                                <FormControl>
-                                                                    <textarea
-                                                                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                                                        placeholder="Enter email addresses (one per line)&#10;john@example.com&#10;jane@example.com"
-                                                                        rows={4}
-                                                                        {...field}
-                                                                    />
-                                                                </FormControl>
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                        )}
-                                                    />
-                                                    <FormField
-                                                        control={bulkAddForm.control}
-                                                        name="defaultRole"
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormLabel>Default Role</FormLabel>
-                                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                                    <FormControl>
-                                                                        <SelectTrigger>
-                                                                            <SelectValue />
-                                                                        </SelectTrigger>
-                                                                    </FormControl>
-                                                                    <SelectContent>
-                                                                        <SelectItem value="MEMBER">Member</SelectItem>
-                                                                        <SelectItem value="INSTRUCTOR">Instructor</SelectItem>
-                                                                        <SelectItem value="MANAGER">Manager</SelectItem>
-                                                                        <SelectItem value="ADMIN">Admin</SelectItem>
-                                                                    </SelectContent>
-                                                                </Select>
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                        )}
-                                                    />
-                                                    <div className="flex justify-end gap-2 pt-4">
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            onClick={() => setIsBulkAddSheetOpen(false)}
-                                                        >
-                                                            Cancel
-                                                        </Button>
-                                                        <Button type="submit" disabled={isLoading} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                                                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                                            <Send className="mr-2 h-4 w-4" />
-                                                            Send Invitations
-                                                        </Button>
-                                                    </div>
-                                                </form>
-                                            </Form>
-                                        </SheetContent>
-                                    </Sheet>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Current Members */}
-                    <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
-                        <CardHeader>
-                            <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-                                <User className="h-5 w-5" />
-                                Current Members ({filteredMembers.length})
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {filteredMembers.length === 0 ? (
-                                <div className="text-center py-8">
-                                    <UserCog className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                                    <p className="text-gray-500">No members found</p>
-                                </div>
-                            ) : (
-                                <div className="overflow-x-auto">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Member</TableHead>
-                                                <TableHead>Role</TableHead>
-                                                <TableHead>Joined</TableHead>
-                                                <TableHead className="text-right">Actions</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {filteredMembers.map((member) => (
-                                                <TableRow key={member.userId}>
-                                                    <TableCell>
-                                                        <div className="flex items-center gap-3">
-                                                            <Avatar className="h-8 w-8">
-                                                                <AvatarImage src={member.user?.profilePicture} />
-                                                                <AvatarFallback>
-                                                                    {member.user?.firstName?.[0]}{member.user?.lastName?.[0]}
-                                                                </AvatarFallback>
-                                                            </Avatar>
-                                                            <div>
-                                                                <p className="font-medium">{member.user?.firstName} {member.user?.lastName}</p>
-                                                                <p className="text-sm text-gray-500">{member.user?.email}</p>
-                                                            </div>
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Badge variant={getRoleBadgeVariant(member.userRole)} className="flex items-center gap-1 w-fit">
-                                                            {getRoleIcon(member.userRole)}
-                                                            {member.userRole}
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {new Date(member.orgUserCreatedAt).toLocaleDateString()}
-                                                    </TableCell>
-                                                    <TableCell className="text-right">
-                                                        <DropdownMenu>
-                                                            <DropdownMenuTrigger asChild>
-                                                                <Button variant="ghost" size="sm">
-                                                                    <MoreHorizontal className="h-4 w-4" />
-                                                                </Button>
-                                                            </DropdownMenuTrigger>
-                                                            <DropdownMenuContent align="end">
-                                                                <DropdownMenuItem onClick={() => updateMemberRole(member.userId, 'MEMBER')}>
-                                                                    Change to Member
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem onClick={() => updateMemberRole(member.userId, 'INSTRUCTOR')}>
-                                                                    Change to Instructor
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem onClick={() => updateMemberRole(member.userId, 'MANAGER')}>
-                                                                    Change to Manager
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem onClick={() => updateMemberRole(member.userId, 'ADMIN')}>
-                                                                    Change to Admin
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem 
-                                                                    onClick={() => removeMember(member.userId)}
-                                                                    className="text-red-600"
-                                                                >
-                                                                    Remove Member
-                                                                </DropdownMenuItem>
-                                                            </DropdownMenuContent>
-                                                        </DropdownMenu>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-
-                    {/* Pending Invitations */}
-                    {filteredInvitations.length > 0 && (
+                    {/* Combined Member Management with Tabs */}
+                    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                         <Card className="border-0 shadow-lg bg-white/80 backdrop-blur">
-                            <CardHeader>
-                                <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-                                    <Mail className="h-5 w-5" />
-                                    Pending Invitations ({filteredInvitations.length})
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="overflow-x-auto">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Email</TableHead>
-                                                <TableHead>Role</TableHead>
-                                                <TableHead>Sent</TableHead>
-                                                <TableHead className="text-right">Actions</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {filteredInvitations.map((invitation) => (
-                                                <TableRow key={invitation.userId}>
-                                                    <TableCell>
-                                                        <div className="flex items-center gap-3">
-                                                            <Avatar className="h-8 w-8">
-                                                                <AvatarFallback>
-                                                                    <Mail className="h-4 w-4" />
-                                                                </AvatarFallback>
-                                                            </Avatar>
-                                                            <div>
-                                                                <p className="font-medium">{invitation.user?.firstName} {invitation.user?.lastName}</p>
-                                                                <p className="text-sm text-gray-500">{invitation.user?.email}</p>
+                            <CardHeader className="pb-4">
+                                <div className="flex flex-col gap-4">
+                                    {/* Title and Actions Row */}
+                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                        <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                                            <Users className="w-5 h-5" />
+                                            Member Management
+                                        </CardTitle>
+                                        <div className="flex gap-2">
+                                            <Sheet open={isAddSheetOpen} onOpenChange={setIsAddSheetOpen}>
+                                                <SheetTrigger asChild>
+                                                    <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                                                        <UserPlus className="h-4 w-4" />
+                                                        Add Member
+                                                    </Button>
+                                                </SheetTrigger>
+                                                <SheetContent className="sm:max-w-md">
+                                                    <SheetHeader>
+                                                        <SheetTitle>Add New Member</SheetTitle>
+                                                        <SheetDescription>
+                                                            Send an invitation to add a new member to your organization.
+                                                        </SheetDescription>
+                                                    </SheetHeader>
+                                                    <Form {...addMemberForm}>
+                                                        <form onSubmit={addMemberForm.handleSubmit(onSubmitAddMember)} className="space-y-4 mt-6">
+                                                            <div className="grid grid-cols-2 gap-4">
+                                                                <FormField
+                                                                    control={addMemberForm.control}
+                                                                    name="firstName"
+                                                                    render={({ field }) => (
+                                                                        <FormItem>
+                                                                            <FormLabel>First Name</FormLabel>
+                                                                            <FormControl>
+                                                                                <Input placeholder="John" {...field} />
+                                                                            </FormControl>
+                                                                            <FormMessage />
+                                                                        </FormItem>
+                                                                    )}
+                                                                />
+                                                                <FormField
+                                                                    control={addMemberForm.control}
+                                                                    name="lastName"
+                                                                    render={({ field }) => (
+                                                                        <FormItem>
+                                                                            <FormLabel>Last Name</FormLabel>
+                                                                            <FormControl>
+                                                                                <Input placeholder="Doe" {...field} />
+                                                                            </FormControl>
+                                                                            <FormMessage />
+                                                                        </FormItem>
+                                                                    )}
+                                                                />
                                                             </div>
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Badge variant={getRoleBadgeVariant(invitation.userRole)} className="flex items-center gap-1 w-fit">
-                                                            {getRoleIcon(invitation.userRole)}
-                                                            {invitation.userRole}
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {new Date(invitation.orgUserCreatedAt).toLocaleDateString()}
-                                                    </TableCell>
-                                                    <TableCell className="text-right">
-                                                        <div className="flex gap-1 justify-end">
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                onClick={() => resendInvitation(invitation.user?.email)}
-                                                                className="text-blue-600 hover:text-blue-700"
-                                                            >
-                                                                <Send className="h-4 w-4" />
-                                                            </Button>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                onClick={() => cancelInvitation(invitation.userId)}
-                                                                className="text-red-600 hover:text-red-700"
-                                                            >
-                                                                <X className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
+                                                            <FormField
+                                                                control={addMemberForm.control}
+                                                                name="email"
+                                                                render={({ field }) => (
+                                                                    <FormItem>
+                                                                        <FormLabel>Email Address</FormLabel>
+                                                                        <FormControl>
+                                                                            <Input placeholder="john.doe@example.com" {...field} />
+                                                                        </FormControl>
+                                                                        <FormMessage />
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                            <FormField
+                                                                control={addMemberForm.control}
+                                                                name="role"
+                                                                render={({ field }) => (
+                                                                    <FormItem>
+                                                                        <FormLabel>Role</FormLabel>
+                                                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                                            <FormControl>
+                                                                                <SelectTrigger>
+                                                                                    <SelectValue />
+                                                                                </SelectTrigger>
+                                                                            </FormControl>
+                                                                            <SelectContent>
+                                                                                <SelectItem value="MEMBER">Member</SelectItem>
+                                                                                <SelectItem value="INSTRUCTOR">Instructor</SelectItem>
+                                                                                <SelectItem value="MANAGER">Manager</SelectItem>
+                                                                                <SelectItem value="ADMIN">Admin</SelectItem>
+                                                                            </SelectContent>
+                                                                        </Select>
+                                                                        <FormMessage />
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                            <div className="flex justify-end gap-2 pt-4">
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="outline"
+                                                                    onClick={() => setIsAddSheetOpen(false)}
+                                                                >
+                                                                    Cancel
+                                                                </Button>
+                                                                <Button type="submit" disabled={isLoading} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                                                                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                                    <Send className="mr-2 h-4 w-4" />
+                                                                    Send Invitation
+                                                                </Button>
+                                                            </div>
+                                                        </form>
+                                                    </Form>
+                                                </SheetContent>
+                                            </Sheet>
+
+                                            <Sheet open={isBulkAddSheetOpen} onOpenChange={setIsBulkAddSheetOpen}>
+                                                <SheetTrigger asChild>
+                                                    <Button variant="outline" className="flex items-center gap-2 border-gray-300">
+                                                        <Mail className="h-4 w-4" />
+                                                        Bulk Add
+                                                    </Button>
+                                                </SheetTrigger>
+                                                <SheetContent className="sm:max-w-md">
+                                                    <SheetHeader>
+                                                        <SheetTitle>Bulk Add Members</SheetTitle>
+                                                        <SheetDescription>
+                                                            Add multiple members at once by entering their email addresses.
+                                                        </SheetDescription>
+                                                    </SheetHeader>
+                                                    <Form {...bulkAddForm}>
+                                                        <form onSubmit={bulkAddForm.handleSubmit(onSubmitBulkAdd)} className="space-y-4 mt-6">
+                                                            <FormField
+                                                                control={bulkAddForm.control}
+                                                                name="emails"
+                                                                render={({ field }) => (
+                                                                    <FormItem>
+                                                                        <FormLabel>Email Addresses</FormLabel>
+                                                                        <FormControl>
+                                                                            <textarea
+                                                                                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                                                                placeholder="Enter email addresses (one per line)&#10;john@example.com&#10;jane@example.com"
+                                                                                rows={4}
+                                                                                {...field}
+                                                                            />
+                                                                        </FormControl>
+                                                                        <FormMessage />
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                            <FormField
+                                                                control={bulkAddForm.control}
+                                                                name="defaultRole"
+                                                                render={({ field }) => (
+                                                                    <FormItem>
+                                                                        <FormLabel>Default Role</FormLabel>
+                                                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                                            <FormControl>
+                                                                                <SelectTrigger>
+                                                                                    <SelectValue />
+                                                                                </SelectTrigger>
+                                                                            </FormControl>
+                                                                            <SelectContent>
+                                                                                <SelectItem value="MEMBER">Member</SelectItem>
+                                                                                <SelectItem value="INSTRUCTOR">Instructor</SelectItem>
+                                                                                <SelectItem value="MANAGER">Manager</SelectItem>
+                                                                                <SelectItem value="ADMIN">Admin</SelectItem>
+                                                                            </SelectContent>
+                                                                        </Select>
+                                                                        <FormMessage />
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                            <div className="flex justify-end gap-2 pt-4">
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="outline"
+                                                                    onClick={() => setIsBulkAddSheetOpen(false)}
+                                                                >
+                                                                    Cancel
+                                                                </Button>
+                                                                <Button type="submit" disabled={isLoading} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                                                                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                                    <Send className="mr-2 h-4 w-4" />
+                                                                    Send Invitations
+                                                                </Button>
+                                                            </div>
+                                                        </form>
+                                                    </Form>
+                                                </SheetContent>
+                                            </Sheet>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Tabs and Search Row */}
+                                    <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+                                        <TabsList className="grid w-full sm:w-auto grid-cols-2">
+                                            <TabsTrigger value="members" className="flex items-center gap-2">
+                                                <User className="w-4 h-4" />
+                                                <span className="hidden sm:inline">Current Members</span>
+                                                <Badge variant="secondary" className="ml-1">
+                                                    {filteredMembers.length}
+                                                </Badge>
+                                            </TabsTrigger>
+                                            <TabsTrigger value="invited" className="flex items-center gap-2">
+                                                <Send className="w-4 h-4" />
+                                                <span className="hidden sm:inline">Invited Users</span>
+                                                <Badge variant="secondary" className="ml-1">
+                                                    {filteredInvitedUsers.length}
+                                                </Badge>
+                                            </TabsTrigger>
+                                        </TabsList>
+                                        <div className="relative flex-1 max-w-sm">
+                                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                                            <Input
+                                                placeholder="Search members..."
+                                                value={searchTerm}
+                                                onChange={(e) => setSearchTerm(e.target.value)}
+                                                className="pl-9"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
+                            </CardHeader>
+                            
+                            <CardContent className="pt-0">
+                                {/* Current Members Tab */}
+                                <TabsContent value="members" className="mt-0">
+                                    {filteredMembers.length === 0 ? (
+                                        <div className="text-center py-8">
+                                            <UserCog className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                                            <p className="text-gray-500">No members found</p>
+                                        </div>
+                                    ) : (
+                                        <div className="overflow-x-auto">
+                                            <Table>
+                                                <TableHeader>
+                                                    <TableRow>
+                                                        <TableHead>Member</TableHead>
+                                                        <TableHead>Role</TableHead>
+                                                        <TableHead>Joined</TableHead>
+                                                        <TableHead className="text-right">Actions</TableHead>
+                                                    </TableRow>
+                                                </TableHeader>
+                                                <TableBody>
+                                                    {filteredMembers.map((member) => (
+                                                        <TableRow key={member.userId}>
+                                                            <TableCell>
+                                                                <div className="flex items-center gap-3">
+                                                                    <Avatar className="h-8 w-8">
+                                                                        <AvatarImage src={member.user?.profilePicture} />
+                                                                        <AvatarFallback>
+                                                                            {member.user?.firstName?.[0]}{member.user?.lastName?.[0]}
+                                                                        </AvatarFallback>
+                                                                    </Avatar>
+                                                                    <div>
+                                                                        <p className="font-medium">{member.user?.firstName} {member.user?.lastName}</p>
+                                                                        <p className="text-sm text-gray-500">{member.user?.email}</p>
+                                                                    </div>
+                                                                </div>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Badge variant={getRoleBadgeVariant(member.userRole)} className="flex items-center gap-1 w-fit">
+                                                                    {getRoleIcon(member.userRole)}
+                                                                    {member.userRole}
+                                                                </Badge>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                {new Date(member.orgUserCreatedAt).toLocaleDateString()}
+                                                            </TableCell>
+                                                            <TableCell className="text-right">
+                                                                <DropdownMenu>
+                                                                    <DropdownMenuTrigger asChild>
+                                                                        <Button variant="ghost" size="sm">
+                                                                            <MoreHorizontal className="h-4 w-4" />
+                                                                        </Button>
+                                                                    </DropdownMenuTrigger>
+                                                                    <DropdownMenuContent align="end">
+                                                                        <DropdownMenuItem onClick={() => updateMemberRole(member.userId, 'MEMBER')}>
+                                                                            Change to Member
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuItem onClick={() => updateMemberRole(member.userId, 'INSTRUCTOR')}>
+                                                                            Change to Instructor
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuItem onClick={() => updateMemberRole(member.userId, 'MANAGER')}>
+                                                                            Change to Manager
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuItem onClick={() => updateMemberRole(member.userId, 'ADMIN')}>
+                                                                            Change to Admin
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuItem 
+                                                                            onClick={() => removeMember(member.userId)}
+                                                                            className="text-red-600"
+                                                                        >
+                                                                            Remove Member
+                                                                        </DropdownMenuItem>
+                                                                    </DropdownMenuContent>
+                                                                </DropdownMenu>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </div>
+                                    )}
+                                </TabsContent>
+
+                                {/* Invited Users Tab */}
+                                <TabsContent value="invited" className="mt-0">
+                                    <div className="p-6 -m-6">
+                                        {filteredInvitedUsers.length === 0 ? (
+                                            <div className="text-center py-8">
+                                                <Send className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                                                <p className="text-gray-500">No invited users found</p>
+                                                <p className="text-sm text-gray-400 mt-1">Users you invite will appear here</p>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                    {filteredInvitedUsers.map((invitedUser) => (
+                                                        <Card key={invitedUser.userId} className="bg-white hover:shadow-md transition-shadow border border-gray-100">
+                                                            <CardContent className="p-4">
+                                                                <div className="flex items-start gap-3">
+                                                                    <div className="relative">
+                                                                        <Avatar className="h-12 w-12 border-2 border-gray-200">
+                                                                            <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+                                                                                <Mail className="h-5 w-5" />
+                                                                            </AvatarFallback>
+                                                                        </Avatar>
+                                                                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
+                                                                            <Send className="h-2 w-2 text-white" />
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <div className="flex items-center gap-2 mb-1">
+                                                                            <h4 className="font-semibold text-gray-900 truncate">
+                                                                                {invitedUser.user?.firstName && invitedUser.user?.lastName
+                                                                                    ? `${invitedUser.user.firstName} ${invitedUser.user.lastName}`
+                                                                                    : 'Invited User'
+                                                                                }
+                                                                            </h4>
+                                                                        </div>
+                                                                        <p className="text-sm text-gray-600 mb-2 truncate">
+                                                                            {invitedUser.user?.email}
+                                                                        </p>
+                                                                        <div className="flex items-center justify-between">
+                                                                            <Badge 
+                                                                                variant={getRoleBadgeVariant(invitedUser.userRole)} 
+                                                                                className="flex items-center gap-1 text-xs"
+                                                                            >
+                                                                                {getRoleIcon(invitedUser.userRole)}
+                                                                                {invitedUser.userRole}
+                                                                            </Badge>
+                                                                            <div className="flex gap-1">
+                                                                                <Button
+                                                                                    variant="ghost"
+                                                                                    size="sm"
+                                                                                    onClick={() => resendInvitation(invitedUser.user?.email)}
+                                                                                    className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-100"
+                                                                                    title="Resend invitation"
+                                                                                >
+                                                                                    <Send className="h-3 w-3" />
+                                                                                </Button>
+                                                                                <Button
+                                                                                    variant="ghost"
+                                                                                    size="sm"
+                                                                                    onClick={() => cancelInvitation(invitedUser.userId)}
+                                                                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-100"
+                                                                                    title="Cancel invitation"
+                                                                                >
+                                                                                    <X className="h-3 w-3" />
+                                                                                </Button>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="mt-2 pt-2 border-t border-gray-100">
+                                                                            <div className="flex items-center justify-between text-xs text-gray-500">
+                                                                                <span className="flex items-center gap-1">
+                                                                                    <Calendar className="h-3 w-3" />
+                                                                                    Invited {new Date(invitedUser.orgUserCreatedAt).toLocaleDateString()}
+                                                                                </span>
+                                                                                <Badge variant="outline" className="text-xs px-1 py-0 h-5 border-gray-300 text-gray-700">
+                                                                                    Pending
+                                                                                </Badge>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </CardContent>
+                                                        </Card>
+                                                    ))}
+                                                </div>
+                                                <div className="mt-4 pt-4 border-t border-gray-200">
+                                                    <div className="flex items-center justify-between text-sm text-gray-600">
+                                                        <div className="flex items-center gap-2">
+                                                            <Activity className="h-4 w-4 text-blue-600" />
+                                                            <span>Total Invitations Sent: {filteredInvitedUsers.length}</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <CheckCircle className="h-4 w-4 text-green-600" />
+                                                            <span>Awaiting responses</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                </TabsContent>
                             </CardContent>
                         </Card>
-                    )}
+                    </Tabs>
                 </div>
             </div>
         </div>
