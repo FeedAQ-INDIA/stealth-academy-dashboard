@@ -1,5 +1,4 @@
-import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
-import "./HomePage.css"
+ import "./HomePage.css"
 import {Button} from "@/components/ui/button.jsx";
 import React, {useState,useEffect, useRef} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx";
@@ -88,7 +87,7 @@ export default function HomePage() {
     ];
 
     return (
-        <><PublicHeader/>
+        <> 
             <div className="p-0 md:p-3 overflow-y-auto h-[calc(100svh-4em)]">
 
 

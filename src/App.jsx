@@ -3,8 +3,7 @@ import Header from "./components-xm/Header/Header.jsx";
 import React, {useEffect} from "react";
 import {useAuthStore, useProtectedURIStore} from "@/zustland/store.js";
 import "./App.css"
-import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
-import HomePage from "@/components-xm/HomeFiles/HomePage.jsx";
+ import HomePage from "@/components-xm/HomeFiles/HomePage.jsx";
 import {LoaderOne} from "@/components/ui/loader.jsx";
 import { Toaster } from "@/components/ui/toaster.jsx";
 

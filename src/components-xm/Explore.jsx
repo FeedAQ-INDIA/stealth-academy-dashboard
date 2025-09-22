@@ -4,8 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { useAuthStore } from "@/zustland/store.js";
 import Header from "@/components-xm/Header/Header.jsx";
-import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
-
+ 
 export function Explore() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -93,7 +92,7 @@ export function Explore() {
 
   return (
     <>
-      {userDetail ? <Header /> : <PublicHeader />}
+      {userDetail ? <Header />  : <></>}
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         <div className="p-4 overflow-y-auto h-[calc(100svh-4em)]">
           <div className="  mx-auto space-y-4">

@@ -26,8 +26,7 @@ import {Input} from "@/components/ui/input.jsx";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
 import axios from "axios";
 import Header from "@/components-xm/Header/Header.jsx";
-import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
-import {Vortex} from "@/components/ui/vortex.jsx";
+ import {Vortex} from "@/components/ui/vortex.jsx";
 import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet.jsx";
 import {LetsConnectForm} from "@/components-xm/HomeFiles/LetsConnectForm.jsx";
 import {Progress} from "@/components/ui/progress.jsx";
@@ -213,7 +212,7 @@ function CourseSnapView() {
 
     return (
         <>
-            {userDetail ? <Header/>:<PublicHeader/>}
+            {userDetail ? <Header/>:<></>}
 
             <div className="overflow-y-auto overflow-x-hidden h-[calc(100svh-4em)] w-full">
                 {/* Hero Section with Vortex */}

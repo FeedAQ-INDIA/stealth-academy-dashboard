@@ -4,8 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { useAuthStore } from "@/zustland/store.js";
 import Header from "@/components-xm/Header/Header.jsx";
-import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb";
 

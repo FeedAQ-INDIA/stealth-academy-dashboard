@@ -28,8 +28,7 @@ import { useNavigate } from "react-router-dom";
 import axiosConn from "@/axioscon.js";
 import { CourseCard } from "@/components-xm/Modules/CourseCard.jsx";
 import Header from "@/components-xm/Header/Header.jsx";
-import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
-import { LoaderOne } from "@/components/ui/loader.jsx";
+ import { LoaderOne } from "@/components/ui/loader.jsx";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
