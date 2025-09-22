@@ -158,7 +158,7 @@ function RegisterAsOrg() {
 
   return (
     <div className=" ">
-              <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
+              <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b  px-4">
                 <SidebarTrigger className="-ml-1" />
                 <Separator orientation="vertical" className="mr-2 h-4" />
                 <Breadcrumb>
