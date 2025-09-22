@@ -442,9 +442,9 @@ const GoalsAnalyticsDashboard = ({ goalsData }) => {
     const notStartedGoals = goalsData.filter(
       (g) => g.status === "NOT_STARTED"
     ).length;
-    const averageProgress = Math.round(
-      goalsData.reduce((sum, g) => sum + g.progress, 0) / totalGoals
-    );
+    const averageProgress = totalGoals > 0 
+      ? Math.round(goalsData.reduce((sum, g) => sum + g.progress, 0) / totalGoals)
+      : 0;
 
     // Progress distribution
     const progressDistribution = [

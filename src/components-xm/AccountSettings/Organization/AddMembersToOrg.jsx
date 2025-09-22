@@ -27,11 +27,9 @@ import {
     UserCog,
     Building2,
     Send,
-    CheckCircle,
     X,
     Users,
-    Calendar,
-    Activity
+    Calendar
 } from "lucide-react";
 import { toast } from "@/components/hooks/use-toast.js";
 import { Alert, AlertDescription } from "@/components/ui/alert.jsx";
@@ -96,21 +94,18 @@ function AddMembersToOrg() {
         },
     });
 
-    // Fetch members when organization is selected
+    // Fetch active members when organization is selected
     const fetchMembers = useCallback(async () => {
         try {
             setIsLoading(true);
-            const response = await axiosConn.get(`/organization/${selectedOrganization.orgId}/users`);
+            const response = await axiosConn.get(`/organization/${selectedOrganization.orgId}/users`, {
+                params: { status: 'ACTIVE' }
+            });
             
             if (response.data.success) {
                 // Parse the response according to the backend structure
-                const allUsers = response.data.data.users || [];
-                const activeMembers = allUsers.filter(user => user.status === 'ACTIVE');
-                const pendingUsers = allUsers.filter(user => user.status === 'PENDING');
-                
+                const activeMembers = response.data.data || [];
                 setMembers(activeMembers);
-                setPendingInvitations(pendingUsers);
-                setInvitedUsers(pendingUsers); // Set invited users same as pending for now
             }
         } catch (error) {
             console.error("Error fetching members:", error);
@@ -124,11 +119,45 @@ function AddMembersToOrg() {
         }
     }, [selectedOrganization?.orgId]);
 
+    // Fetch invited users separately
+    const fetchInvitedUsers = useCallback(async () => {
+            setIsLoading(true);
+            await axiosConn.post(import.meta.env.VITE_API_URL +`/searchCourse`, {
+    limit: 10,
+    offset: 0,
+    getThisData: {
+      datasource: "OrganizationUserInvites",
+      attributes: [], 
+        where: {
+            orgId: selectedOrganization.orgId,
+          },
+    },
+  }).then((response) => {
+     const pendingUsers = response.data.data.results || [];
+     console.log(pendingUsers)
+                setPendingInvitations(pendingUsers);
+                setInvitedUsers(pendingUsers);
+  })
+  .catch((error) => {
+    console.error("Error fetching invited users:", error);
+            toast({
+                title: "Error",
+                description: "Failed to fetch invited users",
+                variant: "destructive",
+            });
+  }).finally(() => {
+    setIsLoading(false);
+  });
+            
+   
+    }, [selectedOrganization?.orgId]);
+
     useEffect(() => {
         if (selectedOrganization?.orgId) {
             fetchMembers();
+            fetchInvitedUsers();
         }
-    }, [selectedOrganization, fetchMembers]);
+    }, [selectedOrganization, fetchMembers, fetchInvitedUsers]);
 
     const onSubmitAddMember = async (data) => {
         setIsLoading(true);
@@ -146,7 +175,8 @@ function AddMembersToOrg() {
             
             setIsAddSheetOpen(false);
             addMemberForm.reset();
-            fetchMembers(); // This will now fetch both active and pending users
+            fetchMembers(); // Refresh active members
+            fetchInvitedUsers(); // Refresh invited users
         } catch (error) {
             console.error("Error inviting member:", error);
             toast({
@@ -192,7 +222,8 @@ function AddMembersToOrg() {
             
             setIsBulkAddSheetOpen(false);
             bulkAddForm.reset();
-            fetchMembers(); // This will now fetch both active and pending users
+            fetchMembers(); // Refresh active members
+            fetchInvitedUsers(); // Refresh invited users
         } catch (error) {
             console.error("Error sending bulk invitations:", error);
             toast({
@@ -216,6 +247,7 @@ function AddMembersToOrg() {
             });
             
             fetchMembers();
+            fetchInvitedUsers();
         } catch (error) {
             console.error("Error removing member:", error);
             toast({
@@ -239,6 +271,7 @@ function AddMembersToOrg() {
             });
             
             fetchMembers();
+            fetchInvitedUsers();
         } catch (error) {
             console.error("Error updating member role:", error);
             toast({
@@ -261,6 +294,7 @@ function AddMembersToOrg() {
             });
             
             fetchMembers(); // Refresh the list
+            fetchInvitedUsers(); // Refresh invited users
         } catch (error) {
             console.error("Error cancelling invitation:", error);
             toast({
@@ -766,103 +800,95 @@ function AddMembersToOrg() {
 
                                 {/* Invited Users Tab */}
                                 <TabsContent value="invited" className="mt-0">
-                                    <div className="p-6 -m-6">
-                                        {filteredInvitedUsers.length === 0 ? (
-                                            <div className="text-center py-8">
-                                                <Send className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                                                <p className="text-gray-500">No invited users found</p>
-                                                <p className="text-sm text-gray-400 mt-1">Users you invite will appear here</p>
-                                            </div>
-                                        ) : (
-                                            <>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {filteredInvitedUsers.length === 0 ? (
+                                        <div className="text-center py-8">
+                                            <Send className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                                            <p className="text-gray-500">No invited users found</p>
+                                            <p className="text-sm text-gray-400 mt-1">Users you invite will appear here</p>
+                                        </div>
+                                    ) : (
+                                        <div className="overflow-x-auto">
+                                            <Table>
+                                                <TableHeader>
+                                                    <TableRow>
+                                                        <TableHead>Invited User</TableHead>
+                                                        <TableHead>Role</TableHead>
+                                                        <TableHead>Invited Date</TableHead>
+                                                        <TableHead>Status</TableHead>
+                                                        <TableHead className="text-right">Actions</TableHead>
+                                                    </TableRow>
+                                                </TableHeader>
+                                                <TableBody>
                                                     {filteredInvitedUsers.map((invitedUser) => (
-                                                        <Card key={invitedUser.userId} className="bg-white hover:shadow-md transition-shadow border border-gray-100">
-                                                            <CardContent className="p-4">
-                                                                <div className="flex items-start gap-3">
+                                                        <TableRow key={invitedUser.userId}>
+                                                            <TableCell>
+                                                                <div className="flex items-center gap-3">
                                                                     <div className="relative">
-                                                                        <Avatar className="h-12 w-12 border-2 border-gray-200">
+                                                                        <Avatar className="h-8 w-8">
                                                                             <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-                                                                                <Mail className="h-5 w-5" />
+                                                                                <Mail className="h-4 w-4" />
                                                                             </AvatarFallback>
                                                                         </Avatar>
-                                                                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
-                                                                            <Send className="h-2 w-2 text-white" />
+                                                                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border border-white flex items-center justify-center">
+                                                                            <Send className="h-1.5 w-1.5 text-white" />
                                                                         </div>
                                                                     </div>
-                                                                    <div className="flex-1 min-w-0">
-                                                                        <div className="flex items-center gap-2 mb-1">
-                                                                            <h4 className="font-semibold text-gray-900 truncate">
-                                                                                {invitedUser.user?.firstName && invitedUser.user?.lastName
-                                                                                    ? `${invitedUser.user.firstName} ${invitedUser.user.lastName}`
-                                                                                    : 'Invited User'
-                                                                                }
-                                                                            </h4>
-                                                                        </div>
-                                                                        <p className="text-sm text-gray-600 mb-2 truncate">
-                                                                            {invitedUser.user?.email}
+                                                                    <div>
+                                                                        <p className="font-medium">
+                                                                            {invitedUser.user?.firstName && invitedUser.user?.lastName
+                                                                                ? `${invitedUser.user.firstName} ${invitedUser.user.lastName}`
+                                                                                : 'Invited User'
+                                                                            }
                                                                         </p>
-                                                                        <div className="flex items-center justify-between">
-                                                                            <Badge 
-                                                                                variant={getRoleBadgeVariant(invitedUser.userRole)} 
-                                                                                className="flex items-center gap-1 text-xs"
-                                                                            >
-                                                                                {getRoleIcon(invitedUser.userRole)}
-                                                                                {invitedUser.userRole}
-                                                                            </Badge>
-                                                                            <div className="flex gap-1">
-                                                                                <Button
-                                                                                    variant="ghost"
-                                                                                    size="sm"
-                                                                                    onClick={() => resendInvitation(invitedUser.user?.email)}
-                                                                                    className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-100"
-                                                                                    title="Resend invitation"
-                                                                                >
-                                                                                    <Send className="h-3 w-3" />
-                                                                                </Button>
-                                                                                <Button
-                                                                                    variant="ghost"
-                                                                                    size="sm"
-                                                                                    onClick={() => cancelInvitation(invitedUser.userId)}
-                                                                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-100"
-                                                                                    title="Cancel invitation"
-                                                                                >
-                                                                                    <X className="h-3 w-3" />
-                                                                                </Button>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="mt-2 pt-2 border-t border-gray-100">
-                                                                            <div className="flex items-center justify-between text-xs text-gray-500">
-                                                                                <span className="flex items-center gap-1">
-                                                                                    <Calendar className="h-3 w-3" />
-                                                                                    Invited {new Date(invitedUser.orgUserCreatedAt).toLocaleDateString()}
-                                                                                </span>
-                                                                                <Badge variant="outline" className="text-xs px-1 py-0 h-5 border-gray-300 text-gray-700">
-                                                                                    Pending
-                                                                                </Badge>
-                                                                            </div>
-                                                                        </div>
+                                                                        <p className="text-sm text-gray-500">{invitedUser.user?.email}</p>
                                                                     </div>
                                                                 </div>
-                                                            </CardContent>
-                                                        </Card>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Badge variant={getRoleBadgeVariant(invitedUser.userRole)} className="flex items-center gap-1 w-fit">
+                                                                    {getRoleIcon(invitedUser.userRole)}
+                                                                    {invitedUser.userRole}
+                                                                </Badge>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <div className="flex items-center gap-1 text-sm text-gray-600">
+                                                                    <Calendar className="h-3 w-3" />
+                                                                    {new Date(invitedUser.orgUserCreatedAt).toLocaleDateString()}
+                                                                </div>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Badge variant="outline" className="border-yellow-300 text-yellow-700 bg-yellow-50">
+                                                                    Pending
+                                                                </Badge>
+                                                            </TableCell>
+                                                            <TableCell className="text-right">
+                                                                <div className="flex justify-end gap-1">
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        onClick={() => resendInvitation(invitedUser.user?.email)}
+                                                                        className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-100"
+                                                                        title="Resend invitation"
+                                                                    >
+                                                                        <Send className="h-4 w-4" />
+                                                                    </Button>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        onClick={() => cancelInvitation(invitedUser.userId)}
+                                                                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-100"
+                                                                        title="Cancel invitation"
+                                                                    >
+                                                                        <X className="h-4 w-4" />
+                                                                    </Button>
+                                                                </div>
+                                                            </TableCell>
+                                                        </TableRow>
                                                     ))}
-                                                </div>
-                                                <div className="mt-4 pt-4 border-t border-gray-200">
-                                                    <div className="flex items-center justify-between text-sm text-gray-600">
-                                                        <div className="flex items-center gap-2">
-                                                            <Activity className="h-4 w-4 text-blue-600" />
-                                                            <span>Total Invitations Sent: {filteredInvitedUsers.length}</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-2">
-                                                            <CheckCircle className="h-4 w-4 text-green-600" />
-                                                            <span>Awaiting responses</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
+                                                </TableBody>
+                                            </Table>
+                                        </div>
+                                    )}
                                 </TabsContent>
                             </CardContent>
                         </Card>
