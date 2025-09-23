@@ -38,10 +38,8 @@ import CourseDocThirdParty from "@/components-xm/Course/CourseDocThirdParty.jsx"
 import CourseQuiz from "@/components-xm/Course/CourseQuiz/CourseQuiz.jsx";
 import CourseFlashcard from "@/components-xm/Course/CourseFlashcard.jsx";
 import { useAuthStore, useProtectedURIStore } from "@/zustland/store";
-import HomePage from "@/components-xm/HomeFiles/HomePage.jsx";
-import CourseSchedule from "@/components-xm/Course/CourseSchedule.jsx";
-import CourseSnapView from "@/components-xm/HomeFiles/CourseSnapView.jsx";
-import BringYourOwnCourse from "./components-xm/BringYourOwnCourse.jsx";
+ import CourseSchedule from "@/components-xm/Course/CourseSchedule.jsx";
+ import BringYourOwnCourse from "./components-xm/BringYourOwnCourse.jsx";
 import { MyCourse } from "./components-xm/MyJourney/MyCourse.jsx";
 import { MyWishlist } from "./components-xm/MyJourney/MyWishlist.jsx";
 import MyJourneyOverview from "./components-xm/MyJourney/MyJourneyOverview.jsx";
@@ -64,15 +62,7 @@ import MyGoals from "./components-xm/AccountSettings/MyGoals.jsx";
 import CourseEmbedder from "./components-xm/Course/CourseEmbedder.jsx";
 
 const router = createBrowserRouter([
-  // {
-  //     path: "/browse",
-  //     element: <HomeExplore/>,
-  // },
-
-  {
-    path: "/explore/:CourseId",
-    element: <CourseSnapView />,
-  },
+ 
 
   {
     path: "/explore",
@@ -102,17 +92,17 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
-      { index: true, element: <HomePage /> }, // now "/" goes to HomePage
+      { index: true, element: <Dashboard /> }, // now "/" goes to HomePage
 
       {
         path: "/signin",
         element: <SignInPage />,
       },
 
-      {
-        path: "/dashboard",
-        element: <Dashboard />,
-      },
+      // {
+      //   path: "/",
+      //   element: <Dashboard />,
+      // },
 
       {
         path: "/account-settings",

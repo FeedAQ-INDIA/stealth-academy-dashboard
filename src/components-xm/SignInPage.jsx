@@ -38,7 +38,7 @@ function SignInPage() {
                 window.location.href = redirectUri;
             }else{
                 // navigate('/dashboard');
-                window.location.href = '/dashboard';
+                window.location.href = '/';
             }
 
         }
@@ -55,7 +55,7 @@ function SignInPage() {
                         <CardTitle className="mb-4 text-center">
                            <a
           className="text-2xl sm:text-3xl font-medium text-black"
-          href="/dashboard"
+          href="/"
           style={{ fontFamily: "Anta" }}
         >
           STEALTH

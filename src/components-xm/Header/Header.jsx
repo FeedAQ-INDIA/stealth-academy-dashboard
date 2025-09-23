@@ -37,7 +37,7 @@ export default function Header() {
               <DialogHeader>
                 <DialogTitle className="mb-4">Switch Apps</DialogTitle>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 ">
-                  <Link to="/dashboard" onClick={() => setIsDialogOpen(false)}>
+                  <Link to="/" onClick={() => setIsDialogOpen(false)}>
 
                   <Card className="bg-blue-500  hover:bg-indigo-600 cursor-pointer">
                     <CardHeader className="flex flex-col items-center">
@@ -62,7 +62,7 @@ export default function Header() {
         {/* Logo */}
         <a
           className="text-2xl sm:text-3xl font-medium text-black"
-          href="/dashboard"
+          href="/"
           style={{ fontFamily: "Anta" }}
         >
           STEALTH

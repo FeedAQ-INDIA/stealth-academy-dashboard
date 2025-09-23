@@ -3,8 +3,7 @@ import Header from "./components-xm/Header/Header.jsx";
 import React, {useEffect} from "react";
 import {useAuthStore, useProtectedURIStore} from "@/zustland/store.js";
 import "./App.css"
- import HomePage from "@/components-xm/HomeFiles/HomePage.jsx";
-import {LoaderOne} from "@/components/ui/loader.jsx";
+ import {LoaderOne} from "@/components/ui/loader.jsx";
 import { Toaster } from "@/components/ui/toaster.jsx";
 
 
@@ -39,10 +38,7 @@ function App() {
     }, [userDetail]); // Redirect only after userDetail updates
 
 
-    if (window.location.pathname === '/') {
-        return <HomePage />;
-    }
-
+ 
 
     // if (loadingStore) {
     //     return <div>Loading...</div>; // Display loading screen until both data are ready
