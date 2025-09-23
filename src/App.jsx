@@ -17,10 +17,8 @@ function App() {
 
 
     useEffect(() => {
-        if (window.location.pathname !== '/') {
-            fetchUserDetail();
-        }
-    }, []);
+             fetchUserDetail();
+     }, []);
 
 
 
@@ -37,12 +35,7 @@ function App() {
 
     }, [userDetail]); // Redirect only after userDetail updates
 
-
  
-
-    // if (loadingStore) {
-    //     return <div>Loading...</div>; // Display loading screen until both data are ready
-    // }
     if(loadingStore){
         return (
             <div className="flex items-center justify-center h-[100svh] w-full">

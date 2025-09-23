@@ -64,7 +64,22 @@ import CourseEmbedder from "./components-xm/Course/CourseEmbedder.jsx";
 const router = createBrowserRouter([
  
 
+      {
+        path: "/signin",
+        element: <SignInPage />,
+      },
+
+
   {
+    path: "/",
+    element: <App />,
+    errorElement: <ErrorPage />,
+    children: [
+      { index: true, element: <Dashboard /> }, // now "/" goes to HomePage
+
+
+
+        {
     path: "/explore",
     element: <Explore />,
     children: [
@@ -87,23 +102,7 @@ const router = createBrowserRouter([
     ],
   },
 
-  {
-    path: "/",
-    element: <App />,
-    errorElement: <ErrorPage />,
-    children: [
-      { index: true, element: <Dashboard /> }, // now "/" goes to HomePage
-
-      {
-        path: "/signin",
-        element: <SignInPage />,
-      },
-
-      // {
-      //   path: "/",
-      //   element: <Dashboard />,
-      // },
-
+ 
       {
         path: "/account-settings",
         element: <AccountDetail />,
