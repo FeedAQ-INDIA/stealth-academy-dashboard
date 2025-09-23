@@ -336,25 +336,37 @@ function CourseSidebar() {
             {courseList?.courseTitle}
           </h2>
 
-          <Collapsible open={isInfoExpanded} onOpenChange={setIsInfoExpanded}>
-            <CollapsibleTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full h-9 text-xs text-gray-600 hover:text-gray-800 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 flex items-center justify-center gap-2 transition-all duration-200 border border-transparent hover:border-blue-200 rounded-lg"
-              >
-                <Info
-                  size={14}
-                  className={isInfoExpanded ? "text-blue-600" : ""}
-                />
-                <span className="font-medium">Course Details</span>
-                {isInfoExpanded ? (
-                  <ChevronUp size={14} className="text-blue-600" />
-                ) : (
-                  <ChevronDown size={14} />
-                )}
-              </Button>
-            </CollapsibleTrigger>
+          {!isUserEnrolled && (<Link to="/explore/bring-your-own-course">
+                  <Button
+                    className="w-full flex gap-2 text-muted-foreground text-xs py-2 h-8 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 mt-2"
+                    size="sm"
+                    variant="ghost"
+                  >
+                    <SquareArrowLeft size={14} />
+                    Explore More Courses
+                  </Button>
+                </Link>)}
+
+          {isUserEnrolled && (
+            <Collapsible open={isInfoExpanded} onOpenChange={setIsInfoExpanded}>
+              <CollapsibleTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full h-9 text-xs text-gray-600 hover:text-gray-800 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 flex items-center justify-center gap-2 transition-all duration-200 border border-transparent hover:border-blue-200 rounded-lg"
+                >
+                  <Info
+                    size={14}
+                    className={isInfoExpanded ? "text-blue-600" : ""}
+                  />
+                  <span className="font-medium">Course Details</span>
+                  {isInfoExpanded ? (
+                    <ChevronUp size={14} className="text-blue-600" />
+                  ) : (
+                    <ChevronDown size={14} />
+                  )}
+                </Button>
+              </CollapsibleTrigger>
 
             <CollapsibleContent className="mt-3 space-y-3 animate-in slide-in-from-top-2 duration-300">
               {/* Enrollment Status Badge */}
@@ -467,6 +479,7 @@ function CourseSidebar() {
                             </div> */}
             </CollapsibleContent>
           </Collapsible>
+          )}
         </div>
       </SidebarHeader>
 
