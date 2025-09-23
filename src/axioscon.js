@@ -7,8 +7,6 @@ const axiosConn = axios.create({
     withCredentials: true
 });
 
-const { publicUri } = useProtectedURIStore.getState();
-
 // Refresh lock + retry queue
 let isRefreshInProgress = false;
 let refreshSubscribers = [];
@@ -44,6 +42,7 @@ axiosConn.interceptors.response.use(
     },
     async function (error) {
         const originalRequest = error.config;
+        const { publicUri } = useProtectedURIStore.getState();
 
         if (publicUri.includes(window.location.pathname) && window.location.pathname === "/signin") {
             return Promise.reject(error);
@@ -86,6 +85,7 @@ axiosConn.interceptors.response.use(
 );
 
 function getRedirectUri() {
+    const { publicUri } = useProtectedURIStore.getState();
     return publicUri.includes(window.location.pathname)
         ? ""
         : "?redirectUri=" + encodeURIComponent(window.location.href);

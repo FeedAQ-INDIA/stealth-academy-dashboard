@@ -1,20 +1,26 @@
 import { create } from 'zustand'
-import axiosConn from "@/axioscon.js";
+
+// Dynamic import function to avoid circular dependency
+const getAxiosConn = async () => {
+    const { default: axiosConn } = await import("@/axioscon.js");
+    return axiosConn;
+};
 
 export const useAuthStore = create((set) => ({
     accessToken: null,
     userDetail: null,
     loading:true,
     setAccessToken: (accessToken) => {
-        set((state) => ({accessToken:  accessToken}));
+        set(() => ({accessToken:  accessToken}));
         console.log("zustland useAuthStore.setAccessToken ",  accessToken);
     },
     setUserDetail: (userDetail) => {
-        set((state) => ({userDetail: userDetail}));
+        set(() => ({userDetail: userDetail}));
         console.log("zustland useAuthStore.setUserDetail ", userDetail);
     },
     fetchUserDetail: async () => {
         try {
+            const axiosConn = await getAxiosConn();
             const res = await axiosConn.post(import.meta.env.VITE_API_URL+"/getUser",
                 { });
             set({ userDetail: res.data?.data?.data, loading: false });  // Set loading to false after fetch
@@ -48,6 +54,7 @@ export const useOrganizationStore = create((set, get) => ({
             set({ organizationsLoading: true });
             console.log("Fetching user organizations...");
             
+            const axiosConn = await getAxiosConn();
             const response = await axiosConn.get("/user/organizations");
             console.log("Organization API response:", response.data);
             
@@ -151,6 +158,7 @@ export const useCreditStore = create((set, get) => ({
         set({ loading: true });
         try {
             // Replace with your actual API endpoint
+            const axiosConn = await getAxiosConn();
             const res = await axiosConn.post(import.meta.env.VITE_API_URL+"/getUser", {});
             set({ 
                 currentCredits: res.data?.data?.data?.creditBalance || 0,
@@ -168,6 +176,7 @@ export const useCreditStore = create((set, get) => ({
     fetchCreditHistory: async () => {
         try {
             // Replace with your actual API endpoint
+            const axiosConn = await getAxiosConn();
             const res = await axiosConn.post(import.meta.env.VITE_API_URL+"/getCreditHistory", {});
             set({ creditHistory: res.data?.data?.history || [] });
         } catch (error) {
@@ -179,6 +188,7 @@ export const useCreditStore = create((set, get) => ({
         set({ loading: true });
         try {
             // Replace with your actual payment API endpoint
+            const axiosConn = await getAxiosConn();
             const res = await axiosConn.post(import.meta.env.VITE_API_URL+"/purchaseCredits", {
                 planId,
                 amount,
@@ -207,6 +217,6 @@ export const useLoadingBarStore = create((set) => ({
         })),
 }));
 
-export const useProtectedURIStore = create((set) => ({
+export const useProtectedURIStore = create(() => ({
     publicUri : ['/signin' ],
 }));
