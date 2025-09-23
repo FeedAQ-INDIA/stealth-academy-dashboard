@@ -266,9 +266,10 @@ function CourseSidebar() {
               {
                 title: "COURSE NOTES",
                 url: `/course/${courseList?.courseId}/notes`,
-                isClickable: true,
+                isClickable: hasContentAccess,
                 isActive:
                   location.pathname === `/course/${courseList?.courseId}/notes`,
+                isLocked: !hasContentAccess,
               },
               ...(courseList?.courseContent?.map((m) => {
                 const contentUrl = `/course/${courseList?.courseId}/${
@@ -565,35 +566,55 @@ function CourseSidebar() {
                     >
                       <SidebarMenuSubItem>
                         <SidebarMenuSubButton
-                          asChild
+                          asChild={item?.isClickable}
                           isActive={isActive}
                           className={`flex items-center gap-1 py-2 rounded-1 h-fit transition-all duration-200 ${
+                            item?.isLocked
+                              ? "opacity-60 cursor-not-allowed"
+                              : ""
+                          } ${
                             isActive
                               ? "bg-gradient-to-r from-blue-100 to-indigo-100 border-l-4 border-blue-500 shadow-md"
                               : "hover:bg-gray-50"
                           }`}
                         >
-                          <Link to={item?.url} className="w-full">
+                          {item?.isClickable ? (
+                            <Link to={item?.url} className="w-full">
+                              <div className="flex items-center gap-2 w-full">
+                                <Avatar className="border shadow-md">
+                                  <AvatarFallback>
+                                    {identifyContentTypeIcons(item?.title)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div
+                                  className={`flex-1 text-left ${
+                                    isActive
+                                      ? "font-semibold text-blue-700"
+                                      : "font-medium text-gray-700 hover:text-gray-900"
+                                  }`}
+                                >
+                                  {item?.title}
+                                </div>
+                                {isActive && (
+                                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                                )}
+                              </div>
+                            </Link>
+                          ) : (
                             <div className="flex items-center gap-2 w-full">
-                              <Avatar className="border shadow-md">
-                                <AvatarFallback>
-                                  {identifyContentTypeIcons(item?.title)}
+                              <Avatar className="border shadow-md bg-gray-400">
+                                <AvatarFallback className="bg-gray-400">
+                                  <Lock size={18} color="#ffffff" />
                                 </AvatarFallback>
                               </Avatar>
-                              <div
-                                className={`flex-1 text-left ${
-                                  isActive
-                                    ? "font-semibold text-blue-700"
-                                    : "font-medium text-gray-700 hover:text-gray-900"
-                                }`}
-                              >
+                              <div className="flex-1 text-gray-500">
                                 {item?.title}
                               </div>
-                              {isActive && (
-                                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                              )}
+                              <div className="text-xs text-gray-400">
+                                Locked
+                              </div>
                             </div>
-                          </Link>
+                          )}
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     </SidebarMenuItem>
