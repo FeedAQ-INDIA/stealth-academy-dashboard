@@ -38,8 +38,8 @@ import CourseDocThirdParty from "@/components-xm/Course/CourseDocThirdParty.jsx"
 import CourseQuiz from "@/components-xm/Course/CourseQuiz/CourseQuiz.jsx";
 import CourseFlashcard from "@/components-xm/Course/CourseFlashcard.jsx";
 import { useAuthStore, useProtectedURIStore } from "@/zustland/store";
- import CourseSchedule from "@/components-xm/Course/CourseSchedule.jsx";
- import BringYourOwnCourse from "./components-xm/BringYourOwnCourse.jsx";
+import CourseSchedule from "@/components-xm/Course/CourseSchedule.jsx";
+import BringYourOwnCourse from "./components-xm/BringYourOwnCourse.jsx";
 import { MyCourse } from "./components-xm/MyJourney/MyCourse.jsx";
 import { MyWishlist } from "./components-xm/MyJourney/MyWishlist.jsx";
 import MyJourneyOverview from "./components-xm/MyJourney/MyJourneyOverview.jsx";
@@ -52,7 +52,7 @@ import ListeningSkillsSession from "./components-xm/LangStudio/SkillSession/List
 import SpeakingSkillsSession from "./components-xm/LangStudio/SkillSession/SpeakingSkillsSession.jsx";
 import EmailWritingSkillsSession from "./components-xm/LangStudio/SkillSession/EmailWritingSkillsSession.jsx";
 import WritingSkillsSession from "./components-xm/LangStudio/SkillSession/WritingSkillsSession.jsx";
-import { MyJourney as LangStudioMyJourney} from "./components-xm/LangStudio/MyJourney.jsx";
+import { MyJourney as LangStudioMyJourney } from "./components-xm/LangStudio/MyJourney.jsx";
 import CourseCertificate from "./components-xm/Course/CourseCertificate.jsx";
 import CourseNotes from "./components-xm/Course/CourseNotes.jsx";
 import MyAchievement from "./components-xm/MyJourney/MyAchievement.jsx";
@@ -62,13 +62,10 @@ import MyGoals from "./components-xm/AccountSettings/MyGoals.jsx";
 import CourseEmbedder from "./components-xm/Course/CourseEmbedder.jsx";
 
 const router = createBrowserRouter([
- 
-
-      {
-        path: "/signin",
-        element: <SignInPage />,
-      },
-
+  {
+    path: "/signin",
+    element: <SignInPage />,
+  },
 
   {
     path: "/",
@@ -77,32 +74,29 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Dashboard /> }, // now "/" goes to HomePage
 
+      {
+        path: "/explore",
+        element: <Explore />,
+        children: [
+          {
+            path: "marketplace",
+            element: <Marketplace />,
+          },
+          {
+            path: "live-learning",
+            element: <LiveLearning />,
+          },
+          {
+            path: "bring-your-own-course",
+            element: <BringYourOwnCourseExplore />,
+          },
+          {
+            path: "privileged-access",
+            element: <PrivilegedAccess />,
+          },
+        ],
+      },
 
-
-        {
-    path: "/explore",
-    element: <Explore />,
-    children: [
-      {
-        path: "marketplace",
-        element: <Marketplace />,
-      },
-      {
-        path: "live-learning",
-        element: <LiveLearning />,
-      },
-      {
-        path: "bring-your-own-course",
-        element: <BringYourOwnCourseExplore />,
-      },
-      {
-        path: "privileged-access",
-        element: <PrivilegedAccess />,
-      },
-    ],
-  },
-
- 
       {
         path: "/account-settings",
         element: <AccountDetail />,
@@ -142,7 +136,6 @@ const router = createBrowserRouter([
           //       index: true,
           //       element: <AllOrders />,
           //     },
-             
 
           //   ],
           // },
@@ -150,7 +143,7 @@ const router = createBrowserRouter([
             path: "/account-settings/notifications",
             element: <Notifications />,
           },
-            {
+          {
             path: "/account-settings/my-goals",
             element: <MyGoals />,
           },
@@ -164,16 +157,15 @@ const router = createBrowserRouter([
             element: <MyLearningSchedule />,
           },
 
-                    {
+          {
             path: "/account-settings/register-organization",
             element: <RegisterAsOrg />,
           },
-          
+
           {
             path: "/account-settings/organization/profile",
             element: <OrgProfile />,
             children: [
-        
               {
                 path: "profile",
                 element: <OrgProfile />,
@@ -185,10 +177,9 @@ const router = createBrowserRouter([
             ],
           },
 
-                    {
+          {
             path: "/account-settings/organization/add-members",
             element: <AddMembersToOrg />,
-  
           },
         ],
       },
@@ -266,13 +257,11 @@ const router = createBrowserRouter([
             element: <MyStudyGroup />,
           },
 
-
           {
             path: "/my-journey/my-learning-schedule",
             element: <MyLearningSchedule />,
           },
 
-          
           {
             path: "/my-journey/wishlist",
             element: <MyWishlist />,
@@ -305,11 +294,11 @@ const router = createBrowserRouter([
         path: "/lang-studio/learning-arena/listening-skills/:sessionId",
         element: <ListeningSkillsSession />,
       },
-         {
+      {
         path: "/lang-studio/learning-arena/speaking-skills/:sessionId",
         element: <SpeakingSkillsSession />,
       },
-               {
+      {
         path: "/lang-studio/learning-arena/email-writing/:sessionId",
         element: <EmailWritingSkillsSession />,
       },
@@ -324,7 +313,7 @@ const router = createBrowserRouter([
       {
         path: "/lang-studio",
         element: <LearningDashboard />,
-      }
+      },
     ],
   },
 ]);

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+/* eslint-disable react/prop-types */
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,10 +10,13 @@ import byoc1 from "@/assets/byoc_1.png";
 
 export default function BringYourOwnCourse() {
   const [urls, setUrls] = useState([""]);
-  const [file, setFile] = useState(null);
   const [courseTitle, setCourseTitle] = useState("");
   const [courseDescription, setCourseDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Course preview state
+  const [courseStructure, setCourseStructure] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   // Helpers
   const isValidHttpUrl = (value) => {
@@ -36,7 +40,114 @@ export default function BringYourOwnCourse() {
     setUrls(newUrls);
   };
 
-  const handleFileChange = (e) => setFile(e.target.files[0]);
+  // Helper function to reset form
+  const resetForm = () => {
+    setUrls([""]);
+    setCourseTitle("");
+    setCourseDescription("");
+    setCourseStructure(null);
+    setShowPreview(false);
+  };
+
+  // Course preview component
+  const CoursePreview = ({ courseData, onEdit }) => {
+    const { course, videoProcessed, contentCreated, aiGeneratedContent } = courseData;
+    
+    return (
+      <div className="space-y-6">
+        {/* Course Header */}
+        <div className="border-b pb-4">
+          <h2 className="text-2xl font-bold text-gray-900">{course.courseTitle}</h2>
+          <p className="text-gray-600 mt-2">{course.courseDescription}</p>
+          <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
+            <span>📅 Created: {new Date(course.createdAt).toLocaleDateString()}</span>
+            <span>⏱️ Duration: {Math.round(course.courseDuration / 60)} min</span>
+            <span>🏷️ Status: {course.status}</span>
+          </div>
+        </div>
+
+        {/* Content Summary */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-blue-50 p-4 rounded-lg text-center">
+            <div className="text-2xl font-bold text-blue-600">{contentCreated.videoContent}</div>
+            <div className="text-sm text-blue-800">Videos</div>
+          </div>
+          <div className="bg-green-50 p-4 rounded-lg text-center">
+            <div className="text-2xl font-bold text-green-600">{contentCreated.writtenContent}</div>
+            <div className="text-sm text-green-800">Written Content</div>
+          </div>
+          <div className="bg-purple-50 p-4 rounded-lg text-center">
+            <div className="text-2xl font-bold text-purple-600">{contentCreated.flashcardSets}</div>
+            <div className="text-sm text-purple-800">Flashcard Sets</div>
+          </div>
+          <div className="bg-orange-50 p-4 rounded-lg text-center">
+            <div className="text-2xl font-bold text-orange-600">{contentCreated.quizSets}</div>
+            <div className="text-sm text-orange-800">Quiz Sets</div>
+          </div>
+        </div>
+
+        {/* Video Content Preview */}
+        {videoProcessed.videos.length > 0 && (
+          <div>
+            <h3 className="text-lg font-semibold mb-3">📹 Video Content</h3>
+            <div className="space-y-2">
+              {videoProcessed.videos.map((video, index) => (
+                <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                    {index + 1}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">{video.videoTitle}</h4>
+                    <div className="text-sm text-gray-500">
+                      Duration: {Math.round(video.duration / 60)} min
+                    </div>
+                  </div>
+                  <div className="text-blue-600 text-sm">▶️ Video</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* AI Generated Content Status */}
+        {aiGeneratedContent && (
+          <div className={`p-4 rounded-lg ${aiGeneratedContent.generationSuccessful ? 'bg-green-50 border border-green-200' : 'bg-yellow-50 border border-yellow-200'}`}>
+            <h3 className="text-lg font-semibold mb-2">
+              🤖 AI-Generated Educational Content
+            </h3>
+            {aiGeneratedContent.generationSuccessful ? (
+              <div className="text-green-800">
+                <p>✅ AI content generation was successful!</p>
+                <div className="mt-2 text-sm">
+                  <div>📝 Total Video Contents: {aiGeneratedContent.totalVideoContents}</div>
+                  <div>🃏 Total Flashcards: {contentCreated.totalFlashcards}</div>
+                  <div>❓ Total Quiz Questions: {contentCreated.totalQuizQuestions}</div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-yellow-800">
+                <p>⚠️ AI content generation failed, but your course was still created successfully with the original content.</p>
+                <p className="text-sm mt-1">Error: {aiGeneratedContent.error}</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="flex gap-3 pt-4 border-t">
+          <Button onClick={onEdit} variant="outline">
+            ✏️ Edit Course Details
+          </Button>
+          <Button onClick={resetForm} variant="outline">
+            🔄 Create Another Course
+          </Button>
+          <Button className="bg-green-600 hover:bg-green-700">
+            🚀 Go to Course
+          </Button>
+        </div>
+      </div>
+    );
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -88,13 +199,13 @@ export default function BringYourOwnCourse() {
 
       if (response.data) {
         toast({
-          title: "Course imported successfully!",
+          title: "Course created successfully!",
+          description: "Your course structure has been generated and is ready for preview.",
         });
-        // Reset form
-        setUrls([""]);
-        setCourseTitle("");
-        setCourseDescription("");
-        setFile(null);
+        
+        // Set course structure for preview
+        setCourseStructure(response.data.data);
+        setShowPreview(true);
       }
     } catch (error) {
       console.error("Error importing course:", error);
@@ -113,13 +224,23 @@ export default function BringYourOwnCourse() {
     <div className="grid grid-cols-1 md:grid-cols-5 md:p-4 gap-4">
       <Card className="bg-white md:col-span-3 mb-0 shadow-lg rounded-lg h-[calc(100svh-4em)] md:h-[calc(100svh-6em)] overflow-y-scroll">
         <CardHeader>
-          <h2 className="text-2xl font-bold">Bring Your Own Course</h2>
+          <h2 className="text-2xl font-bold">
+            {showPreview ? "Course Preview" : "Bring Your Own Course"}
+          </h2>
           <p className="text-muted-foreground mt-2">
-            Enter YouTube video/playlist URLs or any other embeddable URLs. We'll analyze and build a
-            structured course.
+            {showPreview ? 
+              "Your course has been successfully created! Review the structure below." :
+              "Enter YouTube video/playlist URLs or any other embeddable URLs. We'll analyze and build a structured course."
+            }
           </p>
         </CardHeader>
         <CardContent>
+          {showPreview && courseStructure ? (
+            <CoursePreview 
+              courseData={courseStructure} 
+              onEdit={() => setShowPreview(false)}
+            />
+          ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block font-medium mb-2">Course Title *</label>
@@ -182,21 +303,13 @@ export default function BringYourOwnCourse() {
                 Add another URL
               </Button>
             </div>
-            {/* <div>
-                        <label className="block font-medium mb-2">Or upload a file</label>
-                        <Input type="file" accept=".pdf,.doc,.docx,.txt" onChange={handleFileChange} />
-                        {file && (
-                            <div className="mt-2 text-sm text-muted-foreground">
-                                Selected file: {file.name}
-                            </div>
-                        )}
-                    </div> */}
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading
                 ? "Analyzing & Building Course..."
                 : "Analyze & Build Course"}
             </Button>
           </form>
+          )}
         </CardContent>
       </Card>
 
