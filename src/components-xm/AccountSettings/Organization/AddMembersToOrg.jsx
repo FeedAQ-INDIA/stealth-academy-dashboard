@@ -31,7 +31,7 @@ import {
     Users,
     Calendar
 } from "lucide-react";
-import { toast } from "@/components/hooks/use-toast.js";
+import { toast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert.jsx";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu.jsx";
 import { useOrganizationStore } from "@/zustland/store.js";
@@ -250,6 +250,8 @@ function AddMembersToOrg() {
             fetchInvitedUsers();
         } catch (error) {
             console.error("Error removing member:", error);
+     
+            
             toast({
                 title: "Error",
                 description: error.response?.data?.message || "Failed to remove member",
