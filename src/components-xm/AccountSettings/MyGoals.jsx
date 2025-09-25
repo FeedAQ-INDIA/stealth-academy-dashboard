@@ -216,7 +216,7 @@ const MyGoals = () => {
           <CardHeader>
             <CardTitle className="text-center text-2xl sm:text-3xl font-bold tracking-wide flex items-center justify-center gap-3">
               <ShoppingBag className="w-8 h-8" />
-              My Orders
+              My Goals
             </CardTitle>
           </CardHeader>
         </Card>
