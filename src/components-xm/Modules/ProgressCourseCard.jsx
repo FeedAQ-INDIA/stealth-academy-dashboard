@@ -23,15 +23,7 @@ export function ProgressCourseCard({ course }) {
       <CardContent className="p-0">
         <div className="flex flex-col md:flex-row gap-4">
           {/* Course Image with hover zoom and skeleton loader */}
-          <div className="relative w-32 h-34 flex-shrink-0">
-            <div
-              className="absolute inset-0 flex items-center justify-center bg-gray-100 animate-pulse z-0 rounded-lg"
-              style={{
-                display: course.courseImageUrl ? "none" : "flex",
-              }}
-            >
-              <span className="text-gray-300">Image</span>
-            </div>
+          <div className="relative w-32 h-34 flex-shrink-0"> 
             <img
               src={course.courseImageUrl || 'http://localhost:5174/src/assets/byoc_2.png'}
               className="w-full h-full object-cover rounded-lg z-10 transition-transform duration-300 group-hover:scale-105 group-hover:shadow-lg"
