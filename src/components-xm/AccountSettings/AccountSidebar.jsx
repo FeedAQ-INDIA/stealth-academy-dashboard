@@ -57,9 +57,10 @@ function AccountSidebar({ ...props }) {
   const { 
     fetchUserOrganizations, 
     organizationsLoading,
+    organizationsError,
     organizations,
     setSelectedOrganization,
-    selectedOrganization
+    selectedOrganization,
   } = useOrganizationStore();
 
   // Fetch organization status on component mount
@@ -75,12 +76,6 @@ function AccountSidebar({ ...props }) {
     console.log("AccountSidebar Debug - selectedOrganization:", selectedOrganization);
   }, [organizationsLoading, organizations, selectedOrganization]);
 
-  // Helper function to get the current tab from the URL query params
-  const getTabFromURL = () => {
-    const params = new URLSearchParams(location.search);
-    return params.get("tab") || "overview"; // Default to 'overview' tab
-  };
-
   // Dynamic organization menu items based on organization status
   const getOrganizationItems = useCallback(() => {
     console.log("getOrganizationItems called - organizationsLoading:", organizationsLoading, "organizations:", organizations);
@@ -95,6 +90,17 @@ function AccountSidebar({ ...props }) {
         url: "#",
         isActive: false,
         icon: Loader,
+      });
+      return items;
+    }
+
+    // Check for errors
+    if (organizationsError) {
+      items.push({
+        title: "Error loading organizations",
+        url: "#",
+        isActive: false,
+        icon: Shield, // Using Shield as error icon
       });
       return items;
     }
@@ -126,121 +132,90 @@ function AccountSidebar({ ...props }) {
     }
 
     return items;
-  }, [organizationsLoading, organizations, location.pathname]);
+  }, [organizationsLoading, organizationsError, organizations, location.pathname]);
 
-  // Memoized data object that updates when dependencies change
-  const data = React.useMemo(() => ({
-    navMain: [
+  // Get navigation items based on selected profile
+  const getNavigationItems = useCallback(() => {
+    const accountItems = [
       {
-        title: "Account",
-        url: "#",
-        items: [
-          {
-            title: "Profile",
-            url: `/account-settings/profile`,
-            isActive:
-              location.pathname === "/account-settings/profile" ||
-              location.pathname === "/account-settings",
-            icon: UserCircle,
-          },
-          // {
-          //     title: "Security",
-          //     url: `/account-settings/security`,
-          //     isActive: location.pathname === '/account-settings/security',
-          //     icon: Shield,
-          // },
-          {
-            title: "Credit & Orders",
-            url: `/account-settings/credit-and-order`,
-            isActive: location.pathname?.includes(
-              "/account-settings/credit-and-order"
-            ),
-            icon: CreditCard,
-          },
-          {
-            title: "My Goals",
-            url: `/account-settings/my-goals`,
-            isActive: location.pathname?.includes("/account-settings/my-goals"),
-            icon: CreditCard,
-          },
-          {
-            title: "My Learning Schedule",
-            url: `/account-settings/my-learning-schedule`,
-            isActive: location.pathname?.includes(
-              "/account-settings/my-learning-schedule"
-            ),
-            icon: CreditCard,
-          },
-           {
+        title: "Profile",
+        url: `/account-settings/profile`,
+        isActive:
+          location.pathname === "/account-settings/profile" ||
+          location.pathname === "/account-settings",
+        icon: UserCircle,
+      },
+      {
+        title: "Credit & Orders",
+        url: `/account-settings/credit-and-order`,
+        isActive: location.pathname?.includes(
+          "/account-settings/credit-and-order"
+        ),
+        icon: CreditCard,
+      },
+      {
+        title: "My Goals",
+        url: `/account-settings/my-goals`,
+        isActive: location.pathname?.includes("/account-settings/my-goals"),
+        icon: CreditCard,
+      },
+      {
+        title: "My Learning Schedule",
+        url: `/account-settings/my-learning-schedule`,
+        isActive: location.pathname?.includes(
+          "/account-settings/my-learning-schedule"
+        ),
+        icon: CreditCard,
+      },
+    ];
+
+    // If general profile is selected (selectedOrganization is null), show register organization option
+    if (selectedOrganization === null) {
+      accountItems.push({
         title: "Register Organization",
         url: `/account-settings/register-organization`,
         isActive: location.pathname === "/account-settings/register-organization",
         icon: Building,
-      },
-        ],
-      },
+      });
+    }
+
+    return accountItems;
+  }, [selectedOrganization, location.pathname]);
+
+  // Memoized data object that updates when dependencies change
+  const data = React.useMemo(() => {
+    const navSections = [
       {
+        title: "Account",
+        url: "#",
+        items: getNavigationItems(),
+      }
+    ];
+
+    // Only show Organization section if user has selected an organization profile (selectedOrganization is not null)
+    if (selectedOrganization !== null && organizations && organizations.length > 0) {
+      navSections.push({
         title: "Organization",
         url: "#",
         items: getOrganizationItems(),
-        // Add organization selector for organizations section
-        hasSelector: organizations && organizations.length > 0 && organizations.some(org => org && org.orgId),
-        selectorComponent: organizations && organizations.length > 0 && organizations.some(org => org && org.orgId) ? (
-          <div className="px-2 py-2">
-            <Select 
-              value={selectedOrganization?.orgId?.toString() || ""} 
-              onValueChange={(orgId) => {
-                const org = organizations.find(o => o.orgId.toString() === orgId);
-                if (org) {
-                  setSelectedOrganization(org);
-                }
-              }}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Organization" />
-              </SelectTrigger>
-              <SelectContent>
-                {organizations.map((org) => {
-                  // Add null checks to prevent undefined errors
-                  // Now organizations is a flat array of organization objects
-                  if (!org || !org.orgId) {
-                    return null;
-                  }
-                  
-                  return (
-                    <SelectItem 
-                      key={org.orgId} 
-                      value={org.orgId.toString()}
-                    >
-                      {org.orgName}
-                    </SelectItem>
-                  );
-                }).filter(Boolean)}
-              </SelectContent>
-            </Select>
-          </div>
-        ) : null,
-      },
-      {
-        title: "Actions",
-        url: "#",
-        items: [
-          {
-            title: "Sign out",
-            url: `${import.meta.env.VITE_API_URL}/auth/logout`,
-            isActive: false,
-            icon: LogOut,
-          },
-        ],
-      },
-    ],
-  }), [organizations, organizationsLoading, selectedOrganization, location.pathname, getOrganizationItems, setSelectedOrganization]);
+      });
+    }
 
-  const [urlEndpoint, setUrlEndpoint] = React.useState("");
+    navSections.push({
+      title: "Actions",
+      url: "#",
+      items: [
+        {
+          title: "Sign out",
+          url: `${import.meta.env.VITE_API_URL}/auth/logout`,
+          isActive: false,
+          icon: LogOut,
+        },
+      ],
+    });
 
-  useEffect(() => {
-    console.log("Updated urlEndpoint:", urlEndpoint);
-  }, [urlEndpoint]);
+    return { navMain: navSections };
+  }, [organizations, selectedOrganization, getOrganizationItems, getNavigationItems]);
 
   return (
     <>
@@ -253,13 +228,57 @@ function AccountSidebar({ ...props }) {
                 <h2 className="text-lg font-medium text-center">MY ACCOUNT</h2>
 
             </SidebarHeader> */}
+        {/* Profile Selector */}
+        <div className="px-3 py-3 border-b">
+          <div className="mb-2">
+            <span className="text-sm font-medium text-muted-foreground">Profile</span>
+          </div>
+          <Select 
+            value={selectedOrganization === null ? "general" : selectedOrganization.orgId?.toString()} 
+            onValueChange={(profileId) => {
+              console.log("Profile changed to:", profileId);
+              if (profileId === "general") {
+                setSelectedOrganization(null);
+              } else {
+                const org = organizations.find(org => org.orgId?.toString() === profileId);
+                setSelectedOrganization(org || null);
+              }
+            }}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Profile" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="general">General</SelectItem>
+              {organizations && organizations.length > 0 && organizations.map((org) => {
+                // Add more robust validation
+                if (!org || !org.orgId || !org.orgName) {
+                  console.warn("Invalid organization data:", org);
+                  return null;
+                }
+                
+                return (
+                  <SelectItem 
+                    key={`org-${org.orgId}`} 
+                    value={org.orgId.toString()}
+                  >
+                    {org.orgName}
+                  </SelectItem>
+                );
+              }).filter(Boolean)}
+              {organizationsError && (
+                <SelectItem disabled value="error">
+                  Error: {organizationsError}
+                </SelectItem>
+              )}
+            </SelectContent>
+          </Select>
+        </div>
         {/* <Separator/> */}
         <SidebarContent>
           {data.navMain.map((item) => (
             <SidebarGroup key={item.title}>
               <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
-              {/* Render organization selector if it exists */}
-              {item.selectorComponent && item.selectorComponent}
               <SidebarGroupContent>
                 <SidebarMenu>
                   {item.items.map((item) =>

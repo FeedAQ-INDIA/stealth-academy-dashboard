@@ -115,7 +115,7 @@ function NavigationMenuDemo({ orientation }) {
                   : "ghost"
               }
             >
-              BRING YOUR OWN COURSE
+              CURATE YOUR OWN COURSE
             </Button>
           </Link>
         </NavigationMenuItem>

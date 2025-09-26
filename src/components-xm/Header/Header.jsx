@@ -31,6 +31,7 @@ export default function Header() {
   }, []);
 
   return (
+    <>
     <header className="flex h-14 items-center justify-between bg-white px-4 shadow-md border-b">
       <div className="flex gap-2 items-center">
         <div>
@@ -124,5 +125,8 @@ export default function Header() {
         </Sheet>
       </div>
     </header>
+
+
+    </>
   );
 }

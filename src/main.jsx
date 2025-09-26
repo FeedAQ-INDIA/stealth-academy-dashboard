@@ -60,6 +60,7 @@ import MyStudyGroup from "./components-xm/MyJourney/MyStudyGroup.jsx";
 import MyLearningSchedule from "./components-xm/AccountSettings/MyLearningSchedule.jsx";
 import MyGoals from "./components-xm/AccountSettings/MyGoals.jsx";
 import CourseEmbedder from "./components-xm/Course/CourseEmbedder.jsx";
+import Builder from "./components-xm/CourseBuilder/Builder.jsx";
 
 const router = createBrowserRouter([
   {
@@ -267,6 +268,11 @@ const router = createBrowserRouter([
             element: <MyWishlist />,
           },
         ],
+      },
+
+      {
+        path: "/course-builder",
+        element: <Builder />,
       },
 
       {

@@ -1,5 +1,8 @@
 import { create } from 'zustand'
 
+// Key for persisting selected organization (only orgId) in localStorage
+const ORG_STORAGE_KEY = 'fa_selected_org_v1';
+
 // Dynamic import function to avoid circular dependency
 const getAxiosConn = async () => {
     const { default: axiosConn } = await import("@/axioscon.js");
@@ -38,20 +41,35 @@ export const useOrganizationStore = create((set, get) => ({
     
     // Multiple organizations support
     organizations: [],
-    selectedOrganization: null,
+    selectedOrganization: null, // null means general, org object means selected organization (rehydrated after fetch)
     organizationsLoading: false,
+    organizationsError: null, // Add error state
     
     // Actions
     setHasOrganization: (hasOrg) => set({ hasOrganization: hasOrg }),
     setOrganizations: (organizations) => set({ organizations }),
-    setSelectedOrganization: (organization) => set({ selectedOrganization: organization }),
+    setSelectedOrganization: (organization) => {
+        // organization can be null (for general) or an organization object
+        set({ selectedOrganization: organization });
+        try {
+            if (typeof window !== 'undefined') {
+                if (organization && organization.orgId) {
+                    localStorage.setItem(ORG_STORAGE_KEY, organization.orgId.toString());
+                } else {
+                    localStorage.removeItem(ORG_STORAGE_KEY);
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to persist selected organization', e);
+        }
+    },
     
 
     
     // Fetch all organizations for the user
     fetchUserOrganizations: async () => {
         try {
-            set({ organizationsLoading: true });
+            set({ organizationsLoading: true, organizationsError: null });
             console.log("Fetching user organizations...");
             
             const axiosConn = await getAxiosConn();
@@ -63,28 +81,64 @@ export const useOrganizationStore = create((set, get) => ({
                 const organizations = response.data.data || [];
                 console.log("Organizations received:", organizations);
                 
-                set({ 
-                    organizations,
+                // Validate organization data structure
+                const validOrganizations = organizations.filter(org => 
+                    org && typeof org === 'object' && org.orgId && org.orgName
+                );
+                
+                if (validOrganizations.length !== organizations.length) {
+                    console.warn("Some organizations had invalid data structure:", organizations);
+                }
+                
+                const currentState = get();
+                const storedOrgId = (typeof window !== 'undefined') ? localStorage.getItem(ORG_STORAGE_KEY) : null;
+
+                set({
+                    organizations: validOrganizations,
                     organizationsLoading: false,
-                    // Set first organization as selected if none selected
-                    selectedOrganization: organizations.length > 0 && !get().selectedOrganization 
-                        ? organizations[0] 
-                        : get().selectedOrganization
+                    hasOrganization: validOrganizations.length > 0,
                 });
+                
+                // Rehydrate previously selected organization if it still exists
+                if (storedOrgId) {
+                    const match = validOrganizations.find(o => o.orgId?.toString() === storedOrgId);
+                    if (match) {
+                        set({ selectedOrganization: match });
+                    } else {
+                        // Stored org no longer available
+                        try { 
+                            localStorage.removeItem(ORG_STORAGE_KEY); 
+                        } catch {
+                            // ignore cleanup error
+                        }
+                        if (currentState.selectedOrganization === null && validOrganizations.length > 0) {
+                            set({ selectedOrganization: validOrganizations[0] });
+                        }
+                    }
+                } else if (currentState.selectedOrganization === null && validOrganizations.length > 0) {
+                    // No stored org, fallback to first (previous behaviour)
+                    set({ selectedOrganization: validOrganizations[0] });
+                }
                 
                 console.log("Organization store updated successfully");
             } else {
+                const errorMessage = response.data?.message || "Failed to fetch organizations";
                 console.log("API response not successful:", response.data);
                 set({ 
                     organizations: [],
-                    organizationsLoading: false 
+                    organizationsLoading: false,
+                    organizationsError: errorMessage,
+                    hasOrganization: false,
                 });
             }
         } catch (error) {
             console.error("Error fetching user organizations:", error);
+            const errorMessage = error.response?.data?.message || error.message || "Failed to fetch organizations";
             set({ 
                 organizations: [],
-                organizationsLoading: false 
+                organizationsLoading: false,
+                organizationsError: errorMessage,
+                hasOrganization: false,
             });
         }
     },
