@@ -37,7 +37,7 @@ import CourseWritten from "@/components-xm/Course/CourseWritten.jsx";
 import CourseDocThirdParty from "@/components-xm/Course/CourseDocThirdParty.jsx";
 import CourseQuiz from "@/components-xm/Course/CourseQuiz/CourseQuiz.jsx";
 import CourseFlashcard from "@/components-xm/Course/CourseFlashcard.jsx";
-import { useAuthStore, useProtectedURIStore } from "@/zustland/store";
+import { useProtectedURIStore } from "@/zustland/store";
 import CourseSchedule from "@/components-xm/Course/CourseSchedule.jsx";
 import BringYourOwnCourse from "./components-xm/BringYourOwnCourse.jsx";
 import { MyCourse } from "./components-xm/MyJourney/MyCourse.jsx";
@@ -61,6 +61,8 @@ import MyLearningSchedule from "./components-xm/AccountSettings/MyLearningSchedu
 import MyGoals from "./components-xm/AccountSettings/MyGoals.jsx";
 import CourseEmbedder from "./components-xm/Course/CourseEmbedder.jsx";
 import Builder from "./components-xm/CourseBuilder/Builder.jsx";
+import PreviewBuilder from "./components-xm/CourseBuilder/PreviewBuilder.jsx";
+// NOTE: PreviewBuilder & CourseEditorBuilder direct routes removed; they are accessed through Builder component flow.
 
 const router = createBrowserRouter([
   {
@@ -274,6 +276,15 @@ const router = createBrowserRouter([
         path: "/course-builder",
         element: <Builder />,
       },
+
+      
+      {
+        path: "/course-builder/editor",
+        element: <PreviewBuilder />,
+      },
+
+      // Removed /course-builder/editor example route (CourseEditorExample) as part of simplification cleanup.
+
 
       {
         path: "/bring-your-own-course",

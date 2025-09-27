@@ -251,7 +251,7 @@ export default function Builder() {
     }
 
     setIsLoading(true);
-
+    console.log(localStorage.getItem("fa_selected_org_v1"))
     try {
       const payload = {
         orgId: localStorage.getItem("fa_selected_org_v1") || null,
@@ -260,7 +260,7 @@ export default function Builder() {
         courseBuilderData: {
           courseTitle: courseTitle.trim(),
           courseDescription: courseDescription.trim(),
-          sourceUrls: validUrls, // Also include in courseBuilderData for redundancy
+          contentUrlsList: validUrls, // Also include in courseBuilderData for redundancy
         }
       };
 

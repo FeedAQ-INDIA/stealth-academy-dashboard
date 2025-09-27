@@ -234,10 +234,10 @@ function AccountSidebar({ ...props }) {
             <span className="text-sm font-medium text-muted-foreground">Profile</span>
           </div>
           <Select 
-            value={selectedOrganization === null ? "general" : selectedOrganization.orgId?.toString()} 
+            value={selectedOrganization === null ? "GENERAL" : selectedOrganization.orgId?.toString()} 
             onValueChange={(profileId) => {
               console.log("Profile changed to:", profileId);
-              if (profileId === "general") {
+              if (profileId === "GENERAL") {
                 setSelectedOrganization(null);
               } else {
                 const org = organizations.find(org => org.orgId?.toString() === profileId);
@@ -249,7 +249,7 @@ function AccountSidebar({ ...props }) {
               <SelectValue placeholder="Select Profile" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="general">General</SelectItem>
+              <SelectItem value="GENERAL">GENERAL</SelectItem>
               {organizations && organizations.length > 0 && organizations.map((org) => {
                 // Add more robust validation
                 if (!org || !org.orgId || !org.orgName) {

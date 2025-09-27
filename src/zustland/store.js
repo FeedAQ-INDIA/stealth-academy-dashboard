@@ -51,17 +51,12 @@ export const useOrganizationStore = create((set, get) => ({
     setSelectedOrganization: (organization) => {
         // organization can be null (for general) or an organization object
         set({ selectedOrganization: organization });
-        try {
-            if (typeof window !== 'undefined') {
-                if (organization && organization.orgId) {
-                    localStorage.setItem(ORG_STORAGE_KEY, organization.orgId.toString());
-                } else {
-                    localStorage.removeItem(ORG_STORAGE_KEY);
-                }
-            }
-        } catch (e) {
-            console.warn('Failed to persist selected organization', e);
-        }
+       if (organization?.orgId) {
+  localStorage.setItem(ORG_STORAGE_KEY, String(organization.orgId));
+} else {
+  localStorage.removeItem(ORG_STORAGE_KEY);
+}  
+       console.log("Selected organization set to:", organization?.orgId || null);
     },
     
 
