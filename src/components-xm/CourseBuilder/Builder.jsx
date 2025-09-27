@@ -8,13 +8,14 @@ import { toast } from "@/components/hooks/use-toast.js";
 import axiosConn from "@/axioscon";
 import byoc1 from "@/assets/byoc_1.png";
 import { useOrganizationStore } from "@/zustland/store";
+import { useNavigate } from "react-router-dom";
 
 export default function Builder() {
   const [urls, setUrls] = useState([""]);
   const [courseTitle, setCourseTitle] = useState("");
   const [courseDescription, setCourseDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
+  const navigate = useNavigate();
   // Course preview state
   const [courseStructure, setCourseStructure] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -57,138 +58,7 @@ export default function Builder() {
     setShowPreview(false);
     setIsLoading(false); // Ensure loading state is also reset
   };
-
-  // Course preview component
-  const CoursePreview = ({ courseData, onEdit }) => {
-    if (!courseData) {
-      return (
-        <div className="text-center py-8">
-          <p className="text-gray-500">No course data available</p>
-          <Button onClick={onEdit} variant="outline" className="mt-4">
-            Go Back to Editor
-          </Button>
-        </div>
-      );
-    }
-
-    const { course, videoProcessed, contentCreated, aiGeneratedContent } = courseData;
-    
-    // Safety checks for required data
-    if (!course) {
-      return (
-        <div className="text-center py-8">
-          <p className="text-red-500">Error: Course data is incomplete</p>
-          <Button onClick={onEdit} variant="outline" className="mt-4">
-            Go Back to Editor
-          </Button>
-        </div>
-      );
-    }
-    
-    return (
-      <div className="space-y-6">
-        {/* Course Header */}
-        <div className="border-b pb-4">
-          <h2 className="text-2xl font-bold text-gray-900">{course.courseTitle}</h2>
-          <p className="text-gray-600 mt-2">{course.courseDescription}</p>
-          <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
-            <span>📅 Created: {new Date(course.createdAt).toLocaleDateString()}</span>
-            <span>⏱️ Duration: {Math.round(course.courseDuration / 60)} min</span>
-            <span>🏷️ Status: {course.status}</span>
-          </div>
-        </div>
-
-        {/* Content Summary */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-blue-50 p-4 rounded-lg text-center">
-            <div className="text-2xl font-bold text-blue-600">
-              {contentCreated?.videoContent || 0}
-            </div>
-            <div className="text-sm text-blue-800">Videos</div>
-          </div>
-          <div className="bg-green-50 p-4 rounded-lg text-center">
-            <div className="text-2xl font-bold text-green-600">
-              {contentCreated?.writtenContent || 0}
-            </div>
-            <div className="text-sm text-green-800">Written Content</div>
-          </div>
-          <div className="bg-purple-50 p-4 rounded-lg text-center">
-            <div className="text-2xl font-bold text-purple-600">
-              {contentCreated?.flashcardSets || 0}
-            </div>
-            <div className="text-sm text-purple-800">Flashcard Sets</div>
-          </div>
-          <div className="bg-orange-50 p-4 rounded-lg text-center">
-            <div className="text-2xl font-bold text-orange-600">
-              {contentCreated?.quizSets || 0}
-            </div>
-            <div className="text-sm text-orange-800">Quiz Sets</div>
-          </div>
-        </div>
-
-        {/* Video Content Preview */}
-        {videoProcessed?.videos?.length > 0 && (
-          <div>
-            <h3 className="text-lg font-semibold mb-3">📹 Video Content</h3>
-            <div className="space-y-2">
-              {videoProcessed.videos.map((video, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">
-                    {index + 1}
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900">{video.videoTitle || 'Untitled Video'}</h4>
-                    <div className="text-sm text-gray-500">
-                      Duration: {video.duration ? Math.round(video.duration / 60) : 0} min
-                    </div>
-                  </div>
-                  <div className="text-blue-600 text-sm">▶️ Video</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* AI Generated Content Status */}
-        {aiGeneratedContent && (
-          <div className={`p-4 rounded-lg ${aiGeneratedContent.generationSuccessful ? 'bg-green-50 border border-green-200' : 'bg-yellow-50 border border-yellow-200'}`}>
-            <h3 className="text-lg font-semibold mb-2">
-              🤖 AI-Generated Educational Content
-            </h3>
-            {aiGeneratedContent.generationSuccessful ? (
-              <div className="text-green-800">
-                <p>✅ AI content generation was successful!</p>
-                <div className="mt-2 text-sm">
-                  <div>📝 Total Video Contents: {aiGeneratedContent.totalVideoContents || 0}</div>
-                  <div>🃏 Total Flashcards: {contentCreated?.totalFlashcards || 0}</div>
-                  <div>❓ Total Quiz Questions: {contentCreated?.totalQuizQuestions || 0}</div>
-                </div>
-              </div>
-            ) : (
-              <div className="text-yellow-800">
-                <p>⚠️ AI content generation failed, but your course was still created successfully with the original content.</p>
-                <p className="text-sm mt-1">Error: {aiGeneratedContent.error}</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Actions */}
-        <div className="flex gap-3 pt-4 border-t">
-          <Button onClick={onEdit} variant="outline">
-            ✏️ Edit Course Details
-          </Button>
-          <Button onClick={resetForm} variant="outline">
-            🔄 Create Another Course
-          </Button>
-          <Button className="bg-green-600 hover:bg-green-700">
-            🚀 Go to Course
-          </Button>
-        </div>
-      </div>
-    );
-  };
-
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -275,6 +145,7 @@ export default function Builder() {
         // Set course structure for preview
         setCourseStructure(response.data.data);
         setShowPreview(true);
+        navigate(`/course-builder/${response.data.data.courseBuilder.courseBuilderId}`);
       } else {
         throw new Error("Invalid response from server");
       }
@@ -330,12 +201,7 @@ export default function Builder() {
           </p>
         </CardHeader>
         <CardContent>
-          {showPreview && courseStructure ? (
-            <CoursePreview 
-              courseData={courseStructure} 
-              onEdit={() => setShowPreview(false)}
-            />
-          ) : (
+ 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block font-medium mb-2">Course Title *</label>
@@ -430,7 +296,7 @@ export default function Builder() {
               </div>
             )}
           </form>
-          )}
+    
         </CardContent>
       </Card>
 

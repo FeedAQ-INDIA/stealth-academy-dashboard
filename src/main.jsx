@@ -279,7 +279,7 @@ const router = createBrowserRouter([
 
       
       {
-        path: "/course-builder/editor",
+        path: "/course-builder/:CourseBuilderId",
         element: <PreviewBuilder />,
       },
 

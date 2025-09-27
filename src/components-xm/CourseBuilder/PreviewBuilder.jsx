@@ -1,35 +1,11 @@
-/* eslint-disable react/prop-types */
-/**
- * Unified Course Builder Component
- * --------------------------------
- * This component MERGES the old `CourseEditorExample` (demo wrapper) and `PreviewBuilder` (preview + inline editor toggle).
- * It now serves as a single smart container that can:
- *  - Display a course in preview mode (read-only summary & content list)
- *  - Switch to edit mode and render `CourseEditorBuilder`
- *  - Provide optional external save callback
- *  - Start directly in either 'preview' or 'edit' mode via `initialMode` prop
- *  - (Dev only) fallback to an embedded sample dataset when no `courseBuilderData` is supplied
- *
- * Props:
- *  - courseBuilderData: object | null (raw structure that contains courseBuilder, course, courseContent, courseContentDetails)
- *  - initialMode: 'preview' | 'edit' (default 'preview')
- *  - onSave(updatedData): optional callback fired after successful save from editor
- *  - onCancel(): optional callback fired when editing is cancelled
- *  - onBack(): optional handler for back navigation button in empty-state
- *  - showDevSampleFallback: boolean (default true in dev) — if true & no data provided, renders sample data for easier local development
- *
- * Backwards Compatibility:
- *  - Still accepts previous `courseBuilderData` prop name and internal toggle (Edit Course button) remains.
- *
- * Removal / Merge Notes:
- *  - `CourseEditorExample.jsx` has been removed; its sample dataset migrated here as `DEV_SAMPLE_DATA`.
- *  - If you prefer NOT to ship sample data to production bundles, consider tree-shaking via a dynamic import or guard this constant.
- */
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/hooks/use-toast.js";
+import axiosConn from "@/axioscon.js";
 import {
   Edit,
   ArrowLeft,
@@ -39,12 +15,10 @@ import {
   User,
   Globe,
   Eye,
-  BookOpen,
 } from "lucide-react";
 import CourseEditorBuilder from "./CourseEditorBuilder";
+ 
 
-// Dev sample data (extracted from former CourseEditorExample). Used only when no data is provided.
-// Intentionally concise: kept the original structure's `data` inner object already unwrapped for direct use.
 const DEV_SAMPLE_DATA = {
   course: {
     courseId: "temp_course_id",
@@ -143,86 +117,95 @@ const DEV_SAMPLE_DATA = {
   ],
 };
 
-// PreviewBuilder: Displays a read-only view of the course with an inline option to switch to the editor.
-// Simplified: removed unused onEdit prop (editor toggling handled internally) & unused Play icon import.
-// Derive a dev mode flag in a bundler-agnostic way (Vite exposes import.meta.env.MODE)
-// Safe checks so we don't reference undefined globals in browser builds.
-// Priority: process.env (if available) else import.meta.env
-const __DEV__ = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE !== 'production');
+ 
+const __DEV__ = import.meta.env.MODE !== 'production';
 
-export default function PreviewBuilder({
-  courseBuilderData,
-  initialMode = "preview",
-  onSave,
-  onCancel,
-  onBack,
-  showDevSampleFallback = __DEV__,
-}) {
-  const [showEditor, setShowEditor] = useState(initialMode === "edit");
+export default function PreviewBuilder() {
+  const { CourseBuilderId } = useParams();
+  const navigate = useNavigate();
+  const [showEditor, setShowEditor] = useState(false);
   const [courseData, setCourseData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const deriveDetails = useCallback((data) => {
+    if (!data) return data;
+    const cc = data.courseContent || [];
+    const stats = cc.reduce(
+      (acc, item) => {
+        const type = item.contentType || item.courseContent?.courseContentType;
+        if (type === 'CourseVideo') acc.videoCount += 1;
+        else if (type === 'CourseWritten') acc.writtenCount += 1;
+        else if (type === 'CourseQuiz') acc.quizCount += 1;
+        else if (type === 'CourseFlashcard') acc.flashcardCount += 1;
+        return acc;
+      },
+      { videoCount: 0, writtenCount: 0, quizCount: 0, flashcardCount: 0 }
+    );
+    const totalDuration = cc.reduce((sum, item) => {
+      if (item.courseVideo?.duration) return sum + (item.courseVideo.duration || 0);
+      if (item.courseFlashcard?.estimatedDuration) return sum + (item.courseFlashcard.estimatedDuration * 60);
+      if (item.courseContent?.courseContentDuration) return sum + (item.courseContent.courseContentDuration || 0);
+      return sum;
+    }, 0);
+    return {
+      ...data,
+      courseContentDetails: data.courseContentDetails || {
+        totalItems: cc.length,
+        statistics: stats,
+        totalDuration,
+      },
+    };
+  }, []);
 
   useEffect(() => {
-    if (courseBuilderData) {
-      // Normalize inbound data to ensure courseContentDetails always present
-      const normalized = (() => {
-        if (!courseBuilderData) return null;
-        const cc = courseBuilderData.courseContent || [];
-        const stats = cc.reduce(
-          (acc, item) => {
-            const type = item.contentType || item.courseContent?.courseContentType;
-            if (type === 'CourseVideo') acc.videoCount += 1;
-            else if (type === 'CourseWritten') acc.writtenCount += 1;
-            else if (type === 'CourseQuiz') acc.quizCount += 1;
-            else if (type === 'CourseFlashcard') acc.flashcardCount += 1;
-            return acc;
-          },
-          { videoCount: 0, writtenCount: 0, quizCount: 0, flashcardCount: 0 }
-        );
-        const totalDuration = cc.reduce((sum, item) => {
-          // Prefer nested specific record duration else fallback
-          if (item.courseVideo?.duration) return sum + (item.courseVideo.duration || 0);
-          if (item.courseFlashcard?.estimatedDuration)
-            return sum + (item.courseFlashcard.estimatedDuration * 60); // minutes -> seconds
-          if (item.courseContent?.courseContentDuration)
-            return sum + (item.courseContent.courseContentDuration || 0);
-          return sum;
-        }, 0);
-        const details = {
-          totalItems: cc.length,
-            statistics: stats,
-            totalDuration,
-        };
-        return {
-          ...courseBuilderData,
-          courseContentDetails: courseBuilderData.courseContentDetails || details,
-        };
-      })();
-      setCourseData(normalized);
-    } else if (showDevSampleFallback) {
-      // Dev fallback sample
-      // Enrich sample with derived details
-      const sample = { ...DEV_SAMPLE_DATA };
-      const totalDuration = sample.courseContent.reduce((s, c) => s + (c.courseVideo?.duration || c.courseContent?.courseContentDuration || 0), 0);
-      sample.courseContentDetails = {
-        totalItems: sample.courseContent.length,
-        statistics: {
-          videoCount: sample.courseContent.filter(c => c.contentType === 'CourseVideo').length,
-          writtenCount: sample.courseContent.filter(c => c.contentType === 'CourseWritten').length,
-          quizCount: sample.courseContent.filter(c => c.contentType === 'CourseQuiz').length,
-          flashcardCount: sample.courseContent.filter(c => c.contentType === 'CourseFlashcard').length,
-        },
-        totalDuration,
-      };
-      setCourseData(sample);
-    } else {
-      setCourseData(null);
+    let cancelled = false;
+
+    async function fetchData() {
+      if (!CourseBuilderId) {
+        // if no id and dev, use sample
+        if (__DEV__) {
+          const sample = deriveDetails({ ...DEV_SAMPLE_DATA });
+          if (!cancelled) {
+            setCourseData(sample);
+            setLoading(false);
+          }
+        } else {
+          setCourseData(null);
+          setLoading(false);
+        }
+        return;
+      }
+      try {
+        setLoading(true);
+        setError(null);
+        const res = await axiosConn.get(`/courseBuilder/${CourseBuilderId}`);
+        // Expecting res.data.data structure; adjust if API differs
+        const raw = res?.data?.data?.courseBuilderData;
+        const normalized = deriveDetails(raw);
+        if (!cancelled) {
+          setCourseData(raw);
+        }
+        console.log(raw)
+      } catch (e) {
+        if (!cancelled) {
+          setError(e?.response?.data?.message || e.message || 'Failed to load course');
+          if (__DEV__) {
+            const sample = deriveDetails({ ...DEV_SAMPLE_DATA });
+            setCourseData(sample);
+          }
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
-  }, [courseBuilderData, showDevSampleFallback]);
+    fetchData();
+    return () => { cancelled = true; };
+  }, [CourseBuilderId, deriveDetails]);
 
   const handleEditSave = (updatedData) => {
-    setCourseData(updatedData);
+    setCourseData(deriveDetails(updatedData));
     setShowEditor(false);
-    if (onSave) onSave(updatedData);
     toast({
       title: "Course updated successfully!",
       description: "Your changes have been saved.",
@@ -231,7 +214,6 @@ export default function PreviewBuilder({
 
   const handleCancelEdit = () => {
     setShowEditor(false);
-    if (onCancel) onCancel();
   };
 
   const formatDuration = (seconds) => {
@@ -257,24 +239,30 @@ export default function PreviewBuilder({
       />
     );
   }
-
-  if (!courseData) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <p className="text-gray-500 mb-4">No course data available</p>
-          {onBack && (
-            <Button onClick={onBack} variant="outline">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Go Back
-            </Button>
-          )}
-        </div>
+        <p className="text-gray-500">Loading course...</p>
       </div>
     );
   }
 
-  const { courseBuilder, course, courseContent, courseContentDetails } = courseData;
+  if (error && !courseData) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
+        <p className="text-red-500 text-sm">{error}</p>
+        <Button variant="outline" onClick={() => navigate(-1)}>
+          <ArrowLeft className="h-4 w-4 mr-2" /> Back
+        </Button>
+      </div>
+    );
+  }
+
+  if (!courseData) {
+    return null; // nothing to show
+  }
+
+  const { course, courseContent } = courseData;
 
   return (
     <div className="space-y-6 p-6  ">
@@ -282,9 +270,9 @@ export default function PreviewBuilder({
 
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">
-          {course?.courseTitle}{" "}
+          {courseData?.courseDetail?.courseTitle}{" "}
         </h1>
-        <p className="text-gray-600 mt-2">{course?.courseDescription} </p>
+        <p className="text-gray-600 mt-2">{courseData?.courseDetail?.courseDescription} </p>
         <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mt-4">
           <div className="flex">
             <div className="ml-3">
@@ -301,64 +289,17 @@ export default function PreviewBuilder({
             <Edit className="h-4 w-4 mr-2" />
             Edit Course
           </Button>
-          {__DEV__ && !courseBuilderData && (
-            <Badge variant="outline" className="ml-2">DEV SAMPLE</Badge>
-          )}
+ 
         </div>
       </div>
 
      
       {/* Course Overview */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="  gap-6">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="  space-y-6">
           {/* Course Information */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge
-                      variant={
-                        course?.status === "PUBLISHED" ? "default" : "secondary"
-                      }
-                    >
-                      {course?.status}
-                    </Badge>
-                    <Badge variant="outline">{course?.courseType}</Badge>
-                    {course?.isPublic && (
-                      <Badge variant="outline" className="text-green-600">
-                        <Globe className="h-3 w-3 mr-1" />
-                        Public
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      Created:{" "}
-                      {new Date(course?.createdAt).toLocaleDateString()}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {formatDuration(course?.courseDuration)}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <User className="h-4 w-4" />
-                      {course?.courseSourceChannel}
-                    </span>
-                  </div>
-                </div>
-                {course?.courseImageUrl && (
-                  <img
-                    src={course.courseImageUrl}
-                    alt={course.courseTitle}
-                    className="w-24 h-16 object-cover rounded-lg"
-                  />
-                )}
-              </div>
-            </CardHeader>
-          </Card>
+       
 
           {/* Course Content */}
           <Card>
@@ -402,16 +343,7 @@ export default function PreviewBuilder({
                         <Badge variant="outline" className="text-xs">
                           {content.contentType}
                         </Badge>
-                        <Badge
-                          variant={
-                            content.courseContent.status === "PUBLISHED"
-                              ? "default"
-                              : "secondary"
-                          }
-                          className="text-xs"
-                        >
-                          {content.courseContent.status}
-                        </Badge>
+              
                         {content.courseVideo?.isPreview && (
                           <Badge
                             variant="outline"
@@ -439,176 +371,7 @@ export default function PreviewBuilder({
           </Card>
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Quick Stats */}
-          <Card>
-            <CardHeader>
-              <h3 className="text-lg font-semibold">Course Statistics</h3>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-3 bg-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">
-                      {courseContentDetails?.statistics?.videoCount || 0}
-                    </div>
-                    <div className="text-sm text-blue-800">Videos</div>
-                  </div>
-                  <div className="text-center p-3 bg-green-50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">
-                      {courseContentDetails?.statistics?.writtenCount || 0}
-                    </div>
-                    <div className="text-sm text-green-800">Written</div>
-                  </div>
-                </div>
-
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Total Duration:</span>
-                    <span className="font-semibold">
-                      {formatDuration(courseContentDetails?.totalDuration)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Content Items:</span>
-                    <span className="font-semibold">
-                      {courseContentDetails?.totalItems || 0}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Platform:</span>
-                    <span className="font-semibold">
-                      {course?.metadata?.coursePlatform || "N/A"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Builder Information */}
-          <Card>
-            <CardHeader>
-              <h3 className="text-lg font-semibold">Builder Information</h3>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Builder ID:</span>
-                  <span className="font-semibold">
-                    {courseBuilder?.courseBuilderId}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Status:</span>
-                  <Badge
-                    variant={
-                      courseBuilder?.status === "PUBLISHED"
-                        ? "default"
-                        : "secondary"
-                    }
-                  >
-                    {courseBuilder?.status}
-                  </Badge>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Organization:</span>
-                  <span className="font-semibold">
-                    {courseBuilder?.orgId
-                      ? `Org ${courseBuilder.orgId}`
-                      : "General"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Created:</span>
-                  <span className="font-semibold">
-                    {courseBuilder?.v_created_date}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Updated:</span>
-                  <span className="font-semibold">
-                    {courseBuilder?.v_updated_date}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Processing Information */}
-          <Card>
-            <CardHeader>
-              <h3 className="text-lg font-semibold">Processing Status</h3>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="text-center">
-                  <Badge variant="default" className="mb-2">
-                    {courseBuilder?.courseBuilderData?.processingStatus ||
-                      "COMPLETED"}
-                  </Badge>
-                  <p className="text-sm text-gray-600">
-                    Processed{" "}
-                    {courseBuilder?.courseBuilderData?.processedUrls
-                      ?.totalUrlsProcessed || 1}{" "}
-                    URL(s)
-                  </p>
-                </div>
-
-                {courseBuilder?.courseBuilderData?.contentUrlsList && (
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">
-                      Source URLs:
-                    </h4>
-                    <div className="space-y-1">
-                      {courseBuilder.courseBuilderData.contentUrlsList.map(
-                        (url, index) => (
-                          <div
-                            key={index}
-                            className="text-xs text-blue-600 bg-blue-50 p-2 rounded truncate"
-                          >
-                            {url}
-                          </div>
-                        )
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Actions */}
-          <Card>
-            <CardHeader>
-              <h3 className="text-lg font-semibold">Actions</h3>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <Button className="w-full" onClick={() => setShowEditor(true)}>
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit Course Details
-                </Button>
-
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => {
-                    // Add logic to view course
-                    toast({
-                      title: "Opening course...",
-                      description: "This would navigate to the course view.",
-                    });
-                  }}
-                >
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  View Course
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+ 
       </div>
     </div>
   );
