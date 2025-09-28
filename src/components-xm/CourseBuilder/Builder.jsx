@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+ 
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,9 +16,7 @@ export default function Builder() {
   const [courseDescription, setCourseDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  // Course preview state
-  const [courseStructure, setCourseStructure] = useState(null);
-  const [showPreview, setShowPreview] = useState(false);
+
 
   // selectedOrganization: null means general profile, object means organization selected
   const { selectedOrganization } = useOrganizationStore();
@@ -49,15 +47,7 @@ export default function Builder() {
     setUrls(newUrls);
   };
 
-  // Helper function to reset form
-  const resetForm = () => {
-    setUrls([""]);
-    setCourseTitle("");
-    setCourseDescription("");
-    setCourseStructure(null);
-    setShowPreview(false);
-    setIsLoading(false); // Ensure loading state is also reset
-  };
+
  
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -142,9 +132,7 @@ export default function Builder() {
           description: "Your course structure has been generated and is ready for preview.",
         });
         
-        // Set course structure for preview
-        setCourseStructure(response.data.data);
-        setShowPreview(true);
+
         navigate(`/course-builder/${response.data.data.courseBuilder.courseBuilderId}`);
       } else {
         throw new Error("Invalid response from server");
@@ -191,13 +179,10 @@ export default function Builder() {
       <Card className="bg-white md:col-span-3 mb-0 shadow-lg rounded-lg h-[calc(100svh-4em)] md:h-[calc(100svh-6em)] overflow-y-scroll">
         <CardHeader>
           <h2 className="text-2xl font-bold">
-            {showPreview ? "Course Preview" : "Bring Your Own Course"}
+            Bring Your Own Course
           </h2>
           <p className="text-muted-foreground mt-2">
-            {showPreview ? 
-              "Your course has been successfully created! Review the structure below." :
-              "Enter YouTube video/playlist URLs or any other embeddable URLs. We'll analyze and build a structured course."
-            }
+            Enter YouTube video/playlist URLs or any other embeddable URLs. We&apos;ll analyze and build a structured course.
           </p>
         </CardHeader>
         <CardContent>
