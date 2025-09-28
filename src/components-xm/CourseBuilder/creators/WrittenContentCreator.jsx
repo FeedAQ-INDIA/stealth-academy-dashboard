@@ -1,49 +1,97 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { FileText, X, Save } from "lucide-react";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { FileText, Save } from "lucide-react";
 
-export default function WrittenContentCreator({ onAdd, onCancel, isLoading = false }) {
-  const [formData, setFormData] = useState({
-    title: "",
-    content: "",
-    summary: "",
-    estimatedReadTime: 5,
-    category: "Written Content"
+// Zod schema for written content validation
+const writtenContentSchema = z.object({
+  title: z.string()
+    .min(1, "Title is required")
+    .min(3, "Title must be at least 3 characters")
+    .max(100, "Title must be less than 100 characters"),
+  content: z.string()
+    .min(1, "Content is required")
+    .min(50, "Content must be at least 50 characters")
+    .max(10000, "Content must be less than 10,000 characters"),
+  summary: z.string()
+    .max(300, "Summary must be less than 300 characters")
+    .optional(),
+  estimatedReadTime: z.coerce.number()
+    .min(1, "Read time must be at least 1 minute")
+    .max(60, "Read time must be less than 60 minutes"),
+  category: z.enum(["Written Content", "Resource", "Interactive Content"], {
+    required_error: "Please select a category"
+  })
+});
+
+export default function WrittenContentCreator({ 
+  onAdd, 
+  onCancel, 
+  isLoading = false,
+  courseContentSequence = 1 // Add sequence parameter
+}) {
+  const form = useForm({
+    resolver: zodResolver(writtenContentSchema),
+    defaultValues: {
+      title: "",
+      content: "",
+      summary: "",
+      estimatedReadTime: 5,
+      category: "Written Content"
+    }
   });
 
-  const updateField = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  const handleSubmit = async (data) => {
+    try {
+      // Create the content structure expected by the parent
+      const newContent = {
+        contentType: "CourseWritten",
+        courseContent: {
+          courseContentId: `temp_${Date.now()}`, // Temporary ID
+          courseContentTitle: data.title,
+          courseContentCategory: data.category,
+          courseContentType: "CourseWritten",
+          courseContentSequence: courseContentSequence, // Use passed sequence
+          courseContentDuration: data.estimatedReadTime * 60, // Convert minutes to seconds
+          isActive: true,
+          coursecontentIsLicensed: false,
+          metadata: {}
+        },
+        courseWritten: {
+          courseWrittenTitle: data.title, // Matches CourseWritten.courseWrittenTitle field
+          courseWrittenContent: data.content,
+          courseWrittenDescription: data.summary, // Use summary as description
+          metadata: {
+            estimatedReadTime: data.estimatedReadTime,
+            wordCount: data.content.split(' ').length,
+            lastUpdated: new Date().toISOString()
+          }
+        }
+      };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!formData.title.trim()) {
-      alert("Please enter a title");
-      return;
+      await onAdd?.(newContent);
+    } catch (error) {
+      console.error("Error submitting written content:", error);
     }
-    
-    // Create the content structure expected by the parent
-    const newContent = {
-      contentType: "CourseWritten",
-      courseContent: {
-        courseContentId: `temp_${Date.now()}`, // Temporary ID
-        courseContentTitle: formData.title,
-        courseContentCategory: formData.category,
-        courseContentDuration: formData.estimatedReadTime * 60, // Convert minutes to seconds
-        isActive: true,
-        coursecontentIsLicensed: false
-      },
-      courseWritten: {
-        courseWrittenContent: formData.content,
-        courseWrittenSummary: formData.summary,
-        estimatedReadTime: formData.estimatedReadTime
-      }
-    };
-
-    await onAdd?.(newContent);
   };
 
   return (
@@ -58,92 +106,162 @@ export default function WrittenContentCreator({ onAdd, onCancel, isLoading = fal
             <p className="text-sm text-gray-600">Create a new article or written lesson</p>
           </div>
         </div>
- 
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid gap-4">
-          <div>
-            <Label htmlFor="written-title">Title *</Label>
-            <Input
-              id="written-title"
-              value={formData.title}
-              onChange={(e) => updateField("title", e.target.value)}
-              placeholder="Enter article title"
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="written-summary">Summary</Label>
-            <Textarea
-              id="written-summary"
-              value={formData.summary}
-              onChange={(e) => updateField("summary", e.target.value)}
-              placeholder="Brief summary of the content"
-              rows={2}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="written-content">Content *</Label>
-            <Textarea
-              id="written-content"
-              value={formData.content}
-              onChange={(e) => updateField("content", e.target.value)}
-              placeholder="Write your content here... (supports Markdown)"
-              rows={10}
-              className="font-mono text-sm"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              You can use Markdown formatting (# headers, **bold**, *italic*, etc.)
-            </p>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <div className="grid gap-4">
+            {/* Title Field */}
             <div>
-              <Label htmlFor="written-readtime">Estimated Read Time (minutes)</Label>
-              <Input
-                id="written-readtime"
-                type="number"
-                min="1"
-                value={formData.estimatedReadTime}
-                onChange={(e) => updateField("estimatedReadTime", parseInt(e.target.value) || 5)}
-                placeholder="5"
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title *</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Enter article title" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
 
+            {/* Summary Field */}
             <div>
-              <Label htmlFor="written-category">Category</Label>
-              <select
-                id="written-category"
-                value={formData.category}
-                onChange={(e) => updateField("category", e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="Written Content">Written Content</option>
-                <option value="Resource">Resource</option>
-                <option value="Interactive Content">Interactive Content</option>
-              </select>
+              <FormField
+                control={form.control}
+                name="summary"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Summary</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Brief summary of the content"
+                        rows={2}
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Optional brief summary for the written content
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Content Field */}
+            <div>
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Content *</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Write your content here... (supports Markdown)"
+                        rows={10}
+                        className="font-mono text-sm"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      You can use Markdown formatting (# headers, **bold**, *italic*, etc.)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Read Time and Category */}
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <FormField
+                  control={form.control}
+                  name="estimatedReadTime"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Estimated Read Time (minutes)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number"
+                          min="1"
+                          max="60"
+                          placeholder="5"
+                          {...field}
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || 5)}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Time in minutes (1-60)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div>
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a category" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Written Content">Written Content</SelectItem>
+                          <SelectItem value="Resource">Resource</SelectItem>
+                          <SelectItem value="Interactive Content">Interactive Content</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="flex items-center gap-3 pt-4 border-t">
-          <Button
-            type="submit"
-            disabled={isLoading}
-            className="bg-green-600 hover:bg-green-700"
-          >
-            {isLoading ? (
-              <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            ) : (
-              <Save className="h-4 w-4 mr-2" />
+          <div className="flex items-center gap-3 pt-4 border-t">
+            <Button
+              type="submit"
+              disabled={isLoading || form.formState.isSubmitting}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {isLoading || form.formState.isSubmitting ? (
+                <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              Add Written Content
+            </Button>
+            
+            {onCancel && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                disabled={isLoading || form.formState.isSubmitting}
+              >
+                Cancel
+              </Button>
             )}
-            Add Written Content
-          </Button>
-        </div>
-      </form>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }

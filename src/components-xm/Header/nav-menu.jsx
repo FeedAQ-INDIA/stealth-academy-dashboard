@@ -91,26 +91,17 @@ function NavigationMenuDemo({ orientation }) {
         </NavigationMenuItem>
 
 
-        {/* <NavigationMenuItem className={orientation === 'vertical' ? 'w-full' : 'flex-1 sm:flex-none'}>
-                    <Link to="/explore" className="w-full block">
-                        <Button
-                            className="w-full justify-center"
-                            variant={location.pathname.includes('explore') ? 'secondary' : 'ghost'}
-                        >
-                            LIVE LEARNING
-                        </Button>
-                    </Link>
-                </NavigationMenuItem> */}
+ 
         <NavigationMenuItem
           className={
             orientation === "vertical" ? "w-full" : "flex-1 sm:flex-none"
           }
         >
-          <Link to="/bring-your-own-course" className="w-full block">
+          <Link to="/course-builder" className="w-full block">
             <Button
               className="w-full justify-center px-2"
               variant={
-                location.pathname === "/bring-your-own-course"
+                location.pathname === "/course-builder"
                   ? "secondary"
                   : "ghost"
               }

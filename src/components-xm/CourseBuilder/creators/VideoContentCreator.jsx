@@ -1,53 +1,116 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Video, X, Save } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Video, Save } from "lucide-react";
 
-export default function VideoContentCreator({ onAdd, onCancel, isLoading = false }) {
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    videoUrl: "",
-    duration: 0,
-    thumbnailUrl: "",
-    isPreview: false,
-    category: "Video Content"
+// Zod schema for video content validation
+const videoContentSchema = z.object({
+  title: z.string()
+    .min(1, "Title is required")
+    .min(3, "Title must be at least 3 characters")
+    .max(100, "Title must be less than 100 characters"),
+  description: z.string()
+    .max(500, "Description must be less than 500 characters")
+    .optional(),
+  videoUrl: z.string()
+    .url("Please enter a valid URL")
+    .refine((url) => {
+      // Basic validation for common video platforms
+      const videoPatterns = [
+        /youtube\.com\/watch\?v=/,
+        /youtu\.be\//,
+        /vimeo\.com\//,
+        /\.mp4$/,
+        /\.webm$/,
+        /\.ogg$/
+      ];
+      return videoPatterns.some(pattern => pattern.test(url));
+    }, "Please enter a valid video URL (YouTube, Vimeo, or direct video file)")
+    .optional()
+    .or(z.literal("")),
+  duration: z.coerce.number()
+    .min(0, "Duration must be 0 or greater")
+    .max(86400, "Duration must be less than 24 hours"), // 24 hours in seconds
+  thumbnailUrl: z.string()
+    .url("Please enter a valid thumbnail URL")
+    .optional()
+    .or(z.literal("")),
+  category: z.enum(["Video Content", "Interactive Content", "Resource"], {
+    required_error: "Please select a category"
+  }),
+  isPreview: z.boolean().default(false)
+});
+
+export default function VideoContentCreator({ 
+  onAdd, 
+  onCancel, 
+  isLoading = false,
+  courseContentSequence = 1 // Add sequence parameter
+}) {
+  const form = useForm({
+    resolver: zodResolver(videoContentSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      videoUrl: "",
+      duration: 0,
+      thumbnailUrl: "",
+      isPreview: false,
+      category: "Video Content"
+    }
   });
 
-  const updateField = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  const handleSubmit = async (data) => {
+    try {
+      // Create the content structure expected by the parent
+      const newContent = {
+        contentType: "CourseVideo",
+        courseContent: {
+          courseContentId: `temp_${Date.now()}`, // Temporary ID
+          courseContentTitle: data.title,
+          courseContentCategory: data.category,
+          courseContentType: "CourseVideo",
+          courseContentSequence: courseContentSequence, // Use passed sequence
+          courseContentDuration: data.duration,
+          isActive: true,
+          coursecontentIsLicensed: false,
+          metadata: {}
+        },
+        courseVideo: {
+          courseVideoTitle: data.title, // Matches CourseVideo.courseVideoTitle field
+          courseVideoUrl: data.videoUrl,
+          courseVideoDescription: data.description,
+          duration: data.duration,
+          thumbnailUrl: data.thumbnailUrl,
+          isPreview: data.isPreview,
+          metadata: {} // Default empty metadata
+        }
+      };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!formData.title.trim()) {
-      alert("Please enter a title");
-      return;
+      await onAdd?.(newContent);
+    } catch (error) {
+      console.error("Error submitting video content:", error);
     }
-    
-    // Create the content structure expected by the parent
-    const newContent = {
-      contentType: "CourseVideo",
-      courseContent: {
-        courseContentId: `temp_${Date.now()}`, // Temporary ID
-        courseContentTitle: formData.title,
-        courseContentCategory: formData.category,
-        courseContentDuration: formData.duration,
-        isActive: true,
-        coursecontentIsLicensed: false
-      },
-      courseVideo: {
-        courseVideoUrl: formData.videoUrl,
-        courseVideoDescription: formData.description,
-        duration: formData.duration,
-        thumbnailUrl: formData.thumbnailUrl,
-        isPreview: formData.isPreview
-      }
-    };
-
-    await onAdd?.(newContent);
   };
 
   return (
@@ -62,109 +125,207 @@ export default function VideoContentCreator({ onAdd, onCancel, isLoading = false
             <p className="text-sm text-gray-600">Create a new video lesson</p>
           </div>
         </div>
- 
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="md:col-span-2">
-            <Label htmlFor="video-title">Title *</Label>
-            <Input
-              id="video-title"
-              value={formData.title}
-              onChange={(e) => updateField("title", e.target.value)}
-              placeholder="Enter video title"
-              required
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <Label htmlFor="video-description">Description</Label>
-            <Textarea
-              id="video-description"
-              value={formData.description}
-              onChange={(e) => updateField("description", e.target.value)}
-              placeholder="Enter video description"
-              rows={3}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="video-url">Video URL</Label>
-            <Input
-              id="video-url"
-              type="url"
-              value={formData.videoUrl}
-              onChange={(e) => updateField("videoUrl", e.target.value)}
-              placeholder="https://youtube.com/watch?v=..."
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="video-thumbnail">Thumbnail URL</Label>
-            <Input
-              id="video-thumbnail"
-              type="url"
-              value={formData.thumbnailUrl}
-              onChange={(e) => updateField("thumbnailUrl", e.target.value)}
-              placeholder="https://example.com/thumbnail.jpg"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="video-duration">Duration (seconds)</Label>
-            <Input
-              id="video-duration"
-              type="number"
-              min="0"
-              value={formData.duration}
-              onChange={(e) => updateField("duration", parseInt(e.target.value) || 0)}
-              placeholder="300"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="video-category">Category</Label>
-            <select
-              id="video-category"
-              value={formData.category}
-              onChange={(e) => updateField("category", e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value="Video Content">Video Content</option>
-              <option value="Interactive Content">Interactive Content</option>
-              <option value="Resource">Resource</option>
-            </select>
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={formData.isPreview}
-                onChange={(e) => updateField("isPreview", e.target.checked)}
-                className="rounded"
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            {/* Title Field */}
+            <div className="md:col-span-2">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title *</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Enter video title" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              Make this video available as preview
-            </label>
-          </div>
-        </div>
+            </div>
 
-        <div className="flex items-center gap-3 pt-4 border-t">
-          <Button
-            type="submit"
-            disabled={isLoading}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            {isLoading ? (
-              <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            ) : (
-              <Save className="h-4 w-4 mr-2" />
+            {/* Description Field */}
+            <div className="md:col-span-2">
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Enter video description"
+                        rows={3}
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Optional description for the video content
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Video URL Field */}
+            <div>
+              <FormField
+                control={form.control}
+                name="videoUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Video URL</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="url"
+                        placeholder="https://youtube.com/watch?v=..."
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      YouTube, Vimeo, or direct video file URL
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Thumbnail URL Field */}
+            <div>
+              <FormField
+                control={form.control}
+                name="thumbnailUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Thumbnail URL</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="url"
+                        placeholder="https://example.com/thumbnail.jpg"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Duration Field */}
+            <div>
+              <FormField
+                control={form.control}
+                name="duration"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Duration (seconds)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number"
+                        min="0"
+                        max="86400"
+                        placeholder="300"
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Duration in seconds (max 24 hours)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Category Field */}
+            <div>
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Video Content">Video Content</SelectItem>
+                        <SelectItem value="Interactive Content">Interactive Content</SelectItem>
+                        <SelectItem value="Resource">Resource</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Preview Checkbox */}
+            <div className="md:col-span-2">
+              <FormField
+                control={form.control}
+                name="isPreview"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>
+                        Make this video available as preview
+                      </FormLabel>
+                      <FormDescription>
+                        Preview videos can be watched without enrollment
+                      </FormDescription>
+                    </div>
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 pt-4 border-t">
+            <Button
+              type="submit"
+              disabled={isLoading || form.formState.isSubmitting}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {isLoading || form.formState.isSubmitting ? (
+                <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              Add Video Content
+            </Button>
+            
+            {onCancel && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                disabled={isLoading || form.formState.isSubmitting}
+              >
+                Cancel
+              </Button>
             )}
-            Add Video Content
-          </Button>
-        </div>
-      </form>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }

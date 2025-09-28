@@ -1,110 +1,145 @@
-import { useState } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { BookOpen, X, Save, Plus, Trash2 } from "lucide-react";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { BookOpen, Save, Plus, Trash2 } from "lucide-react";
+
+// Zod schema for flashcard content validation
+const flashcardSchema = z.object({
+  front: z.string()
+    .min(1, "Question is required")
+    .min(2, "Question must be at least 2 characters")
+    .max(500, "Question must be less than 500 characters"),
+  back: z.string()
+    .min(1, "Answer is required")
+    .min(2, "Answer must be at least 2 characters")
+    .max(1000, "Answer must be less than 1000 characters"),
+  hint: z.string()
+    .max(200, "Explanation must be less than 200 characters")
+    .optional()
+});
+
+const flashcardContentSchema = z.object({
+  title: z.string()
+    .min(1, "Title is required")
+    .min(3, "Title must be at least 3 characters")
+    .max(100, "Title must be less than 100 characters"),
+  description: z.string()
+    .max(500, "Description must be less than 500 characters")
+    .optional(),
+  category: z.enum(["Interactive Content", "Practice", "Resource"], {
+    required_error: "Please select a category"
+  }),
+  cards: z.array(flashcardSchema)
+    .min(1, "Must have at least one flashcard")
+    .max(100, "Cannot exceed 100 flashcards")
+});
 
 export default function FlashcardContentCreator({
   onAdd,
   onCancel,
   isLoading = false,
+  courseContentSequence = 1 // Add sequence parameter
 }) {
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    category: "Interactive Content",
-    cards: [
-      {
-        id: 1,
-        front: "",
-        back: "",
-        hint: "",
-      },
-    ],
+  const form = useForm({
+    resolver: zodResolver(flashcardContentSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      category: "Interactive Content",
+      cards: [
+        {
+          front: "",
+          back: "",
+          hint: "",
+        },
+      ],
+    }
   });
 
-  const updateField = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "cards"
+  });
 
-  const updateCard = (index, field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      cards: prev.cards.map((card, i) =>
-        i === index ? { ...card, [field]: value } : card
-      ),
-    }));
+  const handleSubmit = async (data) => {
+    try {
+      // Calculate estimated study time (2 minutes per card)
+      const estimatedDuration = data.cards.length * 120;
+
+      // Create the content structure expected by the parent
+      const newContent = {
+        contentType: "CourseFlashcard",
+        courseContent: {
+          courseContentId: `temp_${Date.now()}`, // Temporary ID
+          courseContentTitle: data.title,
+          courseContentCategory: data.category,
+          courseContentType: "CourseFlashcard",
+          courseContentSequence: courseContentSequence, // Use passed sequence
+          courseContentDuration: estimatedDuration,
+          isActive: true,
+          coursecontentIsLicensed: false,
+          metadata: {}
+        },
+        courseFlashcard: {
+          setTitle: data.title, // Matches CourseFlashcard.setTitle field
+          setDescription: data.description, // Matches CourseFlashcard.setDescription field
+          setDifficulty: "MEDIUM", // Default difficulty
+          setTags: [], // Default empty tags
+          estimatedDuration: Math.ceil(data.cards.length * 2), // 2 minutes per card in minutes
+          cardCount: data.cards.length,
+          cards: data.cards.map((card, index) => ({
+            question: card.front, // Matches Flashcard.question field
+            answer: card.back, // Matches Flashcard.answer field
+            explanation: card.hint, // Matches Flashcard.explanation field
+            difficulty: "MEDIUM", // Default difficulty
+            cardType: "BASIC", // Default card type
+            hints: card.hint ? [card.hint] : [], // Convert hint to hints array
+            orderIndex: index + 1, // Matches Flashcard.orderIndex field
+          })),
+        },
+      };
+
+      await onAdd?.(newContent);
+    } catch (error) {
+      console.error("Error submitting flashcard content:", error);
+    }
   };
 
   const addCard = () => {
-    const newCard = {
-      id: formData.cards.length + 1,
+    append({
       front: "",
       back: "",
       hint: "",
-    };
-    setFormData((prev) => ({
-      ...prev,
-      cards: [...prev.cards, newCard],
-    }));
+    });
   };
 
   const removeCard = (index) => {
-    if (formData.cards.length > 1) {
-      setFormData((prev) => ({
-        ...prev,
-        cards: prev.cards.filter((_, i) => i !== index),
-      }));
+    if (fields.length > 1) {
+      remove(index);
     }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!formData.title.trim()) {
-      alert("Please enter a title");
-      return;
-    }
-
-    const hasValidCards = formData.cards.every(
-      (card) => card.front.trim() && card.back.trim()
-    );
-
-    if (!hasValidCards) {
-      alert("Please fill in the front and back of all flashcards");
-      return;
-    }
-
-    // Calculate estimated study time (2 minutes per card)
-    const estimatedDuration = formData.cards.length * 120;
-
-    // Create the content structure expected by the parent
-    const newContent = {
-      contentType: "CourseFlashcard",
-      courseContent: {
-        courseContentId: `temp_${Date.now()}`, // Temporary ID
-        courseContentTitle: formData.title,
-        courseContentCategory: formData.category,
-        courseContentDuration: estimatedDuration,
-        isActive: true,
-        coursecontentIsLicensed: false,
-      },
-      courseFlashcard: {
-        courseFlashcardDescription: formData.description,
-        cardCount: formData.cards.length,
-        cards: formData.cards.map((card) => ({
-          front: card.front,
-          back: card.back,
-          hint: card.hint,
-        })),
-      },
-    };
-
-    await onAdd?.(newContent);
   };
 
   return (
-    <div className="space-y-6 ">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
@@ -121,162 +156,223 @@ export default function FlashcardContentCreator({
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Flashcard Set Settings */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-900">
-            Flashcard Set Settings
-          </h3>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="md:col-span-2">
-              <Label htmlFor="flashcard-title">Title *</Label>
-              <Input
-                id="flashcard-title"
-                value={formData.title}
-                onChange={(e) => updateField("title", e.target.value)}
-                placeholder="Enter flashcard set title"
-                required
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <Label htmlFor="flashcard-description">Description</Label>
-              <Textarea
-                id="flashcard-description"
-                value={formData.description}
-                onChange={(e) => updateField("description", e.target.value)}
-                placeholder="Brief description of this flashcard set"
-                rows={2}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="flashcard-category">Category</Label>
-              <select
-                id="flashcard-category"
-                value={formData.category}
-                onChange={(e) => updateField("category", e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="Interactive Content">Interactive Content</option>
-                <option value="Practice">Practice</option>
-                <option value="Resource">Resource</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Flashcards */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          {/* Flashcard Set Settings */}
+          <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-900">
-              Flashcards ({formData.cards.length} cards)
+              Flashcard Set Settings
             </h3>
-            <Button type="button" onClick={addCard} size="sm" variant="outline">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Card
-            </Button>
-          </div>
 
-          {formData.cards.map((card, index) => (
-            <div key={card.id} className="border rounded-lg p-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <h4 className="font-medium">Card {index + 1}</h4>
-                {formData.cards.length > 1 && (
-                  <Button
-                    type="button"
-                    onClick={() => removeCard(index)}
-                    size="sm"
-                    variant="ghost"
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <Label htmlFor={`card-front-${index}`}>Front Side *</Label>
-                  <Textarea
-                    id={`card-front-${index}`}
-                    value={card.front}
-                    onChange={(e) => updateCard(index, "front", e.target.value)}
-                    placeholder="Question, term, or concept"
-                    rows={3}
-                    className="resize-none"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor={`card-back-${index}`}>Back Side *</Label>
-                  <Textarea
-                    id={`card-back-${index}`}
-                    value={card.back}
-                    onChange={(e) => updateCard(index, "back", e.target.value)}
-                    placeholder="Answer, definition, or explanation"
-                    rows={3}
-                    className="resize-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor={`card-hint-${index}`}>Hint (optional)</Label>
-                <Input
-                  id={`card-hint-${index}`}
-                  value={card.hint}
-                  onChange={(e) => updateCard(index, "hint", e.target.value)}
-                  placeholder="Optional hint to help with the answer"
+            <div className="grid gap-4 md:grid-cols-2">
+              {/* Title Field */}
+              <div className="md:col-span-2">
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Enter flashcard set title" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
 
-              {/* Card Preview */}
-              <div className="mt-4 p-3 bg-gray-50 rounded-md">
-                <p className="text-xs text-gray-600 mb-2">Preview:</p>
-                <div className="grid gap-2 md:grid-cols-2 text-sm">
-                  <div className="bg-white p-2 rounded border">
-                    <p className="font-medium text-gray-600 text-xs mb-1">
-                      FRONT
-                    </p>
-                    <p className="text-gray-900">{card.front || "Empty"}</p>
-                  </div>
-                  <div className="bg-white p-2 rounded border">
-                    <p className="font-medium text-gray-600 text-xs mb-1">
-                      BACK
-                    </p>
-                    <p className="text-gray-900">{card.back || "Empty"}</p>
-                  </div>
-                </div>
-                {card.hint && (
-                  <div className="mt-2 bg-blue-50 p-2 rounded border-l-2 border-blue-200">
-                    <p className="font-medium text-blue-600 text-xs mb-1">
-                      HINT
-                    </p>
-                    <p className="text-blue-800 text-sm">{card.hint}</p>
-                  </div>
-                )}
+              {/* Description Field */}
+              <div className="md:col-span-2">
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Brief description of this flashcard set"
+                          rows={2}
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Optional description for the flashcard set
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Category Field */}
+              <div>
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a category" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Interactive Content">Interactive Content</SelectItem>
+                          <SelectItem value="Practice">Practice</SelectItem>
+                          <SelectItem value="Resource">Resource</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
             </div>
-          ))}
-        </div>
+          </div>
 
-        <div className="flex items-center gap-3 pt-4 border-t">
-          <Button
-            type="submit"
-            disabled={isLoading}
-            className="bg-yellow-600 hover:bg-yellow-700"
-          >
-            {isLoading ? (
-              <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            ) : (
-              <Save className="h-4 w-4 mr-2" />
+          {/* Flashcards */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-medium text-gray-900">
+                Flashcards ({fields.length} cards)
+              </h3>
+              <Button 
+                type="button" 
+                onClick={addCard} 
+                size="sm" 
+                variant="outline"
+                disabled={fields.length >= 100}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Card
+              </Button>
+            </div>
+
+            {fields.map((field, index) => (
+              <div key={field.id} className="border rounded-lg p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium">Card {index + 1}</h4>
+                  {fields.length > 1 && (
+                    <Button
+                      type="button"
+                      onClick={() => removeCard(index)}
+                      size="sm"
+                      variant="ghost"
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  {/* Question Side */}
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name={`cards.${index}.front`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Question *</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Question, term, or concept"
+                              rows={3}
+                              className="resize-none"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Answer Side */}
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name={`cards.${index}.back`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Answer *</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Answer, definition, or explanation"
+                              rows={3}
+                              className="resize-none"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Explanation Field */}
+                <div>
+                  <FormField
+                    control={form.control}
+                    name={`cards.${index}.hint`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Explanation (optional)</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Optional explanation to help with understanding"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Optional explanation that can help students understand the answer
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+          
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-3 pt-4 border-t">
+            <Button
+              type="submit"
+              disabled={isLoading || form.formState.isSubmitting}
+              className="bg-yellow-600 hover:bg-yellow-700"
+            >
+              {isLoading || form.formState.isSubmitting ? (
+                <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              Add Flashcard Set
+            </Button>
+            
+            {onCancel && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                disabled={isLoading || form.formState.isSubmitting}
+              >
+                Cancel
+              </Button>
             )}
-            Add Flashcard Set
-          </Button>
-        </div>
-      </form>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }
