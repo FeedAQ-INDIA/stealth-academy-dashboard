@@ -293,17 +293,17 @@ export default function PreviewBuilder() {
       </div>
 
       {/* Course Content with inline editing */}
-      <Card>
-        <CardHeader>
+      <div>
+        <div>
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
+            <h3 className="flex items-center gap-2 font-semibold text-lg">
               <Video className="h-5 w-5" />
               Course Content ({courseContent?.length || 0} items)
-            </CardTitle>
+            </h3>
             <ContentTypeSelector onSelectType={handleSelectContentType} disabled={isLoading} />
           </div>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div className="mt-4">
           {(!courseContent || courseContent.length === 0) ? (
             <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
               <Video className="h-12 w-12 mx-auto text-gray-400 mb-4" />
@@ -314,7 +314,7 @@ export default function PreviewBuilder() {
           ) : (
             <div className="space-y-3">
               {courseContent?.map((content, index) => (
-                <div key={content.courseContent.courseContentId} className="border rounded-lg bg-gray-50">
+                <div key={content.courseContent.courseContentId} className="border rounded-lg bg-white">
                   <div className="flex items-start gap-4 p-4 hover:bg-gray-100 transition-colors">
                     <div className="flex flex-col items-center gap-2">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-xs ${getContentTypeColor(content.contentType)}`}>
@@ -405,8 +405,8 @@ export default function PreviewBuilder() {
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Add Content Sheet */}
       <Sheet open={addContentSheetOpen} onOpenChange={setAddContentSheetOpen}>
