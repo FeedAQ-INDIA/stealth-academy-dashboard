@@ -16,8 +16,7 @@ import {Separator} from "@/components/ui/separator.jsx";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
 import {BookOpen, CircleArrowLeft, CircleArrowRight, User, Settings, Shield, CreditCard, Bell, UserCircle, LogOut, ShoppingBag, ChevronLeft, ChevronRight} from "lucide-react";
 import {Link, useLocation, useNavigate} from "react-router-dom";
-import { userProfileSchema } from "@/lib/validationSchemas";
-
+ 
 // Custom schema for account settings (simpler than full user profile)
 const createAccountSchema = z.object({
     firstName: z.string().min(1, "First name is required").min(2, "First name must be at least 2 characters"),

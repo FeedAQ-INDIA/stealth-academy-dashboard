@@ -17,22 +17,7 @@ import WrittenFields from './fields/WrittenFields';
 import QuizFields from './fields/QuizFields';
 import FlashcardFields from './fields/FlashcardFields';
 
-/*
-AddContentSheet
-High-level full screen sheet for creating / editing a course content item.
-Delegates subtype specific fields to dedicated components (VideoFields, WrittenFields, etc.).
 
-Props:
-  open:boolean
-  onClose:() => void
-  content: unified content object shape { courseContent, contentType, courseVideo?, courseWritten? ... }
-  updateCourseContent:(id, field, value) => void   // core + certain legacy subtype updates
-  updateContentType:(id, legacyToken, enumValue) => void // switches subtype
-  updateSubtypeField?:(id, field, value) => void   // optional refined updater
-  onSave:() => Promise<void>|void
-  isLoading:boolean
-  formatDuration:(seconds:number)=>string
-*/
 export default function AddContentSheet({
   open,
   onClose,
@@ -42,7 +27,6 @@ export default function AddContentSheet({
   onSave,
   isLoading,
   formatDuration,
-  // New generic updater for subtype fields if available (fallback to updateCourseContent)
   updateSubtypeField
 }) {
   const contentId = content?.courseContent?.courseContentId;
