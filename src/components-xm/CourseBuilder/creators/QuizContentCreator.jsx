@@ -28,13 +28,31 @@ const questionSchema = z.object({
   question: z.string()
     .min(1, "Question is required")
     .min(10, "Question must be at least 10 characters"),
-  type: z.literal("multiple-choice").default("multiple-choice"),
-  options: z.array(z.string().min(1, "Option cannot be empty"))
-    .length(4, "Must have exactly 4 options"),
-  correctAnswer: z.number()
-    .min(0, "Must select a correct answer")
-    .max(3, "Invalid answer selection"),
+  type: z.enum(["SINGLE_CHOICE", "MULTIPLE_CHOICE", "INPUT_BOX"], {
+    required_error: "Please select a question type"
+  }).default("SINGLE_CHOICE"),
+  options: z.array(z.string()).optional(),
+  correctAnswer: z.union([z.number(), z.string()]).optional(),
   explanation: z.string().optional()
+}).refine((data) => {
+  // INPUT_BOX questions need correct answer but not options
+  if (data.type === "INPUT_BOX") {
+    return data.correctAnswer && typeof data.correctAnswer === "string" && data.correctAnswer.trim() !== "";
+  }
+  
+  // Multiple choice questions need options
+  if (!data.options || data.options.length < 2) {
+    return false;
+  }
+  // Check if all options are filled
+  if (data.options.some(opt => !opt || opt.trim() === "")) {
+    return false;
+  }
+  // Check if correct answer is within range
+  return typeof data.correctAnswer === "number" && data.correctAnswer >= 0 && data.correctAnswer < data.options.length;
+}, {
+  message: "Invalid question configuration",
+  path: ["correctAnswer"]
 });
 
 const quizContentSchema = z.object({
@@ -69,7 +87,8 @@ export default function QuizContentCreator({
   onAdd, 
   onCancel, 
   isLoading = false,
-  courseContentSequence = 1 // Add sequence parameter
+  courseContentSequence = 1, // Add sequence parameter
+  courseId = null // Add courseId parameter for entity requirements
 }) {
   const form = useForm({
     resolver: zodResolver(quizContentSchema),
@@ -83,7 +102,7 @@ export default function QuizContentCreator({
       category: "Assessment",
       questions: [{
         question: "",
-        type: "multiple-choice",
+        type: "SINGLE_CHOICE",
         options: ["", "", "", ""],
         correctAnswer: 0,
         explanation: ""
@@ -124,16 +143,20 @@ export default function QuizContentCreator({
           }
         },
         questions: data.questions.map((q, index) => ({
+          courseId: courseId, // Required field from entity
+          courseQuizId: null, // Will be set after quiz creation
+          courseContentId: null, // Will be set after content creation
           quizQuestionTitle: q.question, // Matches QuizQuestion.quizQuestionTitle field
           quizQuestionNote: q.explanation, // Matches QuizQuestion.quizQuestionNote field
-          quizQuestionType: q.type === "multiple-choice" ? "SINGLE_CHOICE" : "SINGLE_CHOICE", // Map to entity enum
+          quizQuestionType: q.type, // Now directly matches entity enum values
           quizQuestionOption: q.options, // JSONB field for options
-          quizQuestionCorrectAnswer: [q.correctAnswer], // JSONB field, array format
+          quizQuestionCorrectAnswer: [q.correctAnswer], // Index for multiple choice
           quizQuestionPosPoint: 1, // Default positive points
           quizQuestionNegPoint: 0, // Default negative points
           questionSequence: index + 1, // Matches QuizQuestion.questionSequence field
           difficultyLevel: "MEDIUM", // Default difficulty
-          explanation: q.explanation
+          explanation: q.explanation,
+          metadata: {} // Default metadata object
         }))
       };
 
@@ -146,7 +169,7 @@ export default function QuizContentCreator({
   const addQuestion = () => {
     append({
       question: "",
-      type: "multiple-choice",
+      type: "SINGLE_CHOICE",
       options: ["", "", "", ""],
       correctAnswer: 0,
       explanation: ""
@@ -409,51 +432,161 @@ export default function QuizContentCreator({
                   )}
                 />
 
+                {/* Question Type */}
+                <FormField
+                  control={form.control}
+                  name={`questions.${index}.type`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Question Type</FormLabel>
+                      <Select 
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          // Handle different question types
+                          if (value === "INPUT_BOX") {
+                            // For input box, set empty string as correct answer
+                            form.setValue(`questions.${index}.correctAnswer`, "");
+                            form.setValue(`questions.${index}.options`, []);
+                          } else {
+                            // For multiple choice, ensure we have at least 4 options
+                            const currentQuestion = form.getValues(`questions.${index}`);
+                            if (!currentQuestion.options || currentQuestion.options.length < 4) {
+                              form.setValue(`questions.${index}.options`, ["", "", "", ""]);
+                            }
+                            form.setValue(`questions.${index}.correctAnswer`, 0);
+                          }
+                        }} 
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select question type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="SINGLE_CHOICE">Single Choice</SelectItem>
+                          <SelectItem value="MULTIPLE_CHOICE">Multiple Choice</SelectItem>
+                          <SelectItem value="INPUT_BOX">Input Box</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 {/* Answer Options */}
                 <div className="space-y-3">
-                  <FormLabel>Answer Options *</FormLabel>
-                  <FormField
-                    control={form.control}
-                    name={`questions.${index}.correctAnswer`}
-                    render={({ field: correctAnswerField }) => (
-                      <FormItem>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={(value) => correctAnswerField.onChange(parseInt(value))}
-                            value={correctAnswerField.value.toString()}
+                  {form.watch(`questions.${index}.type`) === "INPUT_BOX" ? (
+                    // Input Box Question - Show correct answer input
+                    <FormField
+                      control={form.control}
+                      name={`questions.${index}.correctAnswer`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Correct Answer *</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter the correct answer"
+                              {...field}
+                              onChange={(e) => field.onChange(e.target.value)}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            The expected answer for this input question
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ) : (
+                    // Multiple Choice Questions - Show options with radio buttons
+                    <>
+                      <div className="flex items-center justify-between">
+                        <FormLabel>Answer Options *</FormLabel>
+                        {form.watch(`questions.${index}.options`)?.length < 6 && (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const currentOptions = form.getValues(`questions.${index}.options`);
+                              form.setValue(`questions.${index}.options`, [...currentOptions, ""]);
+                            }}
                           >
-                            {[0, 1, 2, 3].map((optIndex) => (
-                              <div key={optIndex} className="flex items-center gap-3">
-                                <RadioGroupItem 
-                                  value={optIndex.toString()} 
-                                  id={`q${index}-opt${optIndex}`}
-                                />
-                                <FormField
-                                  control={form.control}
-                                  name={`questions.${index}.options.${optIndex}`}
-                                  render={({ field: optionField }) => (
-                                    <FormItem className="flex-1">
-                                      <FormControl>
-                                        <Input
-                                          placeholder={`Option ${optIndex + 1}`}
-                                          {...optionField}
-                                        />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                              </div>
-                            ))}
-                          </RadioGroup>
-                        </FormControl>
-                        <FormDescription>
-                          Select the radio button for the correct answer
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                            <Plus className="h-4 w-4 mr-1" />
+                            Add Option
+                          </Button>
+                        )}
+                      </div>
+                      
+                      <FormField
+                        control={form.control}
+                        name={`questions.${index}.correctAnswer`}
+                        render={({ field: correctAnswerField }) => {
+                          const watchedOptions = form.watch(`questions.${index}.options`) || [];
+                          
+                          return (
+                            <FormItem>
+                              <FormControl>
+                                <RadioGroup
+                                  onValueChange={(value) => correctAnswerField.onChange(parseInt(value))}
+                                  value={correctAnswerField.value?.toString() || "0"}
+                                >
+                                  {watchedOptions.map((option, optIndex) => (
+                                    <div key={optIndex} className="flex items-center gap-3">
+                                      <RadioGroupItem 
+                                        value={optIndex.toString()} 
+                                        id={`q${index}-opt${optIndex}`}
+                                      />
+                                      <FormField
+                                        control={form.control}
+                                        name={`questions.${index}.options.${optIndex}`}
+                                        render={({ field: optionField }) => (
+                                          <FormItem className="flex-1">
+                                            <FormControl>
+                                              <Input
+                                                placeholder={`Option ${optIndex + 1}`}
+                                                {...optionField}
+                                              />
+                                            </FormControl>
+                                            <FormMessage />
+                                          </FormItem>
+                                        )}
+                                      />
+                                      {watchedOptions.length > 2 && (
+                                        <Button
+                                          type="button"
+                                          size="sm"
+                                          variant="ghost"
+                                          className="text-red-500 hover:text-red-700"
+                                          onClick={() => {
+                                            const currentOptions = form.getValues(`questions.${index}.options`);
+                                            const newOptions = currentOptions.filter((_, i) => i !== optIndex);
+                                            form.setValue(`questions.${index}.options`, newOptions);
+                                            // Adjust correct answer if needed
+                                            const currentCorrect = form.getValues(`questions.${index}.correctAnswer`);
+                                            if (currentCorrect >= newOptions.length) {
+                                              form.setValue(`questions.${index}.correctAnswer`, Math.max(0, newOptions.length - 1));
+                                            }
+                                          }}
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      )}
+                                    </div>
+                                  ))}
+                                </RadioGroup>
+                              </FormControl>
+                              <FormDescription>
+                                Select the radio button for the correct answer
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          );
+                        }}
+                      />
+                    </>
+                  )}
                 </div>
 
                 {/* Explanation */}
