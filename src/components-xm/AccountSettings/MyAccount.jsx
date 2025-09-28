@@ -16,6 +16,14 @@ import {Separator} from "@/components/ui/separator.jsx";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
 import {BookOpen, CircleArrowLeft, CircleArrowRight, User, Settings, Shield, CreditCard, Bell, UserCircle, LogOut, ShoppingBag, ChevronLeft, ChevronRight} from "lucide-react";
 import {Link, useLocation, useNavigate} from "react-router-dom";
+import { userProfileSchema } from "@/lib/validationSchemas";
+
+// Custom schema for account settings (simpler than full user profile)
+const createAccountSchema = z.object({
+    firstName: z.string().min(1, "First name is required").min(2, "First name must be at least 2 characters"),
+    lastName: z.string().optional(),
+    number: z.string().min(10, "Phone number must be at least 10 digits").optional(),
+});
 
 
 function MyAccount() {
@@ -26,16 +34,7 @@ function MyAccount() {
     const scrollContainerRef = useRef(null);
     const [showLeftArrow, setShowLeftArrow] = useState(false);
     const [showRightArrow, setShowRightArrow] = useState(false);
- 
 
-    const createAccountSchema = z.object({
-        firstName: z.string()
-            .min(1, "Name must be at least one character long."),
-        lastName: z.string().optional(),
-        number: z
-            .string()
-            .length(10, "Phone number must be 10 digits.")
-     });
     const createAccountForm = useForm({
         resolver: zodResolver(createAccountSchema),
         defaultValues: {firstName: "", lastName: "", number: ''},

@@ -1,22 +1,57 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { toast } from "@/components/hooks/use-toast.js";
 import axiosConn from "@/axioscon";
 import byoc1 from "@/assets/byoc_1.png";
 
+// Zod validation schema for bring your own course
+const byocSchema = z.object({
+  courseTitle: z
+    .string()
+    .min(1, "Course title is required")
+    .min(3, "Course title must be at least 3 characters")
+    .max(100, "Course title must not exceed 100 characters"),
+  courseDescription: z
+    .string()
+    .max(500, "Course description must not exceed 500 characters")
+    .optional(),
+  urls: z
+    .array(z.string().url("Please enter a valid URL"))
+    .min(1, "At least one URL is required"),
+});
+
 export default function BringYourOwnCourse() {
   const [urls, setUrls] = useState([""]);
-  const [courseTitle, setCourseTitle] = useState("");
-  const [courseDescription, setCourseDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   
   // Course preview state
   const [courseStructure, setCourseStructure] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
+
+  // Initialize form with Zod validation
+  const form = useForm({
+    resolver: zodResolver(byocSchema),
+    defaultValues: {
+      courseTitle: "",
+      courseDescription: "",
+      urls: [""],
+    },
+  });
 
   // Helpers
   const isValidHttpUrl = (value) => {
@@ -32,19 +67,30 @@ export default function BringYourOwnCourse() {
     const newUrls = [...urls];
     newUrls[index] = value;
     setUrls(newUrls);
+    // Update form state
+    form.setValue('urls', newUrls.filter(url => url.trim() !== ""));
   };
 
-  const addUrlField = () => setUrls([...urls, ""]);
+  const addUrlField = () => {
+    const newUrls = [...urls, ""];
+    setUrls(newUrls);
+  };
+
   const removeUrlField = (index) => {
     const newUrls = urls.filter((_, i) => i !== index);
     setUrls(newUrls);
+    // Update form state
+    form.setValue('urls', newUrls.filter(url => url.trim() !== ""));
   };
 
   // Helper function to reset form
   const resetForm = () => {
     setUrls([""]);
-    setCourseTitle("");
-    setCourseDescription("");
+    form.reset({
+      courseTitle: "",
+      courseDescription: "",
+      urls: [""],
+    });
     setCourseStructure(null);
     setShowPreview(false);
   };
@@ -149,50 +195,20 @@ export default function BringYourOwnCourse() {
     );
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const onSubmit = async (data) => {
     // Validate inputs
     const deduped = Array.from(
-      new Set(urls.map((u) => u.trim()).filter((u) => u !== ""))
+      new Set(data.urls.map((u) => u.trim()).filter((u) => u !== ""))
     );
     const validUrls = deduped;
-    if (validUrls.length === 0) {
-      toast({
-        title: "Please enter at least one URL",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!courseTitle.trim()) {
-      toast({
-        title: "Please enter a course title",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Generic URL validation (allow both YouTube and non-YouTube http/https links)
-    const invalidUrls = validUrls.filter((url) => !isValidHttpUrl(url));
-    if (invalidUrls.length > 0) {
-      toast({
-        title: "Please enter valid http(s) URLs",
-        description: `Invalid: ${invalidUrls.slice(0, 3).join(", ")}${
-          invalidUrls.length > 3 ? " …" : ""
-        }`,
-        variant: "destructive",
-      });
-      return;
-    }
 
     setIsLoading(true);
 
     try {
       const payload = {
         contentUrlsList: validUrls,
-        courseTitle: courseTitle.trim(),
-        courseDescription: courseDescription.trim(),
+        courseTitle: data.courseTitle.trim(),
+        courseDescription: data.courseDescription.trim(),
       };
 
       const response = await axiosConn.post("/createCourseFromUrls", payload);
@@ -241,74 +257,92 @@ export default function BringYourOwnCourse() {
               onEdit={() => setShowPreview(false)}
             />
           ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block font-medium mb-2">Course Title *</label>
-              <Input
-                type="text"
-                placeholder="Enter your course title"
-                value={courseTitle}
-                onChange={(e) => setCourseTitle(e.target.value)}
-                className="mb-4"
-                required
-              />
-            </div>
-            <div>
-              <label className="block font-medium mb-2">
-                Course Description
-              </label>
-              <Textarea
-                placeholder="Enter a brief description of your course (optional)"
-                value={courseDescription}
-                onChange={(e) => setCourseDescription(e.target.value)}
-                className="mb-4 min-h-[100px]"
-                rows={4}
-              />
-            </div>
-            <div>
-              <label className="block font-medium mb-2">
-        Content URLs (YouTube Videos/Playlists or Other Embeddable URLs) *
-              </label>
-              {urls.map((url, idx) => (
-                <div key={idx} className="flex items-center gap-2 mb-2">
-                  <Input
-                    type="url"
-          placeholder={`Enter YouTube or embeddable URL #${
-                      idx + 1
-                    }`}
-                    value={url}
-                    onChange={(e) => handleUrlChange(idx, e.target.value)}
-                    className="flex-1"
-                  />
-                  {urls.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => removeUrlField(idx)}
-                      disabled={isLoading}
-                    >
-                      &times;
-                    </Button>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="courseTitle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Course Title *</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Enter your course title"
+                          disabled={isLoading}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
+                />
+                <FormField
+                  control={form.control}
+                  name="courseDescription"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Course Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          placeholder="Enter a brief description of your course (optional)"
+                          className="min-h-[100px]"
+                          rows={4}
+                          disabled={isLoading}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div>
+                  <label className="block font-medium mb-2">
+                    Content URLs (YouTube Videos/Playlists or Other Embeddable URLs) *
+                  </label>
+                  {urls.map((url, idx) => (
+                    <div key={idx} className="flex items-center gap-2 mb-2">
+                      <Input
+                        type="url"
+                        placeholder={`Enter YouTube or embeddable URL #${idx + 1}`}
+                        value={url}
+                        onChange={(e) => handleUrlChange(idx, e.target.value)}
+                        className="flex-1"
+                        disabled={isLoading}
+                      />
+                      {urls.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          onClick={() => removeUrlField(idx)}
+                          disabled={isLoading}
+                        >
+                          &times;
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addUrlField}
+                    disabled={isLoading}
+                    className="mt-2"
+                  >
+                    Add another URL
+                  </Button>
                 </div>
-              ))}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={addUrlField}
-                disabled={isLoading}
-                className="mt-2"
-              >
-                Add another URL
-              </Button>
-            </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading
-                ? "Analyzing & Building Course..."
-                : "Analyze & Build Course"}
-            </Button>
-          </form>
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={isLoading || !form.formState.isValid}
+                >
+                  {isLoading
+                    ? "Analyzing & Building Course..."
+                    : "Analyze & Build Course"}
+                </Button>
+              </form>
+            </Form>
           )}
         </CardContent>
       </Card>
