@@ -1,4 +1,5 @@
 import { useForm, useFieldArray } from "react-hook-form";
+import { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,7 @@ import {
 } from "@/components/ui/form";
 import { BookOpen, Save, Plus, Trash2 } from "lucide-react";
 
-// Zod schema for flashcard content validation
+// Zod schema aligned with backend entity attributes
 const flashcardSchema = z.object({
   front: z.string()
     .min(1, "Question is required")
@@ -31,23 +32,23 @@ const flashcardSchema = z.object({
   back: z.string()
     .min(1, "Answer is required")
     .min(2, "Answer must be at least 2 characters")
-    .max(1000, "Answer must be less than 1000 characters"),
+    .max(2000, "Answer must be less than 2000 characters"),
   hint: z.string()
-    .max(200, "Explanation must be less than 200 characters")
-    .optional()
+    .max(500, "Explanation must be less than 500 characters")
+    .optional(),
+  difficulty: z.enum(["EASY", "MEDIUM", "HARD"]).default("MEDIUM")
 });
 
 const flashcardContentSchema = z.object({
   title: z.string()
     .min(1, "Title is required")
     .min(3, "Title must be at least 3 characters")
-    .max(100, "Title must be less than 100 characters"),
+    .max(200, "Title must be less than 200 characters"),
   description: z.string()
-    .max(500, "Description must be less than 500 characters")
+    .max(1000, "Description must be less than 1000 characters")
     .optional(),
-  category: z.enum(["Interactive Content", "Practice", "Resource"], {
-    required_error: "Please select a category"
-  }),
+  setDifficulty: z.enum(["EASY", "MEDIUM", "HARD", "MIXED"]).default("MEDIUM"),
+  estimatedDuration: z.coerce.number().int().positive().max(10000).optional(), // minutes
   cards: z.array(flashcardSchema)
     .min(1, "Must have at least one flashcard")
     .max(100, "Cannot exceed 100 flashcards")
@@ -67,16 +68,28 @@ export default function FlashcardContentCreator({
     defaultValues: {
       title: existingContent?.courseContent?.courseContentTitle || existingContent?.courseFlashcard?.setTitle || "",
       description: existingContent?.courseFlashcard?.setDescription || "",
-      category: existingContent?.courseContent?.courseContentCategory || "Interactive Content",
+      setDifficulty: existingContent?.courseFlashcard?.setDifficulty || "MEDIUM",
+      estimatedDuration: existingContent?.courseFlashcard?.estimatedDuration || (existingContent?.courseFlashcard?.cards?.length ? existingContent.courseFlashcard.cards.length * 2 : 2),
       cards: existingContent?.courseFlashcard?.cards?.length
         ? existingContent.courseFlashcard.cards.map(c => ({
             front: c.question,
             back: c.answer,
-            hint: c.explanation || (Array.isArray(c.hints) ? c.hints[0] : "")
+            hint: c.explanation || (Array.isArray(c.hints) ? c.hints[0] : ""),
+            difficulty: c.difficulty || 'MEDIUM'
           }))
-        : [ { front: "", back: "", hint: "" } ],
+        : [ { front: "", back: "", hint: "", difficulty: "MEDIUM" } ],
     }
   });
+
+  const [autoDuration, setAutoDuration] = useState(true);
+
+  // Auto-calculate estimatedDuration = cards.length * 2 (minutes) when enabled
+  const cards = form.watch('cards');
+  useEffect(() => {
+    if (autoDuration) {
+      form.setValue('estimatedDuration', Math.max(1, cards.length * 2));
+    }
+  }, [cards.length, autoDuration]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -85,8 +98,10 @@ export default function FlashcardContentCreator({
 
   const handleSubmit = async (data) => {
     try {
-      // Calculate estimated study time (2 minutes per card)
-      const estimatedDuration = data.cards.length * 120;
+      // Ensure estimatedDuration in minutes (already minutes)
+      const estimatedDuration = data.estimatedDuration || data.cards.length * 2;
+  // Tags removed from UI; preserve existing if editing
+  const tagArray = existingContent?.courseFlashcard?.setTags || [];
 
       // Create the content structure expected by the parent
       const newContent = {
@@ -94,7 +109,7 @@ export default function FlashcardContentCreator({
         courseContent: {
           courseContentId: existingContent?.courseContent?.courseContentId || `temp_${Date.now()}`,
           courseContentTitle: data.title,
-          courseContentCategory: data.category,
+          courseContentCategory: existingContent?.courseContent?.courseContentCategory || "Interactive Content",
           courseContentType: "CourseFlashcard",
           courseContentSequence: existingContent?.courseContent?.courseContentSequence || courseContentSequence,
           courseContentDuration: estimatedDuration,
@@ -103,20 +118,21 @@ export default function FlashcardContentCreator({
           metadata: existingContent?.courseContent?.metadata || {}
         },
         courseFlashcard: {
-          setTitle: data.title, // Matches CourseFlashcard.setTitle field
-          setDescription: data.description, // Matches CourseFlashcard.setDescription field
-          setDifficulty: "MEDIUM", // Default difficulty
-          setTags: [], // Default empty tags
-          estimatedDuration: Math.ceil(data.cards.length * 2), // 2 minutes per card in minutes
+          setTitle: data.title,
+          setDescription: data.description,
+          setDifficulty: data.setDifficulty,
+          setTags: tagArray,
+          estimatedDuration: estimatedDuration,
           cardCount: data.cards.length,
+          metadata: existingContent?.courseFlashcard?.metadata || {},
           cards: data.cards.map((card, index) => ({
-            question: card.front, // Matches Flashcard.question field
-            answer: card.back, // Matches Flashcard.answer field
-            explanation: card.hint, // Matches Flashcard.explanation field
-            difficulty: "MEDIUM", // Default difficulty
-            cardType: "BASIC", // Default card type
-            hints: card.hint ? [card.hint] : [], // Convert hint to hints array
-            orderIndex: index + 1, // Matches Flashcard.orderIndex field
+            question: card.front,
+            answer: card.back,
+            explanation: card.hint,
+            difficulty: card.difficulty || 'MEDIUM',
+            hints: card.hint ? [card.hint] : [],
+            orderIndex: index + 1,
+            metadata: {}
           })),
         },
       };
@@ -215,26 +231,60 @@ export default function FlashcardContentCreator({
                 />
               </div>
 
-              {/* Category Field */}
+              {/* Category field removed per request; using implicit default */}
+              {/* Set Difficulty Field */}
               <div>
                 <FormField
                   control={form.control}
-                  name="category"
+                  name="setDifficulty"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Category</FormLabel>
+                      <FormLabel>Set Difficulty</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select a category" />
+                            <SelectValue placeholder="Select difficulty" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Interactive Content">Interactive Content</SelectItem>
-                          <SelectItem value="Practice">Practice</SelectItem>
-                          <SelectItem value="Resource">Resource</SelectItem>
+                          <SelectItem value="EASY">Easy</SelectItem>
+                          <SelectItem value="MEDIUM">Medium</SelectItem>
+                          <SelectItem value="HARD">Hard</SelectItem>
+                          <SelectItem value="MIXED">Mixed</SelectItem>
                         </SelectContent>
                       </Select>
+                      <FormDescription>
+                        Overall difficulty label for the flashcard set.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Tags field removed per request */}
+
+              {/* Estimated Duration Field */}
+              <div>
+                <FormField
+                  control={form.control}
+                  name="estimatedDuration"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Estimated Duration (min)</FormLabel>
+                      <FormControl>
+                        <Input type="number" min={1} disabled={autoDuration} {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        {autoDuration ? 'Auto-calculated: 2 min per card' : 'Manual override'}
+                        <button
+                          type="button"
+                          className="ml-2 text-xs text-blue-600 underline"
+                          onClick={() => setAutoDuration(a => !a)}
+                        >
+                          {autoDuration ? 'Switch to manual' : 'Use auto'}
+                        </button>
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -324,27 +374,55 @@ export default function FlashcardContentCreator({
                   </div>
                 </div>
 
-                {/* Explanation Field */}
-                <div>
-                  <FormField
-                    control={form.control}
-                    name={`cards.${index}.hint`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Explanation (optional)</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Optional explanation to help with understanding"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Optional explanation that can help students understand the answer
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <div className="grid gap-4 md:grid-cols-3">
+                  {/* Explanation Field */}
+                  <div className="md:col-span-2">
+                    <FormField
+                      control={form.control}
+                      name={`cards.${index}.hint`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Explanation (optional)</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Optional explanation to help with understanding"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Short helper text to clarify the answer.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Card Difficulty */}
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name={`cards.${index}.difficulty`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Difficulty</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Diff" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="EASY">Easy</SelectItem>
+                              <SelectItem value="MEDIUM">Medium</SelectItem>
+                              <SelectItem value="HARD">Hard</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
 
           
