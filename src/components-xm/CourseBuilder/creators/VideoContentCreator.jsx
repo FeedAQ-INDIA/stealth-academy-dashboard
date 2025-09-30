@@ -5,13 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
+// If RadioGroup isn't available in your UI library, replace with a Select.
+// Assuming shadcn/ui style components exist:
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+// Removed category select imports (category field removed)
 import {
   Form,
   FormControl,
@@ -23,19 +20,20 @@ import {
 } from "@/components/ui/form";
 import { Video, Save } from "lucide-react";
 
-// Zod schema for video content validation
+// Zod schema for video content validation (aligned with backend entity)
 const videoContentSchema = z.object({
   title: z.string()
     .min(1, "Title is required")
     .min(3, "Title must be at least 3 characters")
-    .max(100, "Title must be less than 100 characters"),
+    .max(200, "Title must be less than or equal to 200 characters"), // entity allows 200
   description: z.string()
-    .max(500, "Description must be less than 500 characters")
-    .optional(),
+    .max(5000, "Description must be less than 5000 characters")
+    .optional()
+    .or(z.literal("")), // backend TEXT; generous limit client-side
+  videoSourceType: z.enum(["url", "upload"]).default("url"),
   videoUrl: z.string()
     .url("Please enter a valid URL")
     .refine((url) => {
-      // Basic validation for common video platforms
       const videoPatterns = [
         /youtube\.com\/watch\?v=/,
         /youtu\.be\//,
@@ -48,17 +46,23 @@ const videoContentSchema = z.object({
     }, "Please enter a valid video URL (YouTube, Vimeo, or direct video file)")
     .optional()
     .or(z.literal("")),
+  // File object when uploading; validated conditionally
+  videoFile: z.any().optional(),
   duration: z.coerce.number()
     .min(0, "Duration must be 0 or greater")
-    .max(86400, "Duration must be less than 24 hours"), // 24 hours in seconds
+    .max(86400, "Duration must be less than 24 hours"),
   thumbnailUrl: z.string()
     .url("Please enter a valid thumbnail URL")
     .optional()
     .or(z.literal("")),
-  category: z.enum(["Video Content", "Interactive Content", "Resource"], {
-    required_error: "Please select a category"
-  }),
   isPreview: z.boolean().default(false)
+}).superRefine((data, ctx) => {
+  if (data.videoSourceType === 'url' && !data.videoUrl) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['videoUrl'], message: 'Video URL is required when source type is URL' });
+  }
+  if (data.videoSourceType === 'upload' && !data.videoFile) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['videoFile'], message: 'Please select a video file to upload' });
+  }
 });
 
 export default function VideoContentCreator({ 
@@ -68,45 +72,71 @@ export default function VideoContentCreator({
   isLoading = false,
   courseContentSequence = 1,
   mode = "create",
-  existingContent = null
+  existingContent = null,
+  onUpload // optional callback: async (file) => returns { url, duration? }
 }) {
   const form = useForm({
     resolver: zodResolver(videoContentSchema),
     defaultValues: {
       title: existingContent?.courseContent?.courseContentTitle || existingContent?.courseVideo?.courseVideoTitle || "",
       description: existingContent?.courseVideo?.courseVideoDescription || "",
+      videoSourceType: existingContent?.courseVideo?.courseVideoUrl ? 'url' : 'upload',
       videoUrl: existingContent?.courseVideo?.courseVideoUrl || "",
+      videoFile: null,
       duration: existingContent?.courseVideo?.duration || existingContent?.courseContent?.courseContentDuration || 0,
       thumbnailUrl: existingContent?.courseVideo?.thumbnailUrl || "",
-      isPreview: existingContent?.courseVideo?.isPreview || false,
-      category: existingContent?.courseContent?.courseContentCategory || "Video Content"
+      isPreview: existingContent?.courseVideo?.isPreview || false
     }
   });
 
+  const processVideoUpload = async (data) => {
+    if (data.videoSourceType !== 'upload' || !data.videoFile) return { url: data.videoUrl, duration: data.duration };
+    if (!onUpload) {
+      // Parent must handle actual upload; we pass raw file upward for deferred handling
+      return { url: '', duration: data.duration };
+    }
+    try {
+      const result = await onUpload(data.videoFile); // Expect { url, duration? }
+      return { url: result?.url || '', duration: result?.duration ?? data.duration };
+    } catch (e) {
+      console.error('Video upload failed:', e);
+      throw e;
+    }
+  };
+
   const handleSubmit = async (data) => {
     try {
+      // Determine final URL / duration
+      const uploadResult = await processVideoUpload(data);
+
       // Create the content structure expected by the parent
       const newContent = {
         contentType: "CourseVideo",
         courseContent: {
           courseContentId: existingContent?.courseContent?.courseContentId || `temp_${Date.now()}`, // Keep original ID if editing
           courseContentTitle: data.title,
-          courseContentCategory: data.category,
+          // Category removed; enforce constant for backend if required
+          courseContentCategory: "Video Content",
           courseContentType: "CourseVideo",
           courseContentSequence: existingContent?.courseContent?.courseContentSequence || courseContentSequence,
-          courseContentDuration: data.duration, // keep duration sync
+          courseContentDuration: uploadResult.duration, // keep duration sync
           isActive: true,
           coursecontentIsLicensed: false,
           metadata: existingContent?.courseContent?.metadata || {}
         },
         courseVideo: {
           courseVideoTitle: data.title, // Matches CourseVideo.courseVideoTitle field
-          courseVideoUrl: data.videoUrl,
+          courseVideoUrl: uploadResult.url || data.videoUrl || '',
           courseVideoDescription: data.description,
-          duration: data.duration,
+          duration: uploadResult.duration,
           thumbnailUrl: data.thumbnailUrl,
           isPreview: data.isPreview,
           metadata: existingContent?.courseVideo?.metadata || {}
+        },
+        // Provide raw file if upload for parent to finalize (not persisted directly)
+        _local: {
+          videoFile: data.videoSourceType === 'upload' ? data.videoFile : null,
+          sourceType: data.videoSourceType
         }
       };
       if (mode === 'edit') {
@@ -180,29 +210,102 @@ export default function VideoContentCreator({
               />
             </div>
 
-            {/* Video URL Field */}
+            {/* Source Type Toggle */}
             <div>
               <FormField
                 control={form.control}
-                name="videoUrl"
+                name="videoSourceType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Video URL</FormLabel>
+                    <FormLabel>Video Source</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="url"
-                        placeholder="https://youtube.com/watch?v=..."
-                        {...field} 
-                      />
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex flex-col gap-2"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="url" id="src-url" />
+                          <label htmlFor="src-url" className="text-sm cursor-pointer">URL</label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="upload" id="src-upload" />
+                          <label htmlFor="src-upload" className="text-sm cursor-pointer">Upload</label>
+                        </div>
+                      </RadioGroup>
                     </FormControl>
                     <FormDescription>
-                      YouTube, Vimeo, or direct video file URL
+                      Choose to embed via URL or upload a video file.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
+
+            {/* Video URL Field (conditional) */}
+            {form.watch('videoSourceType') === 'url' && (
+              <div>
+                <FormField
+                  control={form.control}
+                  name="videoUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Video URL *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="url"
+                          placeholder="https://youtube.com/watch?v=..."
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        YouTube, Vimeo, or direct .mp4/.webm/.ogg file URL (publicly accessible)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
+
+            {/* Video Upload Field (conditional) */}
+            {form.watch('videoSourceType') === 'upload' && (
+              <div>
+                <FormField
+                  control={form.control}
+                  name="videoFile"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Upload Video *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="file"
+                          accept="video/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              // Basic client-side size limit (e.g., 1GB)
+                              const maxBytes = 1024 * 1024 * 1024; // 1GB
+                              if (file.size > maxBytes) {
+                                form.setError('videoFile', { message: 'File exceeds 1GB limit' });
+                              } else {
+                                form.clearErrors('videoFile');
+                              }
+                            }
+                            field.onChange(file || null);
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Supported: common video formats. Max 1GB (adjust as needed).
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
 
             {/* Thumbnail URL Field */}
             <div>
@@ -252,31 +355,7 @@ export default function VideoContentCreator({
               />
             </div>
 
-            {/* Category Field */}
-            <div>
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a category" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Video Content">Video Content</SelectItem>
-                        <SelectItem value="Interactive Content">Interactive Content</SelectItem>
-                        <SelectItem value="Resource">Resource</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            {/* Category Field removed */}
 
         
           </div>

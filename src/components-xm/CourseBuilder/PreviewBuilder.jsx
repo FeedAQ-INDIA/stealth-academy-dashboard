@@ -91,10 +91,28 @@ export default function PreviewBuilder() {
     if (newContent?.courseContent) {
       newContent.courseContent.courseContentSequence = seq;
     }
-    setCourseData(prev => ({
-      ...prev,
-      courseContent: [...(prev.courseContent || []), newContent]
-    }));
+    setCourseData(prev => {
+      const updated = {
+        ...prev,
+        courseContent: [...(prev.courseContent || []), newContent]
+      };
+      // Log updated JSON after adding new content
+      try {
+        const previewJson = {
+          course: updated.course,
+          courseContent: updated.courseContent,
+          courseBuilder: {
+            courseBuilderId: updated.courseBuilder?.courseBuilderId,
+            status: updated.courseBuilder?.status
+          }
+        };
+        // Only log for add action
+        console.log('[CourseBuilder] Content Added -> Updated JSON:', previewJson);
+      } catch (e) {
+        console.warn('Failed to log updated course JSON after add', e);
+      }
+      return updated;
+    });
     setAddContentSheetOpen(false);
     setSelectedContentType(null);
     handleSave();
@@ -111,14 +129,29 @@ export default function PreviewBuilder() {
   };
 
   const handleEditContent = (updatedContent) => {
-    setCourseData(prev => ({
-      ...prev,
-      courseContent: prev.courseContent.map(content =>
+    setCourseData(prev => {
+      const updatedCourseContent = prev.courseContent.map(content =>
         content.courseContent.courseContentId === updatedContent.courseContent.courseContentId
           ? updatedContent
           : content
-      )
-    }));
+      );
+      const updated = { ...prev, courseContent: updatedCourseContent };
+      // Log updated JSON after editing existing content
+      try {
+        const previewJson = {
+          course: updated.course,
+          courseContent: updated.courseContent,
+          courseBuilder: {
+            courseBuilderId: updated.courseBuilder?.courseBuilderId,
+            status: updated.courseBuilder?.status
+          }
+        };
+        console.log('[CourseBuilder] Content Edited -> Updated JSON:', previewJson);
+      } catch (e) {
+        console.warn('Failed to log updated course JSON after edit', e);
+      }
+      return updated;
+    });
     setEditContentSheetOpen(false);
     setCurrentEditingContent(null);
     handleSave();
@@ -438,7 +471,7 @@ export default function PreviewBuilder() {
                       </h4>
                       
                       {(() => {
-                        const desc = content.courseVideo?.courseVideoDescription || content.courseWritten?.courseWrittenDescription || content.courseQuiz?.courseQuizDescription || content.courseFlashcard?.setDescription;
+                        const desc = content.courseVideo?.courseVideoDescription || content.courseWritten?.courseWrittenContent || content.courseQuiz?.courseQuizDescription || content.courseFlashcard?.setDescription;
                         return desc ? (<p className="text-sm text-gray-600 mb-2 line-clamp-2">{desc}</p>) : null;
                       })()}
 

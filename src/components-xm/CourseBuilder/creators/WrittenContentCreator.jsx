@@ -22,25 +22,38 @@ import {
 } from "@/components/ui/form";
 import { FileText, Save } from "lucide-react";
 
-// Zod schema for written content validation
+// Zod schema with conditional validation depending on content source (text vs embed)
 const writtenContentSchema = z.object({
   title: z.string()
     .min(1, "Title is required")
     .min(3, "Title must be at least 3 characters")
     .max(100, "Title must be less than 100 characters"),
-  content: z.string()
-    .min(1, "Content is required")
-    .min(50, "Content must be at least 50 characters")
-    .max(10000, "Content must be less than 10,000 characters"),
-  summary: z.string()
-    .max(300, "Summary must be less than 300 characters")
-    .optional(),
+  // content can be optional when using embed mode; validated in superRefine
+  content: z.string().optional().default(""),
+  contentSource: z.enum(["text", "embed"]).default("text"),
+  embedUrl: z.union([
+    z.literal(""),
+    z.string()
+      .trim()
+      .max(100, "Embed URL must be at most 100 characters")
+      .url("Must be a valid URL")
+  ]).optional(),
   estimatedReadTime: z.coerce.number()
     .min(1, "Read time must be at least 1 minute")
-    .max(60, "Read time must be less than 60 minutes"),
-  category: z.enum(["Written Content", "Resource", "Interactive Content"], {
-    required_error: "Please select a category"
-  })
+    .max(60, "Read time must be less than 60 minutes")
+}).superRefine((data, ctx) => {
+  if (data.contentSource === 'embed') {
+    if (!data.embedUrl || !data.embedUrl.trim()) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Embed URL is required in embed mode", path: ["embedUrl"] });
+    }
+  } else {
+    const content = data.content || "";
+    if (!content.trim()) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Content is required when not using embed mode", path: ["content"] });
+    } else if (content.trim().length < 50) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Content must be at least 50 characters", path: ["content"] });
+    }
+  }
 });
 
 export default function WrittenContentCreator({ 
@@ -55,11 +68,11 @@ export default function WrittenContentCreator({
   const form = useForm({
     resolver: zodResolver(writtenContentSchema),
     defaultValues: {
-      title: existingContent?.courseContent?.courseContentTitle || existingContent?.courseWritten?.courseWrittenTitle || "",
-      content: existingContent?.courseWritten?.courseWrittenContent || "",
-      summary: existingContent?.courseWritten?.courseWrittenDescription || "",
-      estimatedReadTime: existingContent?.courseContent?.courseContentDuration ? Math.max(1, Math.round(existingContent.courseContent.courseContentDuration / 60)) : 5,
-      category: existingContent?.courseContent?.courseContentCategory || "Written Content"
+  title: existingContent?.courseContent?.courseContentTitle || existingContent?.courseWritten?.courseWrittenTitle || "",
+  content: existingContent?.courseWritten?.courseWrittenContent || "",
+  contentSource: existingContent?.courseWritten?.courseWrittenEmbedUrl ? 'embed' : 'text',
+  embedUrl: existingContent?.courseWritten?.courseWrittenEmbedUrl || "",
+  estimatedReadTime: existingContent?.courseContent?.courseContentDuration ? Math.max(1, Math.round(existingContent.courseContent.courseContentDuration / 60)) : 5
     }
   });
 
@@ -71,7 +84,7 @@ export default function WrittenContentCreator({
         courseContent: {
           courseContentId: existingContent?.courseContent?.courseContentId || `temp_${Date.now()}`,
           courseContentTitle: data.title,
-          courseContentCategory: data.category,
+          courseContentCategory: existingContent?.courseContent?.courseContentCategory || "Written Content",
           courseContentType: "CourseWritten",
           courseContentSequence: existingContent?.courseContent?.courseContentSequence || courseContentSequence,
           courseContentDuration: data.estimatedReadTime * 60, // Convert minutes to seconds
@@ -81,12 +94,14 @@ export default function WrittenContentCreator({
         },
         courseWritten: {
           courseWrittenTitle: data.title, // Matches CourseWritten.courseWrittenTitle field
-          courseWrittenContent: data.content,
-          courseWrittenDescription: data.summary, // Use summary as description
+          courseWrittenContent: data.contentSource === 'embed' ? "" : data.content,
+          courseWrittenEmbedUrl: data.contentSource === 'embed' && data.embedUrl?.trim() ? data.embedUrl.trim() : null,
+          courseWrittenUrlIsEmbeddable: data.contentSource === 'embed' && !!data.embedUrl?.trim(),
           metadata: {
             ...(existingContent?.courseWritten?.metadata || {}),
             estimatedReadTime: data.estimatedReadTime,
-            wordCount: data.content.split(' ').length,
+            contentMode: data.contentSource === 'embed' ? 'embed' : 'text',
+            wordCount: data.contentSource === 'embed' ? 0 : data.content.split(/\s+/).filter(Boolean).length,
             lastUpdated: new Date().toISOString()
           }
         }
@@ -138,107 +153,116 @@ export default function WrittenContentCreator({
               />
             </div>
 
-            {/* Summary Field */}
-            <div>
+            {/* Content Source & Conditional Fields */}
+            <div className="grid gap-4 md:grid-cols-3">
               <FormField
                 control={form.control}
-                name="summary"
+                name="contentSource"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Summary</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Brief summary of the content"
-                        rows={2}
-                        {...field} 
-                      />
-                    </FormControl>
+                    <FormLabel>Content Source</FormLabel>
+                    <Select
+                      onValueChange={(val) => {
+                        field.onChange(val);
+                        if (val === 'text') {
+                          form.setValue('embedUrl', "");
+                        }
+                      }}
+                      defaultValue={field.value}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select source" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="text">Text</SelectItem>
+                        <SelectItem value="embed">Embedded URL</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormDescription>
-                      Optional brief summary for the written content
+                      Choose whether content is written text or an external embed.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            </div>
-
-            {/* Content Field */}
-            <div>
-              <FormField
-                control={form.control}
-                name="content"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Content *</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Write your content here... (supports Markdown)"
-                        rows={10}
-                        className="font-mono text-sm"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      You can use Markdown formatting (# headers, **bold**, *italic*, etc.)
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Read Time and Category */}
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
+              {form.watch('contentSource') === 'embed' && (
                 <FormField
                   control={form.control}
-                  name="estimatedReadTime"
+                  name="embedUrl"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Estimated Read Time (minutes)</FormLabel>
+                    <FormItem className="md:col-span-2">
+                      <FormLabel>Embed URL *</FormLabel>
                       <FormControl>
                         <Input 
-                          type="number"
-                          min="1"
-                          max="60"
-                          placeholder="5"
+                          placeholder="https://..." 
                           {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 5)}
+                          onChange={(e) => field.onChange(e.target.value)}
                         />
                       </FormControl>
                       <FormDescription>
-                        Time in minutes (1-60)
+                        External resource URL (YouTube, Loom, etc.)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            </div>
+
+            {form.watch('contentSource') === 'text' && (
+              <div>
+                <FormField
+                  control={form.control}
+                  name="content"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Content *</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Write your content here... (supports Markdown)"
+                          rows={10}
+                          className="font-mono text-sm"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        You can use Markdown formatting (# headers, **bold**, *italic*, etc.)
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
+            )}
 
-              <div>
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a category" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Written Content">Written Content</SelectItem>
-                          <SelectItem value="Resource">Resource</SelectItem>
-                          <SelectItem value="Interactive Content">Interactive Content</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+            {/* Read Time */}
+            <div>
+              <FormField
+                control={form.control}
+                name="estimatedReadTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Estimated Read Time (minutes)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number"
+                        min="1"
+                        max="60"
+                        placeholder="5"
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || 5)}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Time in minutes (1-60)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
           </div>
 
