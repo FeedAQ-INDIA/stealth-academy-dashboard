@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +40,7 @@ export default function PreviewBuilder() {
   const [editContentSheetOpen, setEditContentSheetOpen] = useState(false);
   const [currentEditingContent, setCurrentEditingContent] = useState(null);
   const [selectedContentType, setSelectedContentType] = useState(null);
+  const reorderSaveTimer = useRef(null);
 
   // Helper functions
   const getContentTypeColor = (contentType) => {
@@ -86,6 +87,10 @@ export default function PreviewBuilder() {
   };
 
   const handleAddContent = (newContent) => {
+    const seq = (courseData?.courseContent?.length || 0) + 1;
+    if (newContent?.courseContent) {
+      newContent.courseContent.courseContentSequence = seq;
+    }
     setCourseData(prev => ({
       ...prev,
       courseContent: [...(prev.courseContent || []), newContent]
@@ -138,8 +143,17 @@ export default function PreviewBuilder() {
     setCourseData(prev => {
       const newContent = [...prev.courseContent];
       [newContent[currentIndex], newContent[newIndex]] = [newContent[newIndex], newContent[currentIndex]];
-      return { ...prev, courseContent: newContent };
+      const resequenced = newContent.map((c, idx) => ({
+        ...c,
+        courseContent: {
+          ...c.courseContent,
+          courseContentSequence: idx + 1
+        }
+      }));
+      return { ...prev, courseContent: resequenced };
     });
+    if (reorderSaveTimer.current) clearTimeout(reorderSaveTimer.current);
+    reorderSaveTimer.current = setTimeout(() => { handleSave(); }, 800);
   };
 
   const handleSave = async () => {
@@ -191,8 +205,71 @@ export default function PreviewBuilder() {
         setLoading(true);
         setError(null);
         const res = await axiosConn.get(`/courseBuilder/${CourseBuilderId}`);
-        const data = res?.data?.data?.courseBuilderData;
-        setCourseData(data);
+        const apiData = res?.data?.data; // full object as shown in new API response
+
+        // Guard if structure missing
+        if (!apiData || !apiData.courseBuilderId) {
+          setError('Invalid course builder response');
+          setCourseData(null);
+          return;
+        }
+
+        const courseBuilderData = apiData.courseBuilderData || {};
+        const courseDetail = courseBuilderData.courseDetail || {};
+        const rawContent = Array.isArray(courseDetail.courseContent) ? courseDetail.courseContent : [];
+
+        // Normalize each content item to previous internal shape expected by JSX
+        const normalizedContent = rawContent.map((item) => {
+          const isVideo = item.courseContentType === 'CourseVideo';
+          const details = item.courseContentTypeDetails || {};
+          return {
+            contentType: item.courseContentType,
+            courseContent: {
+              courseContentId: item.courseContentId,
+              courseContentTitle: item.courseContentTitle,
+              courseContentSequence: item.courseContentSequence,
+              status: item.status,
+              metadata: item.metadata,
+            },
+            // Only include courseVideo object for video content
+            courseVideo: isVideo ? {
+              duration: details.duration,
+              courseVideoDescription: details.courseVideoDescription,
+              thumbnailUrl: details.thumbnailUrl,
+              isPreview: details.isPreview,
+            } : undefined,
+          };
+        }).sort((a,b) => (a.courseContent.courseContentSequence||0) - (b.courseContent.courseContentSequence||0));
+
+        const internalData = {
+          course: {
+            courseTitle: courseDetail.courseTitle || courseBuilderData.courseTitle,
+            courseDescription: courseDetail.courseDescription || courseBuilderData.courseDescription,
+            courseId: courseDetail.courseId,
+            status: courseDetail.status,
+            deliveryMode: courseDetail.deliveryMode,
+            courseType: courseDetail.courseType,
+            courseDuration: courseDetail.courseDuration,
+            courseImageUrl: courseDetail.courseImageUrl,
+            courseSourceChannel: courseDetail.courseSourceChannel,
+            metadata: courseDetail.metadata,
+          },
+            // list of normalized content
+          courseContent: normalizedContent,
+          courseBuilder: {
+            courseBuilderId: apiData.courseBuilderId,
+            status: apiData.status,
+            orgId: apiData.orgId,
+            // keep the original builder data so we can send it back on save
+            courseBuilderData: courseBuilderData,
+            timestamps: {
+              createdAt: apiData.course_builder_created_at,
+              updatedAt: apiData.course_builder_updated_at,
+            }
+          }
+        };
+
+        setCourseData(internalData);
       } catch (e) {
         setError(e?.response?.data?.message || e.message || 'Failed to load course');
       } finally {
@@ -226,7 +303,10 @@ export default function PreviewBuilder() {
     return <div className="text-center py-8">No course data available</div>;
   }
 
-  const { course, courseContent } = courseData;
+  const { course, courseContent, courseBuilder } = courseData;
+  const totalDurationSeconds = (courseContent || []).reduce((sum, c) => sum + (c.courseVideo?.duration || c.courseContent?.courseContentDuration || 0), 0);
+  const courseDifficulty = course?.metadata?.courseDifficulty;
+  const sourceChannel = course?.courseSourceChannel;
 
   return (
     <div className="space-y-6 p-6">
@@ -263,12 +343,22 @@ export default function PreviewBuilder() {
             <div className="cursor-pointer group" onClick={() => setEditingCourseInfo(true)}>
               <div className="flex items-center gap-2 group-hover:bg-gray-50 p-2 rounded">
                 <div className="flex-1">
-                  <h1 className="text-3xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                    {course?.courseTitle || 'Untitled Course'}
-                  </h1>
-                  <p className="text-gray-600 mt-2 group-hover:text-gray-700 transition-colors">
+                  <div className="flex items-start gap-3 flex-wrap">
+                    <h1 className="text-3xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                      {course?.courseTitle || 'Untitled Course'}
+                    </h1>
+                    {courseBuilder?.status && (
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full border ${courseBuilder.status === 'PUBLISHED' ? 'bg-green-50 text-green-600 border-green-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200'}`}>{courseBuilder.status}</span>
+                    )}
+                    {courseDifficulty && (
+                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-50 text-blue-600 border border-blue-200">{courseDifficulty}</span>
+                    )}
+                    <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600 border border-gray-200">{courseContent?.length || 0} items · {formatDuration(totalDurationSeconds)}</span>
+                  </div>
+                  <p className="text-gray-600 mt-2 group-hover:text-gray-700 transition-colors max-w-3xl">
                     {course?.courseDescription || 'No description'}
                   </p>
+                  {sourceChannel && <p className="text-xs text-gray-500 mt-1">Source: {sourceChannel}</p>}
                 </div>
                 <Edit className="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
               </div>
@@ -347,16 +437,15 @@ export default function PreviewBuilder() {
                         {content.courseContent.courseContentTitle}
                       </h4>
                       
-                      {content.courseVideo?.courseVideoDescription && (
-                        <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                          {content.courseVideo.courseVideoDescription}
-                        </p>
-                      )}
+                      {(() => {
+                        const desc = content.courseVideo?.courseVideoDescription || content.courseWritten?.courseWrittenDescription || content.courseQuiz?.courseQuizDescription || content.courseFlashcard?.setDescription;
+                        return desc ? (<p className="text-sm text-gray-600 mb-2 line-clamp-2">{desc}</p>) : null;
+                      })()}
 
                       <div className="flex items-center gap-3 text-xs text-gray-500">
                         <span className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
-                          {formatDuration(content.courseVideo?.duration)}
+                          {formatDuration(content.courseVideo?.duration || content.courseContent?.courseContentDuration)}
                         </span>
                         <Badge variant="outline" className="text-xs">
                           {content.contentType}
@@ -420,6 +509,7 @@ export default function PreviewBuilder() {
               onAdd={handleAddContent}
               onCancel={handleCancelAddContent}
               isLoading={isLoading}
+              courseContentSequence={(courseContent?.length || 0) + 1}
             />
           )}
         </SheetContent>
@@ -431,7 +521,17 @@ export default function PreviewBuilder() {
           side="bottom" 
           className="w-screen h-screen max-w-none p-8 inset-0 border-0"
         >
-         
+          {currentEditingContent && (
+            <ContentCreator
+              contentType={currentEditingContent.contentType}
+              mode="edit"
+              existingContent={currentEditingContent}
+              onUpdate={handleEditContent}
+              onCancel={() => { setEditContentSheetOpen(false); setCurrentEditingContent(null); }}
+              isLoading={isLoading}
+              courseContentSequence={currentEditingContent.courseContent?.courseContentSequence}
+            />
+          )}
         </SheetContent>
       </Sheet>
     </div>

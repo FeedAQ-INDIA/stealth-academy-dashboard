@@ -10,11 +10,24 @@ const CONTENT_CREATORS = {
   CourseFlashcard: FlashcardContentCreator,
 };
 
+function ErrorBoundary({ children }) {
+  try {
+    return children;
+  } catch (e) {
+    // Fallback simple UI
+    return <div className="text-sm text-red-600">Failed to render creator: {e.message}</div>;
+  }
+}
+
 export default function ContentCreator({
   contentType,
   onAdd,
+  onUpdate,
   onCancel,
   isLoading = false,
+  courseContentSequence = 1,
+  mode = "create",
+  existingContent = null,
 }) {
   const CreatorComponent = CONTENT_CREATORS[contentType];
 
@@ -36,11 +49,20 @@ export default function ContentCreator({
 
   return (
     <div className="overflow-y-auto h-full px-2">
-      <CreatorComponent
-        onAdd={onAdd}
-        onCancel={onCancel}
-        isLoading={isLoading}
-      />
+      <ErrorBoundary>
+        <CreatorComponent
+          // Creation props
+          onAdd={onAdd}
+          // Edit props
+          onUpdate={onUpdate}
+          existingContent={existingContent}
+          mode={mode}
+          // Common
+          onCancel={onCancel}
+          isLoading={isLoading}
+          courseContentSequence={courseContentSequence}
+        />
+      </ErrorBoundary>
     </div>
   );
 }

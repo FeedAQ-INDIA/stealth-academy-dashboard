@@ -55,23 +55,26 @@ const flashcardContentSchema = z.object({
 
 export default function FlashcardContentCreator({
   onAdd,
+  onUpdate,
   onCancel,
   isLoading = false,
-  courseContentSequence = 1 // Add sequence parameter
+  courseContentSequence = 1,
+  mode = 'create',
+  existingContent = null
 }) {
   const form = useForm({
     resolver: zodResolver(flashcardContentSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      category: "Interactive Content",
-      cards: [
-        {
-          front: "",
-          back: "",
-          hint: "",
-        },
-      ],
+      title: existingContent?.courseContent?.courseContentTitle || existingContent?.courseFlashcard?.setTitle || "",
+      description: existingContent?.courseFlashcard?.setDescription || "",
+      category: existingContent?.courseContent?.courseContentCategory || "Interactive Content",
+      cards: existingContent?.courseFlashcard?.cards?.length
+        ? existingContent.courseFlashcard.cards.map(c => ({
+            front: c.question,
+            back: c.answer,
+            hint: c.explanation || (Array.isArray(c.hints) ? c.hints[0] : "")
+          }))
+        : [ { front: "", back: "", hint: "" } ],
     }
   });
 
@@ -89,15 +92,15 @@ export default function FlashcardContentCreator({
       const newContent = {
         contentType: "CourseFlashcard",
         courseContent: {
-          courseContentId: `temp_${Date.now()}`, // Temporary ID
+          courseContentId: existingContent?.courseContent?.courseContentId || `temp_${Date.now()}`,
           courseContentTitle: data.title,
           courseContentCategory: data.category,
           courseContentType: "CourseFlashcard",
-          courseContentSequence: courseContentSequence, // Use passed sequence
+          courseContentSequence: existingContent?.courseContent?.courseContentSequence || courseContentSequence,
           courseContentDuration: estimatedDuration,
           isActive: true,
           coursecontentIsLicensed: false,
-          metadata: {}
+          metadata: existingContent?.courseContent?.metadata || {}
         },
         courseFlashcard: {
           setTitle: data.title, // Matches CourseFlashcard.setTitle field
@@ -117,8 +120,11 @@ export default function FlashcardContentCreator({
           })),
         },
       };
-
-      await onAdd?.(newContent);
+      if (mode === 'edit') {
+        await onUpdate?.(newContent);
+      } else {
+        await onAdd?.(newContent);
+      }
     } catch (error) {
       console.error("Error submitting flashcard content:", error);
     }
@@ -147,10 +153,10 @@ export default function FlashcardContentCreator({
           </div>
           <div>
             <h2 className="text-xl font-semibold text-gray-900">
-              Add Flashcard Set
+              {mode === 'edit' ? 'Edit Flashcard Set' : 'Add Flashcard Set'}
             </h2>
             <p className="text-sm text-gray-600">
-              Create a new set of study flashcards
+              {mode === 'edit' ? 'Update this set of study flashcards' : 'Create a new set of study flashcards'}
             </p>
           </div>
         </div>
@@ -357,7 +363,7 @@ export default function FlashcardContentCreator({
               ) : (
                 <Save className="h-4 w-4 mr-2" />
               )}
-              Add Flashcard Set
+              {mode === 'edit' ? 'Save Changes' : 'Add Flashcard Set'}
             </Button>
             
             {onCancel && (

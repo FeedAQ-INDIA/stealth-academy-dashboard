@@ -63,20 +63,23 @@ const videoContentSchema = z.object({
 
 export default function VideoContentCreator({ 
   onAdd, 
+  onUpdate,
   onCancel, 
   isLoading = false,
-  courseContentSequence = 1 // Add sequence parameter
+  courseContentSequence = 1,
+  mode = "create",
+  existingContent = null
 }) {
   const form = useForm({
     resolver: zodResolver(videoContentSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      videoUrl: "",
-      duration: 0,
-      thumbnailUrl: "",
-      isPreview: false,
-      category: "Video Content"
+      title: existingContent?.courseContent?.courseContentTitle || existingContent?.courseVideo?.courseVideoTitle || "",
+      description: existingContent?.courseVideo?.courseVideoDescription || "",
+      videoUrl: existingContent?.courseVideo?.courseVideoUrl || "",
+      duration: existingContent?.courseVideo?.duration || existingContent?.courseContent?.courseContentDuration || 0,
+      thumbnailUrl: existingContent?.courseVideo?.thumbnailUrl || "",
+      isPreview: existingContent?.courseVideo?.isPreview || false,
+      category: existingContent?.courseContent?.courseContentCategory || "Video Content"
     }
   });
 
@@ -86,15 +89,15 @@ export default function VideoContentCreator({
       const newContent = {
         contentType: "CourseVideo",
         courseContent: {
-          courseContentId: `temp_${Date.now()}`, // Temporary ID
+          courseContentId: existingContent?.courseContent?.courseContentId || `temp_${Date.now()}`, // Keep original ID if editing
           courseContentTitle: data.title,
           courseContentCategory: data.category,
           courseContentType: "CourseVideo",
-          courseContentSequence: courseContentSequence, // Use passed sequence
-          courseContentDuration: data.duration,
+          courseContentSequence: existingContent?.courseContent?.courseContentSequence || courseContentSequence,
+          courseContentDuration: data.duration, // keep duration sync
           isActive: true,
           coursecontentIsLicensed: false,
-          metadata: {}
+          metadata: existingContent?.courseContent?.metadata || {}
         },
         courseVideo: {
           courseVideoTitle: data.title, // Matches CourseVideo.courseVideoTitle field
@@ -103,11 +106,14 @@ export default function VideoContentCreator({
           duration: data.duration,
           thumbnailUrl: data.thumbnailUrl,
           isPreview: data.isPreview,
-          metadata: {} // Default empty metadata
+          metadata: existingContent?.courseVideo?.metadata || {}
         }
       };
-
-      await onAdd?.(newContent);
+      if (mode === 'edit') {
+        await onUpdate?.(newContent);
+      } else {
+        await onAdd?.(newContent);
+      }
     } catch (error) {
       console.error("Error submitting video content:", error);
     }
@@ -121,8 +127,8 @@ export default function VideoContentCreator({
             <Video className="h-5 w-5 text-blue-600" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Add Video Content</h2>
-            <p className="text-sm text-gray-600">Create a new video lesson</p>
+            <h2 className="text-xl font-semibold text-gray-900">{mode === 'edit' ? 'Edit Video Content' : 'Add Video Content'}</h2>
+            <p className="text-sm text-gray-600">{mode === 'edit' ? 'Update the video lesson' : 'Create a new video lesson'}</p>
           </div>
         </div>
       </div>
@@ -272,31 +278,7 @@ export default function VideoContentCreator({
               />
             </div>
 
-            {/* Preview Checkbox */}
-            <div className="md:col-span-2">
-              <FormField
-                control={form.control}
-                name="isPreview"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>
-                        Make this video available as preview
-                      </FormLabel>
-                      <FormDescription>
-                        Preview videos can be watched without enrollment
-                      </FormDescription>
-                    </div>
-                  </FormItem>
-                )}
-              />
-            </div>
+        
           </div>
 
           <div className="flex items-center gap-3 pt-4 border-t">
@@ -310,7 +292,7 @@ export default function VideoContentCreator({
               ) : (
                 <Save className="h-4 w-4 mr-2" />
               )}
-              Add Video Content
+              {mode === 'edit' ? 'Save Changes' : 'Add Video Content'}
             </Button>
             
             {onCancel && (

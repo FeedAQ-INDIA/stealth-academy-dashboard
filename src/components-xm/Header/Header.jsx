@@ -34,7 +34,7 @@ export default function Header() {
     <>
     <header className="flex h-14 items-center justify-between bg-white px-4 shadow-md border-b">
       <div className="flex gap-2 items-center">
-        {/* <div>
+        <div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger className="p-2 hover:bg-muted hover:cursor-pointer rounded-md">
               <Grip size={25} />
@@ -70,7 +70,7 @@ export default function Header() {
               </DialogHeader>
             </DialogContent>
           </Dialog>
-        </div> */}
+        </div>
         {/* Logo */}
         <a
           className="text-2xl sm:text-3xl font-medium text-black"

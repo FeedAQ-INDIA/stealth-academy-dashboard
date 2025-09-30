@@ -85,28 +85,31 @@ const quizContentSchema = z.object({
 
 export default function QuizContentCreator({ 
   onAdd, 
+  onUpdate,
   onCancel, 
   isLoading = false,
-  courseContentSequence = 1, // Add sequence parameter
-  courseId = null // Add courseId parameter for entity requirements
+  courseContentSequence = 1,
+  courseId = null,
+  mode = 'create',
+  existingContent = null
 }) {
   const form = useForm({
     resolver: zodResolver(quizContentSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      instructions: "",
-      timeLimit: 10,
-      passingScore: 70,
-      maxAttempts: 3,
-      category: "Assessment",
-      questions: [{
-        question: "",
-        type: "SINGLE_CHOICE",
-        options: ["", "", "", ""],
-        correctAnswer: 0,
-        explanation: ""
-      }]
+      title: existingContent?.courseContent?.courseContentTitle || existingContent?.courseQuiz?.courseQuizTitle || existingContent?.courseQuiz?.title || "",
+      description: existingContent?.courseQuiz?.courseQuizDescription || "",
+      instructions: existingContent?.courseQuiz?.metadata?.instructions || "",
+      timeLimit: existingContent?.courseQuiz?.courseQuizTimer ? Math.max(1, Math.round(existingContent.courseQuiz.courseQuizTimer / 60)) : 10,
+      passingScore: existingContent?.courseQuiz?.courseQuizPassPercent || 70,
+      maxAttempts: existingContent?.courseQuiz?.metadata?.maxAttempts || 3,
+      category: existingContent?.courseContent?.courseContentCategory || 'Assessment',
+      questions: existingContent?.questions?.length ? existingContent.questions.map(q => ({
+        question: q.quizQuestionTitle || q.question || "",
+        type: q.quizQuestionType || 'SINGLE_CHOICE',
+        options: Array.isArray(q.quizQuestionOption) ? q.quizQuestionOption : ["", "", "", ""],
+        correctAnswer: Array.isArray(q.quizQuestionCorrectAnswer) ? q.quizQuestionCorrectAnswer[0] : 0,
+        explanation: q.quizQuestionNote || q.explanation || ""
+      })) : [{ question: "", type: "SINGLE_CHOICE", options: ["", "", "", ""], correctAnswer: 0, explanation: "" }]
     }
   });
 
@@ -121,15 +124,15 @@ export default function QuizContentCreator({
       const newContent = {
         contentType: "CourseQuiz",
         courseContent: {
-          courseContentId: `temp_${Date.now()}`, // Temporary ID
+          courseContentId: existingContent?.courseContent?.courseContentId || `temp_${Date.now()}`,
           courseContentTitle: data.title,
           courseContentCategory: data.category,
           courseContentType: "CourseQuiz",
-          courseContentSequence: courseContentSequence, // Use passed sequence
+          courseContentSequence: existingContent?.courseContent?.courseContentSequence || courseContentSequence,
           courseContentDuration: data.timeLimit * 60, // Convert minutes to seconds
           isActive: true,
           coursecontentIsLicensed: false,
-          metadata: {}
+          metadata: existingContent?.courseContent?.metadata || {}
         },
         courseQuiz: {
           courseQuizDescription: data.description,
@@ -138,6 +141,7 @@ export default function QuizContentCreator({
           courseQuizTimer: data.timeLimit * 60, // Convert minutes to seconds
           courseQuizPassPercent: data.passingScore,
           metadata: {
+            ...(existingContent?.courseQuiz?.metadata || {}),
             instructions: data.instructions,
             maxAttempts: data.maxAttempts
           }
@@ -159,8 +163,11 @@ export default function QuizContentCreator({
           metadata: {} // Default metadata object
         }))
       };
-
-      await onAdd?.(newContent);
+      if (mode === 'edit') {
+        await onUpdate?.(newContent);
+      } else {
+        await onAdd?.(newContent);
+      }
     } catch (error) {
       console.error("Error submitting quiz content:", error);
     }
@@ -190,8 +197,8 @@ export default function QuizContentCreator({
             <HelpCircle className="h-5 w-5 text-purple-600" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Add Quiz Content</h2>
-            <p className="text-sm text-gray-600">Create a new assessment quiz</p>
+            <h2 className="text-xl font-semibold text-gray-900">{mode === 'edit' ? 'Edit Quiz Content' : 'Add Quiz Content'}</h2>
+            <p className="text-sm text-gray-600">{mode === 'edit' ? 'Update this assessment quiz' : 'Create a new assessment quiz'}</p>
           </div>
         </div>
       </div>
@@ -625,7 +632,7 @@ export default function QuizContentCreator({
               ) : (
                 <Save className="h-4 w-4 mr-2" />
               )}
-              Add Quiz Content
+              {mode === 'edit' ? 'Save Changes' : 'Add Quiz Content'}
             </Button>
             
             {onCancel && (

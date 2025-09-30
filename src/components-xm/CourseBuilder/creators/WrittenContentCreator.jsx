@@ -45,18 +45,21 @@ const writtenContentSchema = z.object({
 
 export default function WrittenContentCreator({ 
   onAdd, 
+  onUpdate,
   onCancel, 
   isLoading = false,
-  courseContentSequence = 1 // Add sequence parameter
+  courseContentSequence = 1,
+  mode = 'create',
+  existingContent = null
 }) {
   const form = useForm({
     resolver: zodResolver(writtenContentSchema),
     defaultValues: {
-      title: "",
-      content: "",
-      summary: "",
-      estimatedReadTime: 5,
-      category: "Written Content"
+      title: existingContent?.courseContent?.courseContentTitle || existingContent?.courseWritten?.courseWrittenTitle || "",
+      content: existingContent?.courseWritten?.courseWrittenContent || "",
+      summary: existingContent?.courseWritten?.courseWrittenDescription || "",
+      estimatedReadTime: existingContent?.courseContent?.courseContentDuration ? Math.max(1, Math.round(existingContent.courseContent.courseContentDuration / 60)) : 5,
+      category: existingContent?.courseContent?.courseContentCategory || "Written Content"
     }
   });
 
@@ -66,29 +69,33 @@ export default function WrittenContentCreator({
       const newContent = {
         contentType: "CourseWritten",
         courseContent: {
-          courseContentId: `temp_${Date.now()}`, // Temporary ID
+          courseContentId: existingContent?.courseContent?.courseContentId || `temp_${Date.now()}`,
           courseContentTitle: data.title,
           courseContentCategory: data.category,
           courseContentType: "CourseWritten",
-          courseContentSequence: courseContentSequence, // Use passed sequence
+          courseContentSequence: existingContent?.courseContent?.courseContentSequence || courseContentSequence,
           courseContentDuration: data.estimatedReadTime * 60, // Convert minutes to seconds
           isActive: true,
           coursecontentIsLicensed: false,
-          metadata: {}
+          metadata: existingContent?.courseContent?.metadata || {}
         },
         courseWritten: {
           courseWrittenTitle: data.title, // Matches CourseWritten.courseWrittenTitle field
           courseWrittenContent: data.content,
           courseWrittenDescription: data.summary, // Use summary as description
           metadata: {
+            ...(existingContent?.courseWritten?.metadata || {}),
             estimatedReadTime: data.estimatedReadTime,
             wordCount: data.content.split(' ').length,
             lastUpdated: new Date().toISOString()
           }
         }
       };
-
-      await onAdd?.(newContent);
+      if (mode === 'edit') {
+        await onUpdate?.(newContent);
+      } else {
+        await onAdd?.(newContent);
+      }
     } catch (error) {
       console.error("Error submitting written content:", error);
     }
@@ -102,8 +109,8 @@ export default function WrittenContentCreator({
             <FileText className="h-5 w-5 text-green-600" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Add Written Content</h2>
-            <p className="text-sm text-gray-600">Create a new article or written lesson</p>
+            <h2 className="text-xl font-semibold text-gray-900">{mode === 'edit' ? 'Edit Written Content' : 'Add Written Content'}</h2>
+            <p className="text-sm text-gray-600">{mode === 'edit' ? 'Update the written lesson' : 'Create a new article or written lesson'}</p>
           </div>
         </div>
       </div>
@@ -246,7 +253,7 @@ export default function WrittenContentCreator({
               ) : (
                 <Save className="h-4 w-4 mr-2" />
               )}
-              Add Written Content
+              {mode === 'edit' ? 'Save Changes' : 'Add Written Content'}
             </Button>
             
             {onCancel && (
