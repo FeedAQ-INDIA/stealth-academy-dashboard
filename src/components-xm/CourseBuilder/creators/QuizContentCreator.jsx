@@ -105,7 +105,7 @@ export default function QuizContentCreator({
       timeLimit: existingContent?.courseQuiz?.courseQuizTimer ? Math.max(1, Math.round(existingContent.courseQuiz.courseQuizTimer / 60)) : 10,
       passingScore: existingContent?.courseQuiz?.courseQuizPassPercent || 70,
       maxAttempts: existingContent?.courseQuiz?.metadata?.maxAttempts || 3,
-      questions: existingContent?.questions?.length ? existingContent.questions.map(q => ({
+      questions: (existingContent?.courseQuiz?.questions || existingContent?.questions || []).length ? (existingContent?.courseQuiz?.questions || existingContent?.questions).map(q => ({
         question: q.quizQuestionTitle || q.question || "",
         type: q.quizQuestionType || 'SINGLE_CHOICE',
         options: Array.isArray(q.quizQuestionOption) ? q.quizQuestionOption : ["", "", "", ""],
@@ -127,17 +127,35 @@ export default function QuizContentCreator({
 
   const handleSubmit = async (data) => {
     try {
-      // Create the content structure expected by the parent
+      const questions = data.questions.map((q, index) => ({
+        courseId: courseId,
+        courseQuizId: null,
+        courseContentId: null,
+        quizQuestionTitle: q.question,
+        quizQuestionNote: q.note || null,
+        quizQuestionType: q.type,
+        quizQuestionOption: q.type === 'INPUT_BOX' ? [] : q.options,
+        quizQuestionCorrectAnswer: q.type === 'MULTIPLE_CHOICE' ? q.correctAnswers : q.type === 'SINGLE_CHOICE' ? [q.correctAnswer] : [q.correctAnswer],
+        quizQuestionPosPoint: q.posPoints ?? 1,
+        quizQuestionNegPoint: q.negPoints ?? 0,
+        questionSequence: index + 1,
+        difficultyLevel: q.difficulty || 'MEDIUM',
+        explanation: q.explanation || null,
+        metadata: {}
+      }));
+
+      const totalPos = questions.reduce((s, q) => s + (q.quizQuestionPosPoint || 0), 0);
+      const totalNeg = questions.reduce((s, q) => s + (q.quizQuestionNegPoint || 0), 0);
+
       const newContent = {
         contentType: "CourseQuiz",
         courseContent: {
           courseContentId: existingContent?.courseContent?.courseContentId || `temp_${Date.now()}`,
           courseContentTitle: data.title,
-          // Derive category internally (legacy UI removed): map CERTIFICATION -> Assessment else Quiz
           courseContentCategory: data.quizType === 'CERTIFICATION' ? 'Assessment' : 'Practice',
           courseContentType: "CourseQuiz",
           courseContentSequence: existingContent?.courseContent?.courseContentSequence || courseContentSequence,
-          courseContentDuration: data.isTimed && data.timeLimit ? data.timeLimit * 60 : 0, // seconds
+          courseContentDuration: data.isTimed && data.timeLimit ? data.timeLimit * 60 : 0,
           isActive: true,
           coursecontentIsLicensed: false,
           metadata: existingContent?.courseContent?.metadata || {}
@@ -148,34 +166,19 @@ export default function QuizContentCreator({
           isQuizTimed: data.isTimed,
           courseQuizTimer: data.isTimed && data.timeLimit ? data.timeLimit * 60 : null,
           courseQuizPassPercent: data.passingScore,
+          questionCount: questions.length,
+          totalPosPoints: totalPos,
+          totalNegPoints: totalNeg,
           metadata: {
             ...(existingContent?.courseQuiz?.metadata || {}),
             instructions: data.instructions,
             maxAttempts: data.maxAttempts
-          }
-        },
-        questions: data.questions.map((q, index) => ({
-          courseId: courseId, // Required field from entity
-          courseQuizId: null, // Will be set after quiz creation
-          courseContentId: null, // Will be set after content creation
-          quizQuestionTitle: q.question, // Matches QuizQuestion.quizQuestionTitle field
-          quizQuestionNote: q.note || null,
-          quizQuestionType: q.type, // Now directly matches entity enum values
-          quizQuestionOption: q.options, // JSONB field for options
-          quizQuestionCorrectAnswer: q.type === 'MULTIPLE_CHOICE' ? q.correctAnswers : q.type === 'SINGLE_CHOICE' ? [q.correctAnswer] : [q.correctAnswer],
-          quizQuestionPosPoint: q.posPoints ?? 1,
-          quizQuestionNegPoint: q.negPoints ?? 0,
-          questionSequence: index + 1, // Matches QuizQuestion.questionSequence field
-          difficultyLevel: q.difficulty || 'MEDIUM',
-          explanation: q.explanation || null,
-          metadata: {} // Default metadata object
-        }))
+          },
+          questions
+        }
       };
-      if (mode === 'edit') {
-        await onUpdate?.(newContent);
-      } else {
-        await onAdd?.(newContent);
-      }
+
+      if (mode === 'edit') await onUpdate?.(newContent); else await onAdd?.(newContent);
     } catch (error) {
       console.error("Error submitting quiz content:", error);
     }
