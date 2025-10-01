@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -34,6 +33,9 @@ export default function PreviewBuilder() {
   const [error, setError] = useState(null);
   const [editingCourseInfo, setEditingCourseInfo] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [lastSavedAt, setLastSavedAt] = useState(null);
   
   // Sheet state management
   const [addContentSheetOpen, setAddContentSheetOpen] = useState(false);
@@ -189,6 +191,48 @@ export default function PreviewBuilder() {
     return apiItem;
   };
 
+  // Helper to build payload for publishCourse API
+  const buildPublishPayload = () => {
+    if (!courseData?.courseBuilder?.courseBuilderId) return null;
+    const originalBuilderData = courseData.courseBuilder.courseBuilderData || {};
+    const existingCourseDetail = originalBuilderData.courseDetail || {};
+    const cleanedContent = (courseData.courseContent || []).map(item => {
+      const { _local, ...rest } = item; // strip transient
+      return rest;
+    });
+    const apiContent = cleanedContent.map(internalItemToApi);
+    const updatedCourseDetail = {
+      ...existingCourseDetail,
+      courseTitle: courseData.course.courseTitle,
+      courseDescription: courseData.course.courseDescription,
+      courseId: courseData.course.courseId || existingCourseDetail.courseId || 'temp_course_id',
+      status: 'PUBLISHED',
+      deliveryMode: courseData.course.deliveryMode || existingCourseDetail.deliveryMode || 'ONLINE',
+      courseType: courseData.course.courseType || existingCourseDetail.courseType || 'BYOC',
+      courseDuration: courseData.course.courseDuration || existingCourseDetail.courseDuration || 0,
+      courseImageUrl: courseData.course.courseImageUrl || existingCourseDetail.courseImageUrl || null,
+      courseSourceChannel: courseData.course.courseSourceChannel || existingCourseDetail.courseSourceChannel || null,
+      metadata: courseData.course.metadata || existingCourseDetail.metadata || {},
+      courseContent: apiContent
+    };
+    const courseBuilderData = {
+      ...originalBuilderData,
+      courseTitle: updatedCourseDetail.courseTitle,
+      courseDescription: updatedCourseDetail.courseDescription,
+      processingStatus: originalBuilderData.processingStatus || 'COMPLETED',
+      courseDetail: updatedCourseDetail
+    };
+    return {
+      data: {
+        courseBuilderId: courseData.courseBuilder.courseBuilderId,
+        userId: existingCourseDetail.userId || courseData.courseBuilder.userId, // optional
+        orgId: courseData.courseBuilder.orgId || null,
+        status: 'PUBLISHED',
+        courseBuilderData
+      }
+    };
+  };
+
   // Data update handlers
   const updateCourseMetadata = (field, value) => {
     setCourseData(prev => ({
@@ -312,7 +356,8 @@ export default function PreviewBuilder() {
     reorderSaveTimer.current = setTimeout(() => { handleSave(); }, 800);
   };
 
-  const handleSave = async () => {
+  const handleSave = async (options = {}) => {
+    const { statusOverride, silent } = options;
     setIsLoading(true);
     try {
       if (CourseBuilderId && courseData?.courseBuilder?.courseBuilderId) {
@@ -351,10 +396,11 @@ export default function PreviewBuilder() {
           courseDetail: updatedCourseDetail
         };
 
+        const statusToSend = statusOverride || courseData.courseBuilder.status || 'DRAFT';
+
         const payload = {
           courseBuilderId: courseData.courseBuilder.courseBuilderId,
-            // Keep current status or fallback
-          status: courseData.courseBuilder.status || 'DRAFT',
+          status: statusToSend,
           orgId: courseData.courseBuilder.orgId,
           courseBuilderData: updatedCourseBuilderData
         };
@@ -362,10 +408,23 @@ export default function PreviewBuilder() {
         const response = await axiosConn.post('/createOrUpdateCourseBuilder', payload);
 
         if (response.data.success) {
-          toast({
-            title: 'Course updated successfully!',
-            description: 'Your changes have been saved.'
-          });
+          // Update local status if changed
+          if (statusOverride && statusOverride !== courseData.courseBuilder.status) {
+            setCourseData(prev => ({
+              ...prev,
+              courseBuilder: {
+                ...prev.courseBuilder,
+                status: statusOverride
+              }
+            }));
+          }
+          setLastSavedAt(new Date());
+          if (!silent) {
+            toast({
+              title: statusOverride === 'PUBLISHED' ? 'Course published!' : 'Course updated successfully!',
+              description: statusOverride === 'PUBLISHED' ? 'Your course is now live.' : 'Your changes have been saved.'
+            });
+          }
         }
       } else {
         // No persisted courseBuilder yet: keep local state only
@@ -373,6 +432,7 @@ export default function PreviewBuilder() {
           title: 'Changes saved locally',
           description: 'Create the course first to persist changes.'
         });
+        setLastSavedAt(new Date());
       }
     } catch (error) {
       console.error("Error updating course:", error);
@@ -383,6 +443,50 @@ export default function PreviewBuilder() {
       });
     } finally {
       setIsLoading(false);
+      setIsPublishing(false);
+      setIsSavingDraft(false);
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    if (isLoading) return;
+    setIsSavingDraft(true);
+    await handleSave({ statusOverride: 'DRAFT' });
+  };
+
+  const handlePublish = async () => {
+    if (isLoading || isPublishing) return;
+    if (!courseData?.course?.courseTitle) {
+      toast({ title: 'Add a course title', description: 'A title is required before publishing.', variant: 'destructive' });
+      return;
+    }
+    if (!courseData?.courseContent?.length) {
+      toast({ title: 'Add content', description: 'At least one content item is required to publish.', variant: 'destructive' });
+      return;
+    }
+    if (!courseData?.courseBuilder?.courseBuilderId) {
+      toast({ title: 'Create a draft first', description: 'Save the course at least once before publishing.', variant: 'destructive' });
+      return;
+    }
+    setIsPublishing(true);
+    try {
+      const payload = buildPublishPayload();
+      if (!payload) throw new Error('Failed to build publish payload');
+      const res = await axiosConn.post('/publishCourse', payload);
+      if (res.data?.success) {
+        setCourseData(prev => ({
+          ...prev,
+          courseBuilder: { ...prev.courseBuilder, status: 'PUBLISHED' }
+        }));
+        toast({ title: 'Course published!', description: 'Your course is now live.' });
+      } else {
+        throw new Error(res.data?.message || 'Publish failed');
+      }
+    } catch (e) {
+      console.error('Publish error', e);
+      toast({ title: 'Publish failed', description: e.message || 'Please try again.', variant: 'destructive' });
+    } finally {
+      setIsPublishing(false);
     }
   };
 
@@ -482,11 +586,26 @@ export default function PreviewBuilder() {
   const courseDifficulty = course?.metadata?.courseDifficulty;
   const sourceChannel = course?.courseSourceChannel;
 
+  // Relative time formatter for last saved indicator
+  const formatRelativeTime = (date) => {
+    if (!date) return '';
+    const diff = Date.now() - date.getTime();
+    const sec = Math.floor(diff / 1000);
+    if (sec < 10) return 'just now';
+    if (sec < 60) return sec + 's ago';
+    const min = Math.floor(sec / 60);
+    if (min < 60) return min + 'm ago';
+    const hr = Math.floor(min / 60);
+    if (hr < 24) return hr + 'h ago';
+    const day = Math.floor(hr / 24);
+    return day + 'd ago';
+  };
+
   return (
     <div className="space-y-6 p-6">
-      {/* Header with save functionality */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex-1">
+  {/* Header with save functionality */}
+  <div className="mb-6">
+    <div className="flex-1">
           {editingCourseInfo ? (
             <div className="space-y-3">
               <Input
@@ -524,12 +643,7 @@ export default function PreviewBuilder() {
                     {courseBuilder?.status && (
                       <span className={`px-2 py-1 text-xs font-medium rounded-full border ${courseBuilder.status === 'PUBLISHED' ? 'bg-green-50 text-green-600 border-green-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200'}`}>{courseBuilder.status}</span>
                     )}
-                    {processingStatus && (
-                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200">{processingStatus}</span>
-                    )}
-                    {courseDifficulty && (
-                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-50 text-blue-600 border border-blue-200">{courseDifficulty}</span>
-                    )}
+                  
                     <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600 border border-gray-200">{courseContent?.length || 0} items · {formatDuration(totalDurationSeconds)}</span>
                   </div>
                   <p className="text-gray-600 mt-2 group-hover:text-gray-700 transition-colors max-w-3xl">
@@ -542,20 +656,42 @@ export default function PreviewBuilder() {
             </div>
           )}
         </div>
-
-        <div className="flex items-center gap-3 ml-6">
-          <Button 
-            onClick={handleSave}
-            disabled={isLoading}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
+        <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
+          <div className="text-xs text-gray-500 order-2 sm:order-1">
             {isLoading ? (
-              <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            ) : (
-              <Save className="h-4 w-4 mr-2" />
-            )}
-            Save All Changes
-          </Button>
+              <span className="flex items-center gap-1">
+                <span className="h-3 w-3 animate-spin rounded-full border-2 border-gray-400 border-t-transparent" />
+                Saving…
+              </span>
+            ) : <></>}
+          </div>
+          <div className="flex flex-wrap items-center gap-2 order-1 sm:order-2 justify-end">
+            <Button
+              variant="outline"
+              onClick={handleSaveDraft}
+              disabled={isLoading || isSavingDraft}
+              className="min-w-[110px]"
+            >
+              {isSavingDraft ? (
+                <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              Save Draft
+            </Button>
+            <Button
+              onClick={handlePublish}
+              disabled={isLoading || courseBuilder?.status === 'PUBLISHED'}
+              className={`min-w-[150px] ${courseBuilder?.status === 'PUBLISHED' ? 'bg-green-600 hover:bg-green-600' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+            >
+              {isPublishing ? (
+                <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              {courseBuilder?.status === 'PUBLISHED' ? 'Published' : 'Publish Course'}
+            </Button>
+          </div>
         </div>
       </div>
 
