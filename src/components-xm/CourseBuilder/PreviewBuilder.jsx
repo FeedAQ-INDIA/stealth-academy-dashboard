@@ -66,6 +66,129 @@ export default function PreviewBuilder() {
     return `${minutes}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // -----------------------------------------------
+  // API <-> Internal content item transformation
+  // Internal unified shape: { contentType, courseContent: {..}, courseVideo|courseWritten|... }
+  const apiItemToInternal = (item) => {
+    if (!item) return item;
+    if (item.contentType && item.courseContent) return item; // already unified
+    if (!item.courseContentType) return item; // unknown shape
+
+    const detail = item.courseContentTypeDetail || item.courseContentTypeDetails || {};
+    const base = {
+      contentType: item.courseContentType,
+      courseContent: {
+        courseContentId: item.courseContentId,
+        courseContentTitle: item.courseContentTitle,
+        courseContentSequence: item.courseContentSequence,
+        status: item.status || detail.status,
+        metadata: item.metadata || detail.metadata || {},
+        courseContentDuration: item.courseContentDuration || detail.duration || 0,
+        createdAt: item.createdAt || detail.createdAt,
+        updatedAt: item.updatedAt || detail.updatedAt,
+        isPublished: item.isPublished || false,
+        courseContentCategory: item.courseContentCategory,
+      }
+    };
+    if (item.courseContentType === 'CourseVideo') {
+      base.courseVideo = {
+        duration: detail.duration || item.courseContentDuration || 0,
+        courseVideoDescription: detail.courseVideoDescription,
+        thumbnailUrl: detail.thumbnailUrl,
+        isPreview: detail.isPreview,
+        courseVideoUrl: detail.courseVideoUrl,
+        courseVideoTitle: detail.courseVideoTitle || item.courseContentTitle,
+        sourcePlatform: detail?.metadata?.sourcePlatform || item?.metadata?.sourcePlatform,
+        videoId: detail?.metadata?.videoId || item?.metadata?.videoId,
+        channelTitle: detail?.metadata?.channelTitle,
+      };
+    } else if (item.courseContentType === 'CourseWritten') {
+      base.courseWritten = {
+        courseWrittenContent: detail.courseWrittenContent,
+        courseWrittenEmbedUrl: detail.courseWrittenEmbedUrl,
+        courseWrittenUrlIsEmbeddable: detail.courseWrittenUrlIsEmbeddable,
+      };
+    } else if (item.courseContentType === 'CourseQuiz') {
+      base.courseQuiz = {
+        courseQuizDescription: detail.courseQuizDescription,
+        questions: detail.questions || []
+      };
+    } else if (item.courseContentType === 'CourseFlashcard') {
+      base.courseFlashcard = {
+        setDescription: detail.setDescription,
+        cards: detail.cards || []
+      };
+    } else if (item.courseContentType === 'CourseAssignment') {
+      base.courseAssignment = {
+        assignmentDescription: detail.assignmentDescription,
+        dueDate: detail.dueDate
+      };
+    }
+    return base;
+  };
+
+  const internalItemToApi = (item, idx) => {
+    if (!item) return item;
+    const seq = item.courseContent?.courseContentSequence || idx + 1;
+    const apiItem = {
+      status: item.courseContent?.status || 'DRAFT',
+      courseId: courseData?.course?.courseId || item.courseContent?.courseId || 'temp_course_id',
+      metadata: {
+        ...(item.courseContent?.metadata || {}),
+        sequence: seq,
+        contentType: item.courseVideo?.sourcePlatform === 'YOUTUBE' ? 'YOUTUBE_VIDEO' : (item.courseContent?.metadata?.contentType || item.contentType)
+      },
+      createdAt: item.courseContent?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      isPublished: (item.courseContent?.status || '').toUpperCase() === 'PUBLISHED',
+      courseContentId: item.courseContent?.courseContentId,
+      courseContentType: item.contentType,
+      courseContentTitle: item.courseContent?.courseContentTitle,
+      courseContentCategory: item.courseContent?.courseContentCategory || (item.contentType === 'CourseVideo' ? 'Video Content' : 'Content'),
+      courseContentDuration: item.courseVideo?.duration || item.courseContent?.courseContentDuration || 0,
+      courseContentSequence: seq,
+      coursecontentIsLicensed: false,
+    };
+    if (item.contentType === 'CourseVideo') {
+      apiItem.courseContentTypeDetail = {
+        status: item.courseContent?.status || 'READY',
+        userId: courseData?.courseBuilder?.userId,
+        courseId: courseData?.course?.courseId || 'temp_course_id',
+        duration: item.courseVideo?.duration || 0,
+        metadata: {
+          videoId: item.courseVideo?.videoId,
+          sourcePlatform: item.courseVideo?.sourcePlatform,
+          channelTitle: item.courseVideo?.channelTitle,
+          ...(item.courseVideo?.metadata || {})
+        },
+        createdAt: item.courseContent?.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        isPreview: item.courseVideo?.isPreview || false,
+        thumbnailUrl: item.courseVideo?.thumbnailUrl,
+        courseVideoId: item.courseVideo?.courseVideoId,
+        courseVideoUrl: item.courseVideo?.courseVideoUrl,
+        courseContentId: item.courseContent?.courseContentId,
+        courseVideoTitle: item.courseVideo?.courseVideoTitle || item.courseContent?.courseContentTitle,
+        courseVideoDescription: item.courseVideo?.courseVideoDescription,
+      };
+    } else if (item.contentType === 'CourseWritten') {
+      apiItem.courseContentTypeDetail = {
+        userId: courseData?.courseBuilder?.userId,
+        courseId: courseData?.course?.courseId || 'temp_course_id',
+        metadata: item.courseContent?.metadata || {},
+        createdAt: item.courseContent?.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        courseContentId: item.courseContent?.courseContentId,
+        courseWrittenId: item.courseWritten?.courseWrittenId,
+        courseWrittenTitle: item.courseContent?.courseContentTitle,
+        courseWrittenContent: item.courseWritten?.courseWrittenContent,
+        courseWrittenEmbedUrl: item.courseWritten?.courseWrittenEmbedUrl,
+        courseWrittenUrlIsEmbeddable: item.courseWritten?.courseWrittenUrlIsEmbeddable,
+      };
+    }
+    return apiItem;
+  };
+
   // Data update handlers
   const updateCourseMetadata = (field, value) => {
     setCourseData(prev => ({
@@ -193,24 +316,62 @@ export default function PreviewBuilder() {
     setIsLoading(true);
     try {
       if (CourseBuilderId && courseData?.courseBuilder?.courseBuilderId) {
-        const response = await axiosConn.put(`/courseBuilder/${courseData.courseBuilder.courseBuilderId}`, {
-          courseBuilderData: courseData.courseBuilder.courseBuilderData,
-          course: courseData.course,
-          courseContent: courseData.courseContent,
-          status: courseData.courseBuilder.status,
-          orgId: courseData.courseBuilder.orgId
+        // Build updated courseBuilderData merging existing builder data with current edited state
+        const originalBuilderData = courseData.courseBuilder.courseBuilderData || {};
+        const existingCourseDetail = originalBuilderData.courseDetail || {};
+
+        // Keep JSON format SAME as currently used in UI & provided sample:
+        // Each item: { contentType, courseContent: {...}, courseVideo|courseWritten|... }
+        // Remove transient helper fields like _local before persisting.
+        const cleanedContent = (courseData.courseContent || []).map(item => {
+          const { _local, ...rest } = item; // strip transient
+          return rest;
         });
+
+        const updatedCourseDetail = {
+          ...existingCourseDetail,
+          // Overwrite editable fields from current course state
+          courseTitle: courseData.course.courseTitle,
+            // description etc
+          courseDescription: courseData.course.courseDescription,
+          courseId: courseData.course.courseId,
+          status: courseData.course.status,
+          deliveryMode: courseData.course.deliveryMode,
+          courseType: courseData.course.courseType,
+          courseDuration: courseData.course.courseDuration,
+          courseImageUrl: courseData.course.courseImageUrl,
+          courseSourceChannel: courseData.course.courseSourceChannel,
+          metadata: courseData.course.metadata,
+          // Convert internal unified items -> API items
+          courseContent: cleanedContent.map(internalItemToApi)
+        };
+
+        const updatedCourseBuilderData = {
+          ...originalBuilderData,
+          courseDetail: updatedCourseDetail
+        };
+
+        const payload = {
+          courseBuilderId: courseData.courseBuilder.courseBuilderId,
+            // Keep current status or fallback
+          status: courseData.courseBuilder.status || 'DRAFT',
+          orgId: courseData.courseBuilder.orgId,
+          courseBuilderData: updatedCourseBuilderData
+        };
+
+        const response = await axiosConn.post('/createOrUpdateCourseBuilder', payload);
 
         if (response.data.success) {
           toast({
-            title: "Course updated successfully!",
-            description: "Your changes have been saved.",
+            title: 'Course updated successfully!',
+            description: 'Your changes have been saved.'
           });
         }
       } else {
+        // No persisted courseBuilder yet: keep local state only
         toast({
-          title: "Changes saved locally",
-          description: "Your changes are preserved in the current session.",
+          title: 'Changes saved locally',
+          description: 'Create the course first to persist changes.'
         });
       }
     } catch (error) {
@@ -247,32 +408,11 @@ export default function PreviewBuilder() {
           return;
         }
 
-        const courseBuilderData = apiData.courseBuilderData || {};
+  const courseBuilderData = apiData.courseBuilderData || {};
         const courseDetail = courseBuilderData.courseDetail || {};
         const rawContent = Array.isArray(courseDetail.courseContent) ? courseDetail.courseContent : [];
-
-        // Normalize each content item to previous internal shape expected by JSX
-        const normalizedContent = rawContent.map((item) => {
-          const isVideo = item.courseContentType === 'CourseVideo';
-          const details = item.courseContentTypeDetails || {};
-          return {
-            contentType: item.courseContentType,
-            courseContent: {
-              courseContentId: item.courseContentId,
-              courseContentTitle: item.courseContentTitle,
-              courseContentSequence: item.courseContentSequence,
-              status: item.status,
-              metadata: item.metadata,
-            },
-            // Only include courseVideo object for video content
-            courseVideo: isVideo ? {
-              duration: details.duration,
-              courseVideoDescription: details.courseVideoDescription,
-              thumbnailUrl: details.thumbnailUrl,
-              isPreview: details.isPreview,
-            } : undefined,
-          };
-        }).sort((a,b) => (a.courseContent.courseContentSequence||0) - (b.courseContent.courseContentSequence||0));
+  const normalizedContent = rawContent.map(apiItemToInternal)
+          .sort((a,b) => (a.courseContent?.courseContentSequence||0) - (b.courseContent?.courseContentSequence||0));
 
         const internalData = {
           course: {
@@ -337,6 +477,7 @@ export default function PreviewBuilder() {
   }
 
   const { course, courseContent, courseBuilder } = courseData;
+  const processingStatus = courseBuilder?.courseBuilderData?.processingStatus;
   const totalDurationSeconds = (courseContent || []).reduce((sum, c) => sum + (c.courseVideo?.duration || c.courseContent?.courseContentDuration || 0), 0);
   const courseDifficulty = course?.metadata?.courseDifficulty;
   const sourceChannel = course?.courseSourceChannel;
@@ -382,6 +523,9 @@ export default function PreviewBuilder() {
                     </h1>
                     {courseBuilder?.status && (
                       <span className={`px-2 py-1 text-xs font-medium rounded-full border ${courseBuilder.status === 'PUBLISHED' ? 'bg-green-50 text-green-600 border-green-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200'}`}>{courseBuilder.status}</span>
+                    )}
+                    {processingStatus && (
+                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200">{processingStatus}</span>
                     )}
                     {courseDifficulty && (
                       <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-50 text-blue-600 border border-blue-200">{courseDifficulty}</span>
@@ -471,7 +615,8 @@ export default function PreviewBuilder() {
                       </h4>
                       
                       {(() => {
-                        const desc = content.courseVideo?.courseVideoDescription || content.courseWritten?.courseWrittenContent || content.courseQuiz?.courseQuizDescription || content.courseFlashcard?.setDescription;
+                        const rawDesc = content.courseVideo?.courseVideoDescription || content.courseWritten?.courseWrittenContent || content.courseQuiz?.courseQuizDescription || content.courseFlashcard?.setDescription;
+                        const desc = rawDesc && rawDesc.length > 300 ? rawDesc.slice(0, 300) + '…' : rawDesc;
                         return desc ? (<p className="text-sm text-gray-600 mb-2 line-clamp-2">{desc}</p>) : null;
                       })()}
 
@@ -483,6 +628,14 @@ export default function PreviewBuilder() {
                         <Badge variant="outline" className="text-xs">
                           {content.contentType}
                         </Badge>
+                        {content.courseVideo?.sourcePlatform && (
+                          <Badge variant="outline" className="text-xs">
+                            {content.courseVideo.sourcePlatform}
+                          </Badge>
+                        )}
+                        {content.courseVideo?.channelTitle && (
+                          <span className="max-w-[140px] truncate" title={content.courseVideo.channelTitle}>{content.courseVideo.channelTitle}</span>
+                        )}
                         {content.courseVideo?.isPreview && (
                           <Badge variant="outline" className="text-xs text-green-600">
                             <Eye className="h-3 w-3 mr-1" />
