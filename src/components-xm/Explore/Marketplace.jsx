@@ -22,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 import axiosConn from "@/axioscon.js";
 import { useAuthStore } from "@/zustland/store.js";
 import { CourseCard } from "@/components-xm/Modules/CourseCard.jsx";
-import { LoaderOne } from "@/components/ui/loader.jsx";
+import { Spinner } from "@/components/ui/spinner.jsx";
 import {
   Select,
   SelectContent,
@@ -335,13 +335,9 @@ export function Marketplace() {
       {/* Marketplace Course Content */}
       <div className="min-h-[400px] mt-6">
         {loading ? (
-          <div className="flex items-center justify-center min-h-[400px] w-full">
-            <div className="text-center">
-              <LoaderOne />
-              <p className="mt-4 text-gray-600">
-                Discovering amazing courses for you...
-              </p>
-            </div>
+          <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+            <Spinner size="lg" />
+            <p className="text-sm text-muted-foreground">Discovering amazing courses for you...</p>
           </div>
         ) : (
           <>

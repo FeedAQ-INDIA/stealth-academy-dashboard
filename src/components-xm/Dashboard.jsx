@@ -42,6 +42,7 @@ import mockinterview from "../assets/mock-interview.png";
 import languagestudio from "../assets/language-studio.png";
 import companiontalks from "../assets/companion-talks.png";
 import { ProgressCourseCard } from "./Modules/ProgressCourseCard";
+import { Spinner } from "@/components/ui/spinner";
 
 export function Dashboard() {
   const {
@@ -59,6 +60,8 @@ export function Dashboard() {
   const [limit, setLimit] = useState(4);
   const [offset, setOffset] = useState(0);
   const [courseList, setCourseList] = useState(null);
+  const [isLoadingCourses, setIsLoadingCourses] = useState(true);
+  const [isLoadingCompletedCourses, setIsLoadingCompletedCourses] = useState(true);
   const [apiQuery, setApiQuery] = useState({
     limit: limit,
     offset: offset,
@@ -107,6 +110,7 @@ export function Dashboard() {
   }, [apiQuery]);
 
   const fetchCourses = () => {
+    setIsLoadingCourses(true);
     axiosConn
       .post(import.meta.env.VITE_API_URL + "/searchCourse", apiQuery)
       .then((res) => {
@@ -121,12 +125,21 @@ export function Dashboard() {
       })
       .catch((err) => {
         console.log(err);
+        toast({
+          title: "Error loading courses",
+          description: "Failed to load your enrolled courses. Please try again.",
+          variant: "destructive"
+        });
+      })
+      .finally(() => {
+        setIsLoadingCourses(false);
       });
   };
 
   const [completedCourseList, setCompletedCourseList] = useState([]);
 
   const fetchCompletedCourses = () => {
+    setIsLoadingCompletedCourses(true);
     axiosConn
       .post(import.meta.env.VITE_API_URL + "/searchCourse", {
         limit: 200,
@@ -149,6 +162,14 @@ export function Dashboard() {
       })
       .catch((err) => {
         console.log(err);
+        toast({
+          title: "Error loading completed courses",
+          description: "Failed to load your completed courses. Please try again.",
+          variant: "destructive"
+        });
+      })
+      .finally(() => {
+        setIsLoadingCompletedCourses(false);
       });
   };
 
@@ -423,11 +444,27 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {courseList?.map((course) => (
-                  <ProgressCourseCard key={course.id} course={course} />
-                ))}
-              </div>
+              {isLoadingCourses ? (
+                <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                  <Spinner size="lg" />
+                  <p className="text-sm text-muted-foreground">Loading your courses...</p>
+                </div>
+              ) : courseList?.length > 0 ? (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {courseList.map((course) => (
+                    <ProgressCourseCard key={course.id} course={course} />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                  <BookOpen className="h-12 w-12 text-gray-400" />
+                  <h3 className="text-lg font-medium text-gray-500">No courses enrolled yet</h3>
+                  <p className="text-sm text-gray-400 text-center">Start your learning journey by exploring our course catalog</p>
+                  <Button asChild className="mt-4">
+                    <Link to="/explore">Explore Courses</Link>
+                  </Button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

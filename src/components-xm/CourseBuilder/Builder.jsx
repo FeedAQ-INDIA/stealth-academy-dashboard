@@ -9,6 +9,7 @@ import axiosConn from "@/axioscon";
 import byoc1 from "@/assets/byoc_1.png";
 import { useOrganizationStore } from "@/zustland/store";
 import { useNavigate } from "react-router-dom";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Builder() {
   const [urls, setUrls] = useState([""]);
@@ -268,14 +269,19 @@ export default function Builder() {
               </Button>
             </div>
             <Button type="submit" className="w-full" disabled={isLoading || !courseTitle.trim() || urls.filter(u => u.trim()).length === 0}>
-              {isLoading
-                ? "Analyzing & Building Course..."
-                : "Analyze & Build Course"}
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <Spinner size="sm" decorative />
+                  Analyzing & Building Course...
+                </div>
+              ) : (
+                "Analyze & Build Course"
+              )}
             </Button>
             {isLoading && (
               <div className="text-center text-sm text-gray-600 mt-2">
                 <div className="flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  <Spinner size="xs" decorative />
                   This may take a few moments...
                 </div>
               </div>

@@ -28,7 +28,7 @@ import axiosConn from "@/axioscon.js";
 import { useAuthStore } from "@/zustland/store.js";
 import { CourseCard } from "@/components-xm/Modules/CourseCard.jsx";
 import Header from "@/components-xm/Header/Header.jsx";
- import { LoaderOne } from "@/components/ui/loader.jsx";
+import { Spinner } from "@/components/ui/spinner.jsx";
 import { Badge } from "@/components/ui/badge";
 import { 
   Select,
@@ -384,11 +384,9 @@ export function MyCourse() {
       {/* Content */}
       <div className="min-h-[400px]">
         {loading ? (
-          <div className="flex items-center justify-center min-h-[400px] w-full">
-            <div className="text-center">
-              <LoaderOne />
-              <p className="mt-4 text-gray-600">Loading your courses...</p>
-            </div>
+          <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+            <Spinner size="lg" />
+            <p className="text-sm text-muted-foreground">Loading your courses...</p>
           </div>
         ) : (
           <>

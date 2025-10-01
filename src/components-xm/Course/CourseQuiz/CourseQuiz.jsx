@@ -21,7 +21,7 @@ import {Checkbox} from "@/components/ui/checkbox.jsx";
 import QuizRender from "@/components-xm/Course/CourseQuiz/QuizRender.jsx";
 import {useAuthStore} from "@/zustland/store.js";
 import {Progress} from "@/components/ui/progress.jsx";
-import {Skeleton} from "@/components/ui/skeleton.jsx";
+import {Spinner} from "@/components/ui/spinner.jsx";
 
 function CourseQuiz() {
     const {CourseId, CourseQuizId} = useParams();
@@ -244,23 +244,9 @@ function CourseQuiz() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gray-50">
-                <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
-                    <SidebarTrigger className="-ml-1"/>
-                    <Separator orientation="vertical" className="mr-2 h-4"/>
-                    <Skeleton className="h-4 w-32" />
-                </header>
-                <div className="p-4">
-                    <Card className="border-none shadow-sm">
-                        <CardHeader className="space-y-4">
-                            <div className="flex gap-2">
-                                <Skeleton className="h-6 w-16" />
-                                <Skeleton className="h-6 w-20" />
-                            </div>
-                            <Skeleton className="h-8 w-3/4" />
-                        </CardHeader>
-                    </Card>
-                </div>
+            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+                <Spinner size="lg" />
+                <p className="text-sm text-muted-foreground">Loading quiz content...</p>
             </div>
         );
     }
