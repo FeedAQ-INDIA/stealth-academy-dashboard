@@ -21,85 +21,114 @@ import {
 import { Video, Save } from "lucide-react";
 
 // Zod schema for video content validation (aligned with backend entity)
-const videoContentSchema = z.object({
-  title: z.string()
-    .min(1, "Title is required")
-    .min(3, "Title must be at least 3 characters")
-    .max(200, "Title must be less than or equal to 200 characters"), // entity allows 200
-  description: z.string()
-    .max(5000, "Description must be less than 5000 characters")
-    .optional()
-    .or(z.literal("")), // backend TEXT; generous limit client-side
-  videoSourceType: z.enum(["url", "upload"]).default("url"),
-  videoUrl: z.string()
-    .url("Please enter a valid URL")
-    .refine((url) => {
-      const videoPatterns = [
-        /youtube\.com\/watch\?v=/,
-        /youtu\.be\//,
-        /vimeo\.com\//,
-        /\.mp4$/,
-        /\.webm$/,
-        /\.ogg$/
-      ];
-      return videoPatterns.some(pattern => pattern.test(url));
-    }, "Please enter a valid video URL (YouTube, Vimeo, or direct video file)")
-    .optional()
-    .or(z.literal("")),
-  // File object when uploading; validated conditionally
-  videoFile: z.any().optional(),
-  duration: z.coerce.number()
-    .min(0, "Duration must be 0 or greater")
-    .max(86400, "Duration must be less than 24 hours"),
-  thumbnailUrl: z.string()
-    .url("Please enter a valid thumbnail URL")
-    .optional()
-    .or(z.literal("")),
-  isPreview: z.boolean().default(false)
-}).superRefine((data, ctx) => {
-  if (data.videoSourceType === 'url' && !data.videoUrl) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['videoUrl'], message: 'Video URL is required when source type is URL' });
-  }
-  if (data.videoSourceType === 'upload' && !data.videoFile) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['videoFile'], message: 'Please select a video file to upload' });
-  }
-});
+const videoContentSchema = z
+  .object({
+    title: z
+      .string()
+      .min(1, "Title is required")
+      .min(3, "Title must be at least 3 characters")
+      .max(200, "Title must be less than or equal to 200 characters"), // entity allows 200
+    description: z
+      .string()
+      .max(5000, "Description must be less than 5000 characters")
+      .optional()
+      .or(z.literal("")), // backend TEXT; generous limit client-side
+    videoSourceType: z.enum(["url", "upload"]).default("url"),
+    videoUrl: z
+      .string()
+      .url("Please enter a valid URL")
+      .refine((url) => {
+        const videoPatterns = [
+          /youtube\.com\/watch\?v=/,
+          /youtu\.be\//,
+          /vimeo\.com\//,
+          /\.mp4$/,
+          /\.webm$/,
+          /\.ogg$/,
+        ];
+        return videoPatterns.some((pattern) => pattern.test(url));
+      }, "Please enter a valid video URL (YouTube, Vimeo, or direct video file)")
+      .optional()
+      .or(z.literal("")),
+    // File object when uploading; validated conditionally
+    videoFile: z.any().optional(),
+    duration: z.coerce
+      .number()
+      .min(0, "Duration must be 0 or greater")
+      .max(86400, "Duration must be less than 24 hours"),
+    thumbnailUrl: z
+      .string()
+      .url("Please enter a valid thumbnail URL")
+      .optional()
+      .or(z.literal("")),
+    isPreview: z.boolean().default(false),
+  })
+  .superRefine((data, ctx) => {
+    if (data.videoSourceType === "url" && !data.videoUrl) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["videoUrl"],
+        message: "Video URL is required when source type is URL",
+      });
+    }
+    if (data.videoSourceType === "upload" && !data.videoFile) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["videoFile"],
+        message: "Please select a video file to upload",
+      });
+    }
+  });
 
-export default function VideoContentCreator({ 
-  onAdd, 
+export default function VideoContentCreator({
+  onAdd,
   onUpdate,
-  onCancel, 
+  onCancel,
   isLoading = false,
   courseContentSequence = 1,
   mode = "create",
   existingContent = null,
-  onUpload // optional callback: async (file) => returns { url, duration? }
+  onUpload, // optional callback: async (file) => returns { url, duration? }
 }) {
   const form = useForm({
     resolver: zodResolver(videoContentSchema),
     defaultValues: {
-      title: existingContent?.courseContent?.courseContentTitle || existingContent?.courseVideo?.courseVideoTitle || "",
-      description: existingContent?.courseVideo?.courseVideoDescription || "",
-      videoSourceType: existingContent?.courseVideo?.courseVideoUrl ? 'url' : 'upload',
-      videoUrl: existingContent?.courseVideo?.courseVideoUrl || "",
+      title:
+        existingContent?.courseContentTitle ||
+        existingContent?.courseContentTypeDetail?.courseVideoTitle ||
+        "",
+      description:
+        existingContent?.courseContentTypeDetail?.courseVideoDescription || "",
+      videoSourceType: existingContent?.courseContentTypeDetail?.courseVideoUrl
+        ? "url"
+        : "upload",
+      videoUrl: existingContent?.courseContentTypeDetail?.courseVideoUrl || "",
       videoFile: null,
-      duration: existingContent?.courseVideo?.duration || existingContent?.courseContent?.courseContentDuration || 0,
-      thumbnailUrl: existingContent?.courseVideo?.thumbnailUrl || "",
-      isPreview: existingContent?.courseVideo?.isPreview || false
-    }
+      duration:
+        existingContent?.courseContentTypeDetail?.duration ||
+        existingContent?.courseContentDuration ||
+        0,
+      thumbnailUrl:
+        existingContent?.courseContentTypeDetail?.thumbnailUrl || "",
+      isPreview: existingContent?.courseContentTypeDetail?.isPreview || false,
+    },
   });
 
   const processVideoUpload = async (data) => {
-    if (data.videoSourceType !== 'upload' || !data.videoFile) return { url: data.videoUrl, duration: data.duration };
+    if (data.videoSourceType !== "upload" || !data.videoFile)
+      return { url: data.videoUrl, duration: data.duration };
     if (!onUpload) {
       // Parent must handle actual upload; we pass raw file upward for deferred handling
-      return { url: '', duration: data.duration };
+      return { url: "", duration: data.duration };
     }
     try {
       const result = await onUpload(data.videoFile); // Expect { url, duration? }
-      return { url: result?.url || '', duration: result?.duration ?? data.duration };
+      return {
+        url: result?.url || "",
+        duration: result?.duration ?? data.duration,
+      };
     } catch (e) {
-      console.error('Video upload failed:', e);
+      console.error("Video upload failed:", e);
       throw e;
     }
   };
@@ -112,34 +141,29 @@ export default function VideoContentCreator({
       // Create the content structure expected by the parent
       const newContent = {
         contentType: "CourseVideo",
-        courseContent: {
-          courseContentId: existingContent?.courseContent?.courseContentId || `temp_${Date.now()}`, // Keep original ID if editing
-          courseContentTitle: data.title,
-          // Category removed; enforce constant for backend if required
-          courseContentCategory: "Video Content",
-          courseContentType: "CourseVideo",
-          courseContentSequence: existingContent?.courseContent?.courseContentSequence || courseContentSequence,
-          courseContentDuration: uploadResult.duration, // keep duration sync
-          isActive: true,
-          coursecontentIsLicensed: false,
-          metadata: existingContent?.courseContent?.metadata || {}
-        },
-        courseVideo: {
+        courseContentId:
+          existingContent?.courseContentId || `temp_${Date.now()}`, // Keep original ID if editing
+        courseContentTitle: data.title,
+        // Category removed; enforce constant for backend if required
+        courseContentCategory: "Video Content",
+        courseContentType: "CourseVideo",
+        courseContentSequence:
+          existingContent?.courseContentSequence || courseContentSequence,
+        courseContentDuration: uploadResult.duration, // keep duration sync
+        isActive: true,
+        coursecontentIsLicensed: false,
+        metadata: existingContent?.metadata || {},
+        courseContentTypeDetail: {
           courseVideoTitle: data.title, // Matches CourseVideo.courseVideoTitle field
-          courseVideoUrl: uploadResult.url || data.videoUrl || '',
+          courseVideoUrl: uploadResult.url || data.videoUrl || "",
           courseVideoDescription: data.description,
           duration: uploadResult.duration,
           thumbnailUrl: data.thumbnailUrl,
           isPreview: data.isPreview,
-          metadata: existingContent?.courseVideo?.metadata || {}
+          metadata: existingContent?.courseContentTypeDetail?.metadata || {},
         },
-        // Provide raw file if upload for parent to finalize (not persisted directly)
-        _local: {
-          videoFile: data.videoSourceType === 'upload' ? data.videoFile : null,
-          sourceType: data.videoSourceType
-        }
       };
-      if (mode === 'edit') {
+      if (mode === "edit") {
         await onUpdate?.(newContent);
       } else {
         await onAdd?.(newContent);
@@ -157,8 +181,14 @@ export default function VideoContentCreator({
             <Video className="h-5 w-5 text-blue-600" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">{mode === 'edit' ? 'Edit Video Content' : 'Add Video Content'}</h2>
-            <p className="text-sm text-gray-600">{mode === 'edit' ? 'Update the video lesson' : 'Create a new video lesson'}</p>
+            <h2 className="text-xl font-semibold text-gray-900">
+              {mode === "edit" ? "Edit Video Content" : "Add Video Content"}
+            </h2>
+            <p className="text-sm text-gray-600">
+              {mode === "edit"
+                ? "Update the video lesson"
+                : "Create a new video lesson"}
+            </p>
           </div>
         </div>
       </div>
@@ -175,10 +205,7 @@ export default function VideoContentCreator({
                   <FormItem>
                     <FormLabel>Title *</FormLabel>
                     <FormControl>
-                      <Input 
-                        placeholder="Enter video title" 
-                        {...field} 
-                      />
+                      <Input placeholder="Enter video title" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -195,10 +222,10 @@ export default function VideoContentCreator({
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Textarea 
+                      <Textarea
                         placeholder="Enter video description"
                         rows={3}
-                        {...field} 
+                        {...field}
                       />
                     </FormControl>
                     <FormDescription>
@@ -226,11 +253,21 @@ export default function VideoContentCreator({
                       >
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem value="url" id="src-url" />
-                          <label htmlFor="src-url" className="text-sm cursor-pointer">URL</label>
+                          <label
+                            htmlFor="src-url"
+                            className="text-sm cursor-pointer"
+                          >
+                            URL
+                          </label>
                         </div>
                         <div className="flex items-center space-x-2">
                           <RadioGroupItem value="upload" id="src-upload" />
-                          <label htmlFor="src-upload" className="text-sm cursor-pointer">Upload</label>
+                          <label
+                            htmlFor="src-upload"
+                            className="text-sm cursor-pointer"
+                          >
+                            Upload
+                          </label>
                         </div>
                       </RadioGroup>
                     </FormControl>
@@ -244,7 +281,7 @@ export default function VideoContentCreator({
             </div>
 
             {/* Video URL Field (conditional) */}
-            {form.watch('videoSourceType') === 'url' && (
+            {form.watch("videoSourceType") === "url" && (
               <div>
                 <FormField
                   control={form.control}
@@ -253,14 +290,15 @@ export default function VideoContentCreator({
                     <FormItem>
                       <FormLabel>Video URL *</FormLabel>
                       <FormControl>
-                        <Input 
+                        <Input
                           type="url"
                           placeholder="https://youtube.com/watch?v=..."
-                          {...field} 
+                          {...field}
                         />
                       </FormControl>
                       <FormDescription>
-                        YouTube, Vimeo, or direct .mp4/.webm/.ogg file URL (publicly accessible)
+                        YouTube, Vimeo, or direct .mp4/.webm/.ogg file URL
+                        (publicly accessible)
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -270,7 +308,7 @@ export default function VideoContentCreator({
             )}
 
             {/* Video Upload Field (conditional) */}
-            {form.watch('videoSourceType') === 'upload' && (
+            {form.watch("videoSourceType") === "upload" && (
               <div>
                 <FormField
                   control={form.control}
@@ -279,7 +317,7 @@ export default function VideoContentCreator({
                     <FormItem>
                       <FormLabel>Upload Video *</FormLabel>
                       <FormControl>
-                        <Input 
+                        <Input
                           type="file"
                           accept="video/*"
                           onChange={(e) => {
@@ -288,9 +326,11 @@ export default function VideoContentCreator({
                               // Basic client-side size limit (e.g., 1GB)
                               const maxBytes = 1024 * 1024 * 1024; // 1GB
                               if (file.size > maxBytes) {
-                                form.setError('videoFile', { message: 'File exceeds 1GB limit' });
+                                form.setError("videoFile", {
+                                  message: "File exceeds 1GB limit",
+                                });
                               } else {
-                                form.clearErrors('videoFile');
+                                form.clearErrors("videoFile");
                               }
                             }
                             field.onChange(file || null);
@@ -298,7 +338,8 @@ export default function VideoContentCreator({
                         />
                       </FormControl>
                       <FormDescription>
-                        Supported: common video formats. Max 1GB (adjust as needed).
+                        Supported: common video formats. Max 1GB (adjust as
+                        needed).
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -316,10 +357,10 @@ export default function VideoContentCreator({
                   <FormItem>
                     <FormLabel>Thumbnail URL</FormLabel>
                     <FormControl>
-                      <Input 
+                      <Input
                         type="url"
                         placeholder="https://example.com/thumbnail.jpg"
-                        {...field} 
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -337,13 +378,15 @@ export default function VideoContentCreator({
                   <FormItem>
                     <FormLabel>Duration (seconds)</FormLabel>
                     <FormControl>
-                      <Input 
+                      <Input
                         type="number"
                         min="0"
                         max="86400"
                         placeholder="300"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value) || 0)
+                        }
                       />
                     </FormControl>
                     <FormDescription>
@@ -356,8 +399,6 @@ export default function VideoContentCreator({
             </div>
 
             {/* Category Field removed */}
-
-        
           </div>
 
           <div className="flex items-center gap-3 pt-4 border-t">
@@ -371,9 +412,9 @@ export default function VideoContentCreator({
               ) : (
                 <Save className="h-4 w-4 mr-2" />
               )}
-              {mode === 'edit' ? 'Save Changes' : 'Add Video Content'}
+              {mode === "edit" ? "Save Changes" : "Add Video Content"}
             </Button>
-            
+
             {onCancel && (
               <Button
                 type="button"

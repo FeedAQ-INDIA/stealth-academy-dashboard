@@ -25,33 +25,46 @@ import { BookOpen, Save, Plus, Trash2 } from "lucide-react";
 
 // Zod schema aligned with backend entity attributes
 const flashcardSchema = z.object({
-  front: z.string()
+  front: z
+    .string()
     .min(1, "Question is required")
     .min(2, "Question must be at least 2 characters")
-    .max(500, "Question must be less than 500 characters"),
-  back: z.string()
+    .max(1000, "Question must be less than 1000 characters"),
+  back: z
+    .string()
     .min(1, "Answer is required")
     .min(2, "Answer must be at least 2 characters")
-    .max(2000, "Answer must be less than 2000 characters"),
-  hint: z.string()
-    .max(500, "Explanation must be less than 500 characters")
-    .optional(),
-  difficulty: z.enum(["EASY", "MEDIUM", "HARD"]).default("MEDIUM")
+    .max(5000, "Answer must be less than 5000 characters"),
+  hint: z
+    .string()
+    .max(2000, "Explanation must be less than 2000 characters")
+    .optional()
+    .or(z.literal("")),
+  difficulty: z.enum(["EASY", "MEDIUM", "HARD"]).default("MEDIUM"),
 });
 
 const flashcardContentSchema = z.object({
-  title: z.string()
+  title: z
+    .string()
     .min(1, "Title is required")
     .min(3, "Title must be at least 3 characters")
-    .max(200, "Title must be less than 200 characters"),
-  description: z.string()
-    .max(1000, "Description must be less than 1000 characters")
-    .optional(),
+    .max(200, "Title must be less than or equal to 200 characters"),
+  description: z
+    .string()
+    .max(5000, "Description must be less than 5000 characters")
+    .optional()
+    .or(z.literal("")),
   setDifficulty: z.enum(["EASY", "MEDIUM", "HARD", "MIXED"]).default("MEDIUM"),
-  estimatedDuration: z.coerce.number().int().positive().max(10000).optional(), // minutes
-  cards: z.array(flashcardSchema)
+  estimatedDuration: z.coerce
+    .number()
+    .int()
+    .positive()
+    .max(1440)
+    .optional(), // minutes, max 24 hours
+  cards: z
+    .array(flashcardSchema)
     .min(1, "Must have at least one flashcard")
-    .max(100, "Cannot exceed 100 flashcards")
+    .max(200, "Cannot exceed 200 flashcards"),
 });
 
 export default function FlashcardContentCreator({
@@ -60,25 +73,34 @@ export default function FlashcardContentCreator({
   onCancel,
   isLoading = false,
   courseContentSequence = 1,
-  mode = 'create',
-  existingContent = null
+  mode = "create",
+  existingContent = null,
 }) {
   const form = useForm({
     resolver: zodResolver(flashcardContentSchema),
     defaultValues: {
-      title: existingContent?.courseContent?.courseContentTitle || existingContent?.courseFlashcard?.setTitle || "",
-      description: existingContent?.courseFlashcard?.setDescription || "",
-      setDifficulty: existingContent?.courseFlashcard?.setDifficulty || "MEDIUM",
-      estimatedDuration: existingContent?.courseFlashcard?.estimatedDuration || (existingContent?.courseFlashcard?.cards?.length ? existingContent.courseFlashcard.cards.length * 2 : 2),
-      cards: existingContent?.courseFlashcard?.cards?.length
-        ? existingContent.courseFlashcard.cards.map(c => ({
+      title:
+        existingContent?.courseContentTitle ||
+        existingContent?.courseContentTypeDetail?.setTitle ||
+        "",
+      description:
+        existingContent?.courseContentTypeDetail?.setDescription || "",
+      setDifficulty:
+        existingContent?.courseContentTypeDetail?.setDifficulty || "MEDIUM",
+      estimatedDuration:
+        existingContent?.courseContentTypeDetail?.estimatedDuration ||
+        (existingContent?.courseContentTypeDetail?.cards?.length
+          ? existingContent.courseContentTypeDetail.cards.length * 2
+          : 2),
+      cards: existingContent?.courseContentTypeDetail?.cards?.length
+        ? existingContent.courseContentTypeDetail.cards.map((c) => ({
             front: c.question,
             back: c.answer,
             hint: c.explanation || (Array.isArray(c.hints) ? c.hints[0] : ""),
-            difficulty: c.difficulty || 'MEDIUM'
+            difficulty: c.difficulty || "MEDIUM",
           }))
-        : [ { front: "", back: "", hint: "", difficulty: "MEDIUM" } ],
-    }
+        : [{ front: "", back: "", hint: "", difficulty: "MEDIUM" }],
+    },
   });
 
   const [autoDuration, setAutoDuration] = useState(true);
@@ -89,7 +111,7 @@ export default function FlashcardContentCreator({
     if (autoDuration) {
       form.setValue('estimatedDuration', Math.max(1, cards.length * 2));
     }
-  }, [cards.length, autoDuration]);
+  }, [cards.length, autoDuration, form]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -100,43 +122,43 @@ export default function FlashcardContentCreator({
     try {
       // Ensure estimatedDuration in minutes (already minutes)
       const estimatedDuration = data.estimatedDuration || data.cards.length * 2;
-  // Tags removed from UI; preserve existing if editing
-  const tagArray = existingContent?.courseFlashcard?.setTags || [];
+      // Tags removed from UI; preserve existing if editing
+      const tagArray = existingContent?.courseContentTypeDetail?.setTags || [];
 
       // Create the content structure expected by the parent
       const newContent = {
         contentType: "CourseFlashcard",
-        courseContent: {
-          courseContentId: existingContent?.courseContent?.courseContentId || `temp_${Date.now()}`,
-          courseContentTitle: data.title,
-          courseContentCategory: existingContent?.courseContent?.courseContentCategory || "Interactive Content",
-          courseContentType: "CourseFlashcard",
-          courseContentSequence: existingContent?.courseContent?.courseContentSequence || courseContentSequence,
-          courseContentDuration: estimatedDuration,
-          isActive: true,
-          coursecontentIsLicensed: false,
-          metadata: existingContent?.courseContent?.metadata || {}
-        },
-        courseFlashcard: {
+        courseContentId:
+          existingContent?.courseContentId || `temp_${Date.now()}`, // Keep original ID if editing
+        courseContentTitle: data.title,
+        courseContentCategory: "Interactive Content",
+        courseContentType: "CourseFlashcard",
+        courseContentSequence:
+          existingContent?.courseContentSequence || courseContentSequence,
+        courseContentDuration: estimatedDuration,
+        isActive: true,
+        coursecontentIsLicensed: false,
+        metadata: existingContent?.metadata || {},
+        courseContentTypeDetail: {
           setTitle: data.title,
           setDescription: data.description,
           setDifficulty: data.setDifficulty,
           setTags: tagArray,
           estimatedDuration: estimatedDuration,
           cardCount: data.cards.length,
-          metadata: existingContent?.courseFlashcard?.metadata || {},
           cards: data.cards.map((card, index) => ({
             question: card.front,
             answer: card.back,
             explanation: card.hint,
-            difficulty: card.difficulty || 'MEDIUM',
+            difficulty: card.difficulty || "MEDIUM",
             hints: card.hint ? [card.hint] : [],
             orderIndex: index + 1,
-            metadata: {}
+            metadata: {},
           })),
+          metadata: existingContent?.courseContentTypeDetail?.metadata || {},
         },
       };
-      if (mode === 'edit') {
+      if (mode === "edit") {
         await onUpdate?.(newContent);
       } else {
         await onAdd?.(newContent);
@@ -169,10 +191,12 @@ export default function FlashcardContentCreator({
           </div>
           <div>
             <h2 className="text-xl font-semibold text-gray-900">
-              {mode === 'edit' ? 'Edit Flashcard Set' : 'Add Flashcard Set'}
+              {mode === "edit" ? "Edit Flashcard Set" : "Add Flashcard Set"}
             </h2>
             <p className="text-sm text-gray-600">
-              {mode === 'edit' ? 'Update this set of study flashcards' : 'Create a new set of study flashcards'}
+              {mode === "edit"
+                ? "Update this set of study flashcards"
+                : "Create a new set of study flashcards"}
             </p>
           </div>
         </div>
@@ -304,7 +328,7 @@ export default function FlashcardContentCreator({
                 onClick={addCard} 
                 size="sm" 
                 variant="outline"
-                disabled={fields.length >= 100}
+                disabled={fields.length >= 200}
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Card
@@ -441,7 +465,7 @@ export default function FlashcardContentCreator({
               ) : (
                 <Save className="h-4 w-4 mr-2" />
               )}
-              {mode === 'edit' ? 'Save Changes' : 'Add Flashcard Set'}
+              {mode === "edit" ? "Save Changes" : "Add Flashcard Set"}
             </Button>
             
             {onCancel && (

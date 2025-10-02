@@ -68,56 +68,133 @@ const questionSchema = z.object({
   }
 });
 
-const quizContentSchema = z.object({
-  title: z.string().min(1, "Title is required").min(3, "Title must be at least 3 characters").max(100, "Title must be less than 100 characters"),
-  description: z.string().max(500, "Description must be less than 500 characters").optional(),
-  instructions: z.string().max(1000, "Instructions must be less than 1000 characters").optional(),
-  quizType: z.enum(["CERTIFICATION", "QUIZ"]).default("QUIZ"), // maps to courseQuizType
-  isTimed: z.boolean().default(true), // maps to isQuizTimed
-  timeLimit: z.coerce.number().min(1, "Time limit must be at least 1 minute").max(240, "Time limit must be less than 4 hours").optional(),
-  passingScore: z.coerce.number().min(0, "Passing score must be at least 0%").max(100, "Passing score cannot exceed 100%"),
-  maxAttempts: z.coerce.number().min(1, "Must allow at least 1 attempt").max(10, "Cannot exceed 10 attempts"),
-  questions: z.array(questionSchema).min(1, "Must have at least one question").max(50, "Cannot exceed 50 questions")
-}).superRefine((data, ctx) => {
-  if (data.isTimed && (!data.timeLimit || data.timeLimit < 1)) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["timeLimit"], message: "Time limit required when quiz is timed" });
-  }
-});
+const quizContentSchema = z
+  .object({
+    title: z
+      .string()
+      .min(1, "Title is required")
+      .min(3, "Title must be at least 3 characters")
+      .max(200, "Title must be less than or equal to 200 characters"), // entity allows 200
+    description: z
+      .string()
+      .max(5000, "Description must be less than 5000 characters")
+      .optional()
+      .or(z.literal("")), // backend TEXT; generous limit client-side
+    instructions: z
+      .string()
+      .max(5000, "Instructions must be less than 5000 characters")
+      .optional()
+      .or(z.literal("")),
+    quizType: z.enum(["CERTIFICATION", "QUIZ"]).default("QUIZ"), // maps to courseQuizType
+    isTimed: z.boolean().default(true), // maps to isQuizTimed
+    timeLimit: z.coerce
+      .number()
+      .min(1, "Time limit must be at least 1 minute")
+      .max(480, "Time limit must be less than 8 hours")
+      .optional(),
+    passingScore: z.coerce
+      .number()
+      .min(0, "Passing score must be at least 0%")
+      .max(100, "Passing score cannot exceed 100%"),
+    maxAttempts: z.coerce
+      .number()
+      .min(1, "Must allow at least 1 attempt")
+      .max(20, "Cannot exceed 20 attempts"),
+    questions: z
+      .array(questionSchema)
+      .min(1, "Must have at least one question")
+      .max(100, "Cannot exceed 100 questions"),
+  })
+  .superRefine((data, ctx) => {
+    if (data.isTimed && (!data.timeLimit || data.timeLimit < 1)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["timeLimit"],
+        message: "Time limit required when quiz is timed",
+      });
+    }
+  });
 
-export default function QuizContentCreator({ 
-  onAdd, 
+export default function QuizContentCreator({
+  onAdd,
   onUpdate,
-  onCancel, 
+  onCancel,
   isLoading = false,
   courseContentSequence = 1,
   courseId = null,
-  mode = 'create',
-  existingContent = null
+  mode = "create",
+  existingContent = null,
 }) {
   const form = useForm({
     resolver: zodResolver(quizContentSchema),
     defaultValues: {
-      title: existingContent?.courseContent?.courseContentTitle || existingContent?.courseQuiz?.courseQuizTitle || existingContent?.courseQuiz?.title || "",
-      description: existingContent?.courseQuiz?.courseQuizDescription || "",
-      instructions: existingContent?.courseQuiz?.metadata?.instructions || "",
-      quizType: existingContent?.courseQuiz?.courseQuizType || (existingContent?.courseQuiz?.courseQuizType === "CERTIFICATION" ? "CERTIFICATION" : "QUIZ"),
-      isTimed: existingContent?.courseQuiz?.isQuizTimed ?? true,
-      timeLimit: existingContent?.courseQuiz?.courseQuizTimer ? Math.max(1, Math.round(existingContent.courseQuiz.courseQuizTimer / 60)) : 10,
-      passingScore: existingContent?.courseQuiz?.courseQuizPassPercent || 70,
-      maxAttempts: existingContent?.courseQuiz?.metadata?.maxAttempts || 3,
-      questions: (existingContent?.courseQuiz?.questions || existingContent?.questions || []).length ? (existingContent?.courseQuiz?.questions || existingContent?.questions).map(q => ({
-        question: q.quizQuestionTitle || q.question || "",
-        type: q.quizQuestionType || 'SINGLE_CHOICE',
-        options: Array.isArray(q.quizQuestionOption) ? q.quizQuestionOption : ["", "", "", ""],
-        correctAnswer: q.quizQuestionType === 'SINGLE_CHOICE' ? (Array.isArray(q.quizQuestionCorrectAnswer) ? q.quizQuestionCorrectAnswer[0] : 0) : undefined,
-        correctAnswers: q.quizQuestionType === 'MULTIPLE_CHOICE' ? (Array.isArray(q.quizQuestionCorrectAnswer) ? q.quizQuestionCorrectAnswer : []) : [],
-        explanation: q.explanation || "",
-        note: q.quizQuestionNote || "",
-        posPoints: q.quizQuestionPosPoint ?? 1,
-        negPoints: q.quizQuestionNegPoint ?? 0,
-        difficulty: q.difficultyLevel || 'MEDIUM'
-      })) : [{ question: "", type: "SINGLE_CHOICE", options: ["", "", "", ""], correctAnswer: 0, correctAnswers: [], explanation: "", note: "", posPoints: 1, negPoints: 0, difficulty: 'MEDIUM' }]
-    }
+      title:
+        existingContent?.courseContentTitle ||
+        existingContent?.courseContentTypeDetail?.courseQuizTitle ||
+        existingContent?.courseContentTypeDetail?.title ||
+        "",
+      description:
+        existingContent?.courseContentTypeDetail?.courseQuizDescription || "",
+      instructions:
+        existingContent?.courseContentTypeDetail?.metadata?.instructions || "",
+      quizType:
+        existingContent?.courseContentTypeDetail?.courseQuizType ||
+        (existingContent?.courseContentTypeDetail?.courseQuizType === "CERTIFICATION"
+          ? "CERTIFICATION"
+          : "QUIZ"),
+      isTimed: existingContent?.courseContentTypeDetail?.isQuizTimed ?? true,
+      timeLimit: existingContent?.courseContentTypeDetail?.courseQuizTimer
+        ? Math.max(1, Math.round(existingContent.courseContentTypeDetail.courseQuizTimer / 60))
+        : 10,
+      passingScore:
+        existingContent?.courseContentTypeDetail?.courseQuizPassPercent || 70,
+      maxAttempts:
+        existingContent?.courseContentTypeDetail?.metadata?.maxAttempts || 3,
+      questions: (existingContent?.courseContentTypeDetail?.questions ||
+        existingContent?.questions ||
+        []).length
+        ? (
+            existingContent?.courseContentTypeDetail?.questions ||
+            existingContent?.questions
+          ).map((q) => ({
+            question: q.quizQuestionTitle || q.question || "",
+            type: q.quizQuestionType || "SINGLE_CHOICE",
+            options: Array.isArray(q.quizQuestionOption)
+              ? q.quizQuestionOption
+              : ["", "", "", ""],
+            correctAnswer:
+              q.quizQuestionType === "SINGLE_CHOICE"
+                ? Array.isArray(q.quizQuestionCorrectAnswer)
+                  ? q.quizQuestionCorrectAnswer[0]
+                  : 0
+                : undefined,
+            correctAnswers:
+              q.quizQuestionType === "MULTIPLE_CHOICE"
+                ? Array.isArray(q.quizQuestionCorrectAnswer)
+                  ? q.quizQuestionCorrectAnswer
+                  : []
+                : [],
+            explanation: q.explanation || "",
+            note: q.quizQuestionNote || "",
+            posPoints: q.quizQuestionPosPoint ?? 1,
+            negPoints: q.quizQuestionNegPoint ?? 0,
+            difficulty: q.difficultyLevel || "MEDIUM",
+          }))
+        : [
+            {
+              question: "",
+              type: "SINGLE_CHOICE",
+              options: ["", "", "", ""],
+              correctAnswer: 0,
+              correctAnswers: [],
+              explanation: "",
+              note: "",
+              posPoints: 1,
+              negPoints: 0,
+              difficulty: "MEDIUM",
+            },
+          ],
+    },
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -149,36 +226,44 @@ export default function QuizContentCreator({
 
       const newContent = {
         contentType: "CourseQuiz",
-        courseContent: {
-          courseContentId: existingContent?.courseContent?.courseContentId || `temp_${Date.now()}`,
-          courseContentTitle: data.title,
-          courseContentCategory: data.quizType === 'CERTIFICATION' ? 'Assessment' : 'Practice',
-          courseContentType: "CourseQuiz",
-          courseContentSequence: existingContent?.courseContent?.courseContentSequence || courseContentSequence,
-          courseContentDuration: data.isTimed && data.timeLimit ? data.timeLimit * 60 : 0,
-          isActive: true,
-          coursecontentIsLicensed: false,
-          metadata: existingContent?.courseContent?.metadata || {}
-        },
-        courseQuiz: {
+        courseContentId:
+          existingContent?.courseContentId || `temp_${Date.now()}`, // Keep original ID if editing
+        courseContentTitle: data.title,
+        courseContentCategory:
+          data.quizType === "CERTIFICATION" ? "Assessment" : "Practice",
+        courseContentType: "CourseQuiz",
+        courseContentSequence:
+          existingContent?.courseContentSequence || courseContentSequence,
+        courseContentDuration:
+          data.isTimed && data.timeLimit ? data.timeLimit * 60 : 0,
+        isActive: true,
+        coursecontentIsLicensed: false,
+        metadata: existingContent?.metadata || {},
+        courseContentTypeDetail: {
+          courseQuizTitle: data.title,
           courseQuizDescription: data.description,
           courseQuizType: data.quizType,
           isQuizTimed: data.isTimed,
-          courseQuizTimer: data.isTimed && data.timeLimit ? data.timeLimit * 60 : null,
+          courseQuizTimer:
+            data.isTimed && data.timeLimit ? data.timeLimit * 60 : null,
           courseQuizPassPercent: data.passingScore,
           questionCount: questions.length,
           totalPosPoints: totalPos,
           totalNegPoints: totalNeg,
+          questions: questions,
           metadata: {
-            ...(existingContent?.courseQuiz?.metadata || {}),
+            ...(existingContent?.courseContentTypeDetail?.metadata || {}),
             instructions: data.instructions,
-            maxAttempts: data.maxAttempts
+            maxAttempts: data.maxAttempts,
           },
-          questions
-        }
+        },
       };
 
-      if (mode === 'edit') await onUpdate?.(newContent); else await onAdd?.(newContent);
+      if (mode === "edit") {
+        await onUpdate?.(newContent);
+      } else {
+        await onAdd?.(newContent);
+      }
     } catch (error) {
       console.error("Error submitting quiz content:", error);
     }
@@ -186,16 +271,16 @@ export default function QuizContentCreator({
 
   const addQuestion = () => {
     append({
-  question: "",
-  type: "SINGLE_CHOICE",
-  options: ["", "", "", ""],
-  correctAnswer: 0,
-  correctAnswers: [],
-  explanation: "",
-  note: "",
-  posPoints: 1,
-  negPoints: 0,
-  difficulty: 'MEDIUM'
+      question: "",
+      type: "SINGLE_CHOICE",
+      options: ["", "", "", ""],
+      correctAnswer: 0,
+      correctAnswers: [],
+      explanation: "",
+      note: "",
+      posPoints: 1,
+      negPoints: 0,
+      difficulty: "MEDIUM",
     });
   };
 
@@ -213,8 +298,14 @@ export default function QuizContentCreator({
             <HelpCircle className="h-5 w-5 text-purple-600" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">{mode === 'edit' ? 'Edit Quiz Content' : 'Add Quiz Content'}</h2>
-            <p className="text-sm text-gray-600">{mode === 'edit' ? 'Update this assessment quiz' : 'Create a new assessment quiz'}</p>
+            <h2 className="text-xl font-semibold text-gray-900">
+              {mode === "edit" ? "Edit Quiz Content" : "Add Quiz Content"}
+            </h2>
+            <p className="text-sm text-gray-600">
+              {mode === "edit"
+                ? "Update this assessment quiz"
+                : "Create a new assessment quiz"}
+            </p>
           </div>
         </div>
       </div>
@@ -357,15 +448,17 @@ export default function QuizContentCreator({
                         <Input 
                           type="number"
                           min="1"
-                          max="240"
+                          max="480"
                           placeholder="10"
-                          disabled={!form.watch('isTimed')}
+                          disabled={!form.watch("isTimed")}
                           {...field}
                           onChange={(e) => field.onChange(parseInt(e.target.value) || 10)}
                         />
                       </FormControl>
                       <FormDescription>
-                        {form.watch('isTimed') ? 'Time limit in minutes (1-240)' : 'Disabled (quiz not timed)'}
+                        {form.watch("isTimed")
+                          ? "Time limit in minutes (1-480)"
+                          : "Disabled (quiz not timed)"}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -412,14 +505,14 @@ export default function QuizContentCreator({
                         <Input 
                           type="number"
                           min="1"
-                          max="10"
+                          max="20"
                           placeholder="3"
                           {...field}
                           onChange={(e) => field.onChange(parseInt(e.target.value) || 3)}
                         />
                       </FormControl>
                       <FormDescription>
-                        Maximum attempts allowed (1-10)
+                        Maximum attempts allowed (1-20)
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -439,7 +532,7 @@ export default function QuizContentCreator({
                 onClick={addQuestion} 
                 size="sm" 
                 variant="outline"
-                disabled={fields.length >= 50}
+                disabled={fields.length >= 100}
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Question
@@ -795,7 +888,7 @@ export default function QuizContentCreator({
               ) : (
                 <Save className="h-4 w-4 mr-2" />
               )}
-              {mode === 'edit' ? 'Save Changes' : 'Add Quiz Content'}
+              {mode === "edit" ? "Save Changes" : "Add Quiz Content"}
             </Button>
             
             {onCancel && (

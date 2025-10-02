@@ -22,58 +22,86 @@ import {
 } from "@/components/ui/form";
 import { FileText, Save } from "lucide-react";
 
-// Zod schema with conditional validation depending on content source (text vs embed)
-const writtenContentSchema = z.object({
-  title: z.string()
-    .min(1, "Title is required")
-    .min(3, "Title must be at least 3 characters")
-    .max(100, "Title must be less than 100 characters"),
-  // content can be optional when using embed mode; validated in superRefine
-  content: z.string().optional().default(""),
-  contentSource: z.enum(["text", "embed"]).default("text"),
-  embedUrl: z.union([
-    z.literal(""),
-    z.string()
-      .trim()
-      .max(100, "Embed URL must be at most 100 characters")
-      .url("Must be a valid URL")
-  ]).optional(),
-  estimatedReadTime: z.coerce.number()
-    .min(1, "Read time must be at least 1 minute")
-    .max(60, "Read time must be less than 60 minutes")
-}).superRefine((data, ctx) => {
-  if (data.contentSource === 'embed') {
-    if (!data.embedUrl || !data.embedUrl.trim()) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Embed URL is required in embed mode", path: ["embedUrl"] });
+// Zod schema for written content validation (aligned with backend entity)
+const writtenContentSchema = z
+  .object({
+    title: z
+      .string()
+      .min(1, "Title is required")
+      .min(3, "Title must be at least 3 characters")
+      .max(200, "Title must be less than or equal to 200 characters"), // entity allows 200
+    content: z
+      .string()
+      .max(50000, "Content must be less than 50000 characters")
+      .optional()
+      .or(z.literal("")), // backend TEXT; generous limit client-side
+    contentSource: z.enum(["text", "embed"]).default("text"),
+    embedUrl: z
+      .string()
+      .url("Please enter a valid URL")
+      .optional()
+      .or(z.literal("")),
+    estimatedReadTime: z.coerce
+      .number()
+      .min(1, "Read time must be at least 1 minute")
+      .max(120, "Read time must be less than 2 hours")
+  })
+  .superRefine((data, ctx) => {
+    if (data.contentSource === "embed") {
+      if (!data.embedUrl || !data.embedUrl.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["embedUrl"],
+          message: "Embed URL is required when content source is embed",
+        });
+      }
+    } else {
+      const content = data.content || "";
+      if (!content.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["content"],
+          message: "Content is required when content source is text",
+        });
+      } else if (content.trim().length < 50) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["content"],
+          message: "Content must be at least 50 characters",
+        });
+      }
     }
-  } else {
-    const content = data.content || "";
-    if (!content.trim()) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Content is required when not using embed mode", path: ["content"] });
-    } else if (content.trim().length < 50) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Content must be at least 50 characters", path: ["content"] });
-    }
-  }
-});
+  });
 
-export default function WrittenContentCreator({ 
-  onAdd, 
+export default function WrittenContentCreator({
+  onAdd,
   onUpdate,
-  onCancel, 
+  onCancel,
   isLoading = false,
   courseContentSequence = 1,
-  mode = 'create',
-  existingContent = null
+  mode = "create",
+  existingContent = null,
 }) {
   const form = useForm({
     resolver: zodResolver(writtenContentSchema),
     defaultValues: {
-  title: existingContent?.courseContent?.courseContentTitle || existingContent?.courseWritten?.courseWrittenTitle || "",
-  content: existingContent?.courseWritten?.courseWrittenContent || "",
-  contentSource: existingContent?.courseWritten?.courseWrittenEmbedUrl ? 'embed' : 'text',
-  embedUrl: existingContent?.courseWritten?.courseWrittenEmbedUrl || "",
-  estimatedReadTime: existingContent?.courseContent?.courseContentDuration ? Math.max(1, Math.round(existingContent.courseContent.courseContentDuration / 60)) : 5
-    }
+      title:
+        existingContent?.courseContentTitle ||
+        existingContent?.courseContentTypeDetail?.courseWrittenTitle ||
+        "",
+      content:
+        existingContent?.courseContentTypeDetail?.courseWrittenContent || "",
+      contentSource: existingContent?.courseContentTypeDetail?.courseWrittenEmbedUrl
+        ? "embed"
+        : "text",
+      embedUrl:
+        existingContent?.courseContentTypeDetail?.courseWrittenEmbedUrl || "",
+      estimatedReadTime:
+        existingContent?.courseContentTypeDetail?.estimatedReadTime ||
+        (existingContent?.courseContentDuration
+          ? Math.max(1, Math.round(existingContent.courseContentDuration / 60))
+          : 5),
+    },
   });
 
   const handleSubmit = async (data) => {
@@ -81,32 +109,40 @@ export default function WrittenContentCreator({
       // Create the content structure expected by the parent
       const newContent = {
         contentType: "CourseWritten",
-        courseContent: {
-          courseContentId: existingContent?.courseContent?.courseContentId || `temp_${Date.now()}`,
-          courseContentTitle: data.title,
-          courseContentCategory: existingContent?.courseContent?.courseContentCategory || "Written Content",
-          courseContentType: "CourseWritten",
-          courseContentSequence: existingContent?.courseContent?.courseContentSequence || courseContentSequence,
-          courseContentDuration: data.estimatedReadTime * 60, // Convert minutes to seconds
-          isActive: true,
-          coursecontentIsLicensed: false,
-          metadata: existingContent?.courseContent?.metadata || {}
-        },
-        courseWritten: {
+        courseContentId:
+          existingContent?.courseContentId || `temp_${Date.now()}`, // Keep original ID if editing
+        courseContentTitle: data.title,
+        courseContentCategory: "Written Content",
+        courseContentType: "CourseWritten",
+        courseContentSequence:
+          existingContent?.courseContentSequence || courseContentSequence,
+        courseContentDuration: data.estimatedReadTime * 60, // Convert minutes to seconds
+        isActive: true,
+        coursecontentIsLicensed: false,
+        metadata: existingContent?.metadata || {},
+        courseContentTypeDetail: {
           courseWrittenTitle: data.title, // Matches CourseWritten.courseWrittenTitle field
-          courseWrittenContent: data.contentSource === 'embed' ? "" : data.content,
-          courseWrittenEmbedUrl: data.contentSource === 'embed' && data.embedUrl?.trim() ? data.embedUrl.trim() : null,
-          courseWrittenUrlIsEmbeddable: data.contentSource === 'embed' && !!data.embedUrl?.trim(),
+          courseWrittenContent:
+            data.contentSource === "embed" ? "" : data.content,
+          courseWrittenEmbedUrl:
+            data.contentSource === "embed" && data.embedUrl?.trim()
+              ? data.embedUrl.trim()
+              : null,
+          courseWrittenUrlIsEmbeddable:
+            data.contentSource === "embed" && !!data.embedUrl?.trim(),
+          estimatedReadTime: data.estimatedReadTime,
           metadata: {
-            ...(existingContent?.courseWritten?.metadata || {}),
-            estimatedReadTime: data.estimatedReadTime,
-            contentMode: data.contentSource === 'embed' ? 'embed' : 'text',
-            wordCount: data.contentSource === 'embed' ? 0 : data.content.split(/\s+/).filter(Boolean).length,
-            lastUpdated: new Date().toISOString()
-          }
-        }
+            ...(existingContent?.courseContentTypeDetail?.metadata || {}),
+            contentMode: data.contentSource === "embed" ? "embed" : "text",
+            wordCount:
+              data.contentSource === "embed"
+                ? 0
+                : data.content.split(/\s+/).filter(Boolean).length,
+            lastUpdated: new Date().toISOString(),
+          },
+        },
       };
-      if (mode === 'edit') {
+      if (mode === "edit") {
         await onUpdate?.(newContent);
       } else {
         await onAdd?.(newContent);
@@ -124,17 +160,23 @@ export default function WrittenContentCreator({
             <FileText className="h-5 w-5 text-green-600" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">{mode === 'edit' ? 'Edit Written Content' : 'Add Written Content'}</h2>
-            <p className="text-sm text-gray-600">{mode === 'edit' ? 'Update the written lesson' : 'Create a new article or written lesson'}</p>
+            <h2 className="text-xl font-semibold text-gray-900">
+              {mode === "edit" ? "Edit Written Content" : "Add Written Content"}
+            </h2>
+            <p className="text-sm text-gray-600">
+              {mode === "edit"
+                ? "Update the written lesson"
+                : "Create a new article or written lesson"}
+            </p>
           </div>
         </div>
       </div>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <div className="grid gap-4">
+          <div className="grid gap-4 md:grid-cols-2">
             {/* Title Field */}
-            <div>
+            <div className="md:col-span-2">
               <FormField
                 control={form.control}
                 name="title"
@@ -142,10 +184,7 @@ export default function WrittenContentCreator({
                   <FormItem>
                     <FormLabel>Title *</FormLabel>
                     <FormControl>
-                      <Input 
-                        placeholder="Enter article title" 
-                        {...field} 
-                      />
+                      <Input placeholder="Enter article title" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -153,8 +192,8 @@ export default function WrittenContentCreator({
               />
             </div>
 
-            {/* Content Source & Conditional Fields */}
-            <div className="grid gap-4 md:grid-cols-3">
+            {/* Content Source Selection */}
+            <div>
               <FormField
                 control={form.control}
                 name="contentSource"
@@ -164,8 +203,8 @@ export default function WrittenContentCreator({
                     <Select
                       onValueChange={(val) => {
                         field.onChange(val);
-                        if (val === 'text') {
-                          form.setValue('embedUrl', "");
+                        if (val === "text") {
+                          form.setValue("embedUrl", "");
                         }
                       }}
                       defaultValue={field.value}
@@ -188,32 +227,39 @@ export default function WrittenContentCreator({
                   </FormItem>
                 )}
               />
-              {form.watch('contentSource') === 'embed' && (
+            </div>
+
+            {/* Embed URL Field (conditional) */}
+            {form.watch("contentSource") === "embed" && (
+              <div>
                 <FormField
                   control={form.control}
                   name="embedUrl"
                   render={({ field }) => (
-                    <FormItem className="md:col-span-2">
+                    <FormItem>
                       <FormLabel>Embed URL *</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="https://..." 
+                        <Input
+                          type="url"
+                          placeholder="https://..."
                           {...field}
                           onChange={(e) => field.onChange(e.target.value)}
                         />
                       </FormControl>
                       <FormDescription>
-                        External resource URL (YouTube, Loom, etc.)
+                        External resource URL (documents, presentations, etc.)
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              )}
-            </div>
+              </div>
+            )}
 
-            {form.watch('contentSource') === 'text' && (
-              <div>
+
+            {/* Content Field (conditional) */}
+            {form.watch("contentSource") === "text" && (
+              <div className="md:col-span-2">
                 <FormField
                   control={form.control}
                   name="content"
@@ -221,7 +267,7 @@ export default function WrittenContentCreator({
                     <FormItem>
                       <FormLabel>Content *</FormLabel>
                       <FormControl>
-                        <Textarea 
+                        <Textarea
                           placeholder="Write your content here... (supports Markdown)"
                           rows={10}
                           className="font-mono text-sm"
@@ -238,7 +284,7 @@ export default function WrittenContentCreator({
               </div>
             )}
 
-            {/* Read Time */}
+            {/* Estimated Read Time */}
             <div>
               <FormField
                 control={form.control}
@@ -247,17 +293,19 @@ export default function WrittenContentCreator({
                   <FormItem>
                     <FormLabel>Estimated Read Time (minutes)</FormLabel>
                     <FormControl>
-                      <Input 
+                      <Input
                         type="number"
                         min="1"
-                        max="60"
+                        max="120"
                         placeholder="5"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 5)}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value) || 5)
+                        }
                       />
                     </FormControl>
                     <FormDescription>
-                      Time in minutes (1-60)
+                      Time in minutes (1-120)
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -277,7 +325,7 @@ export default function WrittenContentCreator({
               ) : (
                 <Save className="h-4 w-4 mr-2" />
               )}
-              {mode === 'edit' ? 'Save Changes' : 'Add Written Content'}
+              {mode === "edit" ? "Save Changes" : "Add Written Content"}
             </Button>
             
             {onCancel && (
