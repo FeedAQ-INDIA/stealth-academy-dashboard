@@ -134,7 +134,7 @@ export default function Builder() {
         });
         
 
-        navigate(`/course-builder/${response.data.data.courseBuilder.courseBuilderId}`);
+        navigate(`/course-builder/${response.data.data.courseBuilderId}`);
       } else {
         throw new Error("Invalid response from server");
       }

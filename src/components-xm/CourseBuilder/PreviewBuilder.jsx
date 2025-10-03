@@ -70,76 +70,76 @@ export default function PreviewBuilder() {
 
   const internalItemToApi = (item, idx) => {
     if (!item) return item;
-    const seq = item.courseContent?.courseContentSequence || idx + 1;
+    const seq = item.courseContentSequence || idx + 1;
     const apiItem = {
-      status: item.courseContent?.status || "DRAFT",
+      status: item.status || "DRAFT",
       courseId:
         courseData?.course?.courseId ||
-        item.courseContent?.courseId ||
+        item.courseId ||
         "temp_course_id",
       metadata: {
-        ...(item.courseContent?.metadata || {}),
+        ...(item.metadata || {}),
         sequence: seq,
         contentType:
-          item.courseVideo?.sourcePlatform === "YOUTUBE"
+          item.courseContentTypeDetail?.metadata?.sourcePlatform === "YOUTUBE"
             ? "YOUTUBE_VIDEO"
-            : item.courseContent?.metadata?.contentType || item.contentType,
+            : item.metadata?.contentType || item.courseContentType,
       },
-      createdAt: item.courseContent?.createdAt || new Date().toISOString(),
+      createdAt: item.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       isPublished:
-        (item.courseContent?.status || "").toUpperCase() === "PUBLISHED",
-      courseContentId: item.courseContent?.courseContentId,
-      courseContentType: item.contentType,
-      courseContentTitle: item.courseContent?.courseContentTitle,
+        (item.status || "").toUpperCase() === "PUBLISHED",
+      courseContentId: item.courseContentId,
+      courseContentType: item.courseContentType,
+      courseContentTitle: item.courseContentTitle,
       courseContentCategory:
-        item.courseContent?.courseContentCategory ||
-        (item.contentType === "CourseVideo" ? "Video Content" : "Content"),
+        item.courseContentCategory ||
+        (item.courseContentType === "CourseVideo" ? "Video Content" : "Content"),
       courseContentDuration:
-        item.courseVideo?.duration ||
-        item.courseContent?.courseContentDuration ||
+        item.courseContentTypeDetail?.duration ||
+        item.courseContentDuration ||
         0,
       courseContentSequence: seq,
       coursecontentIsLicensed: false,
     };
-    if (item.contentType === "CourseVideo") {
+    if (item.courseContentType === "CourseVideo") {
       apiItem.courseContentTypeDetail = {
-        status: item.courseContent?.status || "READY",
+        status: item.status || "READY",
         userId: courseData?.courseBuilder?.userId,
         courseId: courseData?.course?.courseId || "temp_course_id",
-        duration: item.courseVideo?.duration || 0,
+        duration: item.courseContentTypeDetail?.duration || 0,
         metadata: {
-          videoId: item.courseVideo?.videoId,
-          sourcePlatform: item.courseVideo?.sourcePlatform,
-          channelTitle: item.courseVideo?.channelTitle,
-          ...(item.courseVideo?.metadata || {}),
+          videoId: item.courseContentTypeDetail?.metadata?.videoId,
+          sourcePlatform: item.courseContentTypeDetail?.metadata?.sourcePlatform,
+          channelTitle: item.courseContentTypeDetail?.metadata?.channelTitle,
+          ...(item.courseContentTypeDetail?.metadata || {}),
         },
-        createdAt: item.courseContent?.createdAt || new Date().toISOString(),
+        createdAt: item.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        isPreview: item.courseVideo?.isPreview || false,
-        thumbnailUrl: item.courseVideo?.thumbnailUrl,
-        courseVideoId: item.courseVideo?.courseVideoId,
-        courseVideoUrl: item.courseVideo?.courseVideoUrl,
-        courseContentId: item.courseContent?.courseContentId,
+        isPreview: item.courseContentTypeDetail?.isPreview || false,
+        thumbnailUrl: item.courseContentTypeDetail?.thumbnailUrl,
+        courseVideoId: item.courseContentTypeDetail?.courseVideoId,
+        courseVideoUrl: item.courseContentTypeDetail?.courseVideoUrl,
+        courseContentId: item.courseContentId,
         courseVideoTitle:
-          item.courseVideo?.courseVideoTitle ||
-          item.courseContent?.courseContentTitle,
-        courseVideoDescription: item.courseVideo?.courseVideoDescription,
+          item.courseContentTypeDetail?.courseVideoTitle ||
+          item.courseContentTitle,
+        courseVideoDescription: item.courseContentTypeDetail?.courseVideoDescription,
       };
-    } else if (item.contentType === "CourseWritten") {
+    } else if (item.courseContentType === "CourseWritten") {
       apiItem.courseContentTypeDetail = {
         userId: courseData?.courseBuilder?.userId,
         courseId: courseData?.course?.courseId || "temp_course_id",
-        metadata: item.courseContent?.metadata || {},
-        createdAt: item.courseContent?.createdAt || new Date().toISOString(),
+        metadata: item.metadata || {},
+        createdAt: item.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        courseContentId: item.courseContent?.courseContentId,
-        courseWrittenId: item.courseWritten?.courseWrittenId,
-        courseWrittenTitle: item.courseContent?.courseContentTitle,
-        courseWrittenContent: item.courseWritten?.courseWrittenContent,
-        courseWrittenEmbedUrl: item.courseWritten?.courseWrittenEmbedUrl,
+        courseContentId: item.courseContentId,
+        courseWrittenId: item.courseContentTypeDetail?.courseWrittenId,
+        courseWrittenTitle: item.courseContentTitle,
+        courseWrittenContent: item.courseContentTypeDetail?.courseWrittenContent,
+        courseWrittenEmbedUrl: item.courseContentTypeDetail?.courseWrittenEmbedUrl,
         courseWrittenUrlIsEmbeddable:
-          item.courseWritten?.courseWrittenUrlIsEmbeddable,
+          item.courseContentTypeDetail?.courseWrittenUrlIsEmbeddable,
       };
     }
     return apiItem;
@@ -150,7 +150,7 @@ export default function PreviewBuilder() {
     if (!courseData?.courseBuilder?.courseBuilderId) return null;
     const originalBuilderData =
       courseData.courseBuilder.courseBuilderData || {};
-    const existingCourseDetail = originalBuilderData.courseDetail || {};
+    const existingCourseDetail = originalBuilderData || {};
     const cleanedContent = (courseData.courseContent || []).map((item) => {
       const { _local: _, ...rest } = item; // strip transient
       return rest;
@@ -191,10 +191,7 @@ export default function PreviewBuilder() {
     };
     const courseBuilderData = {
       ...originalBuilderData,
-      courseTitle: updatedCourseDetail.courseTitle,
-      courseDescription: updatedCourseDetail.courseDescription,
-      processingStatus: originalBuilderData.processingStatus || "COMPLETED",
-      courseDetail: updatedCourseDetail,
+      ...updatedCourseDetail,
     };
     return {
       data: {
@@ -222,8 +219,8 @@ export default function PreviewBuilder() {
 
   const handleAddContent = (newContent) => {
     const seq = (courseData?.courseContent?.length || 0) + 1;
-    if (newContent?.courseContent) {
-      newContent.courseContent.courseContentSequence = seq;
+    if (newContent?.courseContentSequence !== undefined) {
+      newContent.courseContentSequence = seq;
     }
     setCourseData((prev) => {
       const updated = {
@@ -269,7 +266,7 @@ export default function PreviewBuilder() {
     console.log("Updated content from editor:", updatedContent);
     setCourseData((prev) => {
       const updatedCourseContent = prev.courseContent.map((content) =>
-        content?.courseContent?.courseContentId === updatedContent?.courseContent?.courseContentId
+        content?.courseContentId === updatedContent?.courseContentId
           ? updatedContent
           : content
       );
@@ -295,7 +292,7 @@ export default function PreviewBuilder() {
     setCourseData((prev) => ({
       ...prev,
       courseContent: prev.courseContent.filter(
-        (c) => c.courseContent.courseContentId !== contentId
+        (c) => c.courseContentId !== contentId
       ),
     }));
     setEditContentSheetOpen(false);
@@ -305,7 +302,7 @@ export default function PreviewBuilder() {
 
   const moveContent = (contentId, direction) => {
     const currentIndex = courseData.courseContent.findIndex(
-      (c) => c.courseContent.courseContentId === contentId
+      (c) => c.courseContentId === contentId
     );
     const newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
 
@@ -319,10 +316,7 @@ export default function PreviewBuilder() {
       ];
       const resequenced = newContent.map((c, idx) => ({
         ...c,
-        courseContent: {
-          ...c.courseContent,
-          courseContentSequence: idx + 1,
-        },
+        courseContentSequence: idx + 1,
       }));
       return { ...prev, courseContent: resequenced };
     });
@@ -343,7 +337,7 @@ export default function PreviewBuilder() {
         const existingCourseDetail = originalBuilderData.courseDetail || {};
 
         // Keep JSON format SAME as currently used in UI & provided sample:
-        // Each item: { contentType, courseContent: {...}, courseVideo|courseWritten|... }
+        // Each item: { courseContentType, courseContentId, courseContentTitle, courseContentTypeDetail, ... }
         // Remove transient helper fields like _local before persisting.
         const cleanedContent = (courseData.courseContent || []).map((item) => {
           // eslint-disable-next-line no-unused-vars
@@ -371,7 +365,7 @@ export default function PreviewBuilder() {
 
         const updatedCourseBuilderData = {
           ...originalBuilderData,
-          courseDetail: updatedCourseDetail,
+          ...updatedCourseDetail,
         };
 
         const statusToSend =
@@ -390,6 +384,9 @@ export default function PreviewBuilder() {
         );
 
         if (response.data.success) {
+          // Update local courseBuilder data with the response data
+          const updatedCourseBuilderData = response.data.data;
+          
           // Update local status if changed
           if (
             statusOverride &&
@@ -399,7 +396,11 @@ export default function PreviewBuilder() {
               ...prev,
               courseBuilder: {
                 ...prev.courseBuilder,
-                status: statusOverride,
+                courseBuilderId: updatedCourseBuilderData.courseBuilderId,
+                status: updatedCourseBuilderData.status,
+                orgId: updatedCourseBuilderData.orgId,
+                userId: updatedCourseBuilderData.userId,
+                courseBuilderData: updatedCourseBuilderData.courseBuilderData,
               },
             }));
           }
@@ -521,23 +522,43 @@ export default function PreviewBuilder() {
         }
 
         const courseBuilderData = apiData.courseBuilderData || {};
-        const courseDetail = courseBuilderData.courseDetail || {};
+        const courseDetail = courseBuilderData; // courseBuilderData now contains the course details directly
         const rawContent = Array.isArray(courseDetail.courseContent)
           ? courseDetail.courseContent
           : [];
         const normalizedContent = rawContent.sort(
           (a, b) =>
-            (a.courseContent?.courseContentSequence || 0) -
-            (b.courseContent?.courseContentSequence || 0)
+            (a.courseContentSequence || 0) -
+            (b.courseContentSequence || 0)
         );
 
-        if (normalizedContent && normalizedContent.length > 0) {
-          courseDetail.courseContent = normalizedContent;
-        }
+        // Build the course data structure to match component expectations
+        const normalizedCourseData = {
+          course: {
+            courseId: courseDetail.courseId,
+            courseTitle: courseDetail.courseTitle,
+            courseDescription: courseDetail.courseDescription,
+            courseType: courseDetail.courseType,
+            deliveryMode: courseDetail.deliveryMode,
+            courseDuration: courseDetail.courseDuration,
+            courseImageUrl: courseDetail.courseImageUrl,
+            courseSourceChannel: courseDetail.courseSourceChannel,
+            status: courseDetail.status,
+            metadata: courseDetail.metadata,
+          },
+          courseContent: normalizedContent,
+          courseBuilder: {
+            courseBuilderId: apiData.courseBuilderId,
+            userId: apiData.userId,
+            orgId: apiData.orgId,
+            status: apiData.status,
+            courseBuilderData: courseBuilderData,
+          },
+        };
 
-        console.log(courseDetail);
+        console.log("Normalized course data:", normalizedCourseData);
 
-        setCourseData(courseDetail);
+        setCourseData(normalizedCourseData);
         setCourseBuilderData(courseBuilderData);
       } catch (e) {
         setError(
@@ -574,14 +595,12 @@ export default function PreviewBuilder() {
     return <div className="text-center py-8">No course data available</div>;
   }
 
-  const { course, courseContent, courseBuilder } = courseData;
   const totalDurationSeconds = (courseData?.courseContent || []).reduce(
     (sum, c) =>
       sum +
       (c?.courseContentDuration || 0),
     0
   );
-  const sourceChannel = course?.courseSourceChannel;
 
   return (
     <div className="space-y-6 p-6">
@@ -776,7 +795,7 @@ export default function PreviewBuilder() {
                           onClick={() =>
                             moveContent(content?.courseContentId, "down")
                           }
-                          disabled={index === courseContent.length - 1}
+                          disabled={index === courseData.courseContent.length - 1}
                           className="h-6 w-6 p-0"
                         >
                           <ArrowDown className="h-3 w-3" />
@@ -885,7 +904,7 @@ export default function PreviewBuilder() {
               onAdd={handleAddContent}
               onCancel={handleCancelAddContent}
               isLoading={isLoading}
-              courseContentSequence={(courseContent?.length || 0) + 1}
+              courseContentSequence={(courseData?.courseContent?.length || 0) + 1}
             />
           )}
         </SheetContent>
@@ -909,7 +928,7 @@ export default function PreviewBuilder() {
               }}
               isLoading={isLoading}
               courseContentSequence={
-                currentEditingContent.courseContent?.courseContentSequence
+                currentEditingContent.courseContentSequence
               }
             />
           )}
