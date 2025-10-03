@@ -290,9 +290,8 @@ const VideoHeader = React.memo(
                 className="flex items-center gap-2 text-orange-600 border-orange-300 hover:bg-orange-50"
               >
                 <Undo2 size={16} />
-                <span className="hidden sm:inline">Mark as Incomplete</span>
-                <span className="sm:hidden">Incomplete</span>
-              </Button>
+                <span className=" ">Mark Incomplete</span>
+               </Button>
             ) : (
               <Button
                 size="sm"
@@ -300,9 +299,8 @@ const VideoHeader = React.memo(
                 className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
               >
                 <CheckCircle2 size={16} />
-                <span className="hidden sm:inline">Mark as Complete</span>
-                <span className="sm:hidden">Complete</span>
-              </Button>
+                <span className=" ">Mark Complete</span>
+               </Button>
             )}
           </div>
         </div>
