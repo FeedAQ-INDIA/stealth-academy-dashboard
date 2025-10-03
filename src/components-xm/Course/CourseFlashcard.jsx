@@ -181,9 +181,23 @@ function CourseFlashcard() {
   const [difficultyFilter, setDifficultyFilter] = useState("all");
   const [triggerNotesRefresh, setTriggerNotesRefresh] = useState(false);
 
-  const handleNotesSave = () => {
+  // Notes callback - following the pattern from CourseVideoTutorial
+  const handleNotesSave = useCallback(() => {
     setTriggerNotesRefresh((prev) => !prev);
-  };
+  }, []);
+
+  // Notes props construction - following the pattern from CourseVideoTutorial
+  const notesProps = useMemo(() => {
+    const contentData = courseList?.courseContent?.find(
+      (a) => a.courseContentId === courseFlashcardDetail.courseContentId
+    );
+    console.log("Content Data for notes:", contentData);
+    return {
+      courseId: courseList?.courseId,
+      userId: userDetail?.userId,
+      courseContentId: contentData?.courseContentId,
+    };
+  }, [courseList, courseFlashcardDetail, userDetail]);
 
 
   // Navigation logic for prev/next content (similar to CourseVideoTutorial)
@@ -206,6 +220,12 @@ function CourseFlashcard() {
             datasource: "CourseFlashcard",
             attributes: [],
             where: { courseContentId: CourseFlashcardId },
+            include:[
+              {
+                datasource: "Flashcard",
+                as: "flashcards",
+              }
+            ]
           },
         }
       );
@@ -213,22 +233,8 @@ function CourseFlashcard() {
       const flashcardSet = flashcardSetRes.data.data?.results?.[0];
       setCourseFlashcardDetail(flashcardSet);
 
-      // Fetch individual flashcards
-      const flashcardsRes = await axiosConn.post(
-        import.meta.env.VITE_API_URL + "/searchCourse",
-        {
-          limit: 100,
-          offset: 0,
-          getThisData: {
-            datasource: "Flashcard",
-            attributes: [],
-            where: { courseFlashcardId: CourseFlashcardId },
-          },
-        }
-      );
-
-      const flashcardsList = flashcardsRes.data.data?.results || [];
-      setFlashcards(flashcardsList);
+ 
+      setFlashcards(flashcardSet?.flashcards || []);
 
       // Find the content from the courseContent structure
       const content = courseList?.courseContent?.find(
@@ -512,66 +518,10 @@ function CourseFlashcard() {
 
         {/* Flashcard study interface */}
         <div className="  mx-auto space-y-4 sm:space-y-6">
-          {/* Controls */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 p-4 bg-white/70 backdrop-blur-sm rounded-lg border border-white/20 shadow-lg">
-            <div className="flex items-center gap-3 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
-                <span className="font-semibold text-gray-700">
-                  {filteredFlashcards.length} flashcards
-                </span>
-              </div>
-              {/* <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-full border border-blue-200">
-                                <Trophy size={14} className="text-yellow-500" />
-                                <span className="text-xs font-medium text-blue-700">
-                                    {completedCards.size} mastered
-                                </span>
-                            </div> */}
-            </div>
+             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+   <div className="lg:col-span-3 space-y-4">
 
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleFlipAll}
-                className="text-xs sm:text-sm transition-all duration-200 hover:scale-105 bg-white/80 hover:bg-white border-gray-300 hover:border-blue-400 hover:text-blue-600"
-              >
-                {flippedCards.size === flashcards.length ? (
-                  <EyeOff size={14} className="mr-1" />
-                ) : (
-                  <Eye size={14} className="mr-1" />
-                )}
-                <span className="hidden sm:inline">
-                  {flippedCards.size === flashcards.length
-                    ? "Hide All"
-                    : "Show All"}
-                </span>
-                <span className="sm:hidden">
-                  {flippedCards.size === flashcards.length ? "Hide" : "Show"}
-                </span>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleShuffle}
-                className="text-xs sm:text-sm transition-all duration-200 hover:scale-105 bg-white/80 hover:bg-white border-gray-300 hover:border-purple-400 hover:text-purple-600"
-              >
-                <Shuffle size={14} className="mr-1" />
-                <span className="hidden sm:inline">Shuffle</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleReset}
-                className="text-xs sm:text-sm transition-all duration-200 hover:scale-105 bg-white/80 hover:bg-white border-gray-300 hover:border-orange-400 hover:text-orange-600"
-              >
-                <RotateCcw size={14} className="mr-1" />
-                <span className="hidden sm:inline">Reset</span>
-              </Button>
-            </div>
-          </div>
-
-          {/* Flashcards Grid */}
+              {/* Flashcards Grid */}
           {filteredFlashcards.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               {filteredFlashcards.map((card, index) => (
@@ -613,21 +563,36 @@ function CourseFlashcard() {
               </CardContent>
             </Card>
           )}
+   </div>
 
-          {/* Enhanced Notes Creation Section */}
-          <CreateNotesModule
-            handleNotesSave={handleNotesSave}
-            courseId={courseList.courseId}
-            courseContentId={courseFlashcardDetail?.courseContentId}
-          />
+    <div className="lg:col-span-2 space-y-4">
 
-          {/* Enhanced Notes Module */}
-          <NotesModule
-            refreshTrigger={triggerNotesRefresh}
-            courseId={courseList.courseId}
-            userId={userDetail.userId}
-            courseContentId={courseFlashcardDetail?.courseContentId}
-          />
+       {/* Enhanced Notes Creation Section - following CourseVideoTutorial pattern */}
+          {notesProps.courseId && (
+            <CreateNotesModule
+              handleNotesSave={handleNotesSave}
+              courseId={notesProps.courseId}
+              courseContentId={notesProps.courseContentId}
+            />
+          )}
+
+          {/* Enhanced Notes Module - following CourseVideoTutorial pattern */}
+          {notesProps.courseId && notesProps.userId && (
+            <NotesModule
+              refreshTrigger={triggerNotesRefresh}
+              courseId={notesProps.courseId}
+              userId={notesProps.userId}
+              courseContentId={notesProps.courseContentId}
+            />
+          )}
+
+    </div>
+
+    </div>
+
+
+
+   
         </div>
       </div>
     </div>
