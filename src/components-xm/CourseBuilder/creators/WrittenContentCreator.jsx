@@ -4,6 +4,9 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { 
   Select, 
   SelectContent, 
@@ -20,7 +23,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { FileText, Save } from "lucide-react";
+import { FileText, Save, Clock, Edit3, Link, BookOpen } from "lucide-react";
 
 // Zod schema for written content validation (aligned with backend entity)
 const writtenContentSchema = z
@@ -153,192 +156,304 @@ export default function WrittenContentCreator({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-            <FileText className="h-5 w-5 text-green-600" />
+    <div className="mx-auto p-4 space-y-8">
+      {/* Enhanced Header Section */}
+      <Card className="border-l-4 border-l-green-500 bg-gradient-to-r from-green-50 to-emerald-50">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
+                <FileText className="h-6 w-6 text-white" />
+              </div>
+              <div className="space-y-1">
+                <CardTitle className="text-2xl font-bold text-gray-900">
+                  {mode === "edit" ? "Edit Written Content" : "Create Written Content"}
+                </CardTitle>
+                <p className="text-gray-600">
+                  {mode === "edit"
+                    ? "Update the written lesson"
+                    : "Create engaging written content for your learners"}
+                </p>
+              </div>
+            </div>
+            <Badge variant="secondary" className="px-3 py-1">
+              <Clock className="h-3 w-3 mr-1" />
+              {form.watch('estimatedReadTime')} min read
+            </Badge>
           </div>
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">
-              {mode === "edit" ? "Edit Written Content" : "Add Written Content"}
-            </h2>
-            <p className="text-sm text-gray-600">
-              {mode === "edit"
-                ? "Update the written lesson"
-                : "Create a new article or written lesson"}
-            </p>
-          </div>
-        </div>
-      </div>
+        </CardHeader>
+      </Card>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* Title Field */}
-            <div className="md:col-span-2">
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Title *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter article title" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Content Source Selection */}
-            <div>
-              <FormField
-                control={form.control}
-                name="contentSource"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Content Source</FormLabel>
-                    <Select
-                      onValueChange={(val) => {
-                        field.onChange(val);
-                        if (val === "text") {
-                          form.setValue("embedUrl", "");
-                        }
-                      }}
-                      defaultValue={field.value}
-                      value={field.value}
-                    >
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+          {/* Enhanced Content Details Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <BookOpen className="h-4 w-4 text-blue-600" />
+                </div>
+                Content Details
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid gap-6">
+                {/* Title Field */}
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium">Title *</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select source" />
-                        </SelectTrigger>
+                        <Input 
+                          placeholder="e.g., Understanding React Hooks, Introduction to Machine Learning" 
+                          className="h-11"
+                          {...field} 
+                        />
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="text">Text</SelectItem>
-                        <SelectItem value="embed">Embedded URL</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      Choose whether content is written text or an external embed.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            {/* Embed URL Field (conditional) */}
-            {form.watch("contentSource") === "embed" && (
-              <div>
+                {/* Content Source Selection */}
+                <FormField
+                  control={form.control}
+                  name="contentSource"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium">Content Type</FormLabel>
+                      <Select
+                        onValueChange={(val) => {
+                          field.onChange(val);
+                          if (val === "text") {
+                            form.setValue("embedUrl", "");
+                          }
+                        }}
+                        defaultValue={field.value}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="h-11">
+                            <SelectValue placeholder="Select content type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="text">
+                            <div className="flex items-center gap-2">
+                              <Edit3 className="h-4 w-4 text-green-500" />
+                              <div>
+                                <div className="font-medium">Written Text</div>
+                                <div className="text-xs text-gray-600">Create text content directly</div>
+                              </div>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="embed">
+                            <div className="flex items-center gap-2">
+                              <Link className="h-4 w-4 text-blue-500" />
+                              <div>
+                                <div className="font-medium">External Link</div>
+                                <div className="text-xs text-gray-600">Link to external content</div>
+                              </div>
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        Choose whether to write content directly or link to external resources
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Estimated Read Time */}
+                <div className="max-w-xs">
+                  <FormField
+                    control={form.control}
+                    name="estimatedReadTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-medium">Estimated Read Time (minutes)</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Input
+                              type="number"
+                              min="1"
+                              max="120"
+                              placeholder="5"
+                              className="h-11 pr-16"
+                              {...field}
+                              onChange={(e) =>
+                                field.onChange(parseInt(e.target.value) || 5)
+                              }
+                            />
+                            <Clock className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          </div>
+                        </FormControl>
+                        <FormDescription>
+                          Reading time in minutes (1-120)
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Enhanced Content Creation Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                  {form.watch("contentSource") === "embed" ? (
+                    <Link className="h-4 w-4 text-purple-600" />
+                  ) : (
+                    <Edit3 className="h-4 w-4 text-purple-600" />
+                  )}
+                </div>
+                {form.watch("contentSource") === "embed" ? "External Content" : "Written Content"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {/* Embed URL Field (conditional) */}
+              {form.watch("contentSource") === "embed" && (
                 <FormField
                   control={form.control}
                   name="embedUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Embed URL *</FormLabel>
+                      <FormLabel className="text-base font-medium flex items-center gap-2">
+                        <Link className="h-4 w-4 text-blue-500" />
+                        External Resource URL *
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="url"
-                          placeholder="https://..."
+                          placeholder="https://docs.google.com/document/... or https://medium.com/..."
+                          className="h-11"
                           {...field}
                           onChange={(e) => field.onChange(e.target.value)}
                         />
                       </FormControl>
                       <FormDescription>
-                        External resource URL (documents, presentations, etc.)
+                        Link to external documents, articles, presentations, or other learning resources
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </div>
-            )}
+              )}
 
-
-            {/* Content Field (conditional) */}
-            {form.watch("contentSource") === "text" && (
-              <div className="md:col-span-2">
+              {/* Content Field (conditional) */}
+              {form.watch("contentSource") === "text" && (
                 <FormField
                   control={form.control}
                   name="content"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Content *</FormLabel>
+                      <FormLabel className="text-base font-medium flex items-center gap-2">
+                        <Edit3 className="h-4 w-4 text-green-500" />
+                        Article Content *
+                      </FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder="Write your content here... (supports Markdown)"
-                          rows={10}
-                          className="font-mono text-sm"
-                          {...field}
-                        />
+                        <div className="space-y-2">
+                          <Textarea
+                            placeholder="Write your content here...
+
+# Heading 1
+## Heading 2
+
+**Bold text** and *italic text*
+
+- Bullet points
+- Support full
+- Markdown syntax
+
+[Links](https://example.com) and more!"
+                            rows={15}
+                            className="font-mono text-sm resize-none border-green-200 focus:border-green-500"
+                            {...field}
+                          />
+                          <div className="bg-gray-50 border rounded-lg p-4">
+                            <h4 className="font-medium text-sm mb-2 flex items-center gap-2">
+                              <Edit3 className="h-3 w-3" />
+                              Markdown Formatting Guide
+                            </h4>
+                            <div className="text-xs text-gray-600 space-y-1">
+                              <div className="grid grid-cols-2 gap-2">
+                                <code># Heading 1</code>
+                                <code>**Bold Text**</code>
+                                <code>## Heading 2</code>
+                                <code>*Italic Text*</code>
+                                <code>- Bullet List</code>
+                                <code>[Link](url)</code>
+                                <code>1. Numbered List</code>
+                                <code>`Code`</code>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </FormControl>
                       <FormDescription>
-                        You can use Markdown formatting (# headers, **bold**, *italic*, etc.)
+                        Create rich content using Markdown formatting
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </div>
-            )}
-
-            {/* Estimated Read Time */}
-            <div>
-              <FormField
-                control={form.control}
-                name="estimatedReadTime"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Estimated Read Time (minutes)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="1"
-                        max="120"
-                        placeholder="5"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseInt(e.target.value) || 5)
-                        }
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Time in minutes (1-120)
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 pt-4 border-t">
-            <Button
-              type="submit"
-              disabled={isLoading || form.formState.isSubmitting}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              {isLoading || form.formState.isSubmitting ? (
-                <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              ) : (
-                <Save className="h-4 w-4 mr-2" />
               )}
-              {mode === "edit" ? "Save Changes" : "Add Written Content"}
-            </Button>
-            
-            {onCancel && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                disabled={isLoading || form.formState.isSubmitting}
-              >
-                Cancel
-              </Button>
-            )}
-          </div>
+            </CardContent>
+          </Card>
+
+          {/* Enhanced Form Actions */}
+          <Card className="bg-gray-50 border-gray-200">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-600">
+                  {form.watch('contentSource') === 'embed' ? 'External Link' : 'Written Article'} •
+                  ~{form.watch('estimatedReadTime')} minute{form.watch('estimatedReadTime') !== 1 ? 's' : ''} read
+                  {form.watch('contentSource') === 'text' && form.watch('content') && (
+                    <span> • {form.watch('content').split(/\s+/).filter(Boolean).length} words</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  {onCancel && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={onCancel}
+                      disabled={isLoading || form.formState.isSubmitting}
+                      className="min-w-[100px]"
+                    >
+                      Cancel
+                    </Button>
+                  )}
+                  
+                  <Button
+                    type="submit"
+                    disabled={isLoading || form.formState.isSubmitting}
+                    className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white min-w-[140px] h-11"
+                  >
+                    {isLoading || form.formState.isSubmitting ? (
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        <span>Saving...</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Save className="h-4 w-4" />
+                        <span>{mode === "edit" ? "Save Changes" : "Create Content"}</span>
+                      </div>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </form>
       </Form>
     </div>

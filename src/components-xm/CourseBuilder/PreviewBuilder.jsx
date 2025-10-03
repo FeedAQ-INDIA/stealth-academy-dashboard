@@ -229,48 +229,16 @@ export default function PreviewBuilder() {
   const handlePublish = async () => {
     if (isLoading) return;
     
-    const validations = [
-      { condition: !courseData?.course?.courseTitle, title: "Add a course title", description: "A title is required before publishing." },
-      { condition: !courseData?.courseContent?.length, title: "Add content", description: "At least one content item is required to publish." },
-      { condition: !courseData?.courseBuilder?.courseBuilderId, title: "Create a draft first", description: "Save the course at least once before publishing." }
-    ];
-
-    for (const validation of validations) {
-      if (validation.condition) {
-        toast({
-          title: validation.title,
-          description: validation.description,
-          variant: "destructive",
-        });
-        return;
-      }
-    }
+  
     
     try {
-      const cleanedContent = prepareContentForApi(courseData.courseContent);
-      const payload = {
-        data: {
-          courseBuilderId: courseData.courseBuilder.courseBuilderId,
-          userId: courseData.courseBuilder.userId,
-          orgId: courseData.courseBuilder.orgId || null,
-          status: "PUBLISHED",
-          courseBuilderData: {
-            ...courseData.courseBuilder.courseBuilderData,
-            courseTitle: courseData.course.courseTitle,
-            courseDescription: courseData.course.courseDescription,
-            status: "PUBLISHED",
-            courseContent: cleanedContent,
-          },
-        },
-      };
+  
       
-      const res = await axiosConn.post("/publishCourse", payload);
+      const res = await axiosConn.post("/publishCourse", {
+        courseBuilderId: courseData.courseBuilder.courseBuilderId
+      });
       if (res.data?.success) {
-        setCourseData((prev) => ({
-          ...prev,
-          courseBuilder: { ...prev.courseBuilder, status: "PUBLISHED" },
-        }));
-        toast({
+         toast({
           title: "Course published!",
           description: "Your course is now live.",
         });

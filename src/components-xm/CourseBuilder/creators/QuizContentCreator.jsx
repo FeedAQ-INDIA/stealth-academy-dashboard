@@ -5,6 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { 
   Select, 
   SelectContent, 
@@ -21,8 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { HelpCircle, Save, Plus, Trash2 } from "lucide-react";
-import { useMemo } from "react";
+import { HelpCircle, Save, Plus, Trash2, Clock, Award, Target } from "lucide-react";
 
 // Zod schema for quiz content validation updated to mirror entity fields & semantics
 const questionSchema = z.object({
@@ -295,270 +298,381 @@ export default function QuizContentCreator({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-            <HelpCircle className="h-5 w-5 text-purple-600" />
+    <div className=" mx-auto p-4 space-y-8">
+      {/* Enhanced Header Section */}
+      <Card className="border-l-4 border-l-purple-500 bg-gradient-to-r from-purple-50 to-indigo-50">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg">
+                <HelpCircle className="h-6 w-6 text-white" />
+              </div>
+              <div className="space-y-1">
+                <CardTitle className="text-2xl font-bold text-gray-900">
+                  {mode === "edit" ? "Edit Quiz Content" : "Create Quiz Content"}
+                </CardTitle>
+                <p className="text-gray-600">
+                  {mode === "edit"
+                    ? "Update this assessment quiz"
+                    : "Create an interactive assessment for your learners"}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {form.watch('isTimed') && form.watch('timeLimit') && (
+                <Badge variant="secondary" className="px-3 py-1">
+                  <Clock className="h-3 w-3 mr-1" />
+                  {form.watch('timeLimit')} min
+                </Badge>
+              )}
+              <Badge variant="outline" className="px-3 py-1">
+                <Target className="h-3 w-3 mr-1" />
+                {form.watch('passingScore')}% to pass
+              </Badge>
+            </div>
           </div>
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">
-              {mode === "edit" ? "Edit Quiz Content" : "Add Quiz Content"}
-            </h2>
-            <p className="text-sm text-gray-600">
-              {mode === "edit"
-                ? "Update this assessment quiz"
-                : "Create a new assessment quiz"}
-            </p>
-          </div>
-        </div>
-      </div>
+        </CardHeader>
+      </Card>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-          {/* Quiz Settings */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-900">Quiz Settings</h3>
-            
-            <div className="grid gap-4 md:grid-cols-2">
-              {/* Title Field */}
-              <div className="md:col-span-2">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Title *</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Enter quiz title" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Description Field */}
-              <div className="md:col-span-2">
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Brief description of the quiz"
-                          rows={2}
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Optional description for the quiz
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Instructions Field */}
-              <div className="md:col-span-2">
-                <FormField
-                  control={form.control}
-                  name="instructions"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Instructions</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Instructions for students taking the quiz"
-                          rows={3}
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Instructions that will be shown to students
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Quiz Type Field */}
-              <div>
-                <FormField
-                  control={form.control}
-                  name="quizType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Quiz Type *</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select quiz type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="QUIZ">Quiz</SelectItem>
-                          <SelectItem value="CERTIFICATION">Certification</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>Maps to courseQuizType entity field</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Timed Toggle */}
-              <div>
-                <FormField
-                  control={form.control}
-                  name="isTimed"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col gap-2">
-                      <FormLabel>Timed Quiz</FormLabel>
-                      <FormControl>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={field.value}
-                            onChange={(e) => field.onChange(e.target.checked)}
-                          />
-                          <span className="text-sm text-gray-600">Enable timer</span>
-                        </div>
-                      </FormControl>
-                      <FormDescription>Controls isQuizTimed & timer fields</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Time Limit Field (conditional) */}
-              <div>
-                <FormField
-                  control={form.control}
-                  name="timeLimit"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Time Limit (minutes)</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number"
-                          min="1"
-                          max="480"
-                          placeholder="10"
-                          disabled={!form.watch("isTimed")}
-                          {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 10)}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        {form.watch("isTimed")
-                          ? "Time limit in minutes (1-480)"
-                          : "Disabled (quiz not timed)"}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Passing Score Field */}
-              <div>
-                <FormField
-                  control={form.control}
-                  name="passingScore"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Passing Score (%)</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number"
-                          min="0"
-                          max="100"
-                          placeholder="70"
-                          {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 70)}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Percentage score required to pass
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Max Attempts Field */}
-              <div>
-                <FormField
-                  control={form.control}
-                  name="maxAttempts"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Max Attempts</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number"
-                          min="1"
-                          max="20"
-                          placeholder="3"
-                          {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 3)}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Maximum attempts allowed (1-20)
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-            </div>
-          </div>
-
-          {/* Questions */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium text-gray-900">Questions</h3>
-              <Button 
-                type="button" 
-                onClick={addQuestion} 
-                size="sm" 
-                variant="outline"
-                disabled={fields.length >= 100}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Question
-              </Button>
-            </div>
-
-            {fields.map((field, index) => (
-              <div key={field.id} className="border rounded-lg p-4 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-medium">Question {index + 1}</h4>
-                  {fields.length > 1 && (
-                    <Button
-                      type="button"
-                      onClick={() => removeQuestion(index)}
-                      size="sm"
-                      variant="ghost"
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+          {/* Enhanced Quiz Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Award className="h-4 w-4 text-blue-600" />
                 </div>
+                Quiz Configuration
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid gap-6 md:grid-cols-2">
+                {/* Title Field */}
+                <div className="md:col-span-2">
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-medium">Quiz Title *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="e.g., JavaScript Fundamentals Assessment" 
+                            className="h-11"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Description Field */}
+                <div className="md:col-span-2">
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-medium">Description</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Brief description of the quiz purpose and content..."
+                            rows={3}
+                            className="resize-none"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Help learners understand what this quiz covers
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Instructions Field */}
+                <div className="md:col-span-2">
+                  <FormField
+                    control={form.control}
+                    name="instructions"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-medium">Instructions</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Instructions for students taking the quiz..."
+                            rows={3}
+                            className="resize-none"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Instructions that will be shown before the quiz starts
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Quiz Type Field */}
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="quizType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-medium">Quiz Type *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="h-11">
+                              <SelectValue placeholder="Select quiz type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="QUIZ">
+                              <div className="flex items-center gap-2">
+                                <HelpCircle className="h-4 w-4 text-blue-500" />
+                                <div>
+                                  <div className="font-medium">Quiz</div>
+                                  <div className="text-xs text-gray-600">Practice assessment</div>
+                                </div>
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="CERTIFICATION">
+                              <div className="flex items-center gap-2">
+                                <Award className="h-4 w-4 text-purple-500" />
+                                <div>
+                                  <div className="font-medium">Certification</div>
+                                  <div className="text-xs text-gray-600">Formal assessment</div>
+                                </div>
+                              </div>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormDescription>Determines assessment weight and behavior</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Passing Score Field */}
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="passingScore"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-medium">Passing Score (%)</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Input 
+                              type="number"
+                              min="0"
+                              max="100"
+                              placeholder="70"
+                              className="h-11 pr-8"
+                              {...field}
+                              onChange={(e) => field.onChange(parseInt(e.target.value) || 70)}
+                            />
+                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">%</div>
+                          </div>
+                        </FormControl>
+                        <FormDescription>
+                          Minimum percentage required to pass
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Timer Settings */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-medium flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-orange-500" />
+                  Timer Settings
+                </h4>
+                <div className="grid gap-6 md:grid-cols-2">
+                  {/* Timed Toggle */}
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="isTimed"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                          <div className="space-y-0.5">
+                            <FormLabel className="text-base font-medium">Enable Timer</FormLabel>
+                            <FormDescription>
+                              Set a time limit for this quiz
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Time Limit Field (conditional) */}
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="timeLimit"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-base font-medium">Time Limit (minutes)</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number"
+                              min="1"
+                              max="480"
+                              placeholder="10"
+                              disabled={!form.watch("isTimed")}
+                              className="h-11"
+                              {...field}
+                              onChange={(e) => field.onChange(parseInt(e.target.value) || 10)}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            {form.watch("isTimed")
+                              ? "Time limit in minutes (1-480)"
+                              : "Enable timer to set time limit"}
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Attempt Settings */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-medium flex items-center gap-2">
+                  <Target className="h-5 w-5 text-green-500" />
+                  Attempt Settings
+                </h4>
+                <div className="grid gap-6 md:grid-cols-1">
+                  {/* Max Attempts Field */}
+                  <div className="max-w-xs">
+                    <FormField
+                      control={form.control}
+                      name="maxAttempts"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-base font-medium">Maximum Attempts</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number"
+                              min="1"
+                              max="20"
+                              placeholder="3"
+                              className="h-11"
+                              {...field}
+                              onChange={(e) => field.onChange(parseInt(e.target.value) || 3)}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Number of attempts allowed (1-20)
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Enhanced Questions Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+                    <HelpCircle className="h-4 w-4 text-indigo-600" />
+                  </div>
+                  <div>
+                    Questions
+                    <Badge variant="outline" className="ml-2">
+                      {fields.length} {fields.length === 1 ? 'question' : 'questions'}
+                    </Badge>
+                  </div>
+                </CardTitle>
+                <Button 
+                  type="button" 
+                  onClick={addQuestion} 
+                  size="sm" 
+                  variant="outline"
+                  disabled={fields.length >= 100}
+                  className="gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Question
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {fields.map((field, index) => {
+                const questionType = form.watch(`questions.${index}.type`);
+                const difficultyColor = {
+                  EASY: 'bg-green-500',
+                  MEDIUM: 'bg-yellow-500', 
+                  HARD: 'bg-red-500'
+                }[form.watch(`questions.${index}.difficulty`)] || 'bg-gray-500';
+                
+                return (
+                  <Card key={field.id} className="border-2 border-gray-100 hover:border-gray-200 transition-all duration-200 shadow-sm hover:shadow-md">
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            <Badge variant="secondary" className="text-sm px-3 py-1 font-semibold">
+                              Q{index + 1}
+                            </Badge>
+                            <div className={`absolute -top-1 -right-1 w-3 h-3 ${difficultyColor} rounded-full border-2 border-white`} title={form.watch(`questions.${index}.difficulty`)}></div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-lg font-semibold text-gray-900">Question {index + 1}</div>
+                            <Badge 
+                              variant={questionType === 'SINGLE_CHOICE' ? 'default' : questionType === 'MULTIPLE_CHOICE' ? 'secondary' : 'outline'}
+                              className="text-xs"
+                            >
+                              {questionType === 'SINGLE_CHOICE' ? 'Single Choice' : 
+                               questionType === 'MULTIPLE_CHOICE' ? 'Multiple Choice' : 'Input Box'}
+                            </Badge>
+                          </div>
+                        </div>
+                        {fields.length > 1 && (
+                          <Button
+                            type="button"
+                            onClick={() => removeQuestion(index)}
+                            size="sm"
+                            variant="ghost"
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
 
                 {/* Question Text */}
                 <FormField
@@ -877,9 +991,12 @@ export default function QuizContentCreator({
                     </FormItem>
                   )}
                 />
-              </div>
-            ))}
-          </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </CardContent>
+          </Card>
 
           <div className="flex items-center gap-3 pt-4 border-t">
             <Button

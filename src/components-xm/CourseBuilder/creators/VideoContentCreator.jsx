@@ -4,11 +4,10 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-// If RadioGroup isn't available in your UI library, replace with a Select.
-// Assuming shadcn/ui style components exist:
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-// Removed category select imports (category field removed)
 import {
   Form,
   FormControl,
@@ -18,7 +17,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Video, Save } from "lucide-react";
+import { Video, Save, Upload, Globe, Clock, Play } from "lucide-react";
 
 // Zod schema for video content validation (aligned with backend entity)
 const videoContentSchema = z
@@ -174,258 +173,355 @@ export default function VideoContentCreator({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-            <Video className="h-5 w-5 text-blue-600" />
+    <div className="mx-auto p-4 space-y-8">
+      {/* Enhanced Header Section */}
+      <Card className="border-l-4 border-l-blue-500 bg-gradient-to-r from-blue-50 to-cyan-50">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+                <Video className="h-6 w-6 text-white" />
+              </div>
+              <div className="space-y-1">
+                <CardTitle className="text-2xl font-bold text-gray-900">
+                  {mode === "edit" ? "Edit Video Content" : "Create Video Content"}
+                </CardTitle>
+                <p className="text-gray-600">
+                  {mode === "edit"
+                    ? "Update the video lesson"
+                    : "Add an engaging video lesson to your course"}
+                </p>
+              </div>
+            </div>
+            {form.watch('duration') > 0 && (
+              <Badge variant="secondary" className="px-3 py-1">
+                <Clock className="h-3 w-3 mr-1" />
+                {Math.floor(form.watch('duration') / 60)}:{String(form.watch('duration') % 60).padStart(2, '0')}
+              </Badge>
+            )}
           </div>
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">
-              {mode === "edit" ? "Edit Video Content" : "Add Video Content"}
-            </h2>
-            <p className="text-sm text-gray-600">
-              {mode === "edit"
-                ? "Update the video lesson"
-                : "Create a new video lesson"}
-            </p>
-          </div>
-        </div>
-      </div>
+        </CardHeader>
+      </Card>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* Title Field */}
-            <div className="md:col-span-2">
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Title *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter video title" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+          {/* Enhanced Video Details Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <Play className="h-4 w-4 text-purple-600" />
+                </div>
+                Video Details
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid gap-6 md:grid-cols-1">
+                {/* Title Field */}
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium">Title *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="e.g., Introduction to JavaScript Variables" 
+                          className="h-11"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            {/* Description Field */}
-            <div className="md:col-span-2">
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Enter video description"
-                        rows={3}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Optional description for the video content
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                {/* Description Field */}
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium">Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Describe what learners will gain from this video..."
+                          rows={4}
+                          className="resize-none"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Help learners understand the video content and objectives
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Source Type Toggle */}
-            <div>
+          {/* Enhanced Video Source Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Upload className="h-4 w-4 text-green-600" />
+                </div>
+                Video Source
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Source Type Toggle */}
               <FormField
                 control={form.control}
                 name="videoSourceType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Video Source</FormLabel>
+                    <FormLabel className="text-base font-medium">Source Type</FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        className="flex flex-col gap-2"
+                        className="grid grid-cols-2 gap-4"
                       >
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-3 border rounded-lg p-4 hover:bg-gray-50 transition-colors">
                           <RadioGroupItem value="url" id="src-url" />
                           <label
                             htmlFor="src-url"
-                            className="text-sm cursor-pointer"
+                            className="flex items-center gap-2 cursor-pointer flex-1"
                           >
-                            URL
+                            <Globe className="h-4 w-4 text-blue-500" />
+                            <div>
+                              <div className="font-medium">URL/Embed</div>
+                              <div className="text-xs text-gray-600">YouTube, Vimeo, etc.</div>
+                            </div>
                           </label>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-3 border rounded-lg p-4 hover:bg-gray-50 transition-colors">
                           <RadioGroupItem value="upload" id="src-upload" />
                           <label
                             htmlFor="src-upload"
-                            className="text-sm cursor-pointer"
+                            className="flex items-center gap-2 cursor-pointer flex-1"
                           >
-                            Upload
+                            <Upload className="h-4 w-4 text-green-500" />
+                            <div>
+                              <div className="font-medium">Upload File</div>
+                              <div className="text-xs text-gray-600">MP4, WebM, etc.</div>
+                            </div>
                           </label>
                         </div>
                       </RadioGroup>
                     </FormControl>
                     <FormDescription>
-                      Choose to embed via URL or upload a video file.
+                      Choose how you want to add your video content
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            </div>
 
-            {/* Video URL Field (conditional) */}
-            {form.watch("videoSourceType") === "url" && (
-              <div>
+              <Separator />
+
+              {/* Video URL Field (conditional) */}
+              {form.watch("videoSourceType") === "url" && (
                 <FormField
                   control={form.control}
                   name="videoUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Video URL *</FormLabel>
+                      <FormLabel className="text-base font-medium flex items-center gap-2">
+                        <Globe className="h-4 w-4 text-blue-500" />
+                        Video URL *
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="url"
-                          placeholder="https://youtube.com/watch?v=..."
+                          placeholder="https://youtube.com/watch?v=... or https://vimeo.com/..."
+                          className="h-11"
                           {...field}
                         />
                       </FormControl>
                       <FormDescription>
-                        YouTube, Vimeo, or direct .mp4/.webm/.ogg file URL
-                        (publicly accessible)
+                        Supports YouTube, Vimeo, or direct video file URLs
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </div>
-            )}
+              )}
 
-            {/* Video Upload Field (conditional) */}
-            {form.watch("videoSourceType") === "upload" && (
-              <div>
+              {/* Video Upload Field (conditional) */}
+              {form.watch("videoSourceType") === "upload" && (
                 <FormField
                   control={form.control}
                   name="videoFile"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Upload Video *</FormLabel>
+                      <FormLabel className="text-base font-medium flex items-center gap-2">
+                        <Upload className="h-4 w-4 text-green-500" />
+                        Upload Video File *
+                      </FormLabel>
+                      <FormControl>
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                          <Input
+                            type="file"
+                            accept="video/*"
+                            className="hidden"
+                            id="video-upload"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const maxBytes = 1024 * 1024 * 1024; // 1GB
+                                if (file.size > maxBytes) {
+                                  form.setError("videoFile", {
+                                    message: "File exceeds 1GB limit",
+                                  });
+                                } else {
+                                  form.clearErrors("videoFile");
+                                }
+                              }
+                              field.onChange(file || null);
+                            }}
+                          />
+                          <label htmlFor="video-upload" className="cursor-pointer">
+                            <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                            <div className="text-sm text-gray-600">
+                              <span className="font-medium text-blue-600">Click to upload</span> or drag and drop
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              MP4, WebM, MOV up to 1GB
+                            </div>
+                          </label>
+                        </div>
+                      </FormControl>
+                      <FormDescription>
+                        Choose a video file from your computer
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Enhanced Video Settings Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <Clock className="h-4 w-4 text-orange-600" />
+                </div>
+                Video Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-6 md:grid-cols-2">
+                {/* Duration Field */}
+                <FormField
+                  control={form.control}
+                  name="duration"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium">Duration (seconds)</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            type="number"
+                            min="0"
+                            max="86400"
+                            placeholder="300"
+                            className="h-11 pr-16"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(parseInt(e.target.value) || 0)
+                            }
+                          />
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">
+                            {Math.floor((field.value || 0) / 60)}:{String((field.value || 0) % 60).padStart(2, '0')}
+                          </div>
+                        </div>
+                      </FormControl>
+                      <FormDescription>
+                        Video length in seconds (max 24 hours)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Thumbnail URL Field */}
+                <FormField
+                  control={form.control}
+                  name="thumbnailUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-medium">Thumbnail URL (optional)</FormLabel>
                       <FormControl>
                         <Input
-                          type="file"
-                          accept="video/*"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              // Basic client-side size limit (e.g., 1GB)
-                              const maxBytes = 1024 * 1024 * 1024; // 1GB
-                              if (file.size > maxBytes) {
-                                form.setError("videoFile", {
-                                  message: "File exceeds 1GB limit",
-                                });
-                              } else {
-                                form.clearErrors("videoFile");
-                              }
-                            }
-                            field.onChange(file || null);
-                          }}
+                          type="url"
+                          placeholder="https://example.com/thumbnail.jpg"
+                          className="h-11"
+                          {...field}
                         />
                       </FormControl>
                       <FormDescription>
-                        Supported: common video formats. Max 1GB (adjust as
-                        needed).
+                        Custom thumbnail image for the video
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-            )}
+            </CardContent>
+          </Card>
 
-            {/* Thumbnail URL Field */}
-            <div>
-              <FormField
-                control={form.control}
-                name="thumbnailUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Thumbnail URL</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="url"
-                        placeholder="https://example.com/thumbnail.jpg"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+          {/* Enhanced Form Actions */}
+          <Card className="bg-gray-50 border-gray-200">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-600">
+                  {form.watch('videoSourceType') === 'url' ? 'Video URL' : 'File Upload'} •
+                  {form.watch('duration') > 0 && (
+                    <span> {Math.floor(form.watch('duration') / 60)}:{String(form.watch('duration') % 60).padStart(2, '0')}</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  {onCancel && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={onCancel}
+                      disabled={isLoading || form.formState.isSubmitting}
+                      className="min-w-[100px]"
+                    >
+                      Cancel
+                    </Button>
+                  )}
 
-            {/* Duration Field */}
-            <div>
-              <FormField
-                control={form.control}
-                name="duration"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Duration (seconds)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        max="86400"
-                        placeholder="300"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseInt(e.target.value) || 0)
-                        }
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Duration in seconds (max 24 hours)
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Category Field removed */}
-          </div>
-
-          <div className="flex items-center gap-3 pt-4 border-t">
-            <Button
-              type="submit"
-              disabled={isLoading || form.formState.isSubmitting}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              {isLoading || form.formState.isSubmitting ? (
-                <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              ) : (
-                <Save className="h-4 w-4 mr-2" />
-              )}
-              {mode === "edit" ? "Save Changes" : "Add Video Content"}
-            </Button>
-
-            {onCancel && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                disabled={isLoading || form.formState.isSubmitting}
-              >
-                Cancel
-              </Button>
-            )}
-          </div>
+                  <Button
+                    type="submit"
+                    disabled={isLoading || form.formState.isSubmitting}
+                    className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white min-w-[140px] h-11"
+                  >
+                    {isLoading || form.formState.isSubmitting ? (
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        <span>Saving...</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Save className="h-4 w-4" />
+                        <span>{mode === "edit" ? "Save Changes" : "Add Video"}</span>
+                      </div>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </form>
       </Form>
     </div>
