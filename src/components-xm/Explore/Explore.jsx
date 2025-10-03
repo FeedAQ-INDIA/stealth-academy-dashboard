@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { ShoppingCart, Upload, Crown, Video, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.jsx";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { useAuthStore } from "@/zustland/store.js";
-import Header from "@/components-xm/Header/Header.jsx";
- 
+
 export function Explore() {
   const navigate = useNavigate();
   const location = useLocation();

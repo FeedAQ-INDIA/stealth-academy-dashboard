@@ -9,11 +9,9 @@ import { Toaster } from "./components/ui/toaster.jsx";
 import { refreshToken } from "./utils/refreshTokenUtils";
 
 import { Dashboard } from "@/components-xm/Dashboard.jsx";
-import { Explore } from "@/components-xm/Explore.jsx";
+import { Explore } from "@/components-xm/Explore/Explore.jsx";
 import {
-  Marketplace,
   BringYourOwnCourse as BringYourOwnCourseExplore,
-  PrivilegedAccess,
   LiveLearning,
 } from "@/components-xm/Explore/index.js";
 import { MyLearningLayout } from "@/components-xm/MyJourney/MyJourneyLayout.jsx";
@@ -22,8 +20,7 @@ import CourseOverview from "@/components-xm/Course/CourseOverview.jsx";
 import CourseVideoTutorial from "@/components-xm/Course/CourseVideoTutorial.jsx";
 import { AccountDetail } from "@/components-xm/AccountSettings/AccountDetail.jsx";
 import MyAccount from "@/components-xm/AccountSettings/MyAccount.jsx";
-import Security from "@/components-xm/AccountSettings/Security.jsx";
-import Billing from "@/components-xm/AccountSettings/Billing/Billing.jsx";
+ import Billing from "@/components-xm/AccountSettings/Billing/Billing.jsx";
 import BillingOverview from "@/components-xm/AccountSettings/Billing/BillingOverview.jsx";
 import BillingHistory from "@/components-xm/AccountSettings/Billing/BillingHistory.jsx";
 
@@ -32,27 +29,14 @@ import {
   OrgProfile,
   AddMembersToOrg,
 } from "@/components-xm/AccountSettings/Organization/index.js";
-import Notifications from "@/components-xm/AccountSettings/Notifications.jsx";
-import CourseWritten from "@/components-xm/Course/CourseWritten.jsx";
+ import CourseWritten from "@/components-xm/Course/CourseWritten.jsx";
 import CourseDocThirdParty from "@/components-xm/Course/CourseDocThirdParty.jsx";
 import CourseQuiz from "@/components-xm/Course/CourseQuiz/CourseQuiz.jsx";
 import CourseFlashcard from "@/components-xm/Course/CourseFlashcard.jsx";
 import { useProtectedURIStore } from "@/zustland/store";
 import CourseSchedule from "@/components-xm/Course/CourseSchedule.jsx";
-import BringYourOwnCourse from "./components-xm/BringYourOwnCourse.jsx";
 import { MyCourse } from "./components-xm/MyJourney/MyCourse.jsx";
-import { MyWishlist } from "./components-xm/MyJourney/MyWishlist.jsx";
 import MyJourneyOverview from "./components-xm/MyJourney/MyJourneyOverview.jsx";
-import LearningArena from "./components-xm/LangStudio/LearningArena.jsx";
-import LearningDashboard from "./components-xm/LangStudio/Dashboard.jsx";
-import LearningArenaItem from "./components-xm/LangStudio/LearningArenaItem.jsx";
-import ComprehensionSkillsSession from "./components-xm/LangStudio/SkillSession/ComprehensionSkillsSession.jsx";
-import ReadingSkillsSession from "./components-xm/LangStudio/SkillSession/ReadingSkillsSession.jsx";
-import ListeningSkillsSession from "./components-xm/LangStudio/SkillSession/ListeningSkillsSession.jsx";
-import SpeakingSkillsSession from "./components-xm/LangStudio/SkillSession/SpeakingSkillsSession.jsx";
-import EmailWritingSkillsSession from "./components-xm/LangStudio/SkillSession/EmailWritingSkillsSession.jsx";
-import WritingSkillsSession from "./components-xm/LangStudio/SkillSession/WritingSkillsSession.jsx";
-import { MyJourney as LangStudioMyJourney } from "./components-xm/LangStudio/MyJourney.jsx";
 import CourseCertificate from "./components-xm/Course/CourseCertificate.jsx";
 import CourseNotes from "./components-xm/Course/CourseNotes.jsx";
 import MyAchievement from "./components-xm/MyJourney/MyAchievement.jsx";
@@ -81,10 +65,7 @@ const router = createBrowserRouter([
         path: "/explore",
         element: <Explore />,
         children: [
-          {
-            path: "marketplace",
-            element: <Marketplace />,
-          },
+ 
           {
             path: "live-learning",
             element: <LiveLearning />,
@@ -93,10 +74,7 @@ const router = createBrowserRouter([
             path: "bring-your-own-course",
             element: <BringYourOwnCourseExplore />,
           },
-          {
-            path: "privileged-access",
-            element: <PrivilegedAccess />,
-          },
+     
         ],
       },
 
@@ -112,10 +90,7 @@ const router = createBrowserRouter([
             path: "/account-settings/profile",
             element: <MyAccount />,
           },
-          {
-            path: "/account-settings/security",
-            element: <Security />,
-          },
+
           {
             path: "/account-settings/credit-and-order",
             element: <Billing />,
@@ -124,28 +99,11 @@ const router = createBrowserRouter([
                 index: true,
                 element: <BillingOverview />,
               },
-              {
-                path: "history",
-                element: <BillingHistory />,
-              },
+ 
             ],
           },
 
-          // {
-          //   path: "/account-settings/orders",
-          //   element: <OrdersLayout />,
-          //   children: [
-          //     {
-          //       index: true,
-          //       element: <AllOrders />,
-          //     },
 
-          //   ],
-          // },
-          {
-            path: "/account-settings/notifications",
-            element: <Notifications />,
-          },
           {
             path: "/account-settings/my-goals",
             element: <MyGoals />,
@@ -265,10 +223,7 @@ const router = createBrowserRouter([
             element: <MyLearningSchedule />,
           },
 
-          {
-            path: "/my-journey/wishlist",
-            element: <MyWishlist />,
-          },
+
         ],
       },
 
@@ -283,54 +238,7 @@ const router = createBrowserRouter([
         element: <PreviewBuilder />,
       },
 
-      // Removed /course-builder/editor example route (CourseEditorExample) as part of simplification cleanup.
-
-
-      {
-        path: "/bring-your-own-course",
-        element: <BringYourOwnCourse />,
-      },
-
-      {
-        path: "/lang-studio/learning-arena",
-        element: <LearningArena />,
-      },
-      {
-        path: "/lang-studio/my-journey",
-        element: <LangStudioMyJourney />,
-      },
-      {
-        path: "/lang-studio/learning-arena/comprehension-skills/:sessionId",
-        element: <ComprehensionSkillsSession />,
-      },
-      {
-        path: "/lang-studio/learning-arena/reading-skills/:sessionId",
-        element: <ReadingSkillsSession />,
-      },
-      {
-        path: "/lang-studio/learning-arena/listening-skills/:sessionId",
-        element: <ListeningSkillsSession />,
-      },
-      {
-        path: "/lang-studio/learning-arena/speaking-skills/:sessionId",
-        element: <SpeakingSkillsSession />,
-      },
-      {
-        path: "/lang-studio/learning-arena/email-writing/:sessionId",
-        element: <EmailWritingSkillsSession />,
-      },
-      {
-        path: "/lang-studio/learning-arena/writing-skills/:sessionId",
-        element: <WritingSkillsSession />,
-      },
-      {
-        path: "/lang-studio/learning-arena/:arenaName",
-        element: <LearningArenaItem />,
-      },
-      {
-        path: "/lang-studio",
-        element: <LearningDashboard />,
-      },
+ 
     ],
   },
 ]);

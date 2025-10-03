@@ -1,4 +1,2 @@
-export { Marketplace } from './Marketplace.jsx';
-export { BringYourOwnCourse } from './BringYourOwnCourse.jsx';
-export { PrivilegedAccess } from './PrivilegedAccess.jsx';
-export { LiveLearning } from './LiveLearning.jsx';
+ export { BringYourOwnCourse } from './BringYourOwnCourse.jsx';
+ export { LiveLearning } from './LiveLearning.jsx';

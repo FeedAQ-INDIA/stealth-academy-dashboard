@@ -20,7 +20,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card.jsx";
-import NavMenuLangStudio from "./NavMenuLangStudio.jsx";
 
 export default function Header() {
   const { userDetail } = useAuthStore();
@@ -83,11 +82,8 @@ export default function Header() {
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex items-center gap-4 ml-4">
-        {location.pathname.includes("/lang-studio") ? (
-          <NavMenuLangStudio />
-        ) : (
+
           <NavigationMenuDemo />
-        )}
       </div>
 
       {/* Right-side button */}
