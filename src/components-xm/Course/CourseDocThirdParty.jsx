@@ -22,7 +22,7 @@ import CreateNotesModule from "@/components-xm/Notes/CreateNotesModule.jsx";
 function CourseDocThirdParty() {
 
     const {CourseId, CourseDocId} = useParams();
-    const {userEnrollmentObj, userEnrollmentCourseLog, fetchUserEnrollmentData, isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus} = useCourse();
+    const {userEnrollmentObj, userCourseContentProgress, fetchUserCourseContentProgress, isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus} = useCourse();
 
     const [courseVideoDetail, setCourseVideoDetail] = useState({});
     const [courseTopicContent, setCourseTopicContent] = useState({});
@@ -70,7 +70,7 @@ function CourseDocThirdParty() {
                 toast({
                     title: "status is updated"
                 });
-                fetchUserEnrollmentData()
+                fetchUserCourseContentProgress()
             })
             .catch((err) => {
                 console.log(err);
@@ -94,7 +94,7 @@ function CourseDocThirdParty() {
                 toast({
                     title: "status is updated"
                 });
-                fetchUserEnrollmentData()
+                fetchUserCourseContentProgress()
             })
             .catch((err) => {
                 console.log(err);
@@ -200,12 +200,12 @@ function CourseDocThirdParty() {
                             {courseVideoDetail?.courseWrittenTitle}
                         </CardTitle>
                         <div className="ml-auto">
-                            {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0  ?
+                            {userCourseContentProgress?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0  ?
                                 <h3 className="flex gap-1 "><Check color="#11a72a"/><span
                                     className="text-blue-800 font-medium">Completed</span></h3> : <Button className="w-fit" size="sm" onClick={() => saveUserEnrollmentData()}>Mark as
                                     Complete</Button>
                             }
-                            {userEnrollmentCourseLog?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0 ?
+                            {userCourseContentProgress?.filter(b => b.courseId == CourseId && b?.courseTopicContentId == courseTopicContent?.courseTopicContentId && b.enrollmentStatus == 'COMPLETED')?.length > 0 ?
                                 <p className='text-right cursor-pointer hover:text-blue-800 hover:underline  hover:underline-offset-4' onClick={() => deleteUserEnrollmentData()}>Undo</p> : <></>
                             }
                         </div>

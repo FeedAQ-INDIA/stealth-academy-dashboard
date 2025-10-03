@@ -10,7 +10,7 @@ import {Form, FormControl, FormField, FormItem, FormMessage} from "@/components/
 import {toast} from "@/components/hooks/use-toast.js";
 import {Save, RotateCcw, FileText, Loader2} from "lucide-react";
 
-function CreateNotesModule({courseId, courseTopicId, courseTopicContentId, handleNotesSave}) {
+function CreateNotesModule({courseId, courseContentId, handleNotesSave, handleGetCurrentTime=null}) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [wordCount, setWordCount] = useState(0);
     const [charCount, setCharCount] = useState(0);
@@ -19,16 +19,16 @@ function CreateNotesModule({courseId, courseTopicId, courseTopicContentId, handl
     const {isUserEnrolledAlready, courseList, enroll, disroll, enrollStatus} = useCourse();
 
     const createNotesSchema = z.object({
-        notesText: z.string()
+        noteContent: z.string()
             .min(3, "Notes must be at least 3 characters long"),
     });
 
     const createNotesForm = useForm({
         resolver: zodResolver(createNotesSchema),
-        defaultValues: {notesText: ""},
+        defaultValues: {noteContent: ""},
     });
 
-    const watchedNotesText = createNotesForm.watch("notesText");
+    const watchedNotesText = createNotesForm.watch("noteContent");
 
     // Update counters and unsaved changes state
     useEffect(() => {
@@ -44,10 +44,10 @@ function CreateNotesModule({courseId, courseTopicId, courseTopicContentId, handl
             const response = await axiosConn.post(
                 import.meta.env.VITE_API_URL + "/saveNote",
                 {
-                    courseTopicId,
                     courseId,
-                    courseTopicContentId,
-                    notesText: data.notesText,
+                    courseContentId,
+                    noteContent: data.noteContent,
+                    noteRefTimestamp: (handleGetCurrentTime !== null) ? handleGetCurrentTime() : null
                 }
             );
 
@@ -86,7 +86,8 @@ function CreateNotesModule({courseId, courseTopicId, courseTopicContentId, handl
                     <h3 className="font-medium text-gray-900">Create Notes</h3>
                 </div>
                 <div className="text-sm text-gray-500">
-                    {wordCount} words • {charCount} characters
+                    {wordCount} words 
+                    {/* • {charCount} characters */}
                 </div>
             </div>
 
@@ -99,7 +100,7 @@ function CreateNotesModule({courseId, courseTopicId, courseTopicContentId, handl
                     <div className="flex-1 min-h-[200px]">
                         <FormField
                             control={createNotesForm.control}
-                            name="notesText"
+                            name="noteContent"
                             render={({field}) => (
                                 <FormItem className="flex-1 w-full h-full">
                                     <FormControl>

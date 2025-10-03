@@ -1,128 +1,349 @@
 import * as React from "react";
-import {useEffect, useState} from "react";
+import { useEffect, useState, useCallback } from "react";
 
- import {
-    Sidebar,
-    SidebarContent,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarMenuSub,
-    SidebarMenuSubButton,
-    SidebarMenuSubItem, useSidebar,
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  useSidebar,
 } from "@/components/ui/sidebar.jsx";
-import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select.jsx";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
-import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible.jsx";
-import {ArrowLeft, ChevronRight, Clock, Loader} from "lucide-react";
-import {Separator} from "@/components/ui/separator.jsx";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible.jsx";
+import {
+  ArrowLeft,
+  ChevronRight,
+  Clock,
+  Loader,
+  UserCircle,
+  Shield,
+  CreditCard,
+  Bell,
+  LogOut,
+  ShoppingBag,
+  Building,
+  Users,
+  UserPlus,
+  Settings as SettingsIcon,
+} from "lucide-react";
+import { Separator } from "@/components/ui/separator.jsx";
+import { useOrganizationStore } from "@/zustland/store.js";
 
+function AccountSidebar({ ...props }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Organization status from zustand store
+  const { 
+    fetchUserOrganizations, 
+    organizationsLoading,
+    organizationsError,
+    organizations,
+    setSelectedOrganization,
+    selectedOrganization,
+  } = useOrganizationStore();
 
-function AccountSidebar({...props}) {
-    const location = useLocation();
-    const navigate = useNavigate();
+  // Fetch organization status on component mount
+  useEffect(() => {
+    console.log("AccountSidebar: Fetching organizations on mount");
+    fetchUserOrganizations();
+  }, [fetchUserOrganizations]); // Include fetchUserOrganizations in dependencies
 
-    // Helper function to get the current tab from the URL query params
-    const getTabFromURL = () => {
-        const params = new URLSearchParams(location.search);
-        return params.get("tab") || "overview"; // Default to 'overview' tab
-    };
+  // Debug logging
+  useEffect(() => {
+    console.log("AccountSidebar Debug - organizationsLoading:", organizationsLoading);
+    console.log("AccountSidebar Debug - organizations:", organizations);
+    console.log("AccountSidebar Debug - selectedOrganization:", selectedOrganization);
+  }, [organizationsLoading, organizations, selectedOrganization]);
 
+  // Dynamic organization menu items based on organization status
+  const getOrganizationItems = useCallback(() => {
+    console.log("getOrganizationItems called - organizationsLoading:", organizationsLoading, "organizations:", organizations);
+    
+    // Always show the main organization dashboard
+    const items = [];
 
-    const data = {
-        navMain: [
-            {
-                title: "", url: "#", items: [{
-                    title: "Profile",
-                    url: `/account-settings/profile`,
-                    isActive: location.pathname === '/account-settings/profile',
-                },
-                    {
-                        title: "Sign out",
-                        url: `${import.meta.env.VITE_API_URL}/auth/logout`,
-                        isActive: location.pathname === import.meta.env.VITE_API_URL+'/auth/logout',
+    // Check if we're still loading
+    if (organizationsLoading) {
+      items.push({
+        title: "Loading organizations...",
+        url: "#",
+        isActive: false,
+        icon: Loader,
+      });
+      return items;
+    }
 
-                    },
+    // Check for errors
+    if (organizationsError) {
+      items.push({
+        title: "Error loading organizations",
+        url: "#",
+        isActive: false,
+        icon: Shield, // Using Shield as error icon
+      });
+      return items;
+    }
 
-                ],
-            },  ]
-    };
+    // If user has organizations, show additional management options
+    if (organizations && organizations.length > 0) {
+      items.push(
+        {
+          title: "Organization Profile",
+          url: `/account-settings/organization/profile`,
+          isActive: location.pathname === "/account-settings/organization/profile",
+          icon: SettingsIcon,
+        },
+        {
+          title: "Manage Members",
+          url: `/account-settings/organization/add-members`,
+          isActive: location.pathname === "/account-settings/organization/add-members",
+          icon: UserPlus,
+        },
+      );
+    } else {
+      // No organizations found
+      items.push({
+        title: "No organizations found",
+        url: `/account-settings/register-organization`,
+        isActive: false,
+        icon: Building,
+      });
+    }
 
+    return items;
+  }, [organizationsLoading, organizationsError, organizations, location.pathname]);
 
-    const [urlEndpoint, setUrlEndpoint] = React.useState("");
+  // Get navigation items based on selected profile
+  const getNavigationItems = useCallback(() => {
+    const accountItems = [
+      {
+        title: "Profile",
+        url: `/account-settings/profile`,
+        isActive:
+          location.pathname === "/account-settings/profile" ||
+          location.pathname === "/account-settings",
+        icon: UserCircle,
+      },
+      {
+        title: "Credit & Orders",
+        url: `/account-settings/credit-and-order`,
+        isActive: location.pathname?.includes(
+          "/account-settings/credit-and-order"
+        ),
+        icon: CreditCard,
+      },
+      {
+        title: "My Goals",
+        url: `/account-settings/my-goals`,
+        isActive: location.pathname?.includes("/account-settings/my-goals"),
+        icon: CreditCard,
+      },
+      {
+        title: "My Learning Schedule",
+        url: `/account-settings/my-learning-schedule`,
+        isActive: location.pathname?.includes(
+          "/account-settings/my-learning-schedule"
+        ),
+        icon: CreditCard,
+      },
+    ];
 
-    useEffect(() => {
-        console.log("Updated urlEndpoint:", urlEndpoint);
-    }, [urlEndpoint]);
+    // If general profile is selected (selectedOrganization is null), show register organization option
+    if (selectedOrganization === null) {
+      accountItems.push({
+        title: "Register Organization",
+        url: `/account-settings/register-organization`,
+        isActive: location.pathname === "/account-settings/register-organization",
+        icon: Building,
+      });
+    }
 
+    return accountItems;
+  }, [selectedOrganization, location.pathname]);
 
-    return (< >
-        <Sidebar className="top-[4rem] h-[calc(100svh-4em)] border-r shadow-md px-0   " style={{borderRadius: '0px', overflowY: 'auto'}}
-                 variant="inset">
+  // Memoized data object that updates when dependencies change
+  const data = React.useMemo(() => {
+    const navSections = [
+      {
+        title: "Account",
+        url: "#",
+        items: getNavigationItems(),
+      }
+    ];
 
-            <SidebarHeader>
+    // Only show Organization section if user has selected an organization profile (selectedOrganization is not null)
+    if (selectedOrganization !== null && organizations && organizations.length > 0) {
+      navSections.push({
+        title: "Organization",
+        url: "#",
+        items: getOrganizationItems(),
+      });
+    }
+
+    navSections.push({
+      title: "Actions",
+      url: "#",
+      items: [
+        {
+          title: "Sign out",
+          url: `${import.meta.env.VITE_API_URL}/auth/logout`,
+          isActive: false,
+          icon: LogOut,
+        },
+      ],
+    });
+
+    return { navMain: navSections };
+  }, [organizations, selectedOrganization, getOrganizationItems, getNavigationItems]);
+
+  return (
+    <>
+      <Sidebar
+        className="top-[4rem] h-[calc(100svh-4em)] border-r shadow-md px-0"
+        style={{ borderRadius: "0px" }}
+        variant="inset"
+      >
+        {/* <SidebarHeader>
                 <h2 className="text-lg font-medium text-center">MY ACCOUNT</h2>
 
-            </SidebarHeader>
-            <Separator/>
-            <SidebarContent>
-
-
-                {data.navMain.map((item) => (<SidebarGroup key={item.title}>
-                    <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            {item.items.map((item) => (item?.subItems?.length > 0 ? (<Collapsible key={item.title}>
-                                    <SidebarMenuItem>
-                                        <CollapsibleTrigger asChild>
-                                            <SidebarMenuButton tooltip={item.title}
-                                                               className="py-5 rounded-1">
-
-                                                <span>{item.title}</span>
-                                                <ChevronRight
-                                                    className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"/>
-                                            </SidebarMenuButton>
-                                        </CollapsibleTrigger>
-                                        <CollapsibleContent>
-                                            <SidebarMenuSub>
-                                                {item?.subItems?.map((subItem) => (
-
-                                                    <SidebarMenuSubItem>
-                                                        <SidebarMenuSubButton asChild
-                                                                              isActive={subItem.isActive}
-                                                                              className="py-5 rounded-1">
-                                                            <Link to={subItem.url}>{subItem.title}</Link>
-                                                        </SidebarMenuSubButton>
-                                                    </SidebarMenuSubItem>))}
-
-                                            </SidebarMenuSub>
-                                        </CollapsibleContent>
-                                    </SidebarMenuItem>
-                                </Collapsible>) : (<SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild isActive={item.isActive}
-                                                       className="py-5 rounded-1">
-                                        <Link to={item.url}>{item.title}</Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>)
-
-                            ))}
-
-                        </SidebarMenu>
-
-                    </SidebarGroupContent>
-                </SidebarGroup>))}
-
-
-            </SidebarContent>
-
-
-        </Sidebar>
-    </ >);
-
+            </SidebarHeader> */}
+        {/* Profile Selector */}
+        <div className="px-3 py-3 border-b">
+          <div className="mb-2">
+            <span className="text-sm font-medium text-muted-foreground">Profile</span>
+          </div>
+          <Select 
+            value={selectedOrganization === null ? "GENERAL" : selectedOrganization.orgId?.toString()} 
+            onValueChange={(profileId) => {
+              console.log("Profile changed to:", profileId);
+              if (profileId === "GENERAL") {
+                setSelectedOrganization(null);
+              } else {
+                const org = organizations.find(org => org.orgId?.toString() === profileId);
+                setSelectedOrganization(org || null);
+              }
+            }}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Profile" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="GENERAL">GENERAL</SelectItem>
+              {organizations && organizations.length > 0 && organizations.map((org) => {
+                // Add more robust validation
+                if (!org || !org.orgId || !org.orgName) {
+                  console.warn("Invalid organization data:", org);
+                  return null;
+                }
+                
+                return (
+                  <SelectItem 
+                    key={`org-${org.orgId}`} 
+                    value={org.orgId.toString()}
+                  >
+                    {org.orgName}
+                  </SelectItem>
+                );
+              }).filter(Boolean)}
+              {organizationsError && (
+                <SelectItem disabled value="error">
+                  Error: {organizationsError}
+                </SelectItem>
+              )}
+            </SelectContent>
+          </Select>
+        </div>
+        {/* <Separator/> */}
+        <SidebarContent>
+          {data.navMain.map((item) => (
+            <SidebarGroup key={item.title}>
+              <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {item.items.map((item) =>
+                    item?.subItems?.length > 0 ? (
+                      <Collapsible key={item.title}>
+                        <SidebarMenuItem>
+                          <CollapsibleTrigger asChild>
+                            <SidebarMenuButton
+                              tooltip={item.title}
+                              className="py-5 rounded-1"
+                            >
+                              {item.icon && (
+                                <item.icon className="mr-2 h-4 w-4" />
+                              )}
+                              <span>{item.title}</span>
+                              <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                            </SidebarMenuButton>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <SidebarMenuSub>
+                              {item?.subItems?.map((subItem) => (
+                                <SidebarMenuSubItem key={subItem.title}>
+                                  <SidebarMenuSubButton
+                                    asChild
+                                    isActive={subItem.isActive}
+                                    className="py-5 rounded-1"
+                                  >
+                                    <Link to={subItem.url}>
+                                      {subItem.icon && (
+                                        <subItem.icon className="mr-2 h-4 w-4" />
+                                      )}
+                                      {subItem.title}
+                                    </Link>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              ))}
+                            </SidebarMenuSub>
+                          </CollapsibleContent>
+                        </SidebarMenuItem>
+                      </Collapsible>
+                    ) : (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton
+                          asChild
+                          isActive={item.isActive}
+                          className="py-5 rounded-1"
+                        >
+                          <Link to={item.url}>
+                            {item.icon && (
+                              <item.icon className="mr-2 h-4 w-4" />
+                            )}
+                            {item.title}
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    )
+                  )}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          ))}
+        </SidebarContent>
+      </Sidebar>
+    </>
+  );
 }
 
 export default AccountSidebar;

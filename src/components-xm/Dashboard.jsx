@@ -1,235 +1,474 @@
-import {BookOpen, Clock, Search, User,} from "lucide-react";
-import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
-import {Input} from "@/components/ui/input";
-import {Avatar, AvatarFallback} from "@/components/ui/avatar"
-import {Link, useNavigate} from "react-router-dom";
-import React, {useEffect, useState} from "react";
+import {
+  BookOpen,
+  Calendar,
+  Clock,
+  Search,
+  Star,
+  TrendingUp,
+  User,
+  Flame,
+  LogIn,
+  Lock,
+  Trophy,
+  ChevronRight,
+  ChevronLeft,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import axiosConn from "@/axioscon.js";
-import {useAuthStore} from "@/zustland/store.js";
-import {toast} from "@/components/hooks/use-toast.js";
-import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet.jsx";
-import compass from '../assets/compass.png'
-import mockinterview from '../assets/mock-interview.png'
-import languagestudio from '../assets/language-studio.png'
-import companiontalks from '../assets/companion-talks.png'
+import { useAuthStore } from "@/zustland/store.js";
+import { toast } from "@/components/hooks/use-toast.js";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet.jsx";
+import compass from "../assets/compass.png";
+import mockinterview from "../assets/mock-interview.png";
+import languagestudio from "../assets/language-studio.png";
+import companiontalks from "../assets/companion-talks.png";
+import { ProgressCourseCard } from "./Modules/ProgressCourseCard";
+import { Spinner } from "@/components/ui/spinner";
 
 export function Dashboard() {
-    const {userDetail, userEnrolledCourseIdList, fetchUserEnrolledCourseIdList} = useAuthStore()
-    const navigate = useNavigate()
+  const {
+    userDetail,
+    userEnrolledCourseIdList,
+    fetchUserEnrolledCourseIdList,
+  } = useAuthStore();
+  const navigate = useNavigate();
 
-    const [totalCount, setTotalCount] = useState(0);
-    const [limit, setLimit] = useState(10);
-    const [offset, setOffset] = useState(0);
-    const [courseList, setCourseList] = useState(null);
-    const [apiQuery, setApiQuery] = useState({
-        limit: limit, offset: offset, getThisData: {
-            datasource: "User", attributes: [], where: {userId: userDetail?.userId},
-            include: [{
-                datasource: "Course", as: "courses", required: false, order: [], attributes: [], where: {},
-            },
-            ],
+  // Static values for streaks
+  const studyStreak = 5; // Example static value
+  const loginStreak = 3; // Example static value
+
+  const [totalCount, setTotalCount] = useState(0);
+  const [limit, setLimit] = useState(4);
+  const [offset, setOffset] = useState(0);
+  const [courseList, setCourseList] = useState(null);
+  const [isLoadingCourses, setIsLoadingCourses] = useState(true);
+  const [isLoadingCompletedCourses, setIsLoadingCompletedCourses] = useState(true);
+  const [apiQuery, setApiQuery] = useState({
+    limit: limit,
+    offset: offset,
+    getThisData: {
+      datasource: "Course",
+      attributes: [],
+      include: [
+        {
+          datasource: "CourseAccess",
+          as: "accessControls",
+          where: {
+            userId: userDetail.userId,
+            accessLevel: "OWN",
+          },
+          required: true,
         },
-    });
+        {
+          datasource: "UserCourseContentProgress",
+          as: "activityLogs",
+          where: {
+            userId: userDetail.userId,
+          },
+          required: false,
+        },
+        {
+          datasource: "UserCourseEnrollment",
+          as: "enrollments",
+          where: {
+            enrollmentStatus: { $ne: "COMPLETED" },
+             userId: userDetail.userId,
+          },
+          required: true,
+        },
+        {
+          datasource: "CourseContent",
+          as: "courseContent",
+          required: true,
+        },
+      ],
+    },
+  });
 
-    useEffect(() => {
-        fetchCourses();
-    }, [apiQuery]);
+  useEffect(() => {
+    fetchCourses();
+    fetchCompletedCourses();
+  }, [apiQuery]);
 
-    const fetchCourses = () => {
-        axiosConn
-            .post(import.meta.env.VITE_API_URL + "/searchCourse", apiQuery)
-            .then((res) => {
-                console.log(res.data);
-                setCourseList(res.data.data?.results?.[0]);
-                setTotalCount(res.data.data.totalCount);
-                setOffset(res.data.data.offset);
-                setLimit(res.data.data.limit);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+  const fetchCourses = () => {
+    setIsLoadingCourses(true);
+    axiosConn
+      .post(import.meta.env.VITE_API_URL + "/searchCourse", apiQuery)
+      .then((res) => {
+        setTotalCount(res.data.data.totalCount);
+        setOffset(res.data.data.offset);
+        setLimit(res.data.data.limit);
+        res.data.data?.results?.forEach((a) => {
+          calculateProgress(a);
+        });
+        console.log(res.data.data?.results);
+        setCourseList(res.data.data?.results);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast({
+          title: "Error loading courses",
+          description: "Failed to load your enrolled courses. Please try again.",
+          variant: "destructive"
+        });
+      })
+      .finally(() => {
+        setIsLoadingCourses(false);
+      });
+  };
+
+  const [completedCourseList, setCompletedCourseList] = useState([]);
+
+  const fetchCompletedCourses = () => {
+    setIsLoadingCompletedCourses(true);
+    axiosConn
+      .post(import.meta.env.VITE_API_URL + "/searchCourse", {
+        limit: 200,
+        offset: 0,
+        getThisData: {
+          datasource: "UserCourseEnrollment",
+          attributes: [],
+          where: {
+            enrollmentStatus: "COMPLETED",
+            userId: userDetail.userId,
+          },
+        },
+      })
+      .then((res) => {
+        console.log(res.data.data?.results);
+        setTotalCount(res.data.data.totalCount);
+        setOffset(res.data.data.offset);
+        setLimit(res.data.data.limit);
+        setCompletedCourseList(res.data.data?.results);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast({
+          title: "Error loading completed courses",
+          description: "Failed to load your completed courses. Please try again.",
+          variant: "destructive"
+        });
+      })
+      .finally(() => {
+        setIsLoadingCompletedCourses(false);
+      });
+  };
+
+  // Calculate progress
+  const calculateProgress = (a) => {
+    if (!a?.courseContent) return 0;
+
+    const completedContent =
+      a?.activityLogs?.filter((p) => p.progressStatus === "COMPLETED")
+        ?.length || 0;
+
+    const totalContent = a?.courseContent?.length || 0;
+    const progressPercentage =
+      totalContent > 0
+        ? Math.round((completedContent / totalContent) * 100)
+        : 0;
+
+    a["progress"] = progressPercentage;
+  };
+
+  const [exploreCourseText, setExploreCourseText] = useState("");
+
+
+    const getStatusBadge = (status) => {
+    const variants = {
+      ENROLLED: "bg-blue-100 text-blue-800 border-blue-200",
+      COMPLETED: "bg-green-100 text-green-800 border-green-200",
+      IN_PROGRESS: "bg-yellow-100 text-yellow-800 border-yellow-200",
+      PENDING: "bg-gray-100 text-gray-800 border-gray-200",
     };
+    return variants[status] || "bg-gray-100 text-gray-800 border-gray-200";
+  };
 
-    const [exploreCourseText, setExploreCourseText] = useState("");
+  
+  return (
+    <div className="p-4">
+      <Card className="mb-4 border-0 shadow-lg bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700  ">
+        <CardHeader className="p-6">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full lg:w-auto">
+              <div className="relative flex-shrink-0">
+                <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-blue-200 shadow-xl">
+                  <AvatarFallback className="text-xl sm:text-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold">
+                    {userDetail?.nameInitial}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-5 h-5 sm:w-6 sm:h-6 bg-green-400 rounded-full border-2 border-white"></div>
+              </div>
+              <div className="flex-1 min-w-0 ">
+                <h1 className="text-2xl sm:text-3xl font-bold mb-2 leading-tight text-white">
+                  WELCOME, {userDetail?.derivedUserName}
+                </h1>
+                <p className="text-white text-base sm:text-lg flex items-center gap-2 flex-wrap">
+                  <User className="w-4 h-4 flex-shrink-0" />
+                  <span className="break-words">
+                    Member since {userDetail?.created_date}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
 
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4  ">
+        {/* Study Streak Card */}
+        <Card className="group relative border-0 shadow-lg bg-gradient-to-br from-orange-50 via-white to-yellow-50 backdrop-blur-sm hover:shadow-2xl transition-all duration-700 hover:scale-[1.03] overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-400/10 to-yellow-400/15 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-200/20 to-yellow-200/20 rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-1000"></div>
+          <CardHeader>
+            <div className=" flex gap-4 items-center z-10">
+              <div className="flex items-center justify-between ">
+                <div className="p-3 bg-gradient-to-br from-orange-100 to-yellow-100 rounded-2xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300 border border-orange-200/50">
+                  <Flame className="w-7 h-7 text-orange-500 group-hover:text-orange-600 transition-colors duration-300" />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold text-orange-700/80 tracking-wide uppercase">
+                    Study Streak
+                  </p>
+                  <div className="flex-1 h-px bg-gradient-to-r from-orange-200 to-transparent"></div>
+                </div>
+                <div className="flex items-end gap-2">
+                  <p className="text-4xl font-black text-gray-800 group-hover:text-orange-700 transition-colors duration-300 leading-none">
+                    {userDetail?.studyStreak}
+                  </p>
+                  <p className="text-lg font-semibold text-orange-600 mb-1">
+                    days
+                  </p>
+                </div>
+              </div>
+            </div>
 
-    return (
-        <div className="p-3 md:p-6">
-            <Card className="rounded-sm  border-0 bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-700 text-white shadow-2xl mb-8 overflow-hidden relative">
-                <div className="absolute inset-0 bg-black/10"></div>
-                <CardHeader className="relative z-10 pb-8">
-                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full lg:w-auto">
-                            <div className="relative flex-shrink-0">
-                                <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-white/20 shadow-xl">
-                                    <AvatarFallback className="text-xl sm:text-2xl bg-white/20 text-white font-bold">
-                                        {userDetail?.nameInitial}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-5 h-5 sm:w-6 sm:h-6 bg-green-400 rounded-full border-2 border-white"></div>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <h1 className="text-2xl sm:text-3xl font-bold mb-2 leading-tight">
-                                    Welcome , {userDetail?.derivedUserName}!
-                                </h1>
-                                <p className="text-blue-100 text-base sm:text-lg flex items-center gap-2 flex-wrap">
-                                    <User className="w-4 h-4 flex-shrink-0" />
-                                    <span className="break-words">Member since {userDetail?.created_date}</span>
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex flex-col xs:flex-row gap-3 w-full lg:w-auto">
-                          <Link to={'/explore'}>  <Button
-                                variant="secondary"
-                                className="bg-white/20 hover:bg-white/30 border-white/30 text-white backdrop-blur-sm w-full xs:w-auto justify-center xs:justify-start"
-                            >
-                                <BookOpen className="w-4 h-4 mr-2 flex-shrink-0" />
-                                <span className="whitespace-nowrap">Explore Courses</span>
-                            </Button></Link>
-                        </div>
-                    </div>
-                </CardHeader>
-            </Card>
+            <div className="flex items-center gap-2 mt-4 p-2 bg-orange-50/50 rounded-xl border border-orange-100 ">
+              <Flame className="w-4 h-4 text-orange-500 animate-pulse" />
+              <span className="text-xs text-orange-700 font-medium">
+                {userDetail?.studyStreak > 0
+                  ? "Keep the momentum going!"
+                  : "Start your learning journey!"}
+              </span>
+            </div>
+          </CardHeader>
+        </Card>
 
-            <Card className="rounded-sm  border-0   py-8 shadow-2xl mb-8 overflow-hidden relative">
-                <CardHeader>
-                    <CardTitle className="text-center tracking-wide">
-                        What would you like to learn today ?
-                    </CardTitle>
+        {/* Enrolled Courses Card */}
+        <Card className="group relative border-0 shadow-lg bg-gradient-to-br from-cyan-50 via-white to-blue-50 backdrop-blur-sm hover:shadow-2xl transition-all duration-700 hover:scale-[1.03] overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/10 to-blue-400/15 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-cyan-200/20 to-blue-200/20 rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-1000"></div>
+          <CardHeader>
+            <div className=" flex gap-4 items-center z-10">
+              <div className="flex items-center justify-between ">
+                <div className="p-3 bg-gradient-to-br from-cyan-100 to-blue-100 rounded-2xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300 border border-cyan-200/50">
+                  <BookOpen className="w-7 h-7 text-cyan-600 group-hover:text-cyan-700 transition-colors duration-300" />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold text-cyan-700/80 tracking-wide uppercase">
+                    Enrolled Courses
+                  </p>
+                  <div className="flex-1 h-px bg-gradient-to-r from-cyan-200 to-transparent"></div>
+                </div>
+                <div className="flex items-end gap-2">
+                  <p className="text-4xl font-black text-gray-800 group-hover:text-cyan-700 transition-colors duration-300 leading-none">
+                    {courseList?.length || 0}
+                  </p>
+                  <p className="text-lg font-semibold text-cyan-600 mb-1">
+                    {courseList?.length === 1 ? "course" : "courses"}
+                  </p>
+                </div>
+              </div>
+            </div>
 
+            <div className="flex items-center gap-2 mt-4 p-2 bg-cyan-50/50 rounded-xl border border-cyan-100">
+              <BookOpen className="w-4 h-4 text-cyan-500" />
+              <span className="text-xs text-cyan-700 font-medium">
+                {courseList?.length > 0
+                  ? "Active learning paths"
+                  : "Ready to explore?"}
+              </span>
+            </div>
+          </CardHeader>
+        </Card>
 
-                </CardHeader>
-                <CardContent>
-                    <div className="my-2">
-                        <div className="flex gap-2 w-full md:w-3/4 lg:w-1/2 mx-auto items-center">
-                            <Input type="text" value={exploreCourseText}
-                                   onChange={(e) => setExploreCourseText(e.target.value)}
-                                   placeholder="What do you want to learn today ?"/>
-                            <Button type="submit"
-                                    onClick={() => navigate('/explore?search=' + exploreCourseText)}><Search/></Button>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+        {/* Learning Hours Card */}
+        <Card className="group relative border-0 shadow-lg bg-gradient-to-br from-emerald-50 via-white to-green-50 backdrop-blur-sm hover:shadow-2xl transition-all duration-700 hover:scale-[1.03] overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/10 to-green-400/15 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-200/20 to-green-200/20 rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-1000"></div>
+          <CardHeader>
+            <div className=" flex gap-4 items-center z-10">
+              <div className="flex items-center justify-between ">
+                <div className="p-3 bg-gradient-to-br from-emerald-100 to-green-100 rounded-2xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300 border border-emerald-200/50">
+                  <Clock className="w-7 h-7 text-emerald-600 group-hover:text-emerald-700 transition-colors duration-300" />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold text-emerald-700/80 tracking-wide uppercase">
+                    Learning Hours
+                  </p>
+                  <div className="flex-1 h-px bg-gradient-to-r from-emerald-200 to-transparent"></div>
+                </div>
+                <div className="flex items-end gap-2">
+                  <p className="text-4xl font-black text-gray-800 group-hover:text-emerald-700 transition-colors duration-300 leading-none">
+                    {(() => {
+                      const totalSeconds = +userDetail?.learningHours || 0;
+                      const hours = totalSeconds / 3600;
+                      return hours.toFixed(1);
+                    })()}
+                  </p>
+                  <p className="text-lg font-semibold text-emerald-600 mb-1">
+                    hrs
+                  </p>
+                </div>
+              </div>
+            </div>
 
-            <section className="my-6 grid grid-cols-1  lg:grid-cols-2  gap-6">
-                {/*<Card className="border-0 bg-muted/50    ">*/}
-                {/*    <CardHeader className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">*/}
-                {/*        <img*/}
-                {/*            src={mockinterview}*/}
-                {/*            alt="Compass"*/}
-                {/*            className="w-16 h-16 md:w-20 md:h-20 object-contain"*/}
-                {/*        />*/}
-                {/*        <div> <CardTitle className="text-lg sm:text-2xl font-semibold  tracking-widest text-cyan-700">*/}
-                {/*            <strong>  MOCK INTERVIEW VAULT</strong>*/}
-                {/*        </CardTitle>*/}
-                {/*            <CardDescription>*/}
-                {/*                <Link to={`/mock-interview`} className="text-blue-700">*/}
-                {/*                    Click Here*/}
-                {/*                </Link> to know More.*/}
-                {/*            </CardDescription>*/}
-                {/*        </div>*/}
+            <div className="flex items-center gap-2 mt-4 p-2 bg-emerald-50/50 rounded-xl border border-emerald-100">
+              <Clock className="w-4 h-4 text-emerald-500" />
+              <span className="text-xs text-emerald-700 font-medium">
+                Time invested in growth
+              </span>
+            </div>
+          </CardHeader>
+        </Card>
 
-                {/*        <div className="md:ml-auto">*/}
+        {/* Achievements Card */}
+        <Card className="group relative border-0 shadow-lg bg-gradient-to-br from-purple-50 via-white to-violet-50 backdrop-blur-sm hover:shadow-2xl transition-all duration-700 hover:scale-[1.03] overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-400/10 to-violet-400/15 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-200/20 to-violet-200/20 rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-1000"></div>
+          <CardHeader>
+            <div className=" flex gap-4 items-center z-10">
+              <div className="flex items-center justify-between ">
+                <div className="p-3 bg-gradient-to-br from-purple-100 to-violet-100 rounded-2xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300 border border-purple-200/50">
+                  <Trophy className="w-7 h-7 text-purple-600 group-hover:text-purple-700 transition-colors duration-300" />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold text-purple-700/80 tracking-wide uppercase">
+                    Achievements
+                  </p>
+                  <div className="flex-1 h-px bg-gradient-to-r from-purple-200 to-transparent"></div>
+                </div>
+                <div className="flex items-end gap-2">
+                  <p className="text-4xl font-black text-gray-800 group-hover:text-purple-700 transition-colors duration-300 leading-none">
+                    {completedCourseList.length}
+                  </p>
+                  <p className="text-lg font-semibold text-purple-600 mb-1">
+                    earned
+                  </p>
+                </div>
+              </div>
+            </div>
 
-                {/*            <Link to={`/schedule-mock-interview`}>*/}
-                {/*            <Button*/}
-                {/*                className="h-8 gap-1 "*/}
-                {/*            >SCHEDULE NOW</Button>*/}
-                {/*            </Link>*/}
-                {/*         </div>*/}
-                {/*    </CardHeader>*/}
+            <div className="flex items-center gap-2 mt-4 p-2 bg-purple-50/50 rounded-xl border border-purple-100">
+              <Trophy className="w-4 h-4 text-purple-500 animate-bounce" />
+              <span className="text-xs text-purple-700 font-medium">
+                {completedCourseList.length > 0
+                  ? "Celebrating your success!"
+                  : "Your first badge awaits!"}
+              </span>
+            </div>
+          </CardHeader>
+        </Card>
+      </div>
 
+      <section className="my-4 animate-slide-in">
+        <Card className="border-0 shadow-md rounded-md">
+          <CardHeader className="flex flex-row gap-2 items-center">
+            <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2 tracking-wide">
+              <BookOpen className="h-5 w-5 text-purple-600" />
+              <span>Continue Learning</span>
+            </CardTitle>
+            <div className="ml-auto flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={offset === 0}
+                onClick={() => {
+                  setOffset(Math.max(offset - limit, 0));
+                  setApiQuery((prevQuery) => ({
+                    ...prevQuery,
+                    offset: Math.max(offset - limit, 0),
+                  }));
+                }}
+                className="hover:bg-blue-50"
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+              </Button>
 
-                {/*</Card>*/}
-
-                <Card className="border-0 bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg overflow-hidden relative">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-                    <CardHeader className="relative z-10">
-                        <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 bg-white/20 rounded-lg flex items-center justify-center">
-                                <BookOpen className="w-8 h-8 text-white" />
-                            </div>
-                            <div className="flex-1">
-                                <CardTitle className="text-xl font-bold tracking-wide">
-                                    THE LANG STUDIO
-                                </CardTitle>
-                                <CardDescription className="text-green-100 mt-2">
-                                    Master new languages with interactive lessons and real-world practice
-                                </CardDescription>
-                            </div>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="relative z-10">
-                        <Button variant="secondary" className="bg-white/20 hover:bg-white/30 border-white/30 text-white backdrop-blur-sm" disabled>
-                            <Clock className="w-4 h-4 mr-2" />
-                            Coming Soon
-                        </Button>
-                    </CardContent>
-                </Card>
-            </section>
-
-
-            {/*<section className="my-6 grid grid-cols-1  lg:grid-cols-2  gap-6">*/}
-            {/*    <Card className="border-0 bg-muted/50 ">*/}
-            {/*        <CardHeader className="flex flex-col md:flex-row md:items-center gap-4">*/}
-            {/*            <img*/}
-            {/*                src={compass}*/}
-            {/*                alt="Compass"*/}
-            {/*                className="w-16 h-16 md:w-20 md:h-20 object-contain"*/}
-            {/*            />*/}
-            
-            {/*            <div className="flex-1">*/}
-            {/*                <CardTitle className="text-lg sm:text-2xl font-semibold tracking-widest text-yellow-600">*/}
-            {/*                    <strong>COUNSELLING COMPASS</strong>*/}
-            {/*                </CardTitle>*/}
-            {/*                <CardDescription>*/}
-            {/*                    <Link to={`/counselling-compass`} className="text-blue-700">*/}
-            {/*                        Click Here*/}
-            {/*                    </Link>{" "}*/}
-            {/*                    to know More.*/}
-            {/*                </CardDescription>*/}
-            {/*            </div>*/}
-            
-            {/*            <div className="md:ml-auto">*/}
-            {/*                <Link to={`/schedule-counselling-compass`}>*/}
-            {/*                    <Button className="h-8 gap-1">SCHEDULE NOW</Button>*/}
-            {/*                </Link>*/}
-            {/*            </div>*/}
-            {/*        </CardHeader>*/}
-            {/*    </Card>*/}
-            {/*    <Card className="border-0 bg-muted/50 ">*/}
-            {/*        <CardHeader className="flex flex-col md:flex-row md:items-center gap-4">*/}
-            {/*            <img*/}
-            {/*                src={companiontalks}*/}
-            {/*                alt="Compass"*/}
-            {/*                className="w-16 h-16 md:w-20 md:h-20 object-contain"*/}
-            {/*            />*/}
-            
-            {/*            <div className="flex-1">*/}
-            {/*                <CardTitle className="text-lg sm:text-2xl font-semibold tracking-widest text-red-600">*/}
-            {/*                    <strong>COMPANION CONNECT</strong>*/}
-            {/*                </CardTitle>*/}
-            {/*                <CardDescription>*/}
-            
-            {/*                </CardDescription>*/}
-            {/*            </div>*/}
-            
-            {/*            <div className="md:ml-auto">*/}
-            {/*                /!*<Link to={`/schedule-counselling-compass`}>*!/*/}
-            {/*                    <Button*/}
-            {/*                        className="h-8 gap-1 bg-[#ffdd00] animate-blink" disabled*/}
-            {/*                    >COMING SOON</Button>*/}
-            {/*            /!*</Link>*!/*/}
-            {/*            </div>*/}
-            {/*        </CardHeader>*/}
-            {/*    </Card>*/}
-            
-            {/*</section>*/}
-
-
-
-        </div>
-    );
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={offset + limit >= totalCount}
+                onClick={() => {
+                  setOffset(
+                    offset + limit < totalCount ? offset + limit : offset
+                  );
+                  setApiQuery((prevQuery) => ({
+                    ...prevQuery,
+                    offset:
+                      offset + limit < totalCount ? offset + limit : offset,
+                  }));
+                }}
+                className="hover:bg-blue-50"
+              >
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="">
+              {isLoadingCourses ? (
+                <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                  <Spinner size="lg" />
+                  <p className="text-sm text-muted-foreground">Loading your courses...</p>
+                </div>
+              ) : courseList?.length > 0 ? (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {courseList.map((course) => (
+                    <ProgressCourseCard key={course.id} course={course} />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                  <BookOpen className="h-12 w-12 text-gray-400" />
+                  <h3 className="text-lg font-medium text-gray-500">No courses enrolled yet</h3>
+                  <p className="text-sm text-gray-400 text-center">Start your learning journey by exploring our course catalog</p>
+                  <Button asChild className="mt-4">
+                    <Link to="/explore">Explore Courses</Link>
+                  </Button>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+    </div>
+  );
 }

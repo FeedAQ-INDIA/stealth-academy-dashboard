@@ -1,0 +1,70 @@
+.certificate-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  background: #f8f9fa;
+}
+
+.certificate-border {
+  background: #fff;
+  border: 4px solid #2d3748;
+  border-radius: 16px;
+  padding: 40px 60px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+.certificate-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 16px;
+}
+
+.certificate-text {
+  font-size: 1.1rem;
+  color: #4a5568;
+  margin: 8px 0;
+}
+
+.certificate-username {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #3182ce;
+  margin: 8px 0 12px 0;
+}
+
+.certificate-coursename {
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #2d3748;
+  margin: 8px 0 20px 0;
+}
+
+.certificate-date, .certificate-id {
+  font-size: 1rem;
+  color: #718096;
+  margin: 6px 0;
+}
+
+.certificate-signature-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+}
+
+.certificate-signature {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40%;
+}
+
+.certificate-signature-line {
+  width: 100px;
+  border-bottom: 2px solid #2d3748;
+  margin-bottom: 4px;
+}

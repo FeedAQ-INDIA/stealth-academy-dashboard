@@ -3,9 +3,8 @@ import Header from "./components-xm/Header/Header.jsx";
 import React, {useEffect} from "react";
 import {useAuthStore, useProtectedURIStore} from "@/zustland/store.js";
 import "./App.css"
-import PublicHeader from "@/components-xm/Header/PublicHeader.jsx";
-import HomePage from "@/components-xm/HomeFiles/HomePage.jsx";
-import {LoaderOne} from "@/components/ui/loader.jsx";
+ import {LoaderOne} from "@/components/ui/loader.jsx";
+import { Toaster } from "@/components/ui/toaster.jsx";
 
 
 function App() {
@@ -13,15 +12,13 @@ function App() {
     const location = useLocation();
 
 
-    const {fetchUserDetail, loading: loadingStore, userDetail, fetchUserEnrolledCourseIdList} = useAuthStore();
+    const {fetchUserDetail, loading: loadingStore, userDetail} = useAuthStore();
     const {publicUri} = useProtectedURIStore();
 
 
     useEffect(() => {
-        if (window.location.pathname !== '/') {
-            fetchUserDetail();
-        }
-    }, []);
+             fetchUserDetail();
+     }, []);
 
 
 
@@ -33,24 +30,12 @@ function App() {
                  window.location = '/signin';
              }
         } else{
-            fetchUserEnrolledCourseIdList(userDetail?.userId);
-            console.log('App.jsx  :: ', location.pathname)
-            //  if(location.pathname == '/') {
-            //     navigate('/dashboard')
-            // }
+
         }
 
     }, [userDetail]); // Redirect only after userDetail updates
 
-
-    if (window.location.pathname === '/') {
-        return <HomePage />;
-    }
-
-
-    // if (loadingStore) {
-    //     return <div>Loading...</div>; // Display loading screen until both data are ready
-    // }
+ 
     if(loadingStore){
         return (
             <div className="flex items-center justify-center h-[100svh] w-full">
@@ -62,11 +47,10 @@ function App() {
     return (
         <>
                  {publicUri.includes(window.location.pathname) ? <></> :<Header/>}
-                <div className={`overflow-y-auto ${publicUri.includes(window.location.pathname) ? '' : 'h-[calc(100svh-4em)]' }`}>
+                <div className={` overflow-y-auto ${publicUri.includes(window.location.pathname) ? '' : 'h-[calc(100svh-4em)]' }`}>
                     <Outlet/>
                 </div>
-
-
+                <Toaster />
         </>
     );
 }
