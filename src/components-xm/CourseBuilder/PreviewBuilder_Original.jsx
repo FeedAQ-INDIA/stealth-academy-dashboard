@@ -24,12 +24,14 @@ export default function PreviewBuilder() {
   const { CourseBuilderId } = useParams();
   const navigate = useNavigate();
 
-  // Simplified state management
+  // State management
   const [courseData, setCourseData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingCourseInfo, setEditingCourseInfo] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Sheet state management
   const [addContentSheetOpen, setAddContentSheetOpen] = useState(false);
   const [editContentSheetOpen, setEditContentSheetOpen] = useState(false);
   const [currentEditingContent, setCurrentEditingContent] = useState(null);
@@ -73,25 +75,44 @@ export default function PreviewBuilder() {
     });
   };
 
-  // Event handlers
   const handleSelectContentType = (contentType) => {
     setSelectedContentType(contentType);
     setAddContentSheetOpen(true);
   };
 
   const handleAddContent = (newContent) => {
-    console.log(newContent)
     const seq = (courseData?.courseContent?.length || 0) + 1;
     if (newContent?.courseContentSequence !== undefined) {
       newContent.courseContentSequence = seq;
     }
-    setCourseData((prev) => ({
-      ...prev,
-      courseContent: [...(prev.courseContent || []), newContent],
-    }));
+    setCourseData((prev) => {
+      const updated = {
+        ...prev,
+        courseContent: [...(prev.courseContent || []), newContent],
+      };
+
+      try {
+        const previewJson = {
+          course: updated.course,
+          courseContent: updated.courseContent,
+          courseBuilder: {
+            courseBuilderId: updated.courseBuilder?.courseBuilderId,
+            status: updated.courseBuilder?.status,
+          },
+        };
+        // Only log for add action
+        console.log(
+          "[CourseBuilder] Content Added -> Updated JSON:",
+          previewJson
+        );
+      } catch (e) {
+        console.warn("Failed to log updated course JSON after add", e);
+      }
+      return updated;
+    });
     setAddContentSheetOpen(false);
     setSelectedContentType(null);
-    // handleSave({ silent: true });
+    handleSave();
   };
 
   const handleCancelAddContent = () => {
@@ -105,18 +126,25 @@ export default function PreviewBuilder() {
   };
 
   const handleEditContent = (updatedContent) => {
-    console.log(updatedContent)
+    console.log("Updated content from editor:", updatedContent);
     setCourseData((prev) => {
       const updatedCourseContent = prev.courseContent.map((content) =>
         content?.courseContentId === updatedContent?.courseContentId
           ? updatedContent
           : content
       );
-      return { ...prev, courseContent: updatedCourseContent };
+      const updated = { ...prev, courseContent: updatedCourseContent };
+      // Log updated JSON after editing existing content
+      try {
+        console.log("[CourseBuilder] Content Edited -> Updated JSON:", updated);
+      } catch (e) {
+        console.warn("Failed to log updated course JSON after edit", e);
+      }
+      return updated;
     });
     setEditContentSheetOpen(false);
     setCurrentEditingContent(null);
-    // handleSave({ silent: true });
+    handleSave();
   };
 
   const handleDeleteContent = (contentId) => {
@@ -128,7 +156,7 @@ export default function PreviewBuilder() {
     }));
     setEditContentSheetOpen(false);
     setCurrentEditingContent(null);
-    // handleSave({ silent: true });
+    handleSave();
   };
 
   const moveContent = (contentId, direction) => {
@@ -151,47 +179,48 @@ export default function PreviewBuilder() {
       }));
       return { ...prev, courseContent: resequenced };
     });
-    // setTimeout(() => handleSave({ silent: true }), 500);
+    // Auto-save after a brief delay
+    setTimeout(() => handleSave({ silent: true }), 500);
+  };
+
+  const buildPayload = (statusOverride) => {
+    const originalBuilderData = courseData.courseBuilder.courseBuilderData || {};
+    const cleanedContent = prepareContentForApi(courseData.courseContent);
+    
+    return {
+      courseBuilderId: courseData.courseBuilder.courseBuilderId,
+      status: statusOverride || courseData.courseBuilder.status || "DRAFT",
+      orgId: courseData.courseBuilder.orgId,
+      courseBuilderData: {
+        ...originalBuilderData,
+        courseTitle: courseData.course.courseTitle,
+        courseDescription: courseData.course.courseDescription,
+        courseId: courseData.course.courseId,
+        status: courseData.course.status,
+        deliveryMode: courseData.course.deliveryMode,
+        courseType: courseData.course.courseType,
+        courseDuration: courseData.course.courseDuration,
+        courseImageUrl: courseData.course.courseImageUrl,
+        courseSourceChannel: courseData.course.courseSourceChannel,
+        metadata: courseData.course.metadata,
+        courseContent: cleanedContent,
+      },
+    };
   };
 
   const handleSave = async (options = {}) => {
     const { statusOverride, silent } = options;
-    
     if (!CourseBuilderId || !courseData?.courseBuilder?.courseBuilderId) {
-      if (!silent) {
-        toast({
-          title: "Changes saved locally",
-          description: "Create the course first to persist changes.",
-        });
-      }
+      toast({
+        title: "Changes saved locally",
+        description: "Create the course first to persist changes.",
+      });
       return;
     }
 
     setIsLoading(true);
     try {
-      const originalBuilderData = courseData.courseBuilder.courseBuilderData || {};
-      const cleanedContent = prepareContentForApi(courseData.courseContent);
-      
-      const payload = {
-        courseBuilderId: courseData.courseBuilder.courseBuilderId,
-        status: statusOverride || courseData.courseBuilder.status || "DRAFT",
-        orgId: courseData.courseBuilder.orgId,
-        courseBuilderData: {
-          ...originalBuilderData,
-          courseTitle: courseData.course.courseTitle,
-          courseDescription: courseData.course.courseDescription,
-          courseId: courseData.course.courseId,
-          status: courseData.course.status,
-          deliveryMode: courseData.course.deliveryMode,
-          courseType: courseData.course.courseType,
-          courseDuration: courseData.course.courseDuration,
-          courseImageUrl: courseData.course.courseImageUrl,
-          courseSourceChannel: courseData.course.courseSourceChannel,
-          metadata: courseData.course.metadata,
-          courseContent: cleanedContent,
-        },
-      };
-
+      const payload = buildPayload(statusOverride);
       const response = await axiosConn.post("/createOrUpdateCourseBuilder", payload);
 
       if (response.data.success) {
@@ -212,40 +241,49 @@ export default function PreviewBuilder() {
       }
     } catch (error) {
       console.error("Error updating course:", error);
-      if (!silent) {
-        toast({
-          title: "Failed to update course",
-          description: error.response?.data?.message || "Please try again.",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Failed to update course",
+        description: error.response?.data?.message || "Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSaveDraft = () => handleSave({ statusOverride: "DRAFT" });
+  const handleSaveDraft = async () => {
+    if (isLoading) return;
+    await handleSave({ statusOverride: "DRAFT" });
+  };
 
   const handlePublish = async () => {
     if (isLoading) return;
-    
-    const validations = [
-      { condition: !courseData?.course?.courseTitle, title: "Add a course title", description: "A title is required before publishing." },
-      { condition: !courseData?.courseContent?.length, title: "Add content", description: "At least one content item is required to publish." },
-      { condition: !courseData?.courseBuilder?.courseBuilderId, title: "Create a draft first", description: "Save the course at least once before publishing." }
-    ];
-
-    for (const validation of validations) {
-      if (validation.condition) {
-        toast({
-          title: validation.title,
-          description: validation.description,
-          variant: "destructive",
-        });
-        return;
-      }
+    if (!courseData?.course?.courseTitle) {
+      toast({
+        title: "Add a course title",
+        description: "A title is required before publishing.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!courseData?.courseContent?.length) {
+      toast({
+        title: "Add content",
+        description: "At least one content item is required to publish.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!courseData?.courseBuilder?.courseBuilderId) {
+      toast({
+        title: "Create a draft first",
+        description: "Save the course at least once before publishing.",
+        variant: "destructive",
+      });
+      return;
     }
     
+    setIsLoading(true);
     try {
       const cleanedContent = prepareContentForApi(courseData.courseContent);
       const payload = {
@@ -284,6 +322,8 @@ export default function PreviewBuilder() {
         description: e.message || "Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -300,8 +340,9 @@ export default function PreviewBuilder() {
         setLoading(true);
         setError(null);
         const res = await axiosConn.get(`/courseBuilder/${CourseBuilderId}`);
-        const apiData = res?.data?.data;
+        const apiData = res?.data?.data; // full object as shown in new API response
 
+        // Guard if structure missing
         if (!apiData?.courseBuilderId) {
           setError("Invalid course builder response");
           setCourseData(null);
@@ -309,25 +350,28 @@ export default function PreviewBuilder() {
         }
 
         const courseBuilderData = apiData.courseBuilderData || {};
-        const rawContent = Array.isArray(courseBuilderData.courseContent)
-          ? courseBuilderData.courseContent
+        const courseDetail = courseBuilderData; // courseBuilderData now contains the course details directly
+        const rawContent = Array.isArray(courseDetail.courseContent)
+          ? courseDetail.courseContent
           : [];
         const normalizedContent = rawContent.sort(
-          (a, b) => (a.courseContentSequence || 0) - (b.courseContentSequence || 0)
+          (a, b) =>
+            (a.courseContentSequence || 0) - (b.courseContentSequence || 0)
         );
 
+        // Build the course data structure to match component expectations
         const normalizedCourseData = {
           course: {
-            courseId: courseBuilderData.courseId,
-            courseTitle: courseBuilderData.courseTitle,
-            courseDescription: courseBuilderData.courseDescription,
-            courseType: courseBuilderData.courseType,
-            deliveryMode: courseBuilderData.deliveryMode,
-            courseDuration: courseBuilderData.courseDuration,
-            courseImageUrl: courseBuilderData.courseImageUrl,
-            courseSourceChannel: courseBuilderData.courseSourceChannel,
-            status: courseBuilderData.status,
-            metadata: courseBuilderData.metadata,
+            courseId: courseDetail.courseId,
+            courseTitle: courseDetail.courseTitle,
+            courseDescription: courseDetail.courseDescription,
+            courseType: courseDetail.courseType,
+            deliveryMode: courseDetail.deliveryMode,
+            courseDuration: courseDetail.courseDuration,
+            courseImageUrl: courseDetail.courseImageUrl,
+            courseSourceChannel: courseDetail.courseSourceChannel,
+            status: courseDetail.status,
+            metadata: courseDetail.metadata,
           },
           courseContent: normalizedContent,
           courseBuilder: {
@@ -339,9 +383,13 @@ export default function PreviewBuilder() {
           },
         };
 
+        console.log("Normalized course data:", normalizedCourseData);
+
         setCourseData(normalizedCourseData);
       } catch (e) {
-        setError(e?.response?.data?.message || e.message || "Failed to load course");
+        setError(
+          e?.response?.data?.message || e.message || "Failed to load course"
+        );
       } finally {
         setLoading(false);
       }
@@ -426,13 +474,13 @@ export default function PreviewBuilder() {
               </div>
             </div>
           ) : (
-            <Button
-              variant="ghost"
-              className="w-full justify-start p-2 h-auto"
+            <button
+              type="button"
+              className="cursor-pointer group w-full text-left"
               onClick={() => setEditingCourseInfo(true)}
             >
-              <div className="flex items-center gap-2 group-hover:bg-gray-50 rounded w-full">
-                <div className="flex-1 text-left">
+              <div className="flex items-center gap-2 group-hover:bg-gray-50 p-2 rounded">
+                <div className="flex-1">
                   <div className="flex items-start gap-3 flex-wrap">
                     <h1 className="text-3xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
                       {courseData?.course?.courseTitle || "Untitled Course"}
@@ -449,7 +497,8 @@ export default function PreviewBuilder() {
                       </span>
                     )}
                     <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600 border border-gray-200">
-                      {courseData?.courseContent?.length || 0} items · {formatDuration(totalDurationSeconds)}
+                      {courseData?.courseContent?.length || 0} items ·{" "}
+                      {formatDuration(totalDurationSeconds)}
                     </span>
                   </div>
                   <p className="text-gray-600 mt-2 group-hover:text-gray-700 transition-colors max-w-3xl">
@@ -458,17 +507,18 @@ export default function PreviewBuilder() {
                 </div>
                 <Edit className="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
               </div>
-            </Button>
+            </button>
           )}
         </div>
-        
         <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
           <div className="text-xs text-gray-500 order-2 sm:order-1">
-            {isLoading && (
+            {isLoading ? (
               <span className="flex items-center gap-1">
                 <span className="h-3 w-3 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></span>
                 <span>Saving…</span>
               </span>
+            ) : (
+              <></>
             )}
           </div>
           <div className="flex flex-wrap items-center gap-2 order-1 sm:order-2 justify-end">
@@ -507,21 +557,23 @@ export default function PreviewBuilder() {
         </div>
       </div>
 
-      {/* Course Content */}
+      {/* Course Content with inline editing */}
       <div>
-        <div className="flex items-center justify-between">
-          <h3 className="flex items-center gap-2 font-semibold text-lg">
-            <Video className="h-5 w-5" />
-            Course Content ({courseData?.courseContent?.length || 0} items)
-          </h3>
-          <ContentTypeSelector
-            onSelectType={handleSelectContentType}
-            disabled={isLoading}
-          />
+        <div>
+          <div className="flex items-center justify-between">
+            <h3 className="flex items-center gap-2 font-semibold text-lg">
+              <Video className="h-5 w-5" />
+              Course Content ({courseData?.courseContent?.length || 0} items)
+            </h3>
+            <ContentTypeSelector
+              onSelectType={handleSelectContentType}
+              disabled={isLoading}
+            />
+          </div>
         </div>
-        
         <div className="mt-4">
-          {!courseData?.courseContent?.length ? (
+          {!courseData?.courseContent ||
+          courseData?.courseContent.length === 0 ? (
             <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
               <Video className="h-12 w-12 mx-auto text-gray-400 mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -537,7 +589,7 @@ export default function PreviewBuilder() {
             </div>
           ) : (
             <div className="space-y-3">
-              {courseData.courseContent.map((content, index) => (
+              {courseData?.courseContent?.map((content, index) => (
                 <div
                   key={content?.courseContentId}
                   className="border rounded-lg bg-white"
@@ -555,7 +607,9 @@ export default function PreviewBuilder() {
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => moveContent(content?.courseContentId, "up")}
+                          onClick={() =>
+                            moveContent(content?.courseContentId, "up")
+                          }
                           disabled={index === 0}
                           className="h-6 w-6 p-0"
                         >
@@ -564,8 +618,12 @@ export default function PreviewBuilder() {
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => moveContent(content?.courseContentId, "down")}
-                          disabled={index === courseData.courseContent.length - 1}
+                          onClick={() =>
+                            moveContent(content?.courseContentId, "down")
+                          }
+                          disabled={
+                            index === courseData.courseContent.length - 1
+                          }
                           className="h-6 w-6 p-0"
                         >
                           <ArrowDown className="h-3 w-3" />
@@ -627,7 +685,11 @@ export default function PreviewBuilder() {
                         size="sm"
                         variant="ghost"
                         onClick={() => {
-                          if (window.confirm("Are you sure you want to delete this content?")) {
+                          if (
+                            window.confirm(
+                              "Are you sure you want to delete this content?"
+                            )
+                          ) {
                             handleDeleteContent(content?.courseContentId);
                           }
                         }}
@@ -644,23 +706,32 @@ export default function PreviewBuilder() {
         </div>
       </div>
 
-      {/* Sheets */}
+      {/* Add Content Sheet */}
       <Sheet open={addContentSheetOpen} onOpenChange={setAddContentSheetOpen}>
-        <SheetContent side="bottom" className="w-screen h-screen max-w-none py-8 inset-0 border-0">
+        <SheetContent
+          side="bottom"
+          className="w-screen h-screen max-w-none py-8 inset-0 border-0"
+        >
           {selectedContentType && (
             <ContentCreator
               contentType={selectedContentType}
               onAdd={handleAddContent}
               onCancel={handleCancelAddContent}
               isLoading={isLoading}
-              courseContentSequence={(courseData?.courseContent?.length || 0) + 1}
+              courseContentSequence={
+                (courseData?.courseContent?.length || 0) + 1
+              }
             />
           )}
         </SheetContent>
       </Sheet>
 
+      {/* Edit Content Sheet */}
       <Sheet open={editContentSheetOpen} onOpenChange={setEditContentSheetOpen}>
-        <SheetContent side="bottom" className="w-screen h-screen max-w-none p-8 inset-0 border-0">
+        <SheetContent
+          side="bottom"
+          className="w-screen h-screen max-w-none p-8 inset-0 border-0"
+        >
           {currentEditingContent && (
             <ContentCreator
               contentType={currentEditingContent.courseContentType}
@@ -672,7 +743,9 @@ export default function PreviewBuilder() {
                 setCurrentEditingContent(null);
               }}
               isLoading={isLoading}
-              courseContentSequence={currentEditingContent.courseContentSequence}
+              courseContentSequence={
+                currentEditingContent.courseContentSequence
+              }
             />
           )}
         </SheetContent>

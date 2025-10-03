@@ -167,6 +167,10 @@ export default function QuizContentCreator({
                 ? Array.isArray(q.quizQuestionCorrectAnswer)
                   ? q.quizQuestionCorrectAnswer[0]
                   : 0
+                : q.quizQuestionType === "INPUT_BOX"
+                ? Array.isArray(q.quizQuestionCorrectAnswer)
+                  ? q.quizQuestionCorrectAnswer[0] || ""
+                  : ""
                 : undefined,
             correctAnswers:
               q.quizQuestionType === "MULTIPLE_CHOICE"
