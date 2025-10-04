@@ -352,6 +352,15 @@ function CourseWritten() {
                       <span className=" ">Mark Complete</span>
                      </Button>
                   )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={toggleFullscreen}
+                    className="flex items-center gap-2 hover:bg-gray-50"
+                  >
+                    <Maximize className="h-4 w-4" />
+                    <span className=" ">Fullscreen</span>
+                  </Button>
                 </div>
               </div>
             </CardHeader>
@@ -363,15 +372,6 @@ function CourseWritten() {
               <Card className="shadow-lg bg-white/70 backdrop-blur-sm border-0">
                 <CardContent className="px-0">
                   <div className="w-full relative ">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={toggleFullscreen}
-                      className="absolute top-2 right-2 z-20 bg-white/90 hover:bg-white shadow-sm"
-                    >
-                      <Maximize className="h-4 w-4 mr-1" />
-                      Fullscreen
-                    </Button>
                     {courseVideoDetail.courseWrittenEmbedUrl ? (
                       courseVideoDetail.courseWrittenUrlIsEmbeddable == null ||
                       courseVideoDetail.courseWrittenUrlIsEmbeddable ===
