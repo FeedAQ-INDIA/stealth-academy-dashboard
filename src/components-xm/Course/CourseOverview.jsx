@@ -703,6 +703,15 @@ function CourseOverview() {
               </DialogContent>
             </Dialog>
           ) : (
+            <>
+            <Button
+              variant="outline"
+              className="hover:bg-gray-100 transition-colors rounded-lg px-6"
+              onClick={() => navigate(`/course-builder/${courseList?.courseBuilderId}`)}
+            >
+              EDIT COURSE
+            </Button>
+            
             <Dialog>
               <DialogTrigger asChild>
                 <Button
@@ -766,6 +775,9 @@ function CourseOverview() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+
+            
+            </>
           )}
         </div>
       </div>

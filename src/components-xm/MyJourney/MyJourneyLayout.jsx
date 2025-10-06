@@ -135,7 +135,6 @@ export function MyLearningLayout() {
     //   path: "/my-journey/my-goals",
     //   description: "Set and track your personal learning goals",
     // },
-  
   ];
 
   // Check scroll position and update arrow visibility
@@ -203,25 +202,22 @@ export function MyLearningLayout() {
         <div className="  mx-auto space-y-4">
           {/* Hero Section with Enhanced Gradient */}
           <div className="relative overflow-hidden">
-
-                            <Card className="  border-0 shadow-lg   bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700   ">
-                                      <CardHeader className="">
-                                                 {/* <div className="flex items-center justify-center mb-2">
+            <Card className="  border-0 shadow-lg   bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700   ">
+              <CardHeader className="">
+                {/* <div className="flex items-center justify-center mb-2">
                                                    <Sparkles className="w-6 h-6 text-yellow-300 animate-float" />
                                                  </div> */}
-                                                 <CardTitle className="text-center tracking-wide text-2xl md:text-3xl  font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
-                                                   My Journey
-                                                 </CardTitle>
-                                                 {/* <p className="text-center text-white/90 mt-2 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                <CardTitle className="text-center tracking-wide text-2xl md:text-3xl  font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                  My Journey
+                </CardTitle>
+                {/* <p className="text-center text-white/90 mt-2 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
                                                    Discover thousands of courses from beginner to advanced levels
                                                  </p> */}
-                                               </CardHeader>
-                                               
-                                       <CardContent className="relative z-10 pb-6">
-                {/* Mobile: Horizontal scroll with arrows, Desktop: Flex wrap */}
-                <div className="relative">
-                  {/* Left Arrow */}
-                  {showLeftArrow && (
+              </CardHeader>
+
+              {/* <CardContent className="relative z-10 pb-6">
+                 <div className="relative">
+                   {showLeftArrow && (
                     <button
                       onClick={scrollLeft}
                       className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-purple-700 rounded-full p-1 shadow-lg transition-all duration-300 sm:hidden"
@@ -231,8 +227,7 @@ export function MyLearningLayout() {
                     </button>
                   )}
 
-                  {/* Right Arrow */}
-                  {showRightArrow && (
+                   {showRightArrow && (
                     <button
                       onClick={scrollRight}
                       className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-purple-700 rounded-full p-1 shadow-lg transition-all duration-300 sm:hidden"
@@ -270,13 +265,11 @@ export function MyLearningLayout() {
                             }}
                             aria-label={`Navigate to ${item.label}`}
                           >
-                            {/* Animated background for active state */}
-                            {isActive && (
+                             {isActive && (
                               <div className="absolute inset-0 bg-gradient-to-r from-white to-blue-50 rounded-lg"></div>
                             )}
 
-                            {/* Hover effect background */}
-                            <div
+                             <div
                               className={`absolute inset-0 bg-gradient-to-br from-white/20 to-white/10 rounded-lg transition-opacity duration-300 ${
                                 isHovered && !isActive
                                   ? "opacity-100"
@@ -305,17 +298,12 @@ export function MyLearningLayout() {
                                          : "text-white"
                                      }`}
                               >
-                                <span className=" inline">
-                                  {item.label}
-                                </span>
-                                {/* <span className="xs:hidden">
-                                  {item.label.split(" ")[0]}
-                                </span> */}
+                                <span className=" inline">{item.label}</span>
+ 
                               </span>
                             </div>
 
-                            {/* Animated border for active state */}
-                            {isActive && (
+                             {isActive && (
                               <div className="absolute inset-0 rounded-lg border border-purple-300 animate-pulse-subtle"></div>
                             )}
                           </button>
@@ -324,10 +312,9 @@ export function MyLearningLayout() {
                     </div>
                   </div>
                 </div>
-              </CardContent>
-             
-                            </Card>
- 
+              </CardContent> */}
+
+            </Card>
           </div>
 
           {/* Achievement Banner */}

@@ -83,8 +83,7 @@ export function MyCourse() {
           as: "enrollments",
           where: {
             userId: userDetail.userId,
-            enrollmentStatus: { $ne: "COMPLETED" },
-          },
+           },
           required: true,
         },
         {
@@ -266,8 +265,7 @@ export function MyCourse() {
             as: "enrollments",
             where: {
               userId: userDetail.userId,
-              enrollmentStatus: { $ne: "COMPLETED" },
-            },
+             },
             required: true,
           },
           {
