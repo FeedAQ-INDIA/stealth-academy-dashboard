@@ -5,6 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { toast } from "@/components/hooks/use-toast.js";
 import axiosConn from "@/axioscon.js";
 import {
@@ -16,6 +24,7 @@ import {
   Trash2,
   ArrowUp,
   ArrowDown,
+  Youtube,
 } from "lucide-react";
 import ContentTypeSelector from "./ContentTypeSelector";
 import ContentCreator from "./creators/ContentCreator";
@@ -34,6 +43,9 @@ export default function PreviewBuilder() {
   const [editContentSheetOpen, setEditContentSheetOpen] = useState(false);
   const [currentEditingContent, setCurrentEditingContent] = useState(null);
   const [selectedContentType, setSelectedContentType] = useState(null);
+  const [youtubeImportDialogOpen, setYoutubeImportDialogOpen] = useState(false);
+  const [youtubePlaylistUrl, setYoutubePlaylistUrl] = useState("");
+  const [importingFromYoutube, setImportingFromYoutube] = useState(false);
 
   // Helper functions
   const getContentTypeColor = (contentType) => {
@@ -77,6 +89,76 @@ export default function PreviewBuilder() {
   const handleSelectContentType = (contentType) => {
     setSelectedContentType(contentType);
     setAddContentSheetOpen(true);
+  };
+
+  const handleImportYoutube = () => {
+    setYoutubeImportDialogOpen(true);
+  };
+
+  const handleYoutubeImport = async () => {
+    if (!youtubePlaylistUrl.trim()) {
+      toast({
+        title: "URL Required",
+        description: "Please enter a YouTube playlist URL",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setImportingFromYoutube(true);
+    try {
+      const response = await axiosConn.post("/importFromYoutube", {
+        playlistUrl: youtubePlaylistUrl.trim(),
+      });
+
+      if (response.data.success) {
+        const importedContent = response.data.data.courseContent || [];
+        
+        // Add imported content to existing course content
+        setCourseData((prev) => {
+          const existingContent = prev.courseContent || [];
+          const startSequence = existingContent.length + 1;
+          
+          // Update sequence numbers for imported content
+          const resequencedImported = importedContent.map((content, index) => ({
+            ...content,
+            courseContentSequence: startSequence + index,
+            courseContentId: `imported_${Date.now()}_${index + 1}`,
+          }));
+          
+          return {
+            ...prev,
+            courseContent: [...existingContent, ...resequencedImported],
+          };
+        });
+
+        toast({
+          title: "Import Successful!",
+          description: `Imported ${importedContent.length} videos from YouTube playlist`,
+        });
+
+        setYoutubeImportDialogOpen(false);
+        setYoutubePlaylistUrl("");
+        
+        // Auto-save after import
+        setTimeout(() => handleSave({ silent: true }), 1000);
+      }
+    } catch (error) {
+      console.error("YouTube import error:", error);
+      const errorMessage = error.response?.data?.message || "Failed to import YouTube playlist";
+      toast({
+        title: "Import Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setImportingFromYoutube(false);
+    }
+  };
+
+  const handleCancelYoutubeImport = () => {
+    setYoutubeImportDialogOpen(false);
+    setYoutubePlaylistUrl("");
   };
 
   const handleAddContent = (newContent) => {
@@ -484,6 +566,7 @@ export default function PreviewBuilder() {
           </h3>
           <ContentTypeSelector
             onSelectType={handleSelectContentType}
+            onImportYoutube={handleImportYoutube}
             disabled={isLoading}
           />
         </div>
@@ -500,6 +583,7 @@ export default function PreviewBuilder() {
               </p>
               <ContentTypeSelector
                 onSelectType={handleSelectContentType}
+                onImportYoutube={handleImportYoutube}
                 disabled={isLoading}
               />
             </div>
@@ -645,6 +729,64 @@ export default function PreviewBuilder() {
           )}
         </SheetContent>
       </Sheet>
+
+      {/* YouTube Import Dialog */}
+      <Dialog open={youtubeImportDialogOpen} onOpenChange={setYoutubeImportDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Youtube className="h-5 w-5 text-red-500" />
+              Import from YouTube Playlist
+            </DialogTitle>
+            <DialogDescription>
+              Enter a YouTube playlist URL to import all videos as course content.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <label htmlFor="playlist-url" className="text-sm font-medium">
+                YouTube Playlist URL
+              </label>
+              <Input
+                id="playlist-url"
+                placeholder="https://www.youtube.com/playlist?list=..."
+                value={youtubePlaylistUrl}
+                onChange={(e) => setYoutubePlaylistUrl(e.target.value)}
+                disabled={importingFromYoutube}
+              />
+              <p className="text-xs text-gray-500">
+                Example: https://www.youtube.com/playlist?list=PL9ooVrP1hQOFrNo8jK9Yb2g2eMDP7De7j
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={handleCancelYoutubeImport}
+              disabled={importingFromYoutube}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleYoutubeImport}
+              disabled={importingFromYoutube || !youtubePlaylistUrl.trim()}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {importingFromYoutube ? (
+                <>
+                  <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Importing...
+                </>
+              ) : (
+                <>
+                  <Youtube className="h-4 w-4 mr-2" />
+                  Import Playlist
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

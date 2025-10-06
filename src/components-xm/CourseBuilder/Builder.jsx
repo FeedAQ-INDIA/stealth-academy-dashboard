@@ -1,4 +1,3 @@
- 
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,6 @@ export default function Builder() {
   const [courseDescription, setCourseDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
 
   // selectedOrganization: null means general profile, object means organization selected
   const { selectedOrganization } = useOrganizationStore();
@@ -48,26 +46,24 @@ export default function Builder() {
     setUrls(newUrls);
   };
 
-
- 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validate inputs
-    const deduped = Array.from(
-      new Set(urls.map((u) => u.trim()).filter((u) => u !== ""))
-    );
-    const validUrls = deduped;
-    
+    // const deduped = Array.from(
+    //   new Set(urls.map((u) => u.trim()).filter((u) => u !== ""))
+    // );
+    // const validUrls = deduped;
+
     // Check for minimum requirements
-    if (validUrls.length === 0) {
-      toast({
-        title: "Please enter at least one URL",
-        description: "You need to provide at least one content URL to create a course.",
-        variant: "destructive",
-      });
-      return;
-    }
+    // if (validUrls.length === 0) {
+    //   toast({
+    //     title: "Please enter at least one URL",
+    //     description: "You need to provide at least one content URL to create a course.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
 
     if (!courseTitle.trim()) {
       toast({
@@ -81,58 +77,55 @@ export default function Builder() {
     if (courseTitle.trim().length < 3) {
       toast({
         title: "Course title too short",
-        description: "Please provide a course title with at least 3 characters.",
+        description:
+          "Please provide a course title with at least 3 characters.",
         variant: "destructive",
       });
       return;
     }
 
     // Enhanced URL validation with better error messaging
-    const invalidUrls = validUrls.filter((url) => !isValidHttpUrl(url));
-    if (invalidUrls.length > 0) {
-      toast({
-        title: "Invalid URLs detected",
-        description: `Please check: ${invalidUrls.slice(0, 2).join(", ")}${
-          invalidUrls.length > 2 ? ` and ${invalidUrls.length - 2} more` : ""
-        }`,
-        variant: "destructive",
-      });
-      return;
-    }
+    // const invalidUrls = validUrls.filter((url) => !isValidHttpUrl(url));
+    // if (invalidUrls.length > 0) {
+    //   toast({
+    //     title: "Invalid URLs detected",
+    //     description: `Please check: ${invalidUrls.slice(0, 2).join(", ")}${
+    //       invalidUrls.length > 2 ? ` and ${invalidUrls.length - 2} more` : ""
+    //     }`,
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
 
     // Check for organization context if needed
     // If an organization-specific context is required but none selected (edge case)
     if (selectedOrganization === undefined) {
       toast({
         title: "Organization context missing",
-        description: "Please select a valid organization or switch to General profile.",
+        description:
+          "Please select a valid organization or switch to General profile.",
         variant: "destructive",
       });
       return;
     }
 
     setIsLoading(true);
-    console.log(localStorage.getItem("fa_selected_org_v1"))
+    console.log(localStorage.getItem("fa_selected_org_v1"));
     try {
       const payload = {
         orgId: localStorage.getItem("fa_selected_org_v1") || null,
-        status: "DRAFT",
-        urls: validUrls, // Include the validated URLs
-        courseBuilderData: {
-          courseTitle: courseTitle.trim(),
-          courseDescription: courseDescription.trim(),
-          contentUrlsList: validUrls, // Also include in courseBuilderData for redundancy
-        }
+        title: courseTitle.trim(),
+        description: courseDescription.trim(),
       };
 
-      const response = await axiosConn.post("/createOrUpdateCourseBuilder", payload);
+      const response = await axiosConn.post("/registerBuilder", payload);
 
       if (response.data) {
         toast({
           title: "Course created successfully!",
-          description: "Your course structure has been generated and is ready for preview.",
+          description:
+            "Your course structure has been generated and is ready for preview.",
         });
-        
 
         navigate(`/course-builder/${response.data.data.courseBuilderId}`);
       } else {
@@ -140,31 +133,37 @@ export default function Builder() {
       }
     } catch (error) {
       console.error("Error creating course:", error);
-      
+
       // Enhanced error handling with specific messages
       let errorTitle = "Failed to create course";
       let errorDescription = "Please try again later.";
-      
+
       if (error.response?.status === 400) {
         errorTitle = "Invalid course data";
-        errorDescription = error.response.data?.message || "Please check your input and try again.";
+        errorDescription =
+          error.response.data?.message ||
+          "Please check your input and try again.";
       } else if (error.response?.status === 401) {
         errorTitle = "Authentication required";
         errorDescription = "Please sign in again to create a course.";
       } else if (error.response?.status === 403) {
         errorTitle = "Permission denied";
-        errorDescription = "You don't have permission to create courses in this organization.";
+        errorDescription =
+          "You don't have permission to create courses in this organization.";
       } else if (error.response?.status === 429) {
         errorTitle = "Too many requests";
-        errorDescription = "Please wait a moment before creating another course.";
+        errorDescription =
+          "Please wait a moment before creating another course.";
       } else if (error.response?.status >= 500) {
         errorTitle = "Server error";
-        errorDescription = "Our servers are experiencing issues. Please try again later.";
-      } else if (error.message.includes('Network')) {
+        errorDescription =
+          "Our servers are experiencing issues. Please try again later.";
+      } else if (error.message.includes("Network")) {
         errorTitle = "Connection error";
-        errorDescription = "Please check your internet connection and try again.";
+        errorDescription =
+          "Please check your internet connection and try again.";
       }
-      
+
       toast({
         title: errorTitle,
         description: errorDescription,
@@ -179,15 +178,13 @@ export default function Builder() {
     <div className="grid grid-cols-1 md:grid-cols-5 md:p-4 gap-4">
       <Card className="bg-white md:col-span-3 mb-0 shadow-lg rounded-lg h-[calc(100svh-4em)] md:h-[calc(100svh-6em)] overflow-y-scroll">
         <CardHeader>
-          <h2 className="text-2xl font-bold">
-            Bring Your Own Course
-          </h2>
+          <h2 className="text-2xl font-bold">Bring Your Own Course</h2>
           <p className="text-muted-foreground mt-2">
-            Enter YouTube video/playlist URLs or any other embeddable URLs. We&apos;ll analyze and build a structured course.
+            Enter YouTube video/playlist URLs or any other embeddable URLs.
+            We&apos;ll analyze and build a structured course.
           </p>
         </CardHeader>
         <CardContent>
- 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block font-medium mb-2">Course Title *</label>
@@ -202,11 +199,12 @@ export default function Builder() {
                 minLength={3}
                 maxLength={100}
               />
-              {courseTitle.trim().length > 0 && courseTitle.trim().length < 3 && (
-                <p className="text-sm text-yellow-600 mt-1">
-                  Course title should be at least 3 characters long
-                </p>
-              )}
+              {courseTitle.trim().length > 0 &&
+                courseTitle.trim().length < 3 && (
+                  <p className="text-sm text-yellow-600 mt-1">
+                    Course title should be at least 3 characters long
+                  </p>
+                )}
             </div>
             <div>
               <label className="block font-medium mb-2">
@@ -227,7 +225,7 @@ export default function Builder() {
                 </p>
               )}
             </div>
-            <div>
+            {/* <div>
               <label className="block font-medium mb-2">
         Content URLs (YouTube Videos/Playlists or Other Embeddable URLs) *
               </label>
@@ -267,8 +265,12 @@ export default function Builder() {
               >
                 Add another URL
               </Button>
-            </div>
-            <Button type="submit" className="w-full" disabled={isLoading || !courseTitle.trim() || urls.filter(u => u.trim()).length === 0}>
+            </div> */}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading || !courseTitle.trim()}
+            >
               {isLoading ? (
                 <div className="flex items-center gap-2">
                   <Spinner size="sm" decorative />
@@ -287,7 +289,6 @@ export default function Builder() {
               </div>
             )}
           </form>
-    
         </CardContent>
       </Card>
 
