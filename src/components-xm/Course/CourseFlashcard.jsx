@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
+import PropTypes from "prop-types";
 import { SidebarTrigger } from "@/components/ui/sidebar.jsx";
 import { Separator } from "@/components/ui/separator.jsx";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb.jsx";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card.jsx";
 import { Badge } from "@/components/ui/badge.jsx";
-import { Zap, RotateCcw, Eye, EyeOff, CheckCircle2, Undo2, Shuffle, CircleArrowLeft, CircleArrowRight } from "lucide-react";
+import { Zap, RotateCcw, Eye, EyeOff, CheckCircle2, Undo2, Shuffle, CircleArrowLeft, CircleArrowRight, BookOpen, Clock, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button.jsx";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select.jsx";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCourse } from "@/components-xm/Course/CourseContext.jsx";
 import axiosConn from "@/axioscon.js";
@@ -17,6 +19,13 @@ import NotesModule from "../Notes/NotesModule";
 
 // FlashcardItem extracted outside main component for clarity and performance
 const FlashcardItem = React.memo(function FlashcardItem({ card, index, isFlipped, isCompleted, onFlip }) {
+  const difficultyColors = {
+    EASY: { bg: 'bg-green-50', border: 'border-green-200', accent: 'bg-green-500', text: 'text-green-700' },
+    MEDIUM: { bg: 'bg-yellow-50', border: 'border-yellow-200', accent: 'bg-yellow-500', text: 'text-yellow-700' },
+    HARD: { bg: 'bg-red-50', border: 'border-red-200', accent: 'bg-red-500', text: 'text-red-700' }
+  };
+  const currentDifficulty = (card?.difficulty || 'MEDIUM').toUpperCase();
+  const colors = difficultyColors[currentDifficulty] || difficultyColors.MEDIUM;
   return (
     <div
       className="group perspective-1000 h-72 cursor-pointer"
@@ -36,8 +45,8 @@ const FlashcardItem = React.memo(function FlashcardItem({ card, index, isFlipped
         <Card
           className={`absolute inset-0 w-full h-full backface-hidden shadow-xl border-2 transition-all duration-300 ${
             isCompleted
-              ? "border-green-400 bg-gradient-to-br from-green-50 to-emerald-100 shadow-green-200/50"
-              : "border-gray-200 bg-gradient-to-br from-white to-gray-50 hover:shadow-2xl"
+              ? `border-green-400 ${colors.bg} shadow-green-200/50`
+              : `${colors.border} ${colors.bg} hover:shadow-2xl`
           }`}
           style={{
             backfaceVisibility: "hidden",
@@ -45,22 +54,23 @@ const FlashcardItem = React.memo(function FlashcardItem({ card, index, isFlipped
           }}
         >
           <CardContent className="p-4 sm:p-6 h-full flex flex-col justify-between relative overflow-hidden">
-            {/* Decorative background elements */}
-            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full opacity-20 transform translate-x-8 -translate-y-8"></div>
-            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-indigo-100 to-pink-100 rounded-full opacity-20 transform -translate-x-6 translate-y-6"></div>
+            {/* Accent bar for difficulty */}
+            <div className={`absolute top-0 left-0 w-full h-1 ${colors.accent}`} />
             <div className="flex items-center justify-between mb-3 sm:mb-4 relative z-10">
-              <Badge
-                variant="outline"
-                className={`text-xs font-medium shadow-sm ${
-                  card.difficulty === "EASY"
-                    ? "bg-green-100 text-green-800 border-green-300"
-                    : card.difficulty === "HARD"
-                    ? "bg-red-100 text-red-800 border-red-300"
-                    : "bg-yellow-100 text-yellow-800 border-yellow-300"
-                }`}
-              >
-                {card.difficulty || "MEDIUM"}
-              </Badge>
+              <div className="flex items-center gap-3">
+                <div className={`w-9 h-9 sm:w-10 sm:h-10 ${colors.accent} rounded-xl flex items-center justify-center text-white font-bold shadow-sm`}>
+                  {index + 1}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className={`${colors.text} border-current text-xs`}>{currentDifficulty}</Badge>
+                  {!!card?.explanation && (
+                    <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700 inline-flex items-center gap-1">
+                      <Lightbulb className="h-3 w-3" />
+                      Has Explanation
+                    </Badge>
+                  )}
+                </div>
+              </div>
               <div className="flex items-center gap-2">
                 {isCompleted && (
                   <div className="animate-bounce">
@@ -78,7 +88,7 @@ const FlashcardItem = React.memo(function FlashcardItem({ card, index, isFlipped
                 <div className="text-base sm:text-lg font-semibold text-gray-800 leading-relaxed">
                   {card.question}
                 </div>
-                <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mx-auto"></div>
+                <div className={`w-12 h-1 rounded-full mx-auto ${colors.accent}`}></div>
               </div>
             </div>
             <div className="mt-4 text-center relative z-10">
@@ -96,8 +106,8 @@ const FlashcardItem = React.memo(function FlashcardItem({ card, index, isFlipped
         <Card
           className={`absolute inset-0 w-full h-full backface-hidden shadow-xl border-2 transition-all duration-300 ${
             isCompleted
-              ? "border-green-400 bg-gradient-to-br from-green-50 to-emerald-100 shadow-green-200/50"
-              : "border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-100 hover:shadow-2xl"
+              ? `border-green-400 ${colors.bg} shadow-green-200/50`
+              : `${colors.border} ${colors.bg} hover:shadow-2xl`
           }`}
           style={{
             backfaceVisibility: "hidden",
@@ -105,16 +115,20 @@ const FlashcardItem = React.memo(function FlashcardItem({ card, index, isFlipped
           }}
         >
           <CardContent className="p-4 h-full flex flex-col justify-between relative overflow-y-auto overflow-x-hidden">
-            {/* Decorative background elements */}
-            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full opacity-20 transform translate-x-10 -translate-y-10"></div>
-            <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr from-blue-100 to-cyan-100 rounded-full opacity-20 transform -translate-x-8 translate-y-8"></div>
+            {/* Accent bar for difficulty */}
+            <div className={`absolute top-0 left-0 w-full h-1 ${colors.accent}`} />
             <div className="flex items-center justify-between mb-3 sm:mb-4 relative z-10">
-              <Badge
-                variant="outline"
-                className="text-xs font-medium bg-blue-100 text-blue-800 border-blue-300 shadow-sm"
-              >
-                Answer
-              </Badge>
+              <div className="flex items-center gap-3">
+                <div className={`w-9 h-9 sm:w-10 sm:h-10 ${colors.accent} rounded-xl flex items-center justify-center text-white font-bold shadow-sm`}>
+                  {index + 1}
+                </div>
+                <Badge
+                  variant="outline"
+                  className={`text-xs font-medium ${colors.text} border-current shadow-sm`}
+                >
+                  Answer
+                </Badge>
+              </div>
               <div className="flex items-center gap-2">
                 {isCompleted && (
                   <div className="animate-bounce">
@@ -135,7 +149,7 @@ const FlashcardItem = React.memo(function FlashcardItem({ card, index, isFlipped
                 {card.explanation && (
                   <div className="mt-3 p-3 bg-white/80 backdrop-blur-sm rounded-lg border border-blue-200 shadow-sm">
                     <p className="text-sm text-gray-700 leading-relaxed">
-                      <span className="font-semibold text-blue-700">💡 Explanation:</span>{" "}
+                      <span className="font-semibold text-blue-700 inline-flex items-center gap-1"><Lightbulb className="h-4 w-4 text-yellow-500" /> Explanation:</span>{" "}
                       {card.explanation}
                     </p>
                   </div>
@@ -158,11 +172,23 @@ const FlashcardItem = React.memo(function FlashcardItem({ card, index, isFlipped
   );
 });
 
+FlashcardItem.propTypes = {
+  card: PropTypes.shape({
+    difficulty: PropTypes.string,
+    question: PropTypes.string,
+    answer: PropTypes.string,
+    explanation: PropTypes.string,
+  }).isRequired,
+  index: PropTypes.number.isRequired,
+  isFlipped: PropTypes.bool.isRequired,
+  isCompleted: PropTypes.bool.isRequired,
+  onFlip: PropTypes.func.isRequired,
+};
+
 function CourseFlashcard() {
   const { userDetail } = useAuthStore();
   const { CourseId, CourseFlashcardId } = useParams();
   const {
-    userCourseEnrollment,
     userCourseContentProgress,
     fetchUserCourseContentProgress,
     fetchUserCourseEnrollment,
@@ -201,13 +227,8 @@ function CourseFlashcard() {
 
 
   // Navigation logic for prev/next content (similar to CourseVideoTutorial)
-  useEffect(() => {
-    if (courseList && CourseFlashcardId) {
-      fetchCourseFlashcard();
-    }
-  }, [courseList, userCourseEnrollment, CourseFlashcardId]);
-
-  const fetchCourseFlashcard = async () => {
+  const fetchCourseFlashcard = useCallback(async () => {
+    if (!courseList || !CourseFlashcardId) return;
     setIsLoading(true);
     try {
       // Fetch flashcard set details
@@ -233,7 +254,6 @@ function CourseFlashcard() {
       const flashcardSet = flashcardSetRes.data.data?.results?.[0];
       setCourseFlashcardDetail(flashcardSet);
 
- 
       setFlashcards(flashcardSet?.flashcards || []);
 
       // Find the content from the courseContent structure
@@ -271,7 +291,13 @@ function CourseFlashcard() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [courseList, CourseFlashcardId]);
+
+  useEffect(() => {
+    if (courseList && CourseFlashcardId) {
+      fetchCourseFlashcard();
+    }
+  }, [courseList, CourseFlashcardId, fetchCourseFlashcard]);
 
   const saveUserProgress = () => {
     if (!courseList?.courseId || !courseFlashcardDetail?.courseContentId)
@@ -283,7 +309,7 @@ function CourseFlashcard() {
         courseContentId: courseFlashcardDetail.courseContentId,
         logStatus: "COMPLETED",
       })
-      .then((res) => {
+      .then(() => {
         toast({
           title: "Progress saved!",
           description: "Flashcard set marked as completed successfully.",
@@ -310,7 +336,7 @@ function CourseFlashcard() {
         courseId: courseList.courseId,
         courseContentId: courseFlashcardDetail.courseContentId,
       })
-      .then((res) => {
+      .then(() => {
         toast({
           title: "Progress updated",
           description: "Content marked as incomplete successfully.",
@@ -404,11 +430,7 @@ function CourseFlashcard() {
   }, [flashcards, difficultyFilter]);
 
   // Memoized progress percentage
-  const progressPercentage = useMemo(() => {
-    return flashcards.length > 0
-      ? Math.round((completedCards.size / flashcards.length) * 100)
-      : 0;
-  }, [completedCards.size, flashcards.length]);
+  // Progress percentage could be used for a progress bar in the future
 
   if (isLoading) {
     return (
