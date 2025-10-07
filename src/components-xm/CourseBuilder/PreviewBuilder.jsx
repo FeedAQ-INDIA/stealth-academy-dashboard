@@ -25,6 +25,7 @@ import {
   ArrowUp,
   ArrowDown,
   Youtube,
+  RotateCcw,
 } from "lucide-react";
 import ContentTypeSelector from "./ContentTypeSelector";
 import ContentCreator from "./creators/ContentCreator";
@@ -39,6 +40,8 @@ export default function PreviewBuilder() {
   const [error, setError] = useState(null);
   const [editingCourseInfo, setEditingCourseInfo] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+  const [savedSnapshot, setSavedSnapshot] = useState(null);
   const [addContentSheetOpen, setAddContentSheetOpen] = useState(false);
   const [editContentSheetOpen, setEditContentSheetOpen] = useState(false);
   const [currentEditingContent, setCurrentEditingContent] = useState(null);
@@ -131,6 +134,7 @@ export default function PreviewBuilder() {
             courseContent: [...existingContent, ...resequencedImported],
           };
         });
+        setIsDirty(true);
 
         toast({
           title: "Import Successful!",
@@ -140,8 +144,7 @@ export default function PreviewBuilder() {
         setYoutubeImportDialogOpen(false);
         setYoutubePlaylistUrl("");
         
-        // Auto-save after import
-        setTimeout(() => handleSave({ silent: true }), 1000);
+        // Mark dirty; user can save or publish later
       }
     } catch (error) {
       console.error("YouTube import error:", error);
@@ -171,9 +174,9 @@ export default function PreviewBuilder() {
       ...prev,
       courseContent: [...(prev.courseContent || []), newContent],
     }));
+    setIsDirty(true);
     setAddContentSheetOpen(false);
     setSelectedContentType(null);
-    // handleSave({ silent: true });
   };
 
   const handleCancelAddContent = () => {
@@ -196,9 +199,9 @@ export default function PreviewBuilder() {
       );
       return { ...prev, courseContent: updatedCourseContent };
     });
+    setIsDirty(true);
     setEditContentSheetOpen(false);
     setCurrentEditingContent(null);
-    // handleSave({ silent: true });
   };
 
   const handleDeleteContent = (contentId) => {
@@ -208,9 +211,9 @@ export default function PreviewBuilder() {
         (c) => c.courseContentId !== contentId
       ),
     }));
+    setIsDirty(true);
     setEditContentSheetOpen(false);
     setCurrentEditingContent(null);
-    // handleSave({ silent: true });
   };
 
   const moveContent = (contentId, direction) => {
@@ -233,7 +236,8 @@ export default function PreviewBuilder() {
       }));
       return { ...prev, courseContent: resequenced };
     });
-    // setTimeout(() => handleSave({ silent: true }), 500);
+    setIsDirty(true);
+    
   };
 
   const handleSave = async (options = {}) => {
@@ -246,10 +250,11 @@ export default function PreviewBuilder() {
           description: "Create the course first to persist changes.",
         });
       }
-      return;
+      return false;
     }
 
     setIsLoading(true);
+    let didSucceed = false;
     try {
       const originalBuilderData = courseData.courseBuilder.courseBuilderData || {};
       const cleanedContent = prepareContentForApi(courseData.courseContent);
@@ -278,12 +283,21 @@ export default function PreviewBuilder() {
 
       if (response.data.success) {
         const updatedData = response.data.data;
+        let newStateAfterSave = null;
         if (statusOverride && statusOverride !== courseData.courseBuilder.status) {
-          setCourseData((prev) => ({
-            ...prev,
-            courseBuilder: { ...prev.courseBuilder, ...updatedData },
-          }));
+          newStateAfterSave = {
+            ...courseData,
+            courseBuilder: { ...courseData.courseBuilder, ...updatedData },
+          };
+          setCourseData(newStateAfterSave);
         }
+        setIsDirty(false);
+        didSucceed = true;
+        // Capture a snapshot of the last saved state
+        const snapshot = JSON.parse(
+          JSON.stringify(newStateAfterSave || courseData)
+        );
+        setSavedSnapshot(snapshot);
         if (!silent) {
           const isPublish = statusOverride === "PUBLISHED";
           toast({
@@ -304,6 +318,7 @@ export default function PreviewBuilder() {
     } finally {
       setIsLoading(false);
     }
+    return didSucceed;
   };
 
   const handleSaveDraft = () => handleSave({ statusOverride: "DRAFT" });
@@ -311,11 +326,19 @@ export default function PreviewBuilder() {
   const handlePublish = async () => {
     if (isLoading) return;
     
-  
-    
     try {
-  
-      
+      // Save unsaved changes silently before publishing
+      if (isDirty) {
+        const saved = await handleSave({ silent: true });
+        if (!saved) {
+          toast({
+            title: "Couldn't save changes",
+            description: "Fix the errors and try publishing again.",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
       const res = await axiosConn.post("/publishCourse", {
         courseBuilderId: courseData.courseBuilder.courseBuilderId
       });
@@ -389,7 +412,9 @@ export default function PreviewBuilder() {
           },
         };
 
-        setCourseData(normalizedCourseData);
+  setCourseData(normalizedCourseData);
+  setIsDirty(false);
+  setSavedSnapshot(JSON.parse(JSON.stringify(normalizedCourseData)));
       } catch (e) {
         setError(e?.response?.data?.message || e.message || "Failed to load course");
       } finally {
@@ -437,19 +462,25 @@ export default function PreviewBuilder() {
             <div className="space-y-3">
               <Input
                 value={courseData?.course?.courseTitle || ""}
-                onChange={(e) => setCourseData(prev => ({
-                  ...prev,
-                  course: { ...prev.course, courseTitle: e.target.value }
-                }))}
+                onChange={(e) => {
+                  setCourseData(prev => ({
+                    ...prev,
+                    course: { ...prev.course, courseTitle: e.target.value }
+                  }));
+                  setIsDirty(true);
+                }}
                 className="text-2xl font-bold border-0 px-0 focus-visible:ring-0"
                 placeholder="Course title..."
               />
               <Textarea
                 value={courseData?.course?.courseDescription || ""}
-                onChange={(e) => setCourseData(prev => ({
-                  ...prev,
-                  course: { ...prev.course, courseDescription: e.target.value }
-                }))}
+                onChange={(e) => {
+                  setCourseData(prev => ({
+                    ...prev,
+                    course: { ...prev.course, courseDescription: e.target.value }
+                  }));
+                  setIsDirty(true);
+                }}
                 className="text-gray-600 border-0 px-0 resize-none focus-visible:ring-0"
                 placeholder="Course description..."
                 rows={2}
@@ -514,18 +545,46 @@ export default function PreviewBuilder() {
         
         <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
           <div className="text-xs text-gray-500 order-2 sm:order-1">
-            {isLoading && (
+            {isLoading ? (
               <span className="flex items-center gap-1">
                 <span className="h-3 w-3 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></span>
                 <span>Saving…</span>
+              </span>
+            ) : isDirty ? (
+              <span className="flex items-center gap-1 text-yellow-700">
+                <span className="h-2 w-2 rounded-full bg-yellow-500"></span>
+                <span>Unsaved changes</span>
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 text-gray-500">
+                <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
+                <span>All changes saved</span>
               </span>
             )}
           </div>
           <div className="flex flex-wrap items-center gap-2 order-1 sm:order-2 justify-end">
             <Button
               variant="outline"
+              onClick={() => {
+                if (!savedSnapshot) return;
+                setCourseData(JSON.parse(JSON.stringify(savedSnapshot)));
+                setIsDirty(false);
+                setEditingCourseInfo(false);
+                setAddContentSheetOpen(false);
+                setEditContentSheetOpen(false);
+                setCurrentEditingContent(null);
+                toast({ title: "Changes discarded", description: "Restored last saved version." });
+              }}
+              disabled={isLoading || !isDirty}
+              className="min-w-[90px]"
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Reset
+            </Button>
+            <Button
+              variant="outline"
               onClick={handleSaveDraft}
-              disabled={isLoading}
+              disabled={isLoading || !isDirty}
               className="min-w-[110px]"
             >
               {isLoading ? (
@@ -751,7 +810,11 @@ export default function PreviewBuilder() {
                 id="playlist-url"
                 placeholder="https://www.youtube.com/playlist?list=..."
                 value={youtubePlaylistUrl}
-                onChange={(e) => setYoutubePlaylistUrl(e.target.value)}
+                onChange={(e) => {
+                  setYoutubePlaylistUrl(e.target.value);
+                  // Changing the URL itself doesn't alter course content,
+                  // so we don't mark dirty here.
+                }}
                 disabled={importingFromYoutube}
               />
               <p className="text-xs text-gray-500">
