@@ -1,303 +1,463 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/components/hooks/use-toast.js";
-import axiosConn from "@/axioscon";
 import byoc1 from "@/assets/byoc_1.png";
-import { useOrganizationStore } from "@/zustland/store";
+import { useOrganizationStore, useAuthStore } from "@/zustland/store";
 import { useNavigate } from "react-router-dom";
-import { Spinner } from "@/components/ui/spinner";
+import { LoaderOne } from "@/components/ui/loader.jsx";
+import axiosConn from "@/axioscon.js";
+import {
+  Grid3X3,
+  List,
+  BookOpen,
+  Plus,
+  Calendar,
+  Eye,
+  Edit,
+  Trash2,
+  ChevronLeft,
+  ChevronRight
+} from "lucide-react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+} from "@/components/ui/pagination";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetTrigger,
+  SheetFooter,
+  SheetClose,
+} from "@/components/ui/sheet";
 
 export default function Builder() {
-  const [urls, setUrls] = useState([""]);
-  const [courseTitle, setCourseTitle] = useState("");
-  const [courseDescription, setCourseDescription] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [listLoading, setListLoading] = useState(true);
+  const [courses, setCourses] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [limit, setLimit] = useState(12);
+  const [offset, setOffset] = useState(0);
+  const [curateOpen, setCurateOpen] = useState(false);
+  const [curateTitle, setCurateTitle] = useState("");
+  const [curateDesc, setCurateDesc] = useState("");
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   const navigate = useNavigate();
 
   // selectedOrganization: null means general profile, object means organization selected
   const { selectedOrganization } = useOrganizationStore();
+  const { userDetail } = useAuthStore();
+
+  const [apiQuery, setApiQuery] = useState({
+    limit: 12,
+    offset: 0,
+    getThisData: {
+      datasource: "CourseBuilder",
+      attributes: [], 
+     where: {
+            userId: userDetail?.userId,
+           },
+    },
+  });
+
+  const fetchCourses = useCallback(() => {
+    setListLoading(true);
+    axiosConn
+      .post(import.meta.env.VITE_API_URL + "/searchCourse", apiQuery)
+      .then((res) => {
+        setCourses(res.data.data?.results || []);
+        setTotalCount(res.data.data?.totalCount || 0);
+        setOffset(res.data.data?.offset || 0);
+        setLimit(res.data.data?.limit || 12);
+        setListLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setCourses([]);
+        setListLoading(false);
+      });
+  }, [apiQuery]);
 
   useEffect(() => {
-    console.log("Builder Debug - selectedOrganization:", selectedOrganization);
-  }, [selectedOrganization]);
+    fetchCourses();
+  }, [fetchCourses]);
 
-  // Helpers
-  const isValidHttpUrl = (value) => {
+  // Load courses for current org (or general profile)
+  useEffect(() => {
+    if (userDetail?.userId) {
+      setApiQuery(prev => ({
+        ...prev,
+        limit: limit,
+        offset: offset,
+        getThisData: {
+          ...prev.getThisData,
+          where: {
+            userId: userDetail.userId,
+          },
+        },
+      }));
+    }
+  }, [selectedOrganization, userDetail, limit, offset]);
+
+  const handleDelete = async (courseBuilderId) => {
     try {
-      const u = new URL(value);
-      return u.protocol === "http:" || u.protocol === "https:";
-    } catch {
-      return false;
-    }
-  };
-
-  const handleUrlChange = (index, value) => {
-    const newUrls = [...urls];
-    newUrls[index] = value;
-    setUrls(newUrls);
-  };
-
-  const addUrlField = () => setUrls([...urls, ""]);
-  const removeUrlField = (index) => {
-    const newUrls = urls.filter((_, i) => i !== index);
-    setUrls(newUrls);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Validate inputs
-    // const deduped = Array.from(
-    //   new Set(urls.map((u) => u.trim()).filter((u) => u !== ""))
-    // );
-    // const validUrls = deduped;
-
-    // Check for minimum requirements
-    // if (validUrls.length === 0) {
-    //   toast({
-    //     title: "Please enter at least one URL",
-    //     description: "You need to provide at least one content URL to create a course.",
-    //     variant: "destructive",
-    //   });
-    //   return;
-    // }
-
-    if (!courseTitle.trim()) {
-      toast({
-        title: "Please enter a course title",
-        description: "Course title is required to create your course.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (courseTitle.trim().length < 3) {
-      toast({
-        title: "Course title too short",
-        description:
-          "Please provide a course title with at least 3 characters.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Enhanced URL validation with better error messaging
-    // const invalidUrls = validUrls.filter((url) => !isValidHttpUrl(url));
-    // if (invalidUrls.length > 0) {
-    //   toast({
-    //     title: "Invalid URLs detected",
-    //     description: `Please check: ${invalidUrls.slice(0, 2).join(", ")}${
-    //       invalidUrls.length > 2 ? ` and ${invalidUrls.length - 2} more` : ""
-    //     }`,
-    //     variant: "destructive",
-    //   });
-    //   return;
-    // }
-
-    // Check for organization context if needed
-    // If an organization-specific context is required but none selected (edge case)
-    if (selectedOrganization === undefined) {
-      toast({
-        title: "Organization context missing",
-        description:
-          "Please select a valid organization or switch to General profile.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    console.log(localStorage.getItem("fa_selected_org_v1"));
-    try {
-      const payload = {
-        orgId: localStorage.getItem("fa_selected_org_v1") || null,
-        title: courseTitle.trim(),
-        description: courseDescription.trim(),
-      };
-
-      const response = await axiosConn.post("/registerBuilder", payload);
-
-      if (response.data) {
-        toast({
-          title: "Course created successfully!",
-          description:
-            "Your course structure has been generated and is ready for preview.",
-        });
-
-        navigate(`/course-builder/${response.data.data.courseBuilderId}`);
-      } else {
-        throw new Error("Invalid response from server");
-      }
+      await axiosConn.delete(`${import.meta.env.VITE_API_URL}/courseBuilder/${courseBuilderId}`);
+      fetchCourses();
+      toast({ title: "Course deleted", description: "Course removed successfully." });
     } catch (error) {
-      console.error("Error creating course:", error);
+      console.error("Delete error:", error);
+      toast({ title: "Delete failed", description: "Failed to delete course.", variant: "destructive" });
+    }
+  };
 
-      // Enhanced error handling with specific messages
-      let errorTitle = "Failed to create course";
-      let errorDescription = "Please try again later.";
+  const handlePublish = async (courseBuilderId) => {
+    try {
+      await axiosConn.patch(`${import.meta.env.VITE_API_URL}/courseBuilder/${courseBuilderId}/publish`);
+      fetchCourses();
+      toast({ title: "Course published", description: "Your course is now live." });
+    } catch (error) {
+      console.error("Publish error:", error);
+      toast({ title: "Publish failed", description: "Failed to publish course.", variant: "destructive" });
+    }
+  };
 
-      if (error.response?.status === 400) {
-        errorTitle = "Invalid course data";
-        errorDescription =
-          error.response.data?.message ||
-          "Please check your input and try again.";
-      } else if (error.response?.status === 401) {
-        errorTitle = "Authentication required";
-        errorDescription = "Please sign in again to create a course.";
-      } else if (error.response?.status === 403) {
-        errorTitle = "Permission denied";
-        errorDescription =
-          "You don't have permission to create courses in this organization.";
-      } else if (error.response?.status === 429) {
-        errorTitle = "Too many requests";
-        errorDescription =
-          "Please wait a moment before creating another course.";
-      } else if (error.response?.status >= 500) {
-        errorTitle = "Server error";
-        errorDescription =
-          "Our servers are experiencing issues. Please try again later.";
-      } else if (error.message.includes("Network")) {
-        errorTitle = "Connection error";
-        errorDescription =
-          "Please check your internet connection and try again.";
+  const handleUnpublish = async (courseBuilderId) => {
+    try {
+      await axiosConn.patch(`${import.meta.env.VITE_API_URL}/courseBuilder/${courseBuilderId}/unpublish`);
+      fetchCourses();
+      toast({ title: "Course moved to drafts", description: "Unpublished successfully." });
+    } catch (error) {
+      console.error("Unpublish error:", error);
+      toast({ title: "Unpublish failed", description: "Failed to unpublish course.", variant: "destructive" });
+    }
+  };
+
+  const handleCurateCreate = async () => {
+    try {
+      if (!curateTitle.trim()) {
+        toast({ title: "Title required", description: "Please provide a title.", variant: "destructive" });
+        return;
       }
-
-      toast({
-        title: errorTitle,
-        description: errorDescription,
-        variant: "destructive",
+      
+      const courseBuilderData = {
+        courseTitle: curateTitle.trim(),
+        courseDescription: curateDesc.trim(),
+      };
+      
+      await axiosConn.post(`${import.meta.env.VITE_API_URL}/courseBuilder`, {
+        userId: userDetail?.userId,
+        orgId: selectedOrganization?.orgId || null,
+        status: "DRAFT",
+        courseBuilderData: courseBuilderData,
       });
-    } finally {
-      setIsLoading(false);
+      
+      fetchCourses();
+      setCurateOpen(false);
+      setCurateTitle("");
+      setCurateDesc("");
+      toast({ 
+        title: "Course created", 
+        description: "Your course draft has been created successfully."
+      });
+    } catch (error) {
+      console.error("Create error:", error);
+      toast({ title: "Failed to create course", description: "Please try again.", variant: "destructive" });
+    }
+  };
+
+  const formatDate = (iso) => {
+    try {
+      const d = new Date(iso);
+      return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    } catch {
+      return iso;
     }
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-5 md:p-4 gap-4">
-      <Card className="bg-white md:col-span-3 mb-0 shadow-lg rounded-lg h-[calc(100svh-4em)] md:h-[calc(100svh-6em)] overflow-y-scroll">
-        <CardHeader>
-          <h2 className="text-2xl font-bold">Bring Your Own Course</h2>
-          <p className="text-muted-foreground mt-2">
-            Enter YouTube video/playlist URLs or any other embeddable URLs.
-            We&apos;ll analyze and build a structured course.
-          </p>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block font-medium mb-2">Course Title *</label>
-              <Input
-                type="text"
-                placeholder="Enter your course title"
-                value={courseTitle}
-                onChange={(e) => setCourseTitle(e.target.value)}
-                className="mb-4"
-                disabled={isLoading}
-                required
-                minLength={3}
-                maxLength={100}
-              />
-              {courseTitle.trim().length > 0 &&
-                courseTitle.trim().length < 3 && (
-                  <p className="text-sm text-yellow-600 mt-1">
-                    Course title should be at least 3 characters long
-                  </p>
-                )}
-            </div>
-            <div>
-              <label className="block font-medium mb-2">
-                Course Description
-              </label>
-              <Textarea
-                placeholder="Enter a brief description of your course (optional)"
-                value={courseDescription}
-                onChange={(e) => setCourseDescription(e.target.value)}
-                className="mb-4 min-h-[100px]"
-                disabled={isLoading}
-                rows={4}
-                maxLength={500}
-              />
-              {courseDescription.length > 0 && (
-                <p className="text-sm text-gray-500 mt-1">
-                  {courseDescription.length}/500 characters
-                </p>
-              )}
-            </div>
-            {/* <div>
-              <label className="block font-medium mb-2">
-        Content URLs (YouTube Videos/Playlists or Other Embeddable URLs) *
-              </label>
-              {urls.map((url, idx) => (
-                <div key={idx} className="flex items-center gap-2 mb-2">
-                  <Input
-                    type="url"
-                    placeholder={`Enter YouTube or embeddable URL #${idx + 1}`}
-                    value={url}
-                    onChange={(e) => handleUrlChange(idx, e.target.value)}
-                    className={`flex-1 ${
-                      url.trim() && !isValidHttpUrl(url.trim()) 
-                        ? 'border-red-300 focus:border-red-500' 
-                        : ''
-                    }`}
-                    disabled={isLoading}
-                  />
-                  {urls.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => removeUrlField(idx)}
-                      disabled={isLoading}
-                    >
-                      &times;
-                    </Button>
-                  )}
-                </div>
-              ))}
+    <div className="p-4 md:p-6 space-y-6">
+      {/* Header Section */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Course Studio</h1>
+          <p className="text-muted-foreground">Create and manage your courses with ease</p>
+        </div>
+        
+        {/* Controls */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          {/* View Mode Toggle and Create Button */}
+          <div className="flex gap-2">
+            <div className="flex border rounded-lg p-1 bg-muted/50">
               <Button
-                type="button"
-                variant="outline"
-                onClick={addUrlField}
-                disabled={isLoading}
-                className="mt-2"
+                size="sm"
+                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                onClick={() => setViewMode('grid')}
+                className="px-3 py-1"
               >
-                Add another URL
+                <Grid3X3 className="h-4 w-4" />
               </Button>
-            </div> */}
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading || !courseTitle.trim()}
-            >
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <Spinner size="sm" decorative />
-                  Analyzing & Building Course...
+              <Button
+                size="sm"
+                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                onClick={() => setViewMode('list')}
+                className="px-3 py-1"
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            {/* Create Course Button */}
+            <Sheet open={curateOpen} onOpenChange={setCurateOpen}>
+              <SheetTrigger asChild>
+                <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Course
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-full sm:max-w-md">
+                <SheetHeader>
+                  <SheetTitle>Create a new course</SheetTitle>
+                  <SheetDescription>Add a title and optional description for your new course.</SheetDescription>
+                </SheetHeader>
+                <div className="mt-6 space-y-4">
+                  <div>
+                    <label htmlFor="create-title" className="block text-sm font-medium mb-1">Title *</label>
+                    <Input
+                      id="create-title"
+                      placeholder="e.g., Mastering React in 7 Days"
+                      value={curateTitle}
+                      onChange={(e) => setCurateTitle(e.target.value)}
+                      minLength={3}
+                      maxLength={100}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="create-desc" className="block text-sm font-medium mb-1">Description</label>
+                    <Textarea
+                      id="create-desc"
+                      placeholder="What will learners achieve? Who is this for? Prerequisites?"
+                      value={curateDesc}
+                      onChange={(e) => setCurateDesc(e.target.value)}
+                      rows={4}
+                      maxLength={500}
+                    />
+                    <div className="text-xs text-muted-foreground mt-1">{curateDesc.length}/500 characters</div>
+                  </div>
                 </div>
-              ) : (
-                "Analyze & Build Course"
-              )}
-            </Button>
-            {isLoading && (
-              <div className="text-center text-sm text-gray-600 mt-2">
-                <div className="flex items-center justify-center gap-2">
-                  <Spinner size="xs" decorative />
-                  This may take a few moments...
-                </div>
+                <SheetFooter className="mt-6">
+                  <SheetClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </SheetClose>
+                  <Button onClick={handleCurateCreate} disabled={!curateTitle.trim()}>Create Course</Button>
+                </SheetFooter>
+              </SheetContent>
+            </Sheet>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="min-h-[400px]">
+        {listLoading ? (
+          <div className="flex items-center justify-center min-h-[400px] w-full">
+            <div className="text-center">
+              <LoaderOne />
+              <p className="mt-4 text-gray-600">Loading your courses...</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Courses Grid/List */}
+            {courses.length === 0 ? (
+              <Card className="border-2 border-dashed border-gray-200">
+                <CardContent className="text-center py-16">
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <BookOpen className="w-10 h-10 text-blue-500" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    Start Creating Courses
+                  </h3>
+                  <p className="text-gray-600 max-w-md mx-auto mb-6">
+                    You haven&apos;t created any courses yet. Click &quot;Create Course&quot; to get started and share your knowledge with the world.
+                  </p>
+                  <Button 
+                    onClick={() => setCurateOpen(true)}
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create Your First Course
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className={`gap-6 ${
+                viewMode === 'grid' 
+                  ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
+                  : 'flex flex-col space-y-4'
+              }`}>
+                {courses.map((course) => (
+                  <Card key={course.courseBuilderId} className={`border-0 shadow-sm hover:shadow-md transition-shadow duration-200 ${
+                    viewMode === 'list' ? 'flex-row p-4' : 'p-4'
+                  }`}>
+                    <CardContent className={`p-0 ${viewMode === 'list' ? 'flex gap-4 items-center' : 'space-y-3'}`}>
+                      {/* Course Image */}
+                      <div className={`${viewMode === 'list' ? 'w-20 h-20' : 'w-full h-40'} relative overflow-hidden rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50`}>
+                        <img 
+                          src={course.courseBuilderData?.courseImageUrl || byoc1} 
+                          alt={course.courseBuilderData?.courseTitle || 'Course'}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-2 right-2">
+                          <span className={`text-xs px-2 py-1 rounded-full border font-medium ${
+                            (course.status || "DRAFT") === "PUBLISHED"
+                              ? "bg-green-50 text-green-700 border-green-200"
+                              : "bg-amber-50 text-amber-700 border-amber-200"
+                          }`}>
+                            {(course.status || "DRAFT").charAt(0).toUpperCase() + (course.status || "DRAFT").slice(1).toLowerCase()}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Course Details */}
+                      <div className={`${viewMode === 'list' ? 'flex-1' : 'space-y-3'}`}>
+                        <div className="space-y-2">
+                          <h3 className="font-semibold text-lg line-clamp-2" title={course.courseBuilderData?.courseTitle || 'Untitled Course'}>
+                            {course.courseBuilderData?.courseTitle || 'Untitled Course'}
+                          </h3>
+                          <p className="text-sm text-gray-600 line-clamp-2">
+                            {course.courseBuilderData?.courseDescription || "No description available"}
+                          </p>
+                        </div>
+                        
+                        <div className="flex items-center text-xs text-muted-foreground space-x-4">
+                          <div className="flex items-center space-x-1">
+                            <Calendar className="h-3 w-3" />
+                            <span>Updated {formatDate(course.course_builder_updated_at)}</span>
+                          </div>
+                        </div>
+                        
+                        {/* Action Buttons */}
+                        <div className="flex gap-2 pt-2">
+                          {(course.status || "DRAFT") === "DRAFT" ? (
+                            <>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                onClick={() => navigate(`/course-builder/${course.courseBuilderId}`)}
+                                className="flex-1"
+                              >
+                                <Edit className="mr-1 h-3 w-3" />
+                                Continue
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                onClick={() => handlePublish(course.courseBuilderId)}
+                                className="flex-1 bg-green-600 hover:bg-green-700"
+                              >
+                                Publish
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                onClick={() => navigate(`/course/${course.publishedCourseId || course.courseBuilderId}`)}
+                                className="flex-1"
+                              >
+                                <Eye className="mr-1 h-3 w-3" />
+                                View
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="secondary" 
+                                onClick={() => handleUnpublish(course.courseBuilderId)}
+                                className="flex-1"
+                              >
+                                Unpublish
+                              </Button>
+                            </>
+                          )}
+                          <Button 
+                            size="sm" 
+                            variant="destructive" 
+                            onClick={() => handleDelete(course.courseBuilderId)}
+                            className="px-3"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             )}
-          </form>
-        </CardContent>
-      </Card>
 
-      <div className="hidden md:block bg-white md:col-span-2 mb-0 md:h-[calc(100svh-6em)] ">
-        <img
-          src={byoc1}
-          alt="Bring Your Own Course"
-          className="w-full md:h-[calc(100svh-6em)] rounded-lg shadow-lg"
-        />
+            {/* Pagination */}
+            {courses.length > 0 && (
+              <Card className="border-0 shadow-sm mt-6">
+                <CardContent className="p-4">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="text-sm text-gray-600">
+                      Showing {offset + 1} to{" "}
+                      {Math.min(offset + limit, totalCount)} of {totalCount}{" "}
+                      course{totalCount !== 1 ? 's' : ''}
+                    </div>
+                    <Pagination className="mr-0 ml-auto w-auto">
+                      <PaginationContent>
+                        <PaginationItem>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={offset === 0}
+                            onClick={() => {
+                              const newOffset = Math.max(offset - limit, 0);
+                              setOffset(newOffset);
+                              setApiQuery((prevQuery) => ({
+                                ...prevQuery,
+                                offset: newOffset,
+                              }));
+                            }}
+                            className="hover:bg-blue-50"
+                          >
+                            <ChevronLeft className="h-4 w-4 mr-1" />
+                            Previous
+                          </Button>
+                        </PaginationItem>
+                        <PaginationItem>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={offset + limit >= totalCount}
+                            onClick={() => {
+                              const newOffset = offset + limit < totalCount ? offset + limit : offset;
+                              setOffset(newOffset);
+                              setApiQuery((prevQuery) => ({
+                                ...prevQuery,
+                                offset: newOffset,
+                              }));
+                            }}
+                            className="hover:bg-blue-50"
+                          >
+                            Next
+                            <ChevronRight className="h-4 w-4 ml-1" />
+                          </Button>
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
