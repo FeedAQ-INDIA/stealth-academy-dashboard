@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/components/hooks/use-toast.js";
-import byoc1 from "@/assets/byoc_1.png";
 import { useOrganizationStore, useAuthStore } from "@/zustland/store";
 import { useNavigate } from "react-router-dom";
 import { LoaderOne } from "@/components/ui/loader.jsx";
@@ -15,11 +14,11 @@ import {
   BookOpen,
   Plus,
   Calendar,
-  Eye,
   Edit,
   Trash2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Loader2
 } from "lucide-react";
 import {
   Pagination,
@@ -36,6 +35,15 @@ import {
   SheetFooter,
   SheetClose,
 } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function Builder() {
   const [listLoading, setListLoading] = useState(true);
@@ -47,6 +55,10 @@ export default function Builder() {
   const [curateTitle, setCurateTitle] = useState("");
   const [curateDesc, setCurateDesc] = useState("");
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const [unpublishDialogOpen, setUnpublishDialogOpen] = useState(false);
+  const [unpublishConfirmation, setUnpublishConfirmation] = useState("");
+  const [selectedCourseForUnpublish, setSelectedCourseForUnpublish] = useState(null);
+  const [unpublishLoading, setUnpublishLoading] = useState(false);
   const navigate = useNavigate();
 
   // selectedOrganization: null means general profile, object means organization selected
@@ -115,26 +127,46 @@ export default function Builder() {
     }
   };
 
-  const handlePublish = async (courseBuilderId) => {
+  const handleConfirmUnpublish = async () => {
+    if (!selectedCourseForUnpublish) return;
+    
+    setUnpublishLoading(true);
     try {
-      await axiosConn.patch(`${import.meta.env.VITE_API_URL}/courseBuilder/${courseBuilderId}/publish`);
-      fetchCourses();
-      toast({ title: "Course published", description: "Your course is now live." });
+      const response = await axiosConn.post(
+        `${import.meta.env.VITE_API_URL}/deleteCourse`,
+        {
+          courseId: selectedCourseForUnpublish.publishedCourseId
+        }
+      );
+      
+      if (response.data.status === 200) {
+        fetchCourses();
+        setUnpublishDialogOpen(false);
+        setUnpublishConfirmation("");
+        setSelectedCourseForUnpublish(null);
+        toast({ 
+          title: "Course deleted successfully", 
+          description: "The course has been permanently removed."
+        });
+      } else {
+        throw new Error(response.data.message || "Course deletion failed");
+      }
     } catch (error) {
-      console.error("Publish error:", error);
-      toast({ title: "Publish failed", description: "Failed to publish course.", variant: "destructive" });
+      console.error("Delete course error:", error);
+      toast({ 
+        title: "Delete failed", 
+        description: error.response?.data?.message || error.message || "Failed to delete course.", 
+        variant: "destructive" 
+      });
+    } finally {
+      setUnpublishLoading(false);
     }
   };
 
-  const handleUnpublish = async (courseBuilderId) => {
-    try {
-      await axiosConn.patch(`${import.meta.env.VITE_API_URL}/courseBuilder/${courseBuilderId}/unpublish`);
-      fetchCourses();
-      toast({ title: "Course moved to drafts", description: "Unpublished successfully." });
-    } catch (error) {
-      console.error("Unpublish error:", error);
-      toast({ title: "Unpublish failed", description: "Failed to unpublish course.", variant: "destructive" });
-    }
+  const handleOpenUnpublishDialog = (course) => {
+    setSelectedCourseForUnpublish(course);
+    setUnpublishDialogOpen(true);
+    setUnpublishConfirmation("");
   };
 
   const handleCurateCreate = async () => {
@@ -306,14 +338,9 @@ export default function Builder() {
                     viewMode === 'list' ? 'flex-row p-4' : 'p-4'
                   }`}>
                     <CardContent className={`p-0 ${viewMode === 'list' ? 'flex gap-4 items-center' : 'space-y-3'}`}>
-                      {/* Course Image */}
-                      <div className={`${viewMode === 'list' ? 'w-20 h-20' : 'w-full h-40'} relative overflow-hidden rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50`}>
-                        <img 
-                          src={course.courseBuilderData?.courseImageUrl || byoc1} 
-                          alt={course.courseBuilderData?.courseTitle || 'Course'}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute top-2 right-2">
+                  
+
+                       <div className="  ">
                           <span className={`text-xs px-2 py-1 rounded-full border font-medium ${
                             (course.status || "DRAFT") === "PUBLISHED"
                               ? "bg-green-50 text-green-700 border-green-200"
@@ -322,8 +349,6 @@ export default function Builder() {
                             {(course.status || "DRAFT").charAt(0).toUpperCase() + (course.status || "DRAFT").slice(1).toLowerCase()}
                           </span>
                         </div>
-                      </div>
-                      
                       {/* Course Details */}
                       <div className={`${viewMode === 'list' ? 'flex-1' : 'space-y-3'}`}>
                         <div className="space-y-2">
@@ -353,14 +378,7 @@ export default function Builder() {
                                 className="flex-1"
                               >
                                 <Edit className="mr-1 h-3 w-3" />
-                                Continue
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                onClick={() => handlePublish(course.courseBuilderId)}
-                                className="flex-1 bg-green-600 hover:bg-green-700"
-                              >
-                                Publish
+                                Edit
                               </Button>
                             </>
                           ) : (
@@ -368,16 +386,16 @@ export default function Builder() {
                               <Button 
                                 size="sm" 
                                 variant="outline" 
-                                onClick={() => navigate(`/course/${course.publishedCourseId || course.courseBuilderId}`)}
+                                onClick={() => navigate(`/course-builder/${course.courseBuilderId}`)}
                                 className="flex-1"
                               >
-                                <Eye className="mr-1 h-3 w-3" />
-                                View
+                                <Edit className="mr-1 h-3 w-3" />
+                                Edit
                               </Button>
                               <Button 
                                 size="sm" 
                                 variant="secondary" 
-                                onClick={() => handleUnpublish(course.courseBuilderId)}
+                                onClick={() => handleOpenUnpublishDialog(course)}
                                 className="flex-1"
                               >
                                 Unpublish
@@ -459,6 +477,62 @@ export default function Builder() {
           </>
         )}
       </div>
+
+      {/* Unpublish Confirmation Dialog */}
+      <Dialog open={unpublishDialogOpen} onOpenChange={setUnpublishDialogOpen}>
+        <DialogContent className="sm:max-w-md rounded-xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-gray-800">
+              Are You Sure You Want To Delete This Course?
+            </DialogTitle>
+            <DialogDescription className="text-gray-600">
+              This action cannot be undone. Type in{" "}
+              <span className="font-semibold text-red-600 italic">
+                &ldquo;{selectedCourseForUnpublish?.courseBuilderData?.courseTitle}&rdquo;
+              </span>{" "}
+              in the input field below and click confirm to permanently delete the course.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center space-y-2">
+            <Input
+              placeholder="Type course title to confirm deletion..."
+              value={unpublishConfirmation}
+              onChange={(e) => setUnpublishConfirmation(e.target.value)}
+              className="rounded-lg"
+            />
+          </div>
+          <DialogFooter className="sm:justify-start gap-2">
+            <DialogClose asChild>
+              <Button
+                type="button"
+                variant="secondary"
+                className="rounded-full"
+              >
+                Cancel
+              </Button>
+            </DialogClose>
+
+            <Button
+              onClick={handleConfirmUnpublish}
+              disabled={
+                unpublishLoading ||
+                selectedCourseForUnpublish?.courseBuilderData?.courseTitle?.trim() !==
+                  unpublishConfirmation?.trim()
+              }
+              className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {unpublishLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Deleting Course...
+                </>
+              ) : (
+                "Delete Course"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
