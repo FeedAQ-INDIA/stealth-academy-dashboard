@@ -167,6 +167,14 @@ function AccountSidebar({ ...props }) {
         ),
         icon: CreditCard,
       },
+            {
+        title: "Study Group",
+        url: `/account-settings/my-study-group`,
+        isActive: location.pathname?.includes(
+          "/account-settings/my-study-group"
+        ),
+        icon: CreditCard,
+      },
     ];
 
     // If general profile is selected (selectedOrganization is null), show register organization option

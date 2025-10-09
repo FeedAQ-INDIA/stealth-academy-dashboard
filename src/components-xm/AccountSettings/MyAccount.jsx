@@ -1,5 +1,4 @@
-import {Card, CardHeader, CardContent, CardTitle} from "@/components/ui/card.jsx";
-import React, {useEffect, useState, useRef, useMemo} from "react";
+import React, {useEffect, useState} from "react";
 import {Button} from "@/components/ui/button.jsx";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.jsx";
 import {Label} from "@/components/ui/label.jsx";
@@ -10,86 +9,153 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.jsx";
 import {useAuthStore} from "@/zustland/store.js";
 import axiosConn from "@/axioscon.js";
-import {toast} from "@/components/hooks/use-toast.js";
+import {useToast} from "@/hooks/use-toast.js";
 import {SidebarTrigger} from "@/components/ui/sidebar.jsx";
 import {Separator} from "@/components/ui/separator.jsx";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
-import {BookOpen, CircleArrowLeft, CircleArrowRight, User, Settings, Shield, CreditCard, Bell, UserCircle, LogOut, ShoppingBag, ChevronLeft, ChevronRight} from "lucide-react";
-import {Link, useLocation, useNavigate} from "react-router-dom";
+import {User, Settings, Loader2, RotateCcw, AlertCircle} from "lucide-react";
+import {Card, CardHeader, CardContent, CardTitle} from "@/components/ui/card.jsx";
+import {Alert, AlertDescription} from "@/components/ui/alert.jsx";
  
-// Custom schema for account settings (simpler than full user profile)
+// Enhanced schema for account settings with better validation
 const createAccountSchema = z.object({
-    firstName: z.string().min(1, "First name is required").min(2, "First name must be at least 2 characters"),
-    lastName: z.string().optional(),
-    number: z.string().min(10, "Phone number must be at least 10 digits").optional(),
+    firstName: z.string()
+        .min(1, "First name is required")
+        .min(2, "First name must be at least 2 characters")
+        .max(50, "First name must not exceed 50 characters")
+        .regex(/^[a-zA-Z\s]+$/, "First name should only contain letters and spaces"),
+    lastName: z.string()
+        .max(50, "Last name must not exceed 50 characters")
+        .regex(/^[a-zA-Z\s]*$/, "Last name should only contain letters and spaces")
+        .optional(),
+    number: z.string()
+        .regex(/^\d{10,15}$/, "Phone number must be 10-15 digits")
+        .optional()
+        .or(z.literal("")),
 });
 
 
 function MyAccount() {
-    const {userDetail, fetchUserDetail} = useAuthStore()
-    const location = useLocation();
-    const navigate = useNavigate();
-    const [hoveredItem, setHoveredItem] = useState(null);
-    const scrollContainerRef = useRef(null);
-    const [showLeftArrow, setShowLeftArrow] = useState(false);
-    const [showRightArrow, setShowRightArrow] = useState(false);
+    const {userDetail, fetchUserDetail, loading: authLoading} = useAuthStore();
+    const { toast } = useToast();
+    
+    // Local state management
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState(null);
+    const [hasChanges, setHasChanges] = useState(false);
 
     const createAccountForm = useForm({
         resolver: zodResolver(createAccountSchema),
         defaultValues: {firstName: "", lastName: "", number: ''},
     });
 
+    // Watch form values to detect changes
+    const watchedValues = createAccountForm.watch();
+    
+    // Check if form has changes compared to original user data
+    useEffect(() => {
+        if (userDetail) {
+            const hasFormChanges = 
+                watchedValues.firstName !== userDetail.firstName ||
+                watchedValues.lastName !== (userDetail.lastName || '') ||
+                watchedValues.number !== (userDetail.number || '');
+            setHasChanges(hasFormChanges);
+        }
+    }, [watchedValues, userDetail]);
+
+    // Initialize form with user data
     useEffect(() => {
         if (userDetail) {
             createAccountForm.reset({
-                firstName: userDetail.firstName,
-                lastName: userDetail.lastName,
+                firstName: userDetail.firstName || '',
+                lastName: userDetail.lastName || '',
                 number: userDetail.number || '',
             });
+            setError(null);
         }
-    }, [userDetail]);
+    }, [userDetail, createAccountForm]);
 
-    // Check scroll position and update arrow visibility
-    const checkScrollPosition = () => {
-        if (scrollContainerRef.current) {
-            const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-            setShowLeftArrow(scrollLeft > 0);
-            setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
+    // Submit handler with improved error handling
+    const onSubmit = async (data) => {
+        if (!hasChanges) {
+            toast({
+                title: "No changes detected",
+                description: "Make some changes before saving.",
+            });
+            return;
+        }
+
+        setIsSubmitting(true);
+        setError(null);
+
+        try {
+            const response = await axiosConn.post(import.meta.env.VITE_API_URL + '/saveUserDetail', {
+                firstName: data.firstName,
+                lastName: data.lastName,
+                number: data.number,
+            });
+
+            // Success handling
+            toast({
+                title: "Profile updated successfully!",
+                description: "Your account information has been saved.",
+            });
+            
+            // Refresh user data
+            await fetchUserDetail();
+            setHasChanges(false);
+            
+        } catch (error) {
+            console.error("Error updating user details:", error);
+            const errorMessage = error.response?.data?.message || "Failed to update profile. Please try again.";
+            
+            setError(errorMessage);
+            toast({
+                title: "Update failed",
+                description: errorMessage,
+                variant: "destructive",
+            });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
- 
-
-    // Check scroll position on mount and resize
-    useEffect(() => {
-        const container = scrollContainerRef.current;
-        if (container) {
-            checkScrollPosition();
-            container.addEventListener('scroll', checkScrollPosition);
-            window.addEventListener('resize', checkScrollPosition);
-            
-            return () => {
-                container.removeEventListener('scroll', checkScrollPosition);
-                window.removeEventListener('resize', checkScrollPosition);
-            };
+    // Reset form to original values
+    const handleReset = () => {
+        if (userDetail) {
+            createAccountForm.reset({
+                firstName: userDetail.firstName || '',
+                lastName: userDetail.lastName || '',
+                number: userDetail.number || '',
+            });
+            setHasChanges(false);
+            setError(null);
         }
-    }, []);
+    };
 
-    function onSubmit(data) {
-        axiosConn.post(import.meta.env.VITE_API_URL + '/saveUserDetail', {
-            firstName: data.firstName,
-            lastName: data.lastName,
-            number: data.number,
-        }).then(res => {
-            toast({
-                title: "User updated successfully!",
-            });
-            fetchUserDetail()
-        }).catch(err => {
-            toast({
-                title: "User updation failed!",
-            });
-        });
+    // Loading state
+    if (authLoading || !userDetail) {
+        return (
+            <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+                <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
+                    <SidebarTrigger className="-ml-1"/>
+                    <Separator orientation="vertical" className="mr-2 h-4"/>
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            <BreadcrumbItem>
+                                <BreadcrumbPage className="truncate max-w-[30ch]">Account Settings</BreadcrumbPage>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
+                </header>
+                <div className="flex items-center justify-center h-96">
+                    <div className="flex flex-col items-center gap-4">
+                        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                        <p className="text-gray-600">Loading your profile...</p>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -149,6 +215,14 @@ function MyAccount() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
+                        {/* Error Alert */}
+                        {error && (
+                            <Alert variant="destructive" className="mb-6">
+                                <AlertCircle className="h-4 w-4" />
+                                <AlertDescription>{error}</AlertDescription>
+                            </Alert>
+                        )}
+
                         <Form {...createAccountForm}>
                             <form
                                 onSubmit={createAccountForm.handleSubmit(onSubmit)}
@@ -161,9 +235,13 @@ function MyAccount() {
                                             name="firstName"
                                             render={({field}) => (
                                                 <FormItem>
-                                                    <FormLabel>First Name</FormLabel>
+                                                    <FormLabel>First Name <span className="text-red-500">*</span></FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="First Name" {...field} />
+                                                        <Input 
+                                                            placeholder="First Name" 
+                                                            {...field} 
+                                                            disabled={isSubmitting}
+                                                        />
                                                     </FormControl>
                                                     <FormMessage/>
                                                 </FormItem>
@@ -178,7 +256,11 @@ function MyAccount() {
                                                 <FormItem>
                                                     <FormLabel>Last Name</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Last Name" {...field} />
+                                                        <Input 
+                                                            placeholder="Last Name" 
+                                                            {...field} 
+                                                            disabled={isSubmitting}
+                                                        />
                                                     </FormControl>
                                                     <FormMessage/>
                                                 </FormItem>
@@ -187,7 +269,14 @@ function MyAccount() {
                                     </div>
                                     <div className="grid w-full items-center gap-1.5">
                                         <Label htmlFor="email">Email</Label>
-                                        <Input type="email" id="email" value={userDetail.email} readOnly className="bg-gray-50"/>
+                                        <Input 
+                                            type="email" 
+                                            id="email" 
+                                            value={userDetail.email} 
+                                            readOnly 
+                                            className="bg-gray-50"
+                                        />
+                                        <p className="text-xs text-gray-500">Email cannot be changed</p>
                                     </div>
                                     <div className="grid w-full items-center gap-1.5">
                                         <FormField
@@ -203,6 +292,7 @@ function MyAccount() {
                                                             placeholder="Phone Number"
                                                             inputMode="numeric"
                                                             pattern="[0-9]*"
+                                                            disabled={isSubmitting}
                                                             onChange={(e) => {
                                                                 const cleaned = e.target.value.replace(/\D/g, "");
                                                                 field.onChange(cleaned);
@@ -217,21 +307,61 @@ function MyAccount() {
                                     </div>
                                     <div className="grid w-full items-center gap-1.5">
                                         <Label htmlFor="language">Language</Label>
-                                        <Input type="text" id="language" value="English" readOnly className="bg-gray-50"/>
+                                        <Input 
+                                            type="text" 
+                                            id="language" 
+                                            value="English" 
+                                            readOnly 
+                                            className="bg-gray-50"
+                                        />
+                                        <p className="text-xs text-gray-500">Language preference cannot be changed</p>
                                     </div>
                                     <div className="grid w-full items-center gap-1.5">
                                         <Label htmlFor="country">Country</Label>
-                                        <Input type="text" id="country" value="India" readOnly className="bg-gray-50"/>
+                                        <Input 
+                                            type="text" 
+                                            id="country" 
+                                            value="India" 
+                                            readOnly 
+                                            className="bg-gray-50"
+                                        />
+                                        <p className="text-xs text-gray-500">Country cannot be changed</p>
                                     </div>
                                 </div>
+                                
                                 <div className="flex gap-4 pt-6">
-                                    <Button onClick={() => createAccountForm.reset()} variant="outline" className="border-gray-300">
+                                    <Button 
+                                        type="button"
+                                        onClick={handleReset} 
+                                        variant="outline" 
+                                        className="border-gray-300"
+                                        disabled={isSubmitting || !hasChanges}
+                                    >
+                                        <RotateCcw className="w-4 h-4 mr-2" />
                                         Reset
                                     </Button>
-                                    <Button type="submit" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                                        Save Changes
+                                    <Button 
+                                        type="submit" 
+                                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                                        disabled={isSubmitting || !hasChanges}
+                                    >
+                                        {isSubmitting ? (
+                                            <>
+                                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                Saving...
+                                            </>
+                                        ) : (
+                                            "Save Changes"
+                                        )}
                                     </Button>
                                 </div>
+                                
+                                {hasChanges && (
+                                    <p className="text-sm text-amber-600 flex items-center gap-2">
+                                        <AlertCircle className="w-4 h-4" />
+                                        You have unsaved changes
+                                    </p>
+                                )}
                             </form>
                         </Form>
                     </CardContent>

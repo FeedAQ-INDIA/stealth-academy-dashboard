@@ -40,12 +40,13 @@ import MyJourneyOverview from "./components-xm/MyJourney/MyJourneyOverview.jsx";
 import CourseCertificate from "./components-xm/Course/CourseCertificate.jsx";
 import CourseNotes from "./components-xm/Course/CourseNotes.jsx";
 import MyAchievement from "./components-xm/MyJourney/MyAchievement.jsx";
-import MyStudyGroup from "./components-xm/MyJourney/MyStudyGroup.jsx";
-import MyLearningSchedule from "./components-xm/AccountSettings/MyLearningSchedule.jsx";
+ import MyLearningSchedule from "./components-xm/AccountSettings/MyLearningSchedule.jsx";
 import MyGoals from "./components-xm/AccountSettings/MyGoals.jsx";
 import CourseEmbedder from "./components-xm/Course/CourseEmbedder.jsx";
 import Builder from "./components-xm/CourseBuilder/Builder.jsx";
 import PreviewBuilder from "./components-xm/CourseBuilder/PreviewBuilder.jsx";
+import MyStudyGroup from "./components-xm/AccountSettings/MyStudyGroup.jsx";
+import StudyGroupDetail from "./components-xm/AccountSettings/StudyGroupDetail.jsx";
 // NOTE: PreviewBuilder & CourseEditorBuilder direct routes removed; they are accessed through Builder component flow.
 
 const router = createBrowserRouter([
@@ -111,6 +112,10 @@ const router = createBrowserRouter([
           {
             path: "/account-settings/my-study-group",
             element: <MyStudyGroup />,
+          },
+          {
+            path: "/account-settings/my-study-group/:groupId",
+            element: <StudyGroupDetail />,
           },
 
           {
@@ -213,10 +218,7 @@ const router = createBrowserRouter([
             element: <MyGoals />,
           },
 
-          {
-            path: "/my-journey/my-study-group",
-            element: <MyStudyGroup />,
-          },
+ 
 
           {
             path: "/my-journey/my-learning-schedule",

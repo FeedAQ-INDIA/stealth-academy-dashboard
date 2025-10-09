@@ -83,7 +83,7 @@ export default function PreviewBuilder() {
       return {
         ...cleanItem,
         courseContentSequence: item.courseContentSequence || idx + 1,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
     });
   };
@@ -116,19 +116,19 @@ export default function PreviewBuilder() {
 
       if (response.data.success) {
         const importedContent = response.data.data.courseContent || [];
-        
+
         // Add imported content to existing course content
         setCourseData((prev) => {
           const existingContent = prev.courseContent || [];
           const startSequence = existingContent.length + 1;
-          
+
           // Update sequence numbers for imported content
           const resequencedImported = importedContent.map((content, index) => ({
             ...content,
             courseContentSequence: startSequence + index,
             courseContentId: `imported_${Date.now()}_${index + 1}`,
           }));
-          
+
           return {
             ...prev,
             courseContent: [...existingContent, ...resequencedImported],
@@ -143,12 +143,13 @@ export default function PreviewBuilder() {
 
         setYoutubeImportDialogOpen(false);
         setYoutubePlaylistUrl("");
-        
+
         // Mark dirty; user can save or publish later
       }
     } catch (error) {
       console.error("YouTube import error:", error);
-      const errorMessage = error.response?.data?.message || "Failed to import YouTube playlist";
+      const errorMessage =
+        error.response?.data?.message || "Failed to import YouTube playlist";
       toast({
         title: "Import Failed",
         description: errorMessage,
@@ -165,7 +166,7 @@ export default function PreviewBuilder() {
   };
 
   const handleAddContent = (newContent) => {
-    console.log(newContent)
+    console.log(newContent);
     const seq = (courseData?.courseContent?.length || 0) + 1;
     if (newContent?.courseContentSequence !== undefined) {
       newContent.courseContentSequence = seq;
@@ -190,7 +191,7 @@ export default function PreviewBuilder() {
   };
 
   const handleEditContent = (updatedContent) => {
-    console.log(updatedContent)
+    console.log(updatedContent);
     setCourseData((prev) => {
       const updatedCourseContent = prev.courseContent.map((content) =>
         content?.courseContentId === updatedContent?.courseContentId
@@ -237,12 +238,11 @@ export default function PreviewBuilder() {
       return { ...prev, courseContent: resequenced };
     });
     setIsDirty(true);
-    
   };
 
   const handleSave = async (options = {}) => {
     const { statusOverride, silent } = options;
-    
+
     if (!CourseBuilderId || !courseData?.courseBuilder?.courseBuilderId) {
       if (!silent) {
         toast({
@@ -256,9 +256,10 @@ export default function PreviewBuilder() {
     setIsLoading(true);
     let didSucceed = false;
     try {
-      const originalBuilderData = courseData.courseBuilder.courseBuilderData || {};
+      const originalBuilderData =
+        courseData.courseBuilder.courseBuilderData || {};
       const cleanedContent = prepareContentForApi(courseData.courseContent);
-      
+
       const payload = {
         courseBuilderId: courseData.courseBuilder.courseBuilderId,
         status: statusOverride || courseData.courseBuilder.status || "DRAFT",
@@ -279,12 +280,18 @@ export default function PreviewBuilder() {
         },
       };
 
-      const response = await axiosConn.post("/createOrUpdateCourseBuilder", payload);
+      const response = await axiosConn.post(
+        "/createOrUpdateCourseBuilder",
+        payload
+      );
 
       if (response.data.success) {
         const updatedData = response.data.data;
         let newStateAfterSave = null;
-        if (statusOverride && statusOverride !== courseData.courseBuilder.status) {
+        if (
+          statusOverride &&
+          statusOverride !== courseData.courseBuilder.status
+        ) {
           newStateAfterSave = {
             ...courseData,
             courseBuilder: { ...courseData.courseBuilder, ...updatedData },
@@ -301,8 +308,12 @@ export default function PreviewBuilder() {
         if (!silent) {
           const isPublish = statusOverride === "PUBLISHED";
           toast({
-            title: isPublish ? "Course published!" : "Course updated successfully!",
-            description: isPublish ? "Your course is now live." : "Your changes have been saved.",
+            title: isPublish
+              ? "Course published!"
+              : "Course updated successfully!",
+            description: isPublish
+              ? "Your course is now live."
+              : "Your changes have been saved.",
           });
         }
       }
@@ -325,7 +336,7 @@ export default function PreviewBuilder() {
 
   const handlePublish = async () => {
     if (isLoading) return;
-    
+
     try {
       // Save unsaved changes silently before publishing
       if (isDirty) {
@@ -340,10 +351,10 @@ export default function PreviewBuilder() {
         }
       }
       const res = await axiosConn.post("/publishCourse", {
-        courseBuilderId: courseData.courseBuilder.courseBuilderId
+        courseBuilderId: courseData.courseBuilder.courseBuilderId,
       });
       if (res.data?.success) {
-         toast({
+        toast({
           title: "Course published!",
           description: "Your course is now live.",
         });
@@ -386,7 +397,8 @@ export default function PreviewBuilder() {
           ? courseBuilderData.courseContent
           : [];
         const normalizedContent = rawContent.sort(
-          (a, b) => (a.courseContentSequence || 0) - (b.courseContentSequence || 0)
+          (a, b) =>
+            (a.courseContentSequence || 0) - (b.courseContentSequence || 0)
         );
 
         const normalizedCourseData = {
@@ -412,11 +424,13 @@ export default function PreviewBuilder() {
           },
         };
 
-  setCourseData(normalizedCourseData);
-  setIsDirty(false);
-  setSavedSnapshot(JSON.parse(JSON.stringify(normalizedCourseData)));
+        setCourseData(normalizedCourseData);
+        setIsDirty(false);
+        setSavedSnapshot(JSON.parse(JSON.stringify(normalizedCourseData)));
       } catch (e) {
-        setError(e?.response?.data?.message || e.message || "Failed to load course");
+        setError(
+          e?.response?.data?.message || e.message || "Failed to load course"
+        );
       } finally {
         setLoading(false);
       }
@@ -463,9 +477,9 @@ export default function PreviewBuilder() {
               <Input
                 value={courseData?.course?.courseTitle || ""}
                 onChange={(e) => {
-                  setCourseData(prev => ({
+                  setCourseData((prev) => ({
                     ...prev,
-                    course: { ...prev.course, courseTitle: e.target.value }
+                    course: { ...prev.course, courseTitle: e.target.value },
                   }));
                   setIsDirty(true);
                 }}
@@ -475,9 +489,12 @@ export default function PreviewBuilder() {
               <Textarea
                 value={courseData?.course?.courseDescription || ""}
                 onChange={(e) => {
-                  setCourseData(prev => ({
+                  setCourseData((prev) => ({
                     ...prev,
-                    course: { ...prev.course, courseDescription: e.target.value }
+                    course: {
+                      ...prev.course,
+                      courseDescription: e.target.value,
+                    },
                   }));
                   setIsDirty(true);
                 }}
@@ -530,7 +547,8 @@ export default function PreviewBuilder() {
                       </span>
                     )}
                     <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600 border border-gray-200">
-                      {courseData?.courseContent?.length || 0} items · {formatDuration(totalDurationSeconds)}
+                      {courseData?.courseContent?.length || 0} items ·{" "}
+                      {formatDuration(totalDurationSeconds)}
                     </span>
                   </div>
                   <p className="text-gray-600 mt-2 group-hover:text-gray-700 transition-colors max-w-3xl">
@@ -542,7 +560,7 @@ export default function PreviewBuilder() {
             </Button>
           )}
         </div>
-        
+
         <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
           <div className="text-xs text-gray-500 order-2 sm:order-1">
             {isLoading ? (
@@ -563,6 +581,7 @@ export default function PreviewBuilder() {
             )}
           </div>
           <div className="flex flex-wrap items-center gap-2 order-1 sm:order-2 justify-end">
+            <Button variant="outline">Get Verified</Button>
             <Button
               variant="outline"
               onClick={() => {
@@ -573,11 +592,13 @@ export default function PreviewBuilder() {
                 setAddContentSheetOpen(false);
                 setEditContentSheetOpen(false);
                 setCurrentEditingContent(null);
-                toast({ title: "Changes discarded", description: "Restored last saved version." });
+                toast({
+                  title: "Changes discarded",
+                  description: "Restored last saved version.",
+                });
               }}
               disabled={isLoading || !isDirty}
-              className="min-w-[90px]"
-            >
+             >
               <RotateCcw className="h-4 w-4 mr-2" />
               Reset
             </Button>
@@ -585,8 +606,7 @@ export default function PreviewBuilder() {
               variant="outline"
               onClick={handleSaveDraft}
               disabled={isLoading || !isDirty}
-              className="min-w-[110px]"
-            >
+             >
               {isLoading ? (
                 <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
               ) : (
@@ -596,8 +616,10 @@ export default function PreviewBuilder() {
             </Button>
             <Button
               onClick={handlePublish}
-              disabled={isLoading || courseData?.courseBuilder?.status === "PUBLISHED"}
-              className={`min-w-[150px] ${
+              disabled={
+                isLoading || courseData?.courseBuilder?.status === "PUBLISHED"
+              }
+              className={` ${
                 courseData?.courseBuilder?.status === "PUBLISHED"
                   ? "bg-green-600 hover:bg-green-600"
                   : "bg-emerald-600 hover:bg-emerald-700"
@@ -629,7 +651,7 @@ export default function PreviewBuilder() {
             disabled={isLoading}
           />
         </div>
-        
+
         <div className="mt-4">
           {!courseData?.courseContent?.length ? (
             <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
@@ -666,7 +688,9 @@ export default function PreviewBuilder() {
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => moveContent(content?.courseContentId, "up")}
+                          onClick={() =>
+                            moveContent(content?.courseContentId, "up")
+                          }
                           disabled={index === 0}
                           className="h-6 w-6 p-0"
                         >
@@ -675,8 +699,12 @@ export default function PreviewBuilder() {
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => moveContent(content?.courseContentId, "down")}
-                          disabled={index === courseData.courseContent.length - 1}
+                          onClick={() =>
+                            moveContent(content?.courseContentId, "down")
+                          }
+                          disabled={
+                            index === courseData.courseContent.length - 1
+                          }
                           className="h-6 w-6 p-0"
                         >
                           <ArrowDown className="h-3 w-3" />
@@ -689,11 +717,17 @@ export default function PreviewBuilder() {
                         {content?.courseContentTitle}
                       </h4>
 
-                      {content.courseContentTypeDetail?.courseVideoDescription && (
+                      {content.courseContentTypeDetail
+                        ?.courseVideoDescription && (
                         <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                          {content.courseContentTypeDetail.courseVideoDescription.length > 300
-                            ? content.courseContentTypeDetail.courseVideoDescription.slice(0, 300) + "…"
-                            : content.courseContentTypeDetail.courseVideoDescription}
+                          {content.courseContentTypeDetail
+                            .courseVideoDescription.length > 300
+                            ? content.courseContentTypeDetail.courseVideoDescription.slice(
+                                0,
+                                300
+                              ) + "…"
+                            : content.courseContentTypeDetail
+                                .courseVideoDescription}
                         </p>
                       )}
 
@@ -738,7 +772,11 @@ export default function PreviewBuilder() {
                         size="sm"
                         variant="ghost"
                         onClick={() => {
-                          if (window.confirm("Are you sure you want to delete this content?")) {
+                          if (
+                            window.confirm(
+                              "Are you sure you want to delete this content?"
+                            )
+                          ) {
                             handleDeleteContent(content?.courseContentId);
                           }
                         }}
@@ -757,21 +795,29 @@ export default function PreviewBuilder() {
 
       {/* Sheets */}
       <Sheet open={addContentSheetOpen} onOpenChange={setAddContentSheetOpen}>
-        <SheetContent side="bottom" className="w-screen h-screen max-w-none py-8 inset-0 border-0">
+        <SheetContent
+          side="bottom"
+          className="w-screen h-screen max-w-none py-8 inset-0 border-0"
+        >
           {selectedContentType && (
             <ContentCreator
               contentType={selectedContentType}
               onAdd={handleAddContent}
               onCancel={handleCancelAddContent}
               isLoading={isLoading}
-              courseContentSequence={(courseData?.courseContent?.length || 0) + 1}
+              courseContentSequence={
+                (courseData?.courseContent?.length || 0) + 1
+              }
             />
           )}
         </SheetContent>
       </Sheet>
 
       <Sheet open={editContentSheetOpen} onOpenChange={setEditContentSheetOpen}>
-        <SheetContent side="bottom" className="w-screen h-screen max-w-none p-8 inset-0 border-0">
+        <SheetContent
+          side="bottom"
+          className="w-screen h-screen max-w-none p-8 inset-0 border-0"
+        >
           {currentEditingContent && (
             <ContentCreator
               contentType={currentEditingContent.courseContentType}
@@ -783,14 +829,19 @@ export default function PreviewBuilder() {
                 setCurrentEditingContent(null);
               }}
               isLoading={isLoading}
-              courseContentSequence={currentEditingContent.courseContentSequence}
+              courseContentSequence={
+                currentEditingContent.courseContentSequence
+              }
             />
           )}
         </SheetContent>
       </Sheet>
 
       {/* YouTube Import Dialog */}
-      <Dialog open={youtubeImportDialogOpen} onOpenChange={setYoutubeImportDialogOpen}>
+      <Dialog
+        open={youtubeImportDialogOpen}
+        onOpenChange={setYoutubeImportDialogOpen}
+      >
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -798,7 +849,8 @@ export default function PreviewBuilder() {
               Import from YouTube Playlist
             </DialogTitle>
             <DialogDescription>
-              Enter a YouTube playlist URL to import all videos as course content.
+              Enter a YouTube playlist URL to import all videos as course
+              content.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -818,7 +870,8 @@ export default function PreviewBuilder() {
                 disabled={importingFromYoutube}
               />
               <p className="text-xs text-gray-500">
-                Example: https://www.youtube.com/playlist?list=PL9ooVrP1hQOFrNo8jK9Yb2g2eMDP7De7j
+                Example:
+                https://www.youtube.com/playlist?list=PL9ooVrP1hQOFrNo8jK9Yb2g2eMDP7De7j
               </p>
             </div>
           </div>
