@@ -216,33 +216,14 @@ export default function Builder() {
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Course Studio</h1>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-wide">Course Curator</h1>
           <p className="text-muted-foreground">Create and manage your courses with ease</p>
         </div>
         
         {/* Controls */}
         <div className="flex flex-col sm:flex-row gap-3">
-          {/* View Mode Toggle and Create Button */}
-          <div className="flex gap-2">
-            <div className="flex border rounded-lg p-1 bg-muted/50">
-              <Button
-                size="sm"
-                variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                onClick={() => setViewMode('grid')}
-                className="px-3 py-1"
-              >
-                <Grid3X3 className="h-4 w-4" />
-              </Button>
-              <Button
-                size="sm"
-                variant={viewMode === 'list' ? 'default' : 'ghost'}
-                onClick={() => setViewMode('list')}
-                className="px-3 py-1"
-              >
-                <List className="h-4 w-4" />
-              </Button>
-            </div>
-            
+ 
+ 
             {/* Create Course Button */}
             <Sheet open={curateOpen} onOpenChange={setCurateOpen}>
               <SheetTrigger asChild>
@@ -290,8 +271,7 @@ export default function Builder() {
                 </SheetFooter>
               </SheetContent>
             </Sheet>
-          </div>
-        </div>
+         </div>
       </div>
 
       {/* Main Content */}
