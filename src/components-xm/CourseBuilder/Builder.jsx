@@ -175,17 +175,12 @@ export default function Builder() {
         toast({ title: "Title required", description: "Please provide a title.", variant: "destructive" });
         return;
       }
+ 
       
-      const courseBuilderData = {
-        courseTitle: curateTitle.trim(),
-        courseDescription: curateDesc.trim(),
-      };
-      
-      await axiosConn.post(`${import.meta.env.VITE_API_URL}/courseBuilder`, {
-        userId: userDetail?.userId,
-        orgId: selectedOrganization?.orgId || null,
-        status: "DRAFT",
-        courseBuilderData: courseBuilderData,
+      await axiosConn.post(`${import.meta.env.VITE_API_URL}/registerBuilder`, {
+         orgId: selectedOrganization?.orgId || null,
+title: curateTitle.trim(),
+        description: curateDesc.trim(),
       });
       
       fetchCourses();
