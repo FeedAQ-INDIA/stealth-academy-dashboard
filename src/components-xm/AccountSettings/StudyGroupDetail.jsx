@@ -492,7 +492,7 @@ const StudyGroupDetail = () => {
                 <p className="text-blue-100 text-lg leading-relaxed mb-4">
                   {studyGroup.description || "No description provided"}
                 </p>
-                <div className="flex items-center gap-6 text-sm text-blue-100">
+                <div className="flex items-center gap-4 text-sm text-blue-100">
                   <span className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
                     Created{" "}

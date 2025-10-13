@@ -236,52 +236,54 @@ function AccountSidebar({ ...props }) {
                 <h2 className="text-lg font-medium text-center">MY ACCOUNT</h2>
 
             </SidebarHeader> */}
-        {/* Profile Selector */}
-        <div className="px-3 py-3 border-b">
-          <div className="mb-2">
-            <span className="text-sm font-medium text-muted-foreground">Profile</span>
-          </div>
-          <Select 
-            value={selectedOrganization === null ? "GENERAL" : selectedOrganization.orgId?.toString()} 
-            onValueChange={(profileId) => {
-              console.log("Profile changed to:", profileId);
-              if (profileId === "GENERAL") {
-                setSelectedOrganization(null);
-              } else {
-                const org = organizations.find(org => org.orgId?.toString() === profileId);
-                setSelectedOrganization(org || null);
-              }
-            }}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Profile" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="GENERAL">GENERAL</SelectItem>
-              {organizations && organizations.length > 0 && organizations.map((org) => {
-                // Add more robust validation
-                if (!org || !org.orgId || !org.orgName) {
-                  console.warn("Invalid organization data:", org);
-                  return null;
+        {/* Profile Selector - Only show if user has organizations */}
+        {!organizationsLoading && organizations && organizations.length > 0 && (
+          <div className="px-3 py-3 border-b">
+            <div className="mb-2">
+              <span className="text-sm font-medium text-muted-foreground">Profile</span>
+            </div>
+            <Select 
+              value={selectedOrganization === null ? "GENERAL" : selectedOrganization.orgId?.toString()} 
+              onValueChange={(profileId) => {
+                console.log("Profile changed to:", profileId);
+                if (profileId === "GENERAL") {
+                  setSelectedOrganization(null);
+                } else {
+                  const org = organizations.find(org => org.orgId?.toString() === profileId);
+                  setSelectedOrganization(org || null);
                 }
-                
-                return (
-                  <SelectItem 
-                    key={`org-${org.orgId}`} 
-                    value={org.orgId.toString()}
-                  >
-                    {org.orgName}
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Profile" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="GENERAL">GENERAL</SelectItem>
+                {organizations.map((org) => {
+                  // Add more robust validation
+                  if (!org || !org.orgId || !org.orgName) {
+                    console.warn("Invalid organization data:", org);
+                    return null;
+                  }
+                  
+                  return (
+                    <SelectItem 
+                      key={`org-${org.orgId}`} 
+                      value={org.orgId.toString()}
+                    >
+                      {org.orgName}
+                    </SelectItem>
+                  );
+                }).filter(Boolean)}
+                {organizationsError && (
+                  <SelectItem disabled value="error">
+                    Error: {organizationsError}
                   </SelectItem>
-                );
-              }).filter(Boolean)}
-              {organizationsError && (
-                <SelectItem disabled value="error">
-                  Error: {organizationsError}
-                </SelectItem>
-              )}
-            </SelectContent>
-          </Select>
-        </div>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         {/* <Separator/> */}
         <SidebarContent>
           {data.navMain.map((item) => (

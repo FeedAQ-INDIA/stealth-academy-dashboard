@@ -528,7 +528,7 @@ function FullScreenView({
                         </div>
                       ) : (
                         <iframe
-                          src={"https://ocpj21.javastudyguide.com"}
+                          src={courseVideoDetail?.courseWrittenEmbedUrl}
                           title={
                             courseVideoDetail?.courseWrittenTitle ||
                             "Course Content"

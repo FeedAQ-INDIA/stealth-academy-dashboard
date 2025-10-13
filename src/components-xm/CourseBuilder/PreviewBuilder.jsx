@@ -507,11 +507,10 @@ export default function PreviewBuilder() {
                   size="sm"
                   onClick={() => {
                     setEditingCourseInfo(false);
-                    handleSave();
                   }}
                 >
                   <Save className="h-4 w-4 mr-1" />
-                  Save
+                  Done
                 </Button>
                 <Button
                   size="sm"
