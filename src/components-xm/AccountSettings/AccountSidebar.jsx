@@ -123,12 +123,12 @@ function AccountSidebar({ ...props }) {
       );
     } else {
       // No organizations found
-      items.push({
-        title: "No organizations found",
-        url: `/account-settings/register-organization`,
-        isActive: false,
-        icon: Building,
-      });
+      // items.push({
+      //   title: "No organizations found",
+      //   url: `/account-settings/register-organization`,
+      //   isActive: false,
+      //   icon: Building,
+      // });
     }
 
     return items;
@@ -179,12 +179,12 @@ function AccountSidebar({ ...props }) {
 
     // If general profile is selected (selectedOrganization is null), show register organization option
     if (selectedOrganization === null) {
-      accountItems.push({
-        title: "Register Organization",
-        url: `/account-settings/register-organization`,
-        isActive: location.pathname === "/account-settings/register-organization",
-        icon: Building,
-      });
+      // accountItems.push({
+      //   title: "Register Organization",
+      //   url: `/account-settings/register-organization`,
+      //   isActive: location.pathname === "/account-settings/register-organization",
+      //   icon: Building,
+      // });
     }
 
     return accountItems;

@@ -58,7 +58,7 @@ function SignInPage() {
           href="/"
           style={{ fontFamily: "Anta" }}
         >
-          STEALTH
+          HUSKITE
         </a>                     </CardTitle>
                     </CardHeader>
 

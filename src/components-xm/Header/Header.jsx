@@ -20,6 +20,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card.jsx";
+import logo from "../../assets/LOGO-4.png";
 
 export default function Header() {
   const { userDetail } = useAuthStore();
@@ -70,13 +71,15 @@ export default function Header() {
             </DialogContent>
           </Dialog>
         </div>
+
+          
         {/* Logo */}
         <a
           className="text-2xl sm:text-3xl font-medium text-black"
           href="/"
           style={{ fontFamily: "Anta" }}
         >
-          STEALTH
+          HUSKITE
         </a>
       </div>
 

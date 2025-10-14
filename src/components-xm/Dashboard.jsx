@@ -206,7 +206,7 @@ export function Dashboard() {
   
   return (
     <div className="p-4">
-      <Card className="mb-4 border-0 shadow-lg bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700  ">
+      <Card className="mb-4 border-0 shadow-lg bg-gradient-to-r from-sky-400 via-sky-400 to-sky-500  ">
         <CardHeader className="p-6">
           <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full lg:w-auto">
