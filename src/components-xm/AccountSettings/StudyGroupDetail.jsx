@@ -480,7 +480,7 @@ const StudyGroupDetail = () => {
 
       <div className="p-4 mx-auto max-w-7xl">
         {/* Study Group Header */}
-        <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 text-white shadow-2xl mb-6">
+        <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700  rounded-2xl text-white shadow-2xl mb-6">
           <CardHeader className="pb-4">
             <div className="flex items-start justify-between">
               <div className="flex-1">

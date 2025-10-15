@@ -34,6 +34,13 @@ import {
   Calendar,
   Edit3,
   Trash2,
+  Paperclip,
+  Download,
+  Volume2,
+  File,
+  Image,
+  Video,
+  Archive,
 } from "lucide-react";
 import { Button } from "@/components/ui/button.jsx";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -109,6 +116,25 @@ function NotesCard({ a, index, fetchCourseNotes }) {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
+  };
+
+  // Helper function to get file icon based on mime type
+  const getFileIcon = (mimeType) => {
+    if (mimeType.startsWith('image/')) return Image;
+    if (mimeType.startsWith('audio/')) return Volume2;
+    if (mimeType.startsWith('video/')) return Video;
+    if (mimeType.includes('pdf')) return FileText;
+    if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('7z')) return Archive;
+    return File;
+  };
+
+  // Helper function to format file size
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   };
 
   const editNotesSchema = z.object({
@@ -204,6 +230,50 @@ function NotesCard({ a, index, fetchCourseNotes }) {
                 </p>
               </div>
             </div>
+
+            {/* File Attachments */}
+            {a?.metadata?.attachments && a.metadata.attachments.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-gray-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <Paperclip className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm font-medium text-gray-700">
+                    Attachments ({a.metadata.attachments.length})
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {a.metadata.attachments.map((file, fileIndex) => {
+                    const FileIcon = getFileIcon(file.mimeType);
+                    return (
+                      <div
+                        key={fileIndex}
+                        className="flex items-center justify-between p-2 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
+                      >
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <FileIcon className="h-4 w-4 text-gray-600 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {file.originalName}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {formatFileSize(file.fileSize)}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 hover:bg-gray-200"
+                          onClick={() => window.open(file.fileUrl, '_blank')}
+                          title="Download or view file"
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
           </CardHeader>
   

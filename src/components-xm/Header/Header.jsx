@@ -1,30 +1,20 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Dice5, Globe, Grip, Menu, Presentation, Video } from "lucide-react";
-import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
+import { Globe, Grip, Menu, Presentation } from "lucide-react";
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import NavigationMenuDemo from "./nav-menu.jsx";
 import { useAuthStore } from "@/zustland/store.js";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar.jsx";
 import React, { useEffect } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
   Card,
-  CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card.jsx";
-import logo from "../../assets/LOGO-4.png";
 
 export default function Header() {
   const { userDetail } = useAuthStore();
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [isSheetOpen, setIsSheetOpen] = React.useState(false);
 
   useEffect(() => {
     console.log("Header compoenent mounted", userDetail);
@@ -35,15 +25,15 @@ export default function Header() {
     <header className="flex h-14 items-center justify-between bg-white px-4 shadow-md border-b">
       <div className="flex gap-2 items-center">
         <div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger className="p-2 hover:bg-muted hover:cursor-pointer rounded-md">
+          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+            <SheetTrigger className="p-2 hover:bg-muted hover:cursor-pointer rounded-md">
               <Grip size={25} />
-            </DialogTrigger>
-            <DialogContent className=" min-h-fit max-h-screen">
-              <DialogHeader>
-                <DialogTitle className="mb-4">Switch Apps</DialogTitle>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 ">
-                  <Link to="/" onClick={() => setIsDialogOpen(false)}>
+            </SheetTrigger>
+            <SheetContent side="left" className="min-h-fit max-h-screen">
+              <SheetHeader>
+                <SheetTitle className="mb-4">Switch Apps</SheetTitle>
+                <div className="grid grid-cols-1 gap-4 ">
+                  <Link to="/" onClick={() => setIsSheetOpen(false)}>
                     <Card className="bg-blue-500  hover:bg-indigo-600 cursor-pointer">
                       <CardHeader className="flex flex-col items-center">
                         <Presentation size={42} className="text-white" />
@@ -55,7 +45,7 @@ export default function Header() {
                   </Link>
                   <Link
                     to="/lang-studio"
-                    onClick={() => setIsDialogOpen(false)}
+                    onClick={() => setIsSheetOpen(false)}
                   >
                     <Card className="bg-green-500 hover:bg-emerald-600  cursor-pointer">
                       <CardHeader className="flex flex-col items-center">
@@ -67,9 +57,9 @@ export default function Header() {
                     </Card>
                   </Link>
                 </div>
-              </DialogHeader>
-            </DialogContent>
-          </Dialog>
+              </SheetHeader>
+            </SheetContent>
+          </Sheet>
         </div>
 
           

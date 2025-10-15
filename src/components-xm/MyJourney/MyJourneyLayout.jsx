@@ -202,7 +202,7 @@ export function MyLearningLayout() {
         <div className="  mx-auto space-y-4">
           {/* Hero Section with Enhanced Gradient */}
           <div className="relative overflow-hidden">
-            <Card className="  border-0 shadow-lg   bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700   ">
+            <Card className="  border-0 shadow-lg   bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700  rounded-2xl   ">
               <CardHeader className="">
                 {/* <div className="flex items-center justify-center mb-2">
                                                    <Sparkles className="w-6 h-6 text-yellow-300 animate-float" />

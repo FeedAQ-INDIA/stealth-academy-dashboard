@@ -32,6 +32,7 @@ function CreateNotesModule({
   handleGetCurrentTime = null,
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingFiles, setIsUploadingFiles] = useState(false);
   
 
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -110,22 +111,66 @@ function CreateNotesModule({
   const onFilesSelected = (e) => {
     const list = Array.from(e.target.files || []);
     if (list.length === 0) return;
-    // Optional: size limit per file (25MB)
+    
+    // File size limit (25MB to match backend's 50MB but be safer for multiple files)
     const MAX_SIZE = 25 * 1024 * 1024;
+    
+    // Allowed file types (matching backend)
+    const allowedMimeTypes = [
+      // Images
+      'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+      // Documents
+      'application/pdf', 'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'text/plain', 'text/csv',
+      // Audio
+      'audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/ogg', 'audio/webm',
+      // Video
+      'video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-msvideo', 'video/webm',
+      // Archives
+      'application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed',
+      // JSON
+      'application/json'
+    ];
+
     const valid = [];
+    const invalid = [];
+    
     for (const f of list) {
       if (f.size > MAX_SIZE) {
-        toast({
-          title: "File too large",
-          description: `${f.name} exceeds 25MB and was skipped`,
-          variant: "destructive",
-        });
+        invalid.push(`${f.name} exceeds 25MB`);
+      } else if (!allowedMimeTypes.includes(f.type)) {
+        invalid.push(`${f.name} is not a supported file type`);
       } else {
         valid.push(f);
       }
     }
-    if (valid.length) setAttachments((prev) => [...prev, ...valid]);
-    // reset the input so selecting the same file again triggers change
+    
+    // Show errors for invalid files
+    if (invalid.length > 0) {
+      toast({
+        title: "File Validation Error",
+        description: invalid.slice(0, 3).join(", ") + (invalid.length > 3 ? "..." : ""),
+        variant: "destructive",
+      });
+    }
+    
+    // Add valid files
+    if (valid.length > 0) {
+      setAttachments((prev) => [...prev, ...valid]);
+      if (valid.length !== list.length) {
+        toast({
+          title: "Partial Upload",
+          description: `${valid.length} of ${list.length} files were added successfully.`,
+        });
+      }
+    }
+    
+    // Reset the input so selecting the same file again triggers change
     e.target.value = "";
   };
 
@@ -229,43 +274,64 @@ function CreateNotesModule({
     setIsSubmitting(true);
     try {
       const hasFiles = attachments.length > 0 || !!recordedBlob;
-      let response;
+      
       if (hasFiles) {
-        const form = new FormData();
-        form.append("courseId", courseId);
-        form.append("courseContentId", courseContentId);
-        form.append("noteContent", data.noteContent || "");
-        form.append(
-          "noteRefTimestamp",
-          handleGetCurrentTime !== null ? String(handleGetCurrentTime()) : ""
-        );
-        // add attachments
-        attachments.forEach((f) => form.append("attachments", f));
-        if (recordedBlob) {
-              const ext = supportedAudioRef.current.ext || "webm";
-              const mime = recordedBlob.type || "audio/webm";
-              const recordedFile = new File([recordedBlob], `note-audio.${ext}`, {
-                type: mime,
-              });
-              form.append("audio", recordedFile);
-            }
-        response = await axiosConn.post(
-          import.meta.env.VITE_API_URL + "/saveNote",
-          form,
-          { headers: { "Content-Type": "multipart/form-data" } }
-        );
-      } else {
-        response = await axiosConn.post(
-          import.meta.env.VITE_API_URL + "/saveNote",
-          {
-            courseId,
-            courseContentId,
-            noteContent: data.noteContent,
-            noteRefTimestamp:
-              handleGetCurrentTime !== null ? handleGetCurrentTime() : null,
-          }
-        );
+        setIsUploadingFiles(true);
       }
+
+      // Prepare FormData for the saveNote API that handles files directly
+      const formData = new FormData();
+      
+      // Add note data
+      formData.append("courseId", courseId.toString());
+      formData.append("courseContentId", courseContentId.toString());
+      formData.append("noteContent", data.noteContent);
+      
+      if (handleGetCurrentTime !== null) {
+        const timestamp = handleGetCurrentTime();
+        if (timestamp !== null) {
+          formData.append("noteRefTimestamp", timestamp.toString());
+        }
+      }
+
+      // Add files directly to FormData
+      if (hasFiles) {
+        const filesToUpload = [...attachments];
+        
+        // Add recorded audio as a file if it exists
+        if (recordedBlob) {
+          const ext = supportedAudioRef.current.ext || "webm";
+          const mime = recordedBlob.type || "audio/webm";
+          const recordedFile = new File([recordedBlob], `note-audio.${ext}`, {
+            type: mime,
+          });
+          filesToUpload.push(recordedFile);
+        }
+
+        // Append each file to FormData
+        filesToUpload.forEach((file) => {
+          formData.append("files", file);
+        });
+
+        // Add metadata as JSON string
+        const metadata = {
+          totalFiles: filesToUpload.length,
+          hasAudio: filesToUpload.some(file => file.type.startsWith('audio/')),
+          hasFiles: filesToUpload.some(file => !file.type.startsWith('audio/'))
+        };
+        formData.append("metadata", JSON.stringify(metadata));
+      }
+
+      // Send the request to saveNote API with files
+      const response = await axiosConn.post(
+        import.meta.env.VITE_API_URL + "/saveNote",
+        formData,
+        { 
+          headers: { 
+            "Content-Type": "multipart/form-data" 
+          } 
+        }
+      );
 
       console.log(response.data);
       toast({
@@ -279,14 +345,15 @@ function CreateNotesModule({
       clearRecording();
       handleNotesSave();
     } catch (err) {
-      console.log(err);
+      console.error("Save note error:", err);
       toast({
         title: "Error Saving Notes",
-        description: "Please try again later.",
+        description: err.response?.data?.message || "Please try again later.",
         variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
+      setIsUploadingFiles(false);
     }
   }
 
@@ -393,6 +460,7 @@ function CreateNotesModule({
                 ref={fileInputRef}
                 type="file"
                 multiple
+                accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,audio/*,video/*,.zip,.rar,.7z,.json"
                 className="hidden"
                 onChange={onFilesSelected}
               />
@@ -455,7 +523,7 @@ function CreateNotesModule({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-                    Saving
+                    {isUploadingFiles ? "Uploading..." : "Saving..."}
                   </>
                 ) : (
                   <>

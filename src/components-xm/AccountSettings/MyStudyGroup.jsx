@@ -261,7 +261,7 @@ const MyStudyGroup = () => {
 
       <div className="p-4 mx-auto">
         {/* Header Card */}
-        <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 text-white shadow-2xl mb-6">
+        <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700  rounded-2xl text-white shadow-2xl mb-6">
           <CardHeader>
             <CardTitle className="text-center text-2xl sm:text-3xl font-bold tracking-wide flex items-center justify-center gap-3">
               <Users className="w-8 h-8" />

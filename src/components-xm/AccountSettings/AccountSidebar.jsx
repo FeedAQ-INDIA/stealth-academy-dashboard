@@ -153,28 +153,28 @@ function AccountSidebar({ ...props }) {
         ),
         icon: CreditCard,
       },
-      {
-        title: "My Goals",
-        url: `/account-settings/my-goals`,
-        isActive: location.pathname?.includes("/account-settings/my-goals"),
-        icon: CreditCard,
-      },
-      {
-        title: "My Learning Schedule",
-        url: `/account-settings/my-learning-schedule`,
-        isActive: location.pathname?.includes(
-          "/account-settings/my-learning-schedule"
-        ),
-        icon: CreditCard,
-      },
-            {
-        title: "Study Group",
-        url: `/account-settings/my-study-group`,
-        isActive: location.pathname?.includes(
-          "/account-settings/my-study-group"
-        ),
-        icon: CreditCard,
-      },
+      // {
+      //   title: "My Goals",
+      //   url: `/account-settings/my-goals`,
+      //   isActive: location.pathname?.includes("/account-settings/my-goals"),
+      //   icon: CreditCard,
+      // },
+      // {
+      //   title: "My Learning Schedule",
+      //   url: `/account-settings/my-learning-schedule`,
+      //   isActive: location.pathname?.includes(
+      //     "/account-settings/my-learning-schedule"
+      //   ),
+      //   icon: CreditCard,
+      // },
+      //       {
+      //   title: "Study Group",
+      //   url: `/account-settings/my-study-group`,
+      //   isActive: location.pathname?.includes(
+      //     "/account-settings/my-study-group"
+      //   ),
+      //   icon: CreditCard,
+      // },
     ];
 
     // If general profile is selected (selectedOrganization is null), show register organization option
