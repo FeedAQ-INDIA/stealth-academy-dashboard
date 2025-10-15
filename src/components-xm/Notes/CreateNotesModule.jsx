@@ -22,6 +22,11 @@ import {
   Mic,
   Square,
   X,
+  Image,
+  Volume2,
+  Video,
+  File,
+  Paperclip,
 } from "lucide-react";
 import PropTypes from "prop-types";
 
@@ -37,10 +42,10 @@ function CreateNotesModule({
 
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [attachments, setAttachments] = useState([]); // File[]
-  const [recordedBlob, setRecordedBlob] = useState(null); // Blob | null
-  const [audioUrl, setAudioUrl] = useState("");
+  const [recordedAudios, setRecordedAudios] = useState([]); // Array of {id, blob, url, name}
   const [isRecording, setIsRecording] = useState(false);
   const [isRequestingMic, setIsRequestingMic] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const supportedAudioRef = useRef({ mime: "", ext: "webm" });
@@ -88,13 +93,15 @@ function CreateNotesModule({
   // Derive unsaved changes from all inputs
   useEffect(() => {
     const hasText = (watchedNotesText || "").trim().length > 0;
-    setHasUnsavedChanges(hasText || attachments.length > 0 || !!recordedBlob);
-  }, [watchedNotesText, attachments, recordedBlob]);
+    setHasUnsavedChanges(hasText || attachments.length > 0 || recordedAudios.length > 0);
+  }, [watchedNotesText, attachments, recordedAudios]);
 
-  // Cleanup audio URL on unmount
+  // Cleanup audio URLs on unmount
   useEffect(() => {
     return () => {
-      if (audioUrl) URL.revokeObjectURL(audioUrl);
+      recordedAudios.forEach(audio => {
+        if (audio.url) URL.revokeObjectURL(audio.url);
+      });
       if (
         mediaRecorderRef.current &&
         mediaRecorderRef.current.state !== "inactive"
@@ -102,20 +109,17 @@ function CreateNotesModule({
         mediaRecorderRef.current.stop();
       }
     };
-  }, [audioUrl]);
+  }, [recordedAudios]);
 
   const pickFiles = () => {
     fileInputRef.current?.click();
   };
 
-  const onFilesSelected = (e) => {
-    const list = Array.from(e.target.files || []);
-    if (list.length === 0) return;
+  // Enhanced file validation with better user feedback
+  const validateFiles = (files) => {
+    const MAX_SIZE = 25 * 1024 * 1024; // 25MB
+    const MAX_TOTAL_FILES = 10; // Limit total files per note
     
-    // File size limit (25MB to match backend's 50MB but be safer for multiple files)
-    const MAX_SIZE = 25 * 1024 * 1024;
-    
-    // Allowed file types (matching backend)
     const allowedMimeTypes = [
       // Images
       'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
@@ -137,24 +141,63 @@ function CreateNotesModule({
       'application/json'
     ];
 
+    const currentFileCount = attachments.length;
     const valid = [];
-    const invalid = [];
+    const errors = [];
     
-    for (const f of list) {
-      if (f.size > MAX_SIZE) {
-        invalid.push(`${f.name} exceeds 25MB`);
-      } else if (!allowedMimeTypes.includes(f.type)) {
-        invalid.push(`${f.name} is not a supported file type`);
+    // Check total file limit
+    if (currentFileCount + files.length > MAX_TOTAL_FILES) {
+      errors.push(`Cannot add more than ${MAX_TOTAL_FILES} files per note. You currently have ${currentFileCount} files.`);
+      return { valid: [], errors };
+    }
+    
+    for (const file of files) {
+      if (file.size > MAX_SIZE) {
+        errors.push(`${file.name} exceeds 25MB limit`);
+      } else if (!allowedMimeTypes.includes(file.type)) {
+        errors.push(`${file.name} is not a supported file type`);
+      } else if (attachments.some(existing => existing.name === file.name && existing.size === file.size)) {
+        errors.push(`${file.name} is already attached`);
       } else {
-        valid.push(f);
+        valid.push(file);
       }
     }
     
+    return { valid, errors };
+  };
+
+  // Handle drag and drop
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFilesValidation(Array.from(e.dataTransfer.files));
+    }
+  };
+
+  // Unified file validation handler
+  const handleFilesValidation = (files) => {
+    if (files.length === 0) return;
+    
+    const { valid, errors } = validateFiles(files);
+    
     // Show errors for invalid files
-    if (invalid.length > 0) {
+    if (errors.length > 0) {
       toast({
         title: "File Validation Error",
-        description: invalid.slice(0, 3).join(", ") + (invalid.length > 3 ? "..." : ""),
+        description: errors.slice(0, 3).join(", ") + (errors.length > 3 ? `... and ${errors.length - 3} more issues` : ""),
         variant: "destructive",
       });
     }
@@ -162,20 +205,34 @@ function CreateNotesModule({
     // Add valid files
     if (valid.length > 0) {
       setAttachments((prev) => [...prev, ...valid]);
-      if (valid.length !== list.length) {
+      if (valid.length !== files.length) {
         toast({
           title: "Partial Upload",
-          description: `${valid.length} of ${list.length} files were added successfully.`,
+          description: `${valid.length} of ${files.length} files were added successfully.`,
+        });
+      } else {
+        toast({
+          title: "Files Added",
+          description: `${valid.length} file${valid.length > 1 ? 's' : ''} added successfully.`,
         });
       }
     }
-    
+  };
+
+  const onFilesSelected = (e) => {
+    const files = Array.from(e.target.files || []);
+    handleFilesValidation(files);
     // Reset the input so selecting the same file again triggers change
     e.target.value = "";
   };
 
   const removeAttachment = (idx) => {
+    const fileName = attachments[idx]?.name;
     setAttachments((prev) => prev.filter((_, i) => i !== idx));
+    toast({
+      title: "File Removed",
+      description: `${fileName} has been removed from attachments.`,
+    });
   };
 
   const startRecording = async () => {
@@ -217,12 +274,20 @@ function CreateNotesModule({
       mr.onstop = () => {
         const type = supportedAudioRef.current.mime || (mr.mimeType || "audio/webm");
         const blob = new Blob(chunks, { type });
-        setRecordedBlob(blob);
         const url = URL.createObjectURL(blob);
-        setAudioUrl((prev) => {
-          if (prev) URL.revokeObjectURL(prev);
-          return url;
-        });
+        const ext = supportedAudioRef.current.ext || "webm";
+        const audioId = Date.now().toString();
+        const audioName = `Voice Note ${new Date().toLocaleTimeString()}`;
+        
+        setRecordedAudios(prev => [...prev, {
+          id: audioId,
+          blob,
+          url,
+          name: audioName,
+          extension: ext,
+          type
+        }]);
+        
         // stop tracks
         stream.getTracks().forEach((t) => t.stop());
       };
@@ -263,17 +328,28 @@ function CreateNotesModule({
   };
 
   const clearRecording = () => {
-    setRecordedBlob(null);
-    if (audioUrl) {
-      URL.revokeObjectURL(audioUrl);
-      setAudioUrl("");
-    }
+    recordedAudios.forEach(audio => {
+      if (audio.url) {
+        URL.revokeObjectURL(audio.url);
+      }
+    });
+    setRecordedAudios([]);
+  };
+
+  const removeRecordedAudio = (audioId) => {
+    setRecordedAudios(prev => {
+      const audioToRemove = prev.find(audio => audio.id === audioId);
+      if (audioToRemove && audioToRemove.url) {
+        URL.revokeObjectURL(audioToRemove.url);
+      }
+      return prev.filter(audio => audio.id !== audioId);
+    });
   };
 
   async function onSubmit(data) {
     setIsSubmitting(true);
     try {
-      const hasFiles = attachments.length > 0 || !!recordedBlob;
+      const hasFiles = attachments.length > 0 || recordedAudios.length > 0;
       
       if (hasFiles) {
         setIsUploadingFiles(true);
@@ -298,15 +374,23 @@ function CreateNotesModule({
       if (hasFiles) {
         const filesToUpload = [...attachments];
         
-        // Add recorded audio as a file if it exists
-        if (recordedBlob) {
-          const ext = supportedAudioRef.current.ext || "webm";
-          const mime = recordedBlob.type || "audio/webm";
-          const recordedFile = new File([recordedBlob], `note-audio.${ext}`, {
-            type: mime,
-          });
+        // Add recorded audios as files
+        recordedAudios.forEach((audio) => {
+          // Create a File object with fallback for compatibility
+          let recordedFile;
+          try {
+            recordedFile = new File([audio.blob], `${audio.name}.${audio.extension}`, {
+              type: audio.type,
+              lastModified: Date.now()
+            });
+          } catch {
+            // Fallback: use the blob directly with a name property
+            recordedFile = audio.blob;
+            recordedFile.name = `${audio.name}.${audio.extension}`;
+            recordedFile.lastModified = Date.now();
+          }
           filesToUpload.push(recordedFile);
-        }
+        });
 
         // Append each file to FormData
         filesToUpload.forEach((file) => {
@@ -317,7 +401,8 @@ function CreateNotesModule({
         const metadata = {
           totalFiles: filesToUpload.length,
           hasAudio: filesToUpload.some(file => file.type.startsWith('audio/')),
-          hasFiles: filesToUpload.some(file => !file.type.startsWith('audio/'))
+          hasFiles: filesToUpload.some(file => !file.type.startsWith('audio/')),
+          recordedAudiosCount: recordedAudios.length
         };
         formData.append("metadata", JSON.stringify(metadata));
       }
@@ -334,16 +419,21 @@ function CreateNotesModule({
       );
 
       console.log(response.data);
-      toast({
-        title: "Notes Saved Successfully",
-        description: "Your notes have been saved and are now available.",
-      });
-
-      createNotesForm.reset();
-      setHasUnsavedChanges(false);
-      setAttachments([]);
-      clearRecording();
-      handleNotesSave();
+      
+      if (response.data.success) {
+        toast({
+          title: "Notes Saved Successfully",
+          description: response.data.message || "Your notes have been saved and are now available.",
+        });
+        
+        createNotesForm.reset();
+        setHasUnsavedChanges(false);
+        setAttachments([]);
+        clearRecording();
+        handleNotesSave();
+      } else {
+        throw new Error(response.data.message || "Failed to save notes");
+      }
     } catch (err) {
       console.error("Save note error:", err);
       toast({
@@ -381,8 +471,20 @@ function CreateNotesModule({
           id="create-notes-form"
           onSubmit={createNotesForm.handleSubmit(onSubmit)}
           className="flex flex-col h-full p-3 gap-2"
+          onDragEnter={handleDrag}
+          onDragLeave={handleDrag}
+          onDragOver={handleDrag}
+          onDrop={handleDrop}
         >
-          <div className="flex-1 min-h-[120px]">
+          <div className={`flex-1 min-h-[120px] relative ${dragActive ? 'ring-2 ring-blue-400 ring-opacity-75' : ''}`}>
+            {dragActive && (
+              <div className="absolute inset-0 bg-blue-50 bg-opacity-90 border-2 border-dashed border-blue-400 rounded-lg flex items-center justify-center z-10">
+                <div className="text-center">
+                  <Upload className="w-8 h-8 text-blue-500 mx-auto mb-2" />
+                  <p className="text-blue-600 font-medium">Drop files here to attach</p>
+                </div>
+              </div>
+            )}
             <FormField
               control={createNotesForm.control}
               name="noteContent"
@@ -402,59 +504,100 @@ function CreateNotesModule({
             />
           </div>
           {/* Chips row: attachments + audio inline */}
-          {(attachments.length > 0 || (recordedBlob && audioUrl)) && (
-            <div className="flex flex-wrap items-center gap-2 py-1">
-              {attachments.map((f, idx) => (
-                <span
-                  key={`${f.name}-${f.size}-${f.lastModified ?? idx}`}
-                  className="inline-flex items-center gap-1 max-w-[220px] truncate rounded-full bg-gray-100 text-gray-700 px-2 py-1 text-xs border border-gray-200"
-                  title={f.name}
-                >
-                  <span className="truncate">{f.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeAttachment(idx)}
-                    className="text-gray-500 hover:text-red-600"
-                    aria-label={`Remove ${f.name}`}
-                    disabled={isSubmitting}
+          {(attachments.length > 0 || recordedAudios.length > 0) && (
+            <div className="flex flex-wrap items-center gap-2 py-1 max-h-24 overflow-y-auto">
+              {attachments.map((f, idx) => {
+                const isImage = f.type.startsWith('image/');
+                const isAudio = f.type.startsWith('audio/');
+                const isVideo = f.type.startsWith('video/');
+                const isPdf = f.type.includes('pdf');
+                
+                return (
+                  <div
+                    key={`${f.name}-${f.size}-${f.lastModified ?? idx}`}
+                    className="inline-flex items-center gap-2 max-w-[280px] rounded-lg bg-gray-100 text-gray-700 px-3 py-2 text-xs border border-gray-200 hover:bg-gray-150 transition-colors"
+                    title={`${f.name} (${(f.size / 1024 / 1024).toFixed(1)} MB)`}
                   >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      {/* File type icon */}
+                      {isImage && <Image className="w-4 h-4 text-green-600 flex-shrink-0" />}
+                      {isAudio && <Volume2 className="w-4 h-4 text-purple-600 flex-shrink-0" />}
+                      {isVideo && <Video className="w-4 h-4 text-blue-600 flex-shrink-0" />}
+                      {isPdf && <FileText className="w-4 h-4 text-red-600 flex-shrink-0" />}
+                      {!isImage && !isAudio && !isVideo && !isPdf && <File className="w-4 h-4 text-gray-600 flex-shrink-0" />}
+                      
+                      <div className="flex-1 min-w-0">
+                        <span className="truncate block font-medium">{f.name}</span>
+                        <span className="text-gray-500 text-xs">
+                          {(f.size / 1024 / 1024).toFixed(1)} MB
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <button
+                      type="button"
+                      onClick={() => removeAttachment(idx)}
+                      className="text-gray-500 hover:text-red-600 hover:bg-red-50 p-1 rounded transition-colors"
+                      aria-label={`Remove ${f.name}`}
+                      disabled={isSubmitting}
+                      title="Remove file"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                );
+              })}
 
-              {recordedBlob && audioUrl && (
-                <span className="inline-flex items-center gap-2 rounded-full bg-gray-100 text-gray-700 px-2 py-1 text-xs border border-gray-200">
-                  <audio
-                    controls
-                    src={audioUrl}
-                    className="h-7"
-                    aria-label="Recorded voice note playback"
-                  >
-                    <track
-                      kind="captions"
-                      src="data:text/vtt,WEBVTT"
-                      label="Auto"
-                      default={false}
-                    />
-                  </audio>
+              {recordedAudios.map((audio) => (
+                <div
+                  key={audio.id}
+                  className="inline-flex items-center gap-2 rounded-lg bg-purple-100 text-purple-700 px-3 py-2 text-xs border border-purple-200"
+                >
+                  <Volume2 className="w-4 h-4 text-purple-600" />
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">{audio.name}</span>
+                    <audio
+                      controls
+                      src={audio.url}
+                      className="h-6 max-w-[120px]"
+                      aria-label={`Recorded audio: ${audio.name}`}
+                    >
+                      <track
+                        kind="captions"
+                        src="data:text/vtt,WEBVTT"
+                        label="Auto"
+                        default={false}
+                      />
+                    </audio>
+                  </div>
                   <button
                     type="button"
-                    onClick={clearRecording}
-                    className="text-gray-500 hover:text-red-600"
-                    aria-label="Remove recording"
+                    onClick={() => removeRecordedAudio(audio.id)}
+                    className="text-purple-500 hover:text-red-600 hover:bg-red-50 p-1 rounded transition-colors"
+                    aria-label={`Remove ${audio.name}`}
                     disabled={isSubmitting}
+                    title="Remove audio recording"
                   >
                     <X className="w-3 h-3" />
                   </button>
-                </span>
-              )}
+                </div>
+              ))}
             </div>
           )}
 
           {/* Action row (not in header) */}
           <div className="flex items-center justify-between gap-3 pt-1">
             <div className="flex items-center gap-2">
+              {/* File count indicator */}
+              {(attachments.length > 0 || recordedAudios.length > 0) && (
+                <div className="flex items-center gap-1 text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+                  <Paperclip className="w-3 h-3" />
+                  <span>
+                    {attachments.length + recordedAudios.length} attached
+                  </span>
+                </div>
+              )}
+              
               {/* hidden input for file selection */}
               <input
                 ref={fileInputRef}

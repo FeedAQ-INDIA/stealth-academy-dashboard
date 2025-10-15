@@ -10,26 +10,22 @@ import { refreshToken } from "./utils/refreshTokenUtils";
 
 import { Dashboard } from "@/components-xm/Dashboard.jsx";
 import { Explore } from "@/components-xm/Explore/Explore.jsx";
-import {
-  BringYourOwnCourse as BringYourOwnCourseExplore,
-  LiveLearning,
-} from "@/components-xm/Explore/index.js";
+import { BringYourOwnCourse as BringYourOwnCourseExplore } from "@/components-xm/Explore/index.js";
 import { MyLearningLayout } from "@/components-xm/MyJourney/MyJourneyLayout.jsx";
 import { CourseDetail } from "@/components-xm/Course/CourseDetail.jsx";
 import CourseOverview from "@/components-xm/Course/CourseOverview.jsx";
 import CourseVideoTutorial from "@/components-xm/Course/CourseVideoTutorial.jsx";
 import { AccountDetail } from "@/components-xm/AccountSettings/AccountDetail.jsx";
 import MyAccount from "@/components-xm/AccountSettings/MyAccount.jsx";
- import Billing from "@/components-xm/AccountSettings/Billing/Billing.jsx";
+import Billing from "@/components-xm/AccountSettings/Billing/Billing.jsx";
 import BillingOverview from "@/components-xm/AccountSettings/Billing/BillingOverview.jsx";
 import BillingHistory from "@/components-xm/AccountSettings/Billing/BillingHistory.jsx";
 
 import {
   RegisterAsOrg,
   OrgProfile,
-  AddMembersToOrg,
 } from "@/components-xm/AccountSettings/Organization/index.js";
- import CourseWritten from "@/components-xm/Course/CourseWritten.jsx";
+import CourseWritten from "@/components-xm/Course/CourseWritten.jsx";
 import CourseDocThirdParty from "@/components-xm/Course/CourseDocThirdParty.jsx";
 import CourseQuiz from "@/components-xm/Course/CourseQuiz/CourseQuiz.jsx";
 import CourseFlashcard from "@/components-xm/Course/CourseFlashcard.jsx";
@@ -40,13 +36,9 @@ import MyJourneyOverview from "./components-xm/MyJourney/MyJourneyOverview.jsx";
 import CourseCertificate from "./components-xm/Course/CourseCertificate.jsx";
 import CourseNotes from "./components-xm/Course/CourseNotes.jsx";
 import MyAchievement from "./components-xm/MyJourney/MyAchievement.jsx";
- import MyLearningSchedule from "./components-xm/AccountSettings/MyLearningSchedule.jsx";
-import MyGoals from "./components-xm/AccountSettings/MyGoals.jsx";
 import CourseEmbedder from "./components-xm/Course/CourseEmbedder.jsx";
 import Builder from "./components-xm/CourseBuilder/Builder.jsx";
 import PreviewBuilder from "./components-xm/CourseBuilder/PreviewBuilder.jsx";
-import MyStudyGroup from "./components-xm/AccountSettings/MyStudyGroup.jsx";
-import StudyGroupDetail from "./components-xm/AccountSettings/StudyGroupDetail.jsx";
 // NOTE: PreviewBuilder & CourseEditorBuilder direct routes removed; they are accessed through Builder component flow.
 
 const router = createBrowserRouter([
@@ -66,16 +58,10 @@ const router = createBrowserRouter([
         path: "/explore",
         element: <Explore />,
         children: [
- 
-          {
-            path: "live-learning",
-            element: <LiveLearning />,
-          },
           {
             path: "bring-your-own-course",
             element: <BringYourOwnCourseExplore />,
           },
-     
         ],
       },
 
@@ -100,27 +86,7 @@ const router = createBrowserRouter([
                 index: true,
                 element: <BillingOverview />,
               },
- 
             ],
-          },
-
-
-          {
-            path: "/account-settings/my-goals",
-            element: <MyGoals />,
-          },
-          {
-            path: "/account-settings/my-study-group",
-            element: <MyStudyGroup />,
-          },
-          {
-            path: "/account-settings/my-study-group/:groupId",
-            element: <StudyGroupDetail />,
-          },
-
-          {
-            path: "/account-settings/my-learning-schedule",
-            element: <MyLearningSchedule />,
           },
 
           {
@@ -136,16 +102,7 @@ const router = createBrowserRouter([
                 path: "profile",
                 element: <OrgProfile />,
               },
-              {
-                path: "add-members",
-                element: <AddMembersToOrg />,
-              },
             ],
-          },
-
-          {
-            path: "/account-settings/organization/add-members",
-            element: <AddMembersToOrg />,
           },
         ],
       },
@@ -213,18 +170,6 @@ const router = createBrowserRouter([
             path: "/my-journey/my-achievement",
             element: <MyAchievement />,
           },
-          {
-            path: "/my-journey/my-goals",
-            element: <MyGoals />,
-          },
-
- 
-
-          {
-            path: "/my-journey/my-learning-schedule",
-            element: <MyLearningSchedule />,
-          },
-
         ],
       },
 
@@ -233,13 +178,10 @@ const router = createBrowserRouter([
         element: <Builder />,
       },
 
-      
       {
         path: "/course-builder/:CourseBuilderId",
         element: <PreviewBuilder />,
       },
-
- 
     ],
   },
 ]);

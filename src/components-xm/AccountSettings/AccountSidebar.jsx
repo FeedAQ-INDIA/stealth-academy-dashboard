@@ -16,12 +16,12 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar.jsx";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select.jsx";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
@@ -48,14 +48,15 @@ import {
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator.jsx";
 import { useOrganizationStore } from "@/zustland/store.js";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 function AccountSidebar({ ...props }) {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // Organization status from zustand store
-  const { 
-    fetchUserOrganizations, 
+  const {
+    fetchUserOrganizations,
     organizationsLoading,
     organizationsError,
     organizations,
@@ -71,15 +72,26 @@ function AccountSidebar({ ...props }) {
 
   // Debug logging
   useEffect(() => {
-    console.log("AccountSidebar Debug - organizationsLoading:", organizationsLoading);
+    console.log(
+      "AccountSidebar Debug - organizationsLoading:",
+      organizationsLoading
+    );
     console.log("AccountSidebar Debug - organizations:", organizations);
-    console.log("AccountSidebar Debug - selectedOrganization:", selectedOrganization);
+    console.log(
+      "AccountSidebar Debug - selectedOrganization:",
+      selectedOrganization
+    );
   }, [organizationsLoading, organizations, selectedOrganization]);
 
   // Dynamic organization menu items based on organization status
   const getOrganizationItems = useCallback(() => {
-    console.log("getOrganizationItems called - organizationsLoading:", organizationsLoading, "organizations:", organizations);
-    
+    console.log(
+      "getOrganizationItems called - organizationsLoading:",
+      organizationsLoading,
+      "organizations:",
+      organizations
+    );
+
     // Always show the main organization dashboard
     const items = [];
 
@@ -111,15 +123,17 @@ function AccountSidebar({ ...props }) {
         {
           title: "Organization Profile",
           url: `/account-settings/organization/profile`,
-          isActive: location.pathname === "/account-settings/organization/profile",
+          isActive:
+            location.pathname === "/account-settings/organization/profile",
           icon: SettingsIcon,
         },
         {
           title: "Manage Members",
           url: `/account-settings/organization/add-members`,
-          isActive: location.pathname === "/account-settings/organization/add-members",
+          isActive:
+            location.pathname === "/account-settings/organization/add-members",
           icon: UserPlus,
-        },
+        }
       );
     } else {
       // No organizations found
@@ -132,7 +146,12 @@ function AccountSidebar({ ...props }) {
     }
 
     return items;
-  }, [organizationsLoading, organizationsError, organizations, location.pathname]);
+  }, [
+    organizationsLoading,
+    organizationsError,
+    organizations,
+    location.pathname,
+  ]);
 
   // Get navigation items based on selected profile
   const getNavigationItems = useCallback(() => {
@@ -197,11 +216,15 @@ function AccountSidebar({ ...props }) {
         title: "Account",
         url: "#",
         items: getNavigationItems(),
-      }
+      },
     ];
 
     // Only show Organization section if user has selected an organization profile (selectedOrganization is not null)
-    if (selectedOrganization !== null && organizations && organizations.length > 0) {
+    if (
+      selectedOrganization !== null &&
+      organizations &&
+      organizations.length > 0
+    ) {
       navSections.push({
         title: "Organization",
         url: "#",
@@ -223,7 +246,12 @@ function AccountSidebar({ ...props }) {
     });
 
     return { navMain: navSections };
-  }, [organizations, selectedOrganization, getOrganizationItems, getNavigationItems]);
+  }, [
+    organizations,
+    selectedOrganization,
+    getOrganizationItems,
+    getNavigationItems,
+  ]);
 
   return (
     <>
@@ -240,16 +268,24 @@ function AccountSidebar({ ...props }) {
         {!organizationsLoading && organizations && organizations.length > 0 && (
           <div className="px-3 py-3 border-b">
             <div className="mb-2">
-              <span className="text-sm font-medium text-muted-foreground">Profile</span>
+              <span className="text-sm font-medium text-muted-foreground">
+                Profile
+              </span>
             </div>
-            <Select 
-              value={selectedOrganization === null ? "GENERAL" : selectedOrganization.orgId?.toString()} 
+            <Select
+              value={
+                selectedOrganization === null
+                  ? "GENERAL"
+                  : selectedOrganization.orgId?.toString()
+              }
               onValueChange={(profileId) => {
                 console.log("Profile changed to:", profileId);
                 if (profileId === "GENERAL") {
                   setSelectedOrganization(null);
                 } else {
-                  const org = organizations.find(org => org.orgId?.toString() === profileId);
+                  const org = organizations.find(
+                    (org) => org.orgId?.toString() === profileId
+                  );
                   setSelectedOrganization(org || null);
                 }
               }}
@@ -259,22 +295,24 @@ function AccountSidebar({ ...props }) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="GENERAL">GENERAL</SelectItem>
-                {organizations.map((org) => {
-                  // Add more robust validation
-                  if (!org || !org.orgId || !org.orgName) {
-                    console.warn("Invalid organization data:", org);
-                    return null;
-                  }
-                  
-                  return (
-                    <SelectItem 
-                      key={`org-${org.orgId}`} 
-                      value={org.orgId.toString()}
-                    >
-                      {org.orgName}
-                    </SelectItem>
-                  );
-                }).filter(Boolean)}
+                {organizations
+                  .map((org) => {
+                    // Add more robust validation
+                    if (!org || !org.orgId || !org.orgName) {
+                      console.warn("Invalid organization data:", org);
+                      return null;
+                    }
+
+                    return (
+                      <SelectItem
+                        key={`org-${org.orgId}`}
+                        value={org.orgId.toString()}
+                      >
+                        {org.orgName}
+                      </SelectItem>
+                    );
+                  })
+                  .filter(Boolean)}
                 {organizationsError && (
                   <SelectItem disabled value="error">
                     Error: {organizationsError}
@@ -334,11 +372,23 @@ function AccountSidebar({ ...props }) {
                         <SidebarMenuButton
                           asChild
                           isActive={item.isActive}
-                          className="py-5 rounded-1"
+                          className={`flex items-center gap-1 py-2 rounded-1 h-fit transition-all duration-200 ${
+                            item?.isLocked
+                              ? "opacity-60 cursor-not-allowed"
+                              : ""
+                          } ${
+                            item.isActive
+                              ? "bg-gradient-to-r from-blue-100 to-indigo-100 border-l-4 border-blue-500 shadow-md transform scale-[1.02]"
+                              : "hover:bg-gray-50"
+                          }`}
                         >
                           <Link to={item.url}>
                             {item.icon && (
-                              <item.icon className="mr-2 h-4 w-4" />
+                              <Avatar className="border shadow-md">
+                                <AvatarFallback className="">
+                                  <item.icon strokeWidth={3} color="#000000" />
+                                </AvatarFallback>
+                              </Avatar>
                             )}
                             {item.title}
                           </Link>

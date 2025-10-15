@@ -105,11 +105,17 @@ function NotesModule({ userId, courseId, courseContentId, refreshTrigger }) {
   };
 
   function onSubmit(data) {
+    // Create FormData to support file uploads even if no files are uploaded
+    const formData = new FormData();
+    formData.append("courseId", courseId.toString());
+    formData.append("courseContentId", courseContentId.toString());
+    formData.append("noteContent", data.noteContent);
+    
     axiosConn
-      .post(import.meta.env.VITE_API_URL + "/saveNote", {
-        courseId,
-        courseContentId,
-        noteContent: data.noteContent,
+      .post(import.meta.env.VITE_API_URL + "/saveNote", formData, {
+        headers: { 
+          "Content-Type": "multipart/form-data" 
+        }
       })
       .then((res) => {
         console.log(res.data);
@@ -121,6 +127,11 @@ function NotesModule({ userId, courseId, courseContentId, refreshTrigger }) {
       })
       .catch((err) => {
         console.log(err);
+        toast({
+          title: "Error Saving Notes",
+          description: err.response?.data?.message || "Please try again later.",
+          variant: "destructive",
+        });
       });
   }
 
@@ -144,12 +155,19 @@ function NotesModule({ userId, courseId, courseContentId, refreshTrigger }) {
 
   function onCommentUpdate(data) {
     console.log(data);
+    
+    // Create FormData to support file uploads
+    const formData = new FormData();
+    formData.append("notesId", data.id.toString());
+    formData.append("courseId", courseId.toString());
+    formData.append("courseContentId", courseContentId.toString());
+    formData.append("noteContent", data.noteContent);
+    
     axiosConn
-      .post(import.meta.env.VITE_API_URL + "/saveNote", {
-        notesId: data.id,
-        courseId,
-        courseContentId,
-        noteContent: data.noteContent,
+      .post(import.meta.env.VITE_API_URL + "/saveNote", formData, {
+        headers: { 
+          "Content-Type": "multipart/form-data" 
+        }
       })
       .then((res) => {
         console.log(res);
@@ -162,6 +180,11 @@ function NotesModule({ userId, courseId, courseContentId, refreshTrigger }) {
       })
       .catch((err) => {
         console.log(err);
+        toast({
+          title: "Error updating note",
+          description: err.response?.data?.message || "Please try again later.",
+          variant: "destructive",
+        });
       });
   }
 
