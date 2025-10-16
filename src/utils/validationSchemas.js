@@ -78,6 +78,34 @@ export const quizSchema = z.object({
   showCorrectAnswers: z.boolean().optional().default(true),
 });
 
+// Course room member invitation schema
+export const inviteMembersSchema = z.object({
+  emailAddresses: z
+    .string()
+    .min(1, 'Please enter at least one email address')
+    .refine((emails) => {
+      const emailArray = emails
+        .split(';')
+        .map(email => email.trim())
+        .filter(email => email.length > 0);
+      
+      if (emailArray.length === 0) {
+        return false;
+      }
+      
+      // Validate each email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailArray.every(email => emailRegex.test(email));
+    }, 'Please enter valid email addresses separated by semicolons (;)'),
+  message: z
+    .string()
+    .optional()
+    .refine(
+      (msg) => !msg || msg.length <= 500,
+      'Message must be 500 characters or less'
+    ),
+});
+
 // Helper function to create form defaults from schema
 export const createFormDefaults = (schema) => {
   const defaults = {};

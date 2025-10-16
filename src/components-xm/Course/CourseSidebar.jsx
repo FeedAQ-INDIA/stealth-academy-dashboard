@@ -27,6 +27,7 @@ import {
   BookOpen,
   Trophy,
   TrendingUp,
+  Component,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator.jsx";
 import { useCourse } from "@/components-xm/Course/CourseContext.jsx";
@@ -262,6 +263,15 @@ function CourseSidebar() {
                 isClickable: true,
                 isActive:
                   location.pathname === `/course/${courseList?.courseId}`,
+              },
+                            {
+                title: "COURSE ROOM",
+                url: `/course/${courseList?.courseId}/room`,
+                isClickable: true,
+                isActive:
+                  location.pathname.includes(`/course/${courseList?.courseId}/room`),
+                isLocked: !hasContentAccess,
+                icon: Component,
               },
               {
                 title: "COURSE NOTES",
@@ -534,8 +544,12 @@ function CourseSidebar() {
                                 ) : (
                                   <Avatar className="border shadow-md">
                                     <AvatarFallback>
-                                      {identifyContentTypeIcons(
-                                        item?.contentType
+                                      {item.icon ? (
+                                        <item.icon strokeWidth={2} color="#000000" />
+                                      ) : (
+                                        identifyContentTypeIcons(
+                                          item?.contentType
+                                        )
                                       )}
                                     </AvatarFallback>
                                   </Avatar>
@@ -596,7 +610,11 @@ function CourseSidebar() {
                               <div className="flex items-center gap-2 w-full">
                                 <Avatar className="border shadow-md">
                                   <AvatarFallback>
-                                    {identifyContentTypeIcons(item?.title)}
+                                    {item.icon ? (
+                                      <item.icon strokeWidth={2} color="#000000" />
+                                    ) : (
+                                      identifyContentTypeIcons(item?.title)
+                                    )}
                                   </AvatarFallback>
                                 </Avatar>
                                 <div

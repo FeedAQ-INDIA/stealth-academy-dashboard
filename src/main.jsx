@@ -19,7 +19,6 @@ import { AccountDetail } from "@/components-xm/AccountSettings/AccountDetail.jsx
 import MyAccount from "@/components-xm/AccountSettings/MyAccount.jsx";
 import Billing from "@/components-xm/AccountSettings/Billing/Billing.jsx";
 import BillingOverview from "@/components-xm/AccountSettings/Billing/BillingOverview.jsx";
-import BillingHistory from "@/components-xm/AccountSettings/Billing/BillingHistory.jsx";
 
 import {
   RegisterAsOrg,
@@ -39,6 +38,12 @@ import MyAchievement from "./components-xm/MyJourney/MyAchievement.jsx";
 import CourseEmbedder from "./components-xm/Course/CourseEmbedder.jsx";
 import Builder from "./components-xm/CourseBuilder/Builder.jsx";
 import PreviewBuilder from "./components-xm/CourseBuilder/PreviewBuilder.jsx";
+import CourseRoom from "./components-xm/Course/CourseRoom.jsx";
+ import CourseRoomDiscussions from "./components-xm/Course/CourseRoomDiscussions.jsx";
+import CourseRoomResources from "./components-xm/Course/CourseRoomResources.jsx";
+import CourseRoomActivities from "./components-xm/Course/CourseRoomActivities.jsx";
+import CourseRoomSettings from "./components-xm/Course/CourseRoomSettings.jsx";
+import CourseRoomMembers from "./components-xm/Course/CourseRoomMembers.jsx";
 // NOTE: PreviewBuilder & CourseEditorBuilder direct routes removed; they are accessed through Builder component flow.
 
 const router = createBrowserRouter([
@@ -114,6 +119,36 @@ const router = createBrowserRouter([
           {
             path: "/course/:CourseId",
             element: <CourseOverview />,
+          },
+          {
+            path: "/course/:CourseId/room",
+            element: <CourseRoom />,
+            children: [
+              {
+                index: true,
+                element: <CourseRoom />,
+              },
+              {
+                path: "/course/:CourseId/room/members",
+                element: <CourseRoomMembers />,
+              },
+              {
+                path: "/course/:CourseId/room/discussions",
+                element: <CourseRoomDiscussions />,
+              },
+              {
+                path: "/course/:CourseId/room/resources", 
+                element: <CourseRoomResources />,
+              },
+              {
+                path: "/course/:CourseId/room/activities",
+                element: <CourseRoomActivities />,
+              },
+              {
+                path: "/course/:CourseId/room/settings",
+                element: <CourseRoomSettings />,
+              },
+            ],
           },
           {
             path: "/course/:CourseId/embed",

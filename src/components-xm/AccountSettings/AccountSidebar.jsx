@@ -45,6 +45,7 @@ import {
   Users,
   UserPlus,
   Settings as SettingsIcon,
+  User,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator.jsx";
 import { useOrganizationStore } from "@/zustland/store.js";
@@ -162,7 +163,7 @@ function AccountSidebar({ ...props }) {
         isActive:
           location.pathname === "/account-settings/profile" ||
           location.pathname === "/account-settings",
-        icon: UserCircle,
+        icon: User,
       },
       {
         title: "Credit & Orders",
@@ -372,7 +373,7 @@ function AccountSidebar({ ...props }) {
                         <SidebarMenuButton
                           asChild
                           isActive={item.isActive}
-                          className={`flex items-center gap-1 py-2 rounded-1 h-fit transition-all duration-200 ${
+                          className={`flex items-center gap-2 py-2 rounded-1 h-fit transition-all duration-200 ${
                             item?.isLocked
                               ? "opacity-60 cursor-not-allowed"
                               : ""
@@ -386,7 +387,7 @@ function AccountSidebar({ ...props }) {
                             {item.icon && (
                               <Avatar className="border shadow-md">
                                 <AvatarFallback className="">
-                                  <item.icon strokeWidth={3} color="#000000" />
+                                  <item.icon strokeWidth={2} color="#000000" />
                                 </AvatarFallback>
                               </Avatar>
                             )}
