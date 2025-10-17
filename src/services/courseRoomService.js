@@ -59,6 +59,25 @@ export const courseRoomService = {
     }
   },
 
+    /**
+   * Get all members of a course room
+   * @param {string} courseId - Course ID
+   * @returns {Promise<Object>} - Course room members data
+   */
+  getCourseRoomInvitedMembers: async (courseId) => {
+    if (!courseId) {
+      throw new Error("Course ID is required");
+    }
+
+    try {
+      const response = await axiosConn.get(`/course-access/getInvitedMembers/${courseId}`);
+      
+      return validateResponse(response, "course room members fetch");
+    } catch (error) {
+      throw handleApiError(error, "Failed to fetch course room members");
+    }
+  },
+
   /**
    * Invite users to join the course room
    * @param {string} courseId - Course ID

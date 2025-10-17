@@ -284,8 +284,7 @@ function CourseNotes() {
                       Phone number missing
                     </AlertTitle>
                     <AlertDescription className="text-red-700">
-                      Please update your phone number to receive updates
-                      regarding this {courseList?.courseType}
+                      Please update your phone number 
                     </AlertDescription>
                   </div>
                   <div>

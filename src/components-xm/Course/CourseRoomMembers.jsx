@@ -211,6 +211,7 @@ function CourseRoomMembers() {
   const { courseList } = useCourse();
   const { userDetail } = useAuthStore();
   const [members, setMembers] = useState([]);
+  const [invitedMembers, setInvitedMembers] = useState([]);
 
   const isCourseOwner = courseList?.userId === userDetail?.userId;
   const isAdmin =
@@ -218,6 +219,9 @@ function CourseRoomMembers() {
       (m) => m.user?.userId === userDetail?.userId && m.accessLevel === "ADMIN"
     ) || false;
   const { toast } = useToast();
+
+  // State for view mode (members/invited)
+  const [viewMode, setViewMode] = useState("members");
 
   // State for invite functionality
   const [inviteSheetOpen, setInviteSheetOpen] = useState(false);
@@ -242,6 +246,7 @@ function CourseRoomMembers() {
     defaultValues: {
       accessLevel: "SHARED",
       status: "ACTIVE",
+      enableCourseTracking: false,
     },
   });
 
@@ -415,6 +420,7 @@ function CourseRoomMembers() {
     updateForm.reset({
       accessLevel: member.accessLevel || "SHARED",
       status: member.status || "ACTIVE",
+      enableCourseTracking: member.enableCourseTracking || false,
     });
     setMemberUpdateSheetOpen(true);
   };
@@ -423,7 +429,11 @@ function CourseRoomMembers() {
     setMemberUpdateSheetOpen(open);
     if (!open) {
       setSelectedMember(null);
-      updateForm.reset();
+      updateForm.reset({
+        accessLevel: "SHARED",
+        status: "ACTIVE",
+        enableCourseTracking: false
+      });
     }
   };
 
@@ -454,7 +464,9 @@ function CourseRoomMembers() {
 
   useEffect(() => {
     fetchMembers();
-  }, [members]);
+    fetchInvitedMembers();
+  }, []);
+
 
   const fetchMembers = useCallback(async () => {
     const result = await courseRoomService.getCourseRoomMembers(
@@ -466,15 +478,44 @@ function CourseRoomMembers() {
     }
   }, [courseList.courseId]);
 
+
+  const fetchInvitedMembers = useCallback(async () => {
+    const result = await courseRoomService.getCourseRoomInvitedMembers(
+      courseList.courseId
+    );
+    console.log("Fetched members:", result.invites);
+    if (result && result.invites) {
+      setInvitedMembers(result.invites);
+    }
+  }, [courseList.courseId]);
+
   return (
     <>
       <Card className="border-0 bg-white shadow-md  rounded-sm">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-              <Users className="h-5 w-5 text-blue-600" />
-              Course Room Members
-            </CardTitle>
+            <div className="flex items-center gap-4">
+              <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                <Users className="h-5 w-5 text-blue-600" />
+                Course Room Members
+              </CardTitle>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="flex items-center gap-2">
+                    View Mode <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onSelect={() => setViewMode("members")}>
+                    <Users className="h-4 w-4 mr-2" /> Members
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => setViewMode("invited")}>
+                    <Mail className="h-4 w-4 mr-2" /> Invited Users
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
 
             {/* Invite Members Button */}
             {isCourseOwner && (
@@ -482,7 +523,6 @@ function CourseRoomMembers() {
                 <SheetTrigger asChild>
                   <Button className="flex items-center gap-2">
                     <UserPlus className="h-4 w-4" />
-                    Invite Members
                   </Button>
                 </SheetTrigger>
                 <SheetContent className="sm:max-w-md h-full overflow-y-auto">
@@ -646,79 +686,67 @@ function CourseRoomMembers() {
             </p>
           </div>
         ) : (
-          <div className=" border">
+          <div className="border">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[300px]">Member</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Joined</TableHead>
+                  <TableHead className="w-[300px]">{viewMode === "members" ? "Member" : "Invited User"}</TableHead>
+                  <TableHead>{viewMode === "members" ? "Role" : "Status"}</TableHead>
+                  <TableHead>{viewMode === "members" ? "Joined" : "Invited Date"}</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {members.map((member) => {
-                  const roleDisplay = getMemberRoleDisplay(
-                    member,
-                    courseList?.userId
-                  );
-                  const RoleIcon = roleDisplay.icon;
+                {viewMode === "members" ? (
+                  members.map((member) => {
+                    const roleDisplay = getMemberRoleDisplay(member, courseList?.userId);
+                    const RoleIcon = roleDisplay.icon;
 
-                  return (
-                    <TableRow key={member.user?.userId || member.email}>
-                      <TableCell className="font-medium">
-                        <div className="flex items-center space-x-1">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage
-                              src={member.user?.profilePicture}
-                             />
-                            <AvatarFallback className="bg-blue-100 text-blue-600">
-                              {member.user?.nameInitial}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className="font-medium text-gray-900">
-                              {member.user?.firstName +
-                                " " +
-                                member.user?.lastName || member.email}
+                    return (
+                      <TableRow key={member.user?.userId || member.email}>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center space-x-1">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={member.user?.profilePicture} />
+                              <AvatarFallback className="bg-blue-100 text-blue-600">
+                                {member.user?.nameInitial}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div className="font-medium text-gray-900">
+                                {member.user?.firstName + " " + member.user?.lastName || member.email}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </TableCell>
+                        </TableCell>
 
-                      <TableCell>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className={roleDisplay.color}
-                        >
-                          <RoleIcon className="h-3 w-3  " />
-                          {roleDisplay.role}
-                        </Button>
-                      </TableCell>
-
-                      <TableCell className="text-sm text-gray-500">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {member.v_created_date}
-                        </div>
-                      </TableCell>
-
-                      <TableCell className="text-right">
-                        <div className="flex items-center gap-2 justify-end">
-                          {/* View Member Details Button */}
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleViewMemberDetails(member)}
-                            className="h-8 px-2"
-                          >
-                            <Eye className="h-3 w-3 mr-1" />
-                            View
+                        <TableCell>
+                          <Button size="sm" variant="ghost" className={roleDisplay.color}>
+                            <RoleIcon className="h-3 w-3" />
+                            {roleDisplay.role}
                           </Button>
+                        </TableCell>
 
-                          {/* Update Member Button - only for owners and admins */}
-                          {(isCourseOwner || isAdmin) && (
+                        <TableCell className="text-sm text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {member.v_created_date}
+                          </div>
+                        </TableCell>
+
+                        <TableCell className="text-right">
+                          <div className="flex items-center gap-2 justify-end">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleViewMemberDetails(member)}
+                              className="h-8 px-2"
+                            >
+                              <Eye className="h-3 w-3 mr-1" />
+                              View
+                            </Button>
+
+                            {(isCourseOwner || isAdmin) && (
                               <Button
                                 variant="outline"
                                 size="sm"
@@ -729,26 +757,104 @@ function CourseRoomMembers() {
                                 Edit
                               </Button>
                             )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  invitedMembers.map((member) => {
+ 
+                    return (
+                      <TableRow key={member.inviteeEmail}>
+                        <TableCell className="font-medium">
+              
+                               <div className="font-medium text-gray-900">
+                                {member.inviteeEmail}
+                              </div>
+                          </TableCell>
 
+                                    <TableCell className="font-medium">
+              
+                               <div className="font-medium text-gray-900">
+                                {member.accessLevel}
+                              </div>
+                          </TableCell>
 
-            {(isCourseOwner || isAdmin) && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleUpdateMember(member)}
-                                className="h-8 px-2"
-                              >
-                                <Edit className="h-3 w-3 mr-1" />
-                                Delete
-                              </Button>
+     <TableCell className="font-medium">
+              
+                               <div className="font-medium text-gray-900">
+                                {member.inviteStatus}
+                              </div>
+                          </TableCell>     
+
+                          
+     <TableCell className="font-medium">
+              
+                               <div className="font-medium text-gray-900">
+                                {member.expiredAt}
+                              </div>
+                          </TableCell>    
+
+                                   
+
+                        <TableCell className="text-sm text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {member.v_created_date}
+                          </div>
+                        </TableCell>
+
+                        <TableCell className="text-right">
+                          <div className="flex items-center gap-2 justify-end">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleViewMemberDetails(member)}
+                              className="h-8 px-2"
+                            >
+                              <Eye className="h-3 w-3 mr-1" />
+                              View
+                            </Button>
+
+                            {(isCourseOwner || isAdmin) && (
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 px-2 text-red-600 hover:text-red-700"
+                                  >
+                                    <Trash2 className="h-3 w-3 mr-1" />
+                                    Cancel Invite
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Cancel Invitation?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This will cancel the pending invitation for {member.email}. 
+                                      This action cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Keep Invite</AlertDialogCancel>
+                                    <AlertDialogAction 
+                                      className="bg-red-600 hover:bg-red-700"
+                                      onClick={() => {/* Handle cancel invite */}}
+                                    >
+                                      Cancel Invite
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
                             )}
-
-          
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
               </TableBody>
             </Table>
           </div>
@@ -979,7 +1085,30 @@ function CourseRoomMembers() {
                   )}
                 />
 
-   
+                {/* Enable Course Tracking Switch */}
+                <FormField
+                  control={updateForm.control}
+                  name="enableCourseTracking"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">
+                          Enable member course tracking
+                        </FormLabel>
+                        <FormDescription>
+                          Track member progress and activity in this course room
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
 
                 {/* Action Buttons */}
                 <div className="flex gap-3 pt-4">
