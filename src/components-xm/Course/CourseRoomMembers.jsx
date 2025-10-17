@@ -451,7 +451,7 @@ function CourseRoomMembers() {
       setMemberUpdateSheetOpen(false);
       setSelectedMember(null);
       updateForm.reset();
-      fetchMembers(); // Refresh member list
+      fetchMembers(); 
     } catch (error) {
       console.error("Update member error:", error);
       toast({
