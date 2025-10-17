@@ -321,7 +321,7 @@ function CourseRoom() {
 
         
         {/* Tab Content */}
-        {activeTab === "members" && !userDetail?.number && (
+        {!userDetail?.number && (
           <Alert
             variant="destructive"
             className="border-red-200 bg-red-50 rounded-sm"

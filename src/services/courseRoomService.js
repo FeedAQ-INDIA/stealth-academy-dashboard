@@ -51,23 +51,7 @@ export const courseRoomService = {
     }
 
     try {
-      const response = await axiosConn.post("/searchCourse", {
-        limit: 100,
-        offset: 0,
-        getThisData: {
-          datasource: "CourseRoom",
-          attributes: [],
-          where: { courseId },
-          include: [
-            {
-              datasource: "User",
-              as: "user",
-              required: true,
-              attributes: ["userId", "firstName", "lastName", "email", "profilePicture"],
-            },
-          ],
-        },
-      });
+      const response = await axiosConn.get(`/course-access/getCourseMembers/${courseId}`);
       
       return validateResponse(response, "course room members fetch");
     } catch (error) {
@@ -76,12 +60,62 @@ export const courseRoomService = {
   },
 
   /**
-   * Invite a user to join the course room
+   * Invite users to join the course room
    * @param {string} courseId - Course ID
-   * @param {string} email - Email address to invite
-    * @returns {Promise<Object>} - Operation result
+   * @param {Array} invites - Array of invite objects with email and accessLevel
+   * @param {Object} options - Additional options for invitation
+   * @param {string} options.userId - User ID of the inviter
+   * @param {string} options.orgId - Organization ID (optional)
+   * @param {boolean} options.enableCourseTracking - Enable tracking for invited members
+   * @returns {Promise<Object>} - Operation result
    */
-  inviteUserToCourseRoom: async (courseId, email, ) => {
+  inviteUsersToCourseRoom: async (courseId, invites, options = {}) => {
+    if (!courseId || !invites || !Array.isArray(invites) || invites.length === 0) {
+      throw new Error("Course ID and invites array are required");
+    }
+
+    if (!options.userId) {
+      throw new Error("User ID is required for invitation");
+    }
+
+    // Validate each invite
+    for (const invite of invites) {
+      if (!invite.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(invite.email)) {
+        throw new Error(`Invalid email address: ${invite.email || 'undefined'}`);
+      }
+      
+      const validAccessLevels = ["SHARED", "ADMIN"];
+      if (invite.accessLevel && !validAccessLevels.includes(invite.accessLevel)) {
+        throw new Error(`Invalid access level: ${invite.accessLevel}`);
+      }
+    }
+
+    try {
+      const payload = {
+        courseId,
+        userId: options.userId,
+        invites: invites.map(invite => ({
+          email: invite.email,
+          accessLevel: invite.accessLevel || "SHARED",
+          message: invite.message || null
+        })),
+        enableCourseTracking: options.enableCourseTracking || false
+      };
+
+      if (options.orgId) {
+        payload.orgId = options.orgId;
+      }
+
+      const response = await axiosConn.post("/course-access/inviteUser", payload);
+      
+      return validateResponse(response, "course room invitation");
+    } catch (error) {
+      throw handleApiError(error, "Failed to invite users to course room");
+    }
+  },
+
+
+  inviteUserToCourseRoom: async (courseId, email, options = {}) => {
     if (!courseId || !email) {
       throw new Error("Course ID and email are required");
     }
@@ -90,33 +124,32 @@ export const courseRoomService = {
       throw new Error("Please provide a valid email address");
     }
 
-    try {
-      const response = await axiosConn.post("/inviteToCourseRoom", {
-        courseId,
-        email,
-       });
-      
-      return validateResponse(response, "course room invitation");
-    } catch (error) {
-      throw handleApiError(error, "Failed to send course room invitation");
-    }
+    const invite = {
+      email,
+      accessLevel: options.accessType || "SHARED",
+      message: options.message || null
+    };
+
+    return await this.inviteUsersToCourseRoom(courseId, [invite], {
+      userId: options.userId,
+      orgId: options.orgId,
+      enableCourseTracking: options.enableCourseTracking || false
+    });
   },
 
   /**
    * Remove a member from the course room
-   * @param {string} courseId - Course ID
-   * @param {string} userId - User ID to remove
+   * @param {string} courseAccessId - Course Access ID to remove
    * @returns {Promise<Object>} - Operation result
    */
-  removeMemberFromCourseRoom: async (courseId, userId) => {
-    if (!courseId || !userId) {
-      throw new Error("Course ID and user ID are required");
+  removeMemberFromCourseRoom: async (courseAccessId) => {
+    if (!courseAccessId) {
+      throw new Error("Course Access ID is required");
     }
 
     try {
-      const response = await axiosConn.post("/removeFromCourseRoom", {
-        courseId,
-        userId,
+      const response = await axiosConn.post("/course-access/revokeAccess", {
+        courseAccessId,
       });
       
       return validateResponse(response, "member removal from course room");
@@ -173,26 +206,24 @@ export const courseRoomService = {
 
   /**
    * Update member role in course room
-   * @param {string} courseId - Course ID
-   * @param {string} userId - User ID to update
-   * @param {string} role - New role (MEMBER, MODERATOR)
+   * @param {string} courseAccessId - Course Access ID to update
+   * @param {string} accessLevel - New access level (SHARED, ADMIN)
    * @returns {Promise<Object>} - Operation result
    */
-  updateMemberRole: async (courseId, userId, role) => {
-    if (!courseId || !userId || !role) {
-      throw new Error("Course ID, user ID, and role are required");
+  updateMemberRole: async (courseAccessId, accessLevel) => {
+    if (!courseAccessId || !accessLevel) {
+      throw new Error("Course Access ID and access level are required");
     }
 
-    const validRoles = ["MEMBER", "MODERATOR"];
-    if (!validRoles.includes(role)) {
-      throw new Error("Invalid role. Must be MEMBER or MODERATOR");
+    const validAccessLevels = ["SHARED", "ADMIN"];
+    if (!validAccessLevels.includes(accessLevel)) {
+      throw new Error("Invalid access level. Must be SHARED or ADMIN");
     }
 
     try {
-      const response = await axiosConn.post("/updateCourseRoomMemberRole", {
-        courseId,
-        userId,
-        role,
+      const response = await axiosConn.post("/course-access/updateUserAccess", {
+        courseAccessId,
+        accessLevel,
       });
       
       return validateResponse(response, "member role update");

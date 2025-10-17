@@ -97,13 +97,11 @@ export const inviteMembersSchema = z.object({
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailArray.every(email => emailRegex.test(email));
     }, 'Please enter valid email addresses separated by semicolons (;)'),
-  message: z
-    .string()
-    .optional()
-    .refine(
-      (msg) => !msg || msg.length <= 500,
-      'Message must be 500 characters or less'
-    ),
+  accessType: z
+    .enum(['SHARED', 'ADMIN'])
+    .default('SHARED'),
+  enableCourseTracking: z.boolean().optional().default(false),
+ 
 });
 
 // Helper function to create form defaults from schema

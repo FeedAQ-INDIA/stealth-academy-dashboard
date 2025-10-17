@@ -46,6 +46,7 @@ import {
   UserPlus,
   Settings as SettingsIcon,
   User,
+  BellIcon,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator.jsx";
 import { useOrganizationStore } from "@/zustland/store.js";
@@ -172,6 +173,14 @@ function AccountSidebar({ ...props }) {
           "/account-settings/credit-and-order"
         ),
         icon: CreditCard,
+      },
+      {
+        title: "Notification",
+        url: `/account-settings/notification`,
+        isActive: location.pathname?.includes(
+          "/account-settings/notification"
+        ),
+        icon: BellIcon,
       },
       // {
       //   title: "My Goals",

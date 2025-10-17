@@ -44,6 +44,7 @@ import CourseRoomResources from "./components-xm/Course/CourseRoomResources.jsx"
 import CourseRoomActivities from "./components-xm/Course/CourseRoomActivities.jsx";
 import CourseRoomSettings from "./components-xm/Course/CourseRoomSettings.jsx";
 import CourseRoomMembers from "./components-xm/Course/CourseRoomMembers.jsx";
+import Notifications from "./components-xm/AccountSettings/Notifications.jsx";
 // NOTE: PreviewBuilder & CourseEditorBuilder direct routes removed; they are accessed through Builder component flow.
 
 const router = createBrowserRouter([
@@ -97,6 +98,11 @@ const router = createBrowserRouter([
           {
             path: "/account-settings/register-organization",
             element: <RegisterAsOrg />,
+          },
+
+                    {
+            path: "/account-settings/notification",
+            element: <Notifications />,
           },
 
           {
