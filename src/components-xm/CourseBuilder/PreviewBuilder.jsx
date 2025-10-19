@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -49,6 +50,11 @@ export default function PreviewBuilder() {
   const [youtubeImportDialogOpen, setYoutubeImportDialogOpen] = useState(false);
   const [youtubePlaylistUrl, setYoutubePlaylistUrl] = useState("");
   const [importingFromYoutube, setImportingFromYoutube] = useState(false);
+  const [unpublishDialogOpen, setUnpublishDialogOpen] = useState(false);
+  const [unpublishConfirmation, setUnpublishConfirmation] = useState("");
+  const [selectedCourseForUnpublish, setSelectedCourseForUnpublish] = useState(null);
+  const [unpublishLoading, setUnpublishLoading] = useState(false);
+
 
   // Helper functions
   const getContentTypeColor = (contentType) => {
@@ -371,6 +377,8 @@ export default function PreviewBuilder() {
     }
   };
 
+
+
   // Fetch course data
   useEffect(() => {
     async function fetchData() {
@@ -466,6 +474,54 @@ export default function PreviewBuilder() {
     (sum, c) => sum + (c?.courseContentDuration || 0),
     0
   );
+
+
+
+
+  const handleConfirmUnpublish = async () => {
+    if (!selectedCourseForUnpublish) return;
+
+    setUnpublishLoading(true);
+    try {
+      const response = await axiosConn.post(
+        `${import.meta.env.VITE_API_URL}/deleteCourse`,
+        {
+          courseId: selectedCourseForUnpublish.publishedCourseId,
+        }
+      );
+
+      if (response.data.status === 200) {
+        fetchCourses();
+        setUnpublishDialogOpen(false);
+        setUnpublishConfirmation("");
+        setSelectedCourseForUnpublish(null);
+        toast({
+          title: "Course deleted successfully",
+          description: "The course has been permanently removed.",
+        });
+      } else {
+        throw new Error(response.data.message || "Course deletion failed");
+      }
+    } catch (error) {
+      console.error("Delete course error:", error);
+      toast({
+        title: "Delete failed",
+        description:
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to delete course.",
+        variant: "destructive",
+      });
+    } finally {
+      setUnpublishLoading(false);
+    }
+  };
+
+  const handleOpenUnpublishDialog = (course) => {
+    setSelectedCourseForUnpublish(course);
+    setUnpublishDialogOpen(true);
+    setUnpublishConfirmation("");
+  };
 
   return (
     <div className="space-y-6 p-6">
@@ -580,7 +636,13 @@ export default function PreviewBuilder() {
             )}
           </div>
           <div className="flex flex-wrap items-center gap-2 order-1 sm:order-2 justify-end">
-            <Button variant="outline">Get Verified</Button>
+        {courseData?.courseBuilder?.status === "PUBLISHED"  &&  <Button
+              variant="outline"
+              onClick={() => handleOpenUnpublishDialog(courseData?.course)}
+              className="flex-1"
+            >
+              Unpublish
+            </Button>}   
             <Button
               variant="outline"
               onClick={() => {
@@ -597,7 +659,7 @@ export default function PreviewBuilder() {
                 });
               }}
               disabled={isLoading || !isDirty}
-             >
+            >
               <RotateCcw className="h-4 w-4 mr-2" />
               Reset
             </Button>
@@ -605,7 +667,7 @@ export default function PreviewBuilder() {
               variant="outline"
               onClick={handleSaveDraft}
               disabled={isLoading || !isDirty}
-             >
+            >
               {isLoading ? (
                 <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
               ) : (
@@ -897,6 +959,65 @@ export default function PreviewBuilder() {
                   <Youtube className="h-4 w-4 mr-2" />
                   Import Playlist
                 </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Unpublish Confirmation Dialog */}
+      <Dialog open={unpublishDialogOpen} onOpenChange={setUnpublishDialogOpen}>
+        <DialogContent className="sm:max-w-md rounded-xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-gray-800">
+              Are You Sure You Want To Delete This Course?
+            </DialogTitle>
+            <DialogDescription className="text-gray-600">
+              This action cannot be undone. Type in{" "}
+              <span className="font-semibold text-red-600 italic">
+                &ldquo;
+                {selectedCourseForUnpublish?.courseBuilderData?.courseTitle}
+                &rdquo;
+              </span>{" "}
+              in the input field below and click confirm to permanently delete
+              the course.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center space-y-2">
+            <Input
+              placeholder="Type course title to confirm deletion..."
+              value={unpublishConfirmation}
+              onChange={(e) => setUnpublishConfirmation(e.target.value)}
+              className="rounded-lg"
+            />
+          </div>
+          <DialogFooter className="sm:justify-start gap-2">
+            <DialogClose asChild>
+              <Button
+                type="button"
+                variant="secondary"
+                className="rounded-full"
+              >
+                Cancel
+              </Button>
+            </DialogClose>
+
+            <Button
+              onClick={handleConfirmUnpublish}
+              disabled={
+                unpublishLoading ||
+                selectedCourseForUnpublish?.courseBuilderData?.courseTitle?.trim() !==
+                  unpublishConfirmation?.trim()
+              }
+              className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {unpublishLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Deleting Course...
+                </>
+              ) : (
+                "Delete Course"
               )}
             </Button>
           </DialogFooter>
