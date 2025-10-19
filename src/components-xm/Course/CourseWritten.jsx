@@ -222,6 +222,20 @@ function CourseWritten() {
     return `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}`;
   };
 
+  // Show loading state while courseList is loading
+  if (!courseList) {
+    return (
+      <div className="min-h-screen bg-gray-50/30 flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="flex items-center gap-2 text-gray-600">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <span>Loading course content...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Check enrollment access
   const isUserEnrolled =
     userCourseEnrollment && userCourseEnrollment.length > 0;
@@ -444,20 +458,24 @@ function CourseWritten() {
               </Card>
             </div>
             <div className="lg:col-span-2 overflow-y-auto space-y-4">
-              {/* Enhanced Notes Creation Section */}
-              <CreateNotesModule
-                handleNotesSave={handleNotesSave}
-                courseId={courseList.courseId}
-                courseContentId={courseVideoDetail?.courseContentId}
-              />
+              {courseList?.courseId && (
+                <>
+                  {/* Enhanced Notes Creation Section */}
+                  <CreateNotesModule
+                    handleNotesSave={handleNotesSave}
+                    courseId={courseList.courseId}
+                    courseContentId={courseVideoDetail?.courseContentId}
+                  />
 
-              {/* Enhanced Notes Module */}
-              <NotesModule
-                refreshTrigger={triggerNotesRefresh}
-                courseId={courseList.courseId}
-                userId={userDetail.userId}
-                courseContentId={courseVideoDetail?.courseContentId}
-              />
+                  {/* Enhanced Notes Module */}
+                  <NotesModule
+                    refreshTrigger={triggerNotesRefresh}
+                    courseId={courseList.courseId}
+                    userId={userDetail.userId}
+                    courseContentId={courseVideoDetail?.courseContentId}
+                  />
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -551,20 +569,24 @@ function FullScreenView({
             </Card>
           </div>
           <div className="lg:col-span-1 overflow-y-auto my-4 space-y-4">
-            {/* Enhanced Notes Creation Section */}
-            <CreateNotesModule
-              handleNotesSave={handleNotesSave}
-              courseId={courseList.courseId}
-              courseContentId={courseVideoDetail?.courseContentId}
-            />
+            {courseList?.courseId && (
+              <>
+                {/* Enhanced Notes Creation Section */}
+                <CreateNotesModule
+                  handleNotesSave={handleNotesSave}
+                  courseId={courseList.courseId}
+                  courseContentId={courseVideoDetail?.courseContentId}
+                />
 
-            {/* Enhanced Notes Module */}
-            <NotesModule
-              refreshTrigger={triggerNotesRefresh}
-              courseId={courseList.courseId}
-              userId={userDetail.userId}
-              courseContentId={courseVideoDetail?.courseContentId}
-            />
+                {/* Enhanced Notes Module */}
+                <NotesModule
+                  refreshTrigger={triggerNotesRefresh}
+                  courseId={courseList.courseId}
+                  userId={userDetail.userId}
+                  courseContentId={courseVideoDetail?.courseContentId}
+                />
+              </>
+            )}
           </div>
         </div>
 

@@ -1,23 +1,24 @@
-import { Button } from "@/components/ui/button.jsx";
 import {
   Card,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card.jsx";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu.jsx";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select.jsx";
 import { useState } from "react";
-import { Users, MoreVertical, Mail } from "lucide-react";
+import { Users, Mail } from "lucide-react";
 import { useCourse } from "./CourseContext";
 import { useAuthStore } from "@/zustland/store";
 import { useCourseRoomMembers } from "@/hooks/useCourseRoomMembers.js";
 import { MemberInviteSheet } from "./components/MemberInviteSheet";
 import { MemberDetailsSheet } from "./components/MemberDetailsSheet";
 import { MemberUpdateSheet } from "./components/MemberUpdateSheet";
+import { RevokeAccessDialog } from "./components/RevokeAccessDialog";
 import { MembersTable } from "./components/MembersTable";
 import { InvitedMembersTable } from "./components/InvitedMembersTable";
 
@@ -36,6 +37,7 @@ function CourseRoomMembers() {
     invitedMembers,
     inviteMembers,
     updateMember,
+    revokeAccess,
     cancelInvite,
   } = useCourseRoomMembers(
     courseList?.courseId,
@@ -55,6 +57,7 @@ function CourseRoomMembers() {
   const [inviteSheetOpen, setInviteSheetOpen] = useState(false);
   const [memberDetailsSheetOpen, setMemberDetailsSheetOpen] = useState(false);
   const [memberUpdateSheetOpen, setMemberUpdateSheetOpen] = useState(false);
+  const [revokeDialogOpen, setRevokeDialogOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
 
   // Event handlers
@@ -83,6 +86,17 @@ function CourseRoomMembers() {
     await cancelInvite(member);
   };
 
+  const handleRevokeAccess = (member) => {
+    setSelectedMember(member);
+    setRevokeDialogOpen(true);
+  };
+
+  const handleConfirmRevoke = async (member) => {
+    await revokeAccess(member);
+    setRevokeDialogOpen(false);
+    setSelectedMember(null);
+  };
+
   return (
     <>
       {/* Header Card */}
@@ -92,25 +106,27 @@ function CourseRoomMembers() {
             <div className="flex items-center gap-4">
               <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
                 <Users className="h-5 w-5 text-blue-600" />
-                Course Room Members
+                 
               </CardTitle>
 
-              {/* View Mode Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="flex items-center gap-2">
-                    View Mode <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onSelect={() => setViewMode("members")}>
-                    <Users className="h-4 w-4 mr-2" /> Members
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => setViewMode("invited")}>
-                    <Mail className="h-4 w-4 mr-2" /> Invited Users
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {/* View Mode Select */}
+              <Select value={viewMode} onValueChange={setViewMode}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select view mode" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="members">
+                    <div className="flex items-center">
+                      <Users className="h-4 w-4 mr-2" /> Members
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="invited">
+                    <div className="flex items-center">
+                      <Mail className="h-4 w-4 mr-2" /> Invited Users
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Invite Members Sheet */}
@@ -145,6 +161,7 @@ function CourseRoomMembers() {
               isAdmin={isAdmin}
               onViewDetails={handleViewMemberDetails}
               onUpdateMember={handleUpdateMember}
+              onRevokeAccess={handleRevokeAccess}
             />
           )
         ) : !invitedMembers || invitedMembers.length === 0 ? (
@@ -183,6 +200,14 @@ function CourseRoomMembers() {
         member={selectedMember}
         onUpdateSubmit={handleMemberUpdate}
         isCourseOwner={isCourseOwner}
+      />
+
+      {/* Revoke Access Dialog */}
+      <RevokeAccessDialog
+        open={revokeDialogOpen}
+        onOpenChange={setRevokeDialogOpen}
+        member={selectedMember}
+        onConfirm={handleConfirmRevoke}
       />
     </>
   );

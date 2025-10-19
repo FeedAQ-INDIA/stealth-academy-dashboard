@@ -178,6 +178,27 @@ export const courseRoomService = {
   },
 
   /**
+   * Cancel a pending course invitation
+   * @param {number} inviteId - Invite ID to cancel
+   * @returns {Promise<Object>} - Operation result
+   */
+  cancelInvite: async (inviteId) => {
+    if (!inviteId) {
+      throw new Error("Invite ID is required");
+    }
+
+    try {
+      const response = await axiosConn.post("/course-access/cancelInvite", {
+        inviteId,
+      });
+      
+      return validateResponse(response, "invitation cancellation");
+    } catch (error) {
+      throw handleApiError(error, "Failed to cancel invitation");
+    }
+  },
+
+  /**
    * Join a course room via invite link
    * @param {string} courseId - Course ID
    * @param {string} inviteToken - Optional invite token

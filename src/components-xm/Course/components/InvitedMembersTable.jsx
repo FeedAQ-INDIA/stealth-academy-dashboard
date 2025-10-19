@@ -41,9 +41,8 @@ export function InvitedMembersTable({
         <TableHeader>
           <TableRow>
             <TableHead className="w-[300px]">Invited User</TableHead>
-            <TableHead>Access Level</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Expires At</TableHead>
+             <TableHead>Status</TableHead>
+            <TableHead>Expires at</TableHead>
             <TableHead>Invited Date</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -57,12 +56,7 @@ export function InvitedMembersTable({
                     {member.inviteeEmail}
                   </div>
                 </TableCell>
-
-                <TableCell className="font-medium">
-                  <div className="font-medium text-gray-900">
-                    {member.accessLevel}
-                  </div>
-                </TableCell>
+ d
 
                 <TableCell className="font-medium">
                   <div className="font-medium text-gray-900">
@@ -72,7 +66,7 @@ export function InvitedMembersTable({
 
                 <TableCell className="font-medium">
                   <div className="font-medium text-gray-900">
-                    {member.expiredAt}
+                    {member.v_expires_date + " " + member.v_expires_time}
                   </div>
                 </TableCell>
 

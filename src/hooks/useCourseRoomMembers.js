@@ -41,8 +41,8 @@ export function useCourseRoomMembers(courseId, userId, organizationId) {
     
     try {
       const result = await courseRoomService.getCourseRoomInvitedMembers(courseId);
-      if (result && result.invites) {
-        setInvitedMembers(result.invites);
+      if (result && result.data) {
+        setInvitedMembers(result.data || []);
       }
     } catch (error) {
       console.error("Error fetching invited members:", error);
@@ -193,12 +193,50 @@ export function useCourseRoomMembers(courseId, userId, organizationId) {
     [toast, fetchMembers]
   );
 
+  // Revoke member access
+  const revokeAccess = useCallback(
+    async (member) => {
+      try {
+        if (!member?.courseAccessId) {
+          throw new Error("Invalid member data");
+        }
+
+        await courseRoomService.removeMemberFromCourseRoom(member.courseAccessId);
+
+        const memberName = member?.user
+          ? `${member.user.firstName} ${member.user.lastName}`
+          : member?.email;
+
+        toast({
+          title: "Access Revoked",
+          description: `Successfully revoked access for ${memberName}.`,
+        });
+
+        // Refresh member list
+        await fetchMembers();
+      } catch (error) {
+        console.error("Revoke access error:", error);
+        toast({
+          title: "Revoke Failed",
+          description: error.message || "Failed to revoke access",
+          variant: "destructive",
+        });
+      }
+    },
+    [toast, fetchMembers]
+  );
+
   // Cancel invitation
   const cancelInvite = useCallback(
     async (member) => {
       try {
-        // Here you would call the API to cancel the invitation
+        if (!member?.inviteId) {
+          throw new Error("Invalid invitation data");
+        }
+
         console.log("Canceling invite for:", member);
+
+        await courseRoomService.cancelInvite(member.inviteId);
 
         toast({
           title: "Invitation Cancelled",
@@ -231,6 +269,7 @@ export function useCourseRoomMembers(courseId, userId, organizationId) {
     isLoading,
     inviteMembers,
     updateMember,
+    revokeAccess,
     cancelInvite,
     refreshMembers: fetchMembers,
     refreshInvitedMembers: fetchInvitedMembers,

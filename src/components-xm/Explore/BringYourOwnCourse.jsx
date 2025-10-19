@@ -74,7 +74,6 @@ export function BringYourOwnCourse() {
           as: "accessControls",
           where: {
             userId: userDetail.userId,
-            accessLevel: "OWN",
           },
           required: true,
         },
@@ -236,7 +235,6 @@ export function BringYourOwnCourse() {
           as: "accessControls",
           where: {
             userId: userDetail.userId,
-            accessLevel: "OWN",
           },
           required: true,
         },
@@ -372,55 +370,5 @@ export function BringYourOwnCourse() {
     </div>
   );
 
-  
-//   return (
-//     <div className="min-h-[400px]">
-//       <Card className="border-2 border-dashed border-blue-200 bg-blue-50/30">
-//         <CardContent className="text-center py-16">
-//           <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
-//             <Upload className="w-10 h-10 text-blue-500" />
-//           </div>
-//           <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-//             Share Your Knowledge
-//           </h3>
-//           <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8 text-lg">
-//             Have expertise to share? Upload your own courses and help others learn. 
-//             Create engaging content, reach a global audience, and monetize your knowledge.
-//           </p>
-//           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-//             <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3">
-//               <Upload className="mr-2 h-5 w-5" />
-//               Upload Course
-//             </Button>
-//             <Button variant="outline" className="px-8 py-3">
-//               Learn More
-//             </Button>
-//           </div>
-//           <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-//             <div className="text-center">
-//               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-//                 <BookOpen className="w-6 h-6 text-blue-600" />
-//               </div>
-//               <h4 className="font-semibold mb-2">Create Content</h4>
-//               <p className="text-sm text-gray-600">Design and upload your course materials</p>
-//             </div>
-//             <div className="text-center">
-//               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-//                 <Users className="w-6 h-6 text-blue-600" />
-//               </div>
-//               <h4 className="font-semibold mb-2">Reach Students</h4>
-//               <p className="text-sm text-gray-600">Connect with learners worldwide</p>
-//             </div>
-//             <div className="text-center">
-//               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-//                 <TrendingUp className="w-6 h-6 text-blue-600" />
-//               </div>
-//               <h4 className="font-semibold mb-2">Earn Revenue</h4>
-//               <p className="text-sm text-gray-600">Monetize your expertise</p>
-//             </div>
-//           </div>
-//         </CardContent>
-//       </Card>
-//     </div>
-//   );
+   
 }

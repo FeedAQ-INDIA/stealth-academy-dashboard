@@ -268,20 +268,7 @@ function CourseRoom() {
         <div className="ml-auto flex items-center gap-2">
           {/* Member Statistics */}
           <div className="hidden sm:flex items-center gap-2">
-            <Badge variant="outline" className="flex items-center gap-1">
-              <Users className="h-3 w-3" />
-              {memberStats.total} Total
-            </Badge>
-            <Badge variant="outline" className="flex items-center gap-1 text-green-600">
-              <UserCheck className="h-3 w-3" />
-              {memberStats.online} Online
-            </Badge>
-            {memberStats.pending > 0 && (
-              <Badge variant="outline" className="flex items-center gap-1 text-orange-600">
-                <Clock className="h-3 w-3" />
-                {memberStats.pending} Pending
-              </Badge>
-            )}
+            
           </div>
           
           {/* Mobile stats summary */}

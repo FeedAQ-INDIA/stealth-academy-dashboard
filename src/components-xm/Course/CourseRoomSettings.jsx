@@ -100,22 +100,7 @@ function CourseRoomSettings() {
  
         </CardHeader>
         <CardContent className="space-y-6">
-          <div>
-            <Label htmlFor="description" className="text-sm font-medium">
-              Room Description
-            </Label>
-            <Textarea
-              id="description"
-              placeholder="Describe your course room..."
-              rows={4}
-              value={settings.roomDescription}
-              onChange={(e) => updateSetting('roomDescription', e.target.value)}
-              className="mt-2"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              This description will be visible to all members
-            </p>
-          </div>
+       
 
           <div className="flex items-center justify-between">
             <div>
@@ -128,16 +113,7 @@ function CourseRoomSettings() {
             />
           </div>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <Label className="text-sm font-medium">Allow Member Invites</Label>
-              <p className="text-xs text-gray-500">Let members invite others to the room</p>
-            </div>
-            <Switch
-              checked={settings.allowMemberInvites}
-              onCheckedChange={(checked) => updateSetting('allowMemberInvites', checked)}
-            />
-          </div>
+ 
         </CardContent>
       </Card>
 
@@ -171,17 +147,7 @@ function CourseRoomSettings() {
               onCheckedChange={(checked) => updateSetting('pushNotifications', checked)}
             />
           </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <Label className="text-sm font-medium">Weekly Digest</Label>
-              <p className="text-xs text-gray-500">Receive a summary of weekly activity</p>
-            </div>
-            <Switch
-              checked={settings.weeklyDigest}
-              onCheckedChange={(checked) => updateSetting('weeklyDigest', checked)}
-            />
-          </div>
+ 
 
           <div className="flex items-center justify-between">
             <div>
@@ -196,49 +162,7 @@ function CourseRoomSettings() {
         </CardContent>
       </Card>
 
-      {/* Permission Settings */}
-      <Card className="border-0 bg-white shadow-sm rounded-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-800">
-            <Shield className="h-5 w-5 text-blue-600" />
-            Permission Settings
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <Label className="text-sm font-medium">Members Can Create Discussions</Label>
-              <p className="text-xs text-gray-500">Allow members to start new discussion threads</p>
-            </div>
-            <Switch
-              checked={settings.membersCanCreateDiscussions}
-              onCheckedChange={(checked) => updateSetting('membersCanCreateDiscussions', checked)}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <Label className="text-sm font-medium">Members Can Upload Resources</Label>
-              <p className="text-xs text-gray-500">Let members share files and resources</p>
-            </div>
-            <Switch
-              checked={settings.membersCanUploadResources}
-              onCheckedChange={(checked) => updateSetting('membersCanUploadResources', checked)}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <Label className="text-sm font-medium">Moderation Required</Label>
-              <p className="text-xs text-gray-500">Require moderator approval for posts</p>
-            </div>
-            <Switch
-              checked={settings.moderationRequired}
-              onCheckedChange={(checked) => updateSetting('moderationRequired', checked)}
-            />
-          </div>
-        </CardContent>
-      </Card>
+ 
 
       {/* Privacy Settings */}
       <Card className="border-0 bg-white shadow-sm rounded-sm">
@@ -260,27 +184,8 @@ function CourseRoomSettings() {
             />
           </div>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <Label className="text-sm font-medium">Show Online Status</Label>
-              <p className="text-xs text-gray-500">Display when members are online</p>
-            </div>
-            <Switch
-              checked={settings.showOnlineStatus}
-              onCheckedChange={(checked) => updateSetting('showOnlineStatus', checked)}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <Label className="text-sm font-medium">Allow Direct Messages</Label>
-              <p className="text-xs text-gray-500">Enable private messaging between members</p>
-            </div>
-            <Switch
-              checked={settings.allowDirectMessages}
-              onCheckedChange={(checked) => updateSetting('allowDirectMessages', checked)}
-            />
-          </div>
+ 
+ 
         </CardContent>
       </Card>
 

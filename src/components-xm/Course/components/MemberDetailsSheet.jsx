@@ -144,18 +144,7 @@ export function MemberDetailsSheet({ open, onOpenChange, member, courseOwnerId }
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <UserCheck className="h-4 w-4 text-gray-400" />
-                <div>
-                  <p className="text-sm font-medium text-gray-700">Status</p>
-                  <div className="mt-1">
-                    <span className={statusDisplay.className}>
-                      <StatusIcon className="h-3 w-3" />
-                      {statusDisplay.label}
-                    </span>
-                  </div>
-                </div>
-              </div>
+              
 
               <div className="flex items-center gap-3">
                 <Calendar className="h-4 w-4 text-gray-400" />

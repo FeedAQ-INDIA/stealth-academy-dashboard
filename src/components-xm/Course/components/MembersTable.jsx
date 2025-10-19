@@ -13,7 +13,7 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar.jsx";
 import { getMemberRoleDisplay } from "@/utils/memberHelpers.js";
-import { Calendar, Eye, Edit } from "lucide-react";
+import { Calendar, Eye, Edit, UserMinus } from "lucide-react";
 
 /**
  * MembersTable Component
@@ -26,6 +26,7 @@ export function MembersTable({
   isAdmin,
   onViewDetails,
   onUpdateMember,
+  onRevokeAccess,
 }) {
   if (!members || members.length === 0) {
     return null;
@@ -98,15 +99,29 @@ export function MembersTable({
                     </Button>
 
                     {(isCourseOwner || isAdmin) && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onUpdateMember(member)}
-                        className="h-8 px-2"
-                      >
-                        <Edit className="h-3 w-3 mr-1" />
-                        Edit
-                      </Button>
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onUpdateMember(member)}
+                          className="h-8 px-2"
+                        >
+                          <Edit className="h-3 w-3 mr-1" />
+                          Edit
+                        </Button>
+
+                        {member.user?.userId !== courseOwnerId && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => onRevokeAccess(member)}
+                            className="h-8 px-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <UserMinus className="h-3 w-3 mr-1" />
+                            Revoke
+                          </Button>
+                        )}
+                      </>
                     )}
                   </div>
                 </TableCell>
