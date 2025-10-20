@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Pencil, Trash2, Loader2, Calendar, Clock } from "lucide-react";
+import { BookOpen, Pencil, Trash2, Calendar, Clock } from "lucide-react";
+import { InlineLoader } from "@/components/ui/loading-components";
 import {
   Card,
   CardHeader,
@@ -499,10 +500,7 @@ const EventCard = ({
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeleting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
-                </>
+                <InlineLoader message="Deleting..." size="sm" />
               ) : (
                 <>
                   <Trash2 className="mr-2 h-4 w-4" />
@@ -691,10 +689,7 @@ const EventCard = ({
                   disabled={isEditing}
                 >
                   {isEditing ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Updating...
-                    </>
+                    <InlineLoader message="Updating..." size="sm" />
                   ) : (
                     "Save Changes"
                   )}

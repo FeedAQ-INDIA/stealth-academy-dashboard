@@ -28,8 +28,8 @@ import axiosConn from "@/axioscon.js";
 import { useAuthStore } from "@/zustland/store.js";
 import { CourseCard } from "@/components-xm/Modules/CourseCard.jsx";
 import Header from "@/components-xm/Header/Header.jsx";
-import { Spinner } from "@/components/ui/spinner.jsx";
 import { Badge } from "@/components/ui/badge";
+import { ContentLoader } from "@/components/ui/loading-components";
 import { 
   Select,
   SelectContent,
@@ -307,10 +307,7 @@ export function MyJourney() {
       {/* Content */}
       <div className="min-h-[400px]">
         {loading ? (
-          <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-            <Spinner size="lg" />
-            <p className="text-sm text-muted-foreground">Loading your courses...</p>
-          </div>
+          <ContentLoader message="Loading your courses..." size="lg" className="min-h-[400px]" />
         ) : (
           <>
             {/* Courses Grid/List */}

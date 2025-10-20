@@ -24,11 +24,11 @@ import {
   X,
   Play,
   Upload,
-  Loader2,
   Save,
   Mic,
   Square,
 } from "lucide-react";
+import { InlineLoader } from "@/components/ui/loading-components";
 import { Button } from "@/components/ui/button.jsx";
 import { useParams } from "react-router-dom";
 import axiosConn from "@/axioscon.js";
@@ -828,10 +828,7 @@ function NotesCard({ a, fetchCourseNotes }) {
                           disabled={editNotesForm.formState.isSubmitting}
                         >
                           {editNotesForm.formState.isSubmitting ? (
-                            <>
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              Saving...
-                            </>
+                            <InlineLoader message="Saving..." size="sm" />
                           ) : (
                             <>
                               <Save className="w-4 h-4 mr-2" />

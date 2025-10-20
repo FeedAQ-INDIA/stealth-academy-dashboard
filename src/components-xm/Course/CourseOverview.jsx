@@ -52,7 +52,7 @@ import {
 } from "@/components/ui/dialog.jsx";
 import { Input } from "@/components/ui/input.jsx";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.jsx";
-import { Loader2 } from "lucide-react";
+import { InlineLoader, ContentLoader } from "@/components/ui/loading-components";
 
 function CourseOverview() {
   const { CourseId } = useParams();
@@ -335,9 +335,7 @@ function CourseOverview() {
  
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
+      <ContentLoader message="Loading course overview..." size="lg" className="min-h-screen" />
     );
   }
 
@@ -463,10 +461,7 @@ function CourseOverview() {
                     className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {enrollmentLoading ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        Enrolling...
-                      </>
+                      <InlineLoader message="Enrolling..." size="sm" />
                     ) : (
                       "Enroll Now"
                     )}
@@ -691,10 +686,7 @@ function CourseOverview() {
                     className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {unenrollLoading ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        Leaving Course...
-                      </>
+                      <InlineLoader message="Leaving Course..." size="sm" />
                     ) : (
                       "Leave Course"
                     )}
@@ -764,10 +756,7 @@ function CourseOverview() {
                     className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {deleteCourseLoading ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        Deleting Course...
-                      </>
+                      <InlineLoader message="Deleting Course..." size="sm" />
                     ) : (
                       "Delete Course"
                     )}

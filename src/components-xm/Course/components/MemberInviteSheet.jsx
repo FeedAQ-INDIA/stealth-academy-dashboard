@@ -29,7 +29,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { inviteMembersSchema } from "@/utils/validationSchemas.js";
 import { getEmailCount } from "@/utils/memberHelpers.js";
-import { UserPlus, Mail, Send, Loader2 } from "lucide-react";
+import { UserPlus, Mail, Send } from "lucide-react";
+import { InlineLoader } from "@/components/ui/loading-components";
 
 /**
  * MemberInviteSheet Component
@@ -204,10 +205,7 @@ export function MemberInviteSheet({
                 className="flex-1"
               >
                 {isSubmitting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Sending...
-                  </>
+                  <InlineLoader message="Sending..." size="sm" />
                 ) : (
                   <>
                     <Send className="h-4 w-4 mr-2" />

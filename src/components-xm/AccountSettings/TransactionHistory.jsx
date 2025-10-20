@@ -67,6 +67,7 @@ import {
   PaginationContent,
   PaginationItem,
 } from "@/components/ui/pagination";
+import { ContentLoader } from "@/components/ui/loading-components";
 
 function BillingHistory() {
   const { toast } = useToast();
@@ -150,42 +151,6 @@ function BillingHistory() {
     ...transaction,
   }));
 
-  const handleExportHistory = () => {
-    // Create CSV content
-    const csvContent = [
-      ["Date", "Type", "Description", "Credits", "Amount", "Status"],
-      ...mappedHistory.map((transaction) => [
-        transaction.date,
-        transaction.type,
-        transaction.description,
-        transaction.credits,
-        transaction.amount,
-        transaction.status,
-      ]),
-    ]
-      .map((row) => row.join(","))
-      .join("\n");
-
-    // Create and download file
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.style.display = "none";
-    a.href = url;
-    a.download = `credit_history_${new Date().toISOString().split("T")[0]}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
-
-    toast({
-      title: "Export Successful!",
-      description:
-        "Your transaction history has been downloaded as a CSV file.",
-      duration: 3000,
-    });
-  };
-
   const getTypeColor = (type) => {
     switch (type) {
       case "bonus":
@@ -261,12 +226,8 @@ function BillingHistory() {
           </CardHeader>
           <CardContent>
             {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <span className="ml-3 text-gray-600">
-                  Loading transactions...
-                </span>
-              </div>
+          <ContentLoader message="Loading your courses..." size="lg" className="min-h-[400px]" />
+
             ) : mappedHistory.length === 0 ? (
               <div className="text-center py-8">
                 <Clock className="w-12 h-12 text-gray-400 mx-auto mb-4" />

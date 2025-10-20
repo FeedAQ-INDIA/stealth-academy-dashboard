@@ -10,6 +10,7 @@ import {
 import {Card, CardHeader, CardTitle, CardContent} from "@/components/ui/card.jsx";
 import React, {useEffect, useState} from "react";
 import {Badge} from "@/components/ui/badge.jsx";
+import { ContentLoader, InlineLoader } from "@/components/ui/loading-components";
  
 import {CheckCircle2, Undo2, Zap, Check, CircleArrowLeft, CircleArrowRight, Clock, PlayCircle, BookOpen, FileText, Trophy} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
@@ -21,7 +22,6 @@ import {Checkbox} from "@/components/ui/checkbox.jsx";
 import QuizRender from "@/components-xm/Course/CourseQuiz/QuizRender.jsx";
 import {useAuthStore} from "@/zustland/store.js";
 import {Progress} from "@/components/ui/progress.jsx";
-import {Spinner} from "@/components/ui/spinner.jsx";
 
 function CourseQuiz() {
     const {CourseId, CourseQuizId} = useParams();
@@ -244,10 +244,7 @@ function CourseQuiz() {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-                <Spinner size="lg" />
-                <p className="text-sm text-muted-foreground">Loading quiz content...</p>
-            </div>
+            <ContentLoader message="Loading quiz content..." size="lg" className="min-h-[400px]" />
         );
     }
 

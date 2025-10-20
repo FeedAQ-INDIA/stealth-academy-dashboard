@@ -28,7 +28,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
+import { InlineLoader } from "@/components/ui/loading-components";
 
 const GoalCard = ({ goal, onGoalUpdate, onEditGoal }) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -248,10 +248,7 @@ const GoalCard = ({ goal, onGoalUpdate, onEditGoal }) => {
                     className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {deleteLoading ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        Deleting Goal...
-                      </>
+                      <InlineLoader message="Deleting Goal..." size="sm" />
                     ) : (
                       "Delete Goal"
                     )}

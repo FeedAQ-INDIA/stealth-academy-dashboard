@@ -13,9 +13,10 @@ import {useToast} from "@/hooks/use-toast.js";
 import {SidebarTrigger} from "@/components/ui/sidebar.jsx";
 import {Separator} from "@/components/ui/separator.jsx";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
-import {User, Settings, Loader2, RotateCcw, AlertCircle} from "lucide-react";
+import {User, Settings, RotateCcw, AlertCircle} from "lucide-react";
 import {Card, CardHeader, CardContent, CardTitle} from "@/components/ui/card.jsx";
 import {Alert, AlertDescription} from "@/components/ui/alert.jsx";
+import { ContentLoader, InlineLoader } from "@/components/ui/loading-components";
  
 // Enhanced schema for account settings with better validation
 const createAccountSchema = z.object({
@@ -148,12 +149,7 @@ function MyAccount() {
                         </BreadcrumbList>
                     </Breadcrumb>
                 </header>
-                <div className="flex items-center justify-center h-96">
-                    <div className="flex flex-col items-center gap-4">
-                        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-                        <p className="text-gray-600">Loading your profile...</p>
-                    </div>
-                </div>
+                <ContentLoader message="Loading your profile..." size="lg" className="min-h-[400px]" />
             </div>
         );
     }
@@ -346,10 +342,7 @@ function MyAccount() {
                                         disabled={isSubmitting || !hasChanges}
                                     >
                                         {isSubmitting ? (
-                                            <>
-                                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                                Saving...
-                                            </>
+                                            <InlineLoader message="Saving..." size="sm" />
                                         ) : (
                                             "Save Changes"
                                         )}

@@ -28,6 +28,7 @@ import axiosConn from "@/axioscon.js";
 import { useAuthStore } from "@/zustland/store.js";
 import { CourseCard } from "@/components-xm/Modules/CourseCard.jsx";
 import { LoaderOne } from "@/components/ui/loader.jsx";
+import { ContentLoader } from "@/components/ui/loading-components";
 
 
 
@@ -284,12 +285,7 @@ export function BringYourOwnCourse() {
        {/* Content */}
       <div className="min-h-[400px] mt-6">
         {loading ? (
-          <div className="flex items-center justify-center min-h-[400px] w-full">
-            <div className="text-center">
-              <LoaderOne />
-              <p className="mt-4 text-gray-600">Loading your courses...</p>
-            </div>
-          </div>
+          <ContentLoader message="Loading your courses..." size="lg" className="min-h-[400px]" />
         ) : (
           <>
             {/* Courses Grid/List */}

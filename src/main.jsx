@@ -28,6 +28,7 @@ import CourseQuiz from "@/components-xm/Course/CourseQuiz/CourseQuiz.jsx";
 import CourseFlashcard from "@/components-xm/Course/CourseFlashcard.jsx";
 import { useProtectedURIStore } from "@/zustland/store";
 import CourseSchedule from "@/components-xm/Course/CourseSchedule.jsx";
+import { LoadingProvider } from "./contexts/LoadingContext";
  import CourseCertificate from "./components-xm/Course/CourseCertificate.jsx";
 import CourseNotes from "./components-xm/Course/CourseNotes.jsx";
 import CourseEmbedder from "./components-xm/Course/CourseEmbedder.jsx";
@@ -231,10 +232,12 @@ async function runTokenRefresh() {
 
   createRoot(document.getElementById("root")).render(
     <StrictMode>
-      {/*<Provider store={store} >*/} {/* Wrap with Provider */}
-      <RouterProvider router={router} />
-      <Toaster />
-      {/*</Provider>*/}
+      <LoadingProvider>
+        {/*<Provider store={store} >*/} {/* Wrap with Provider */}
+        <RouterProvider router={router} />
+        <Toaster />
+        {/*</Provider>*/}
+      </LoadingProvider>
     </StrictMode>
   );
 })();

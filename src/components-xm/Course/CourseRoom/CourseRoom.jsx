@@ -29,6 +29,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { Link, useParams, useNavigate, useLocation, Outlet } from "react-router-dom";
+import { ContentLoader } from "@/components/ui/loading-components";
 import { useCourse } from "@/components-xm/Course/CourseContext.jsx";
 import { useAuthStore } from "@/zustland/store.js";
 import { useToast } from "@/hooks/use-toast.js";
@@ -244,9 +245,7 @@ function CourseRoom() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
+      <ContentLoader message="Loading course room..." size="lg" className="min-h-screen" />
     );
   }
 

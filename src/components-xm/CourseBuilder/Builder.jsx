@@ -45,6 +45,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ContentLoader } from "@/components/ui/loading-components";
 
 export default function Builder() {
   const [listLoading, setListLoading] = useState(true);
@@ -327,22 +328,13 @@ export default function Builder() {
             </SheetFooter>
           </SheetContent>
         </Sheet>
-
-         <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
-          <Upload className="mr-1 h-4 w-4" />
-              <span className="tracking-wide">UPLOAD COURSE</span>
-            </Button>
       </div>
 
       {/* Main Content */}
       <div className="min-h-[400px]">
         {listLoading ? (
-          <div className="flex items-center justify-center min-h-[400px] w-full">
-            <div className="text-center">
-              <LoaderOne />
-              <p className="mt-4 text-gray-600">Loading your courses...</p>
-            </div>
-          </div>
+          <ContentLoader message="Loading your courses..." size="lg" className="min-h-[400px]" />
+
         ) : (
           <>
             {/* Courses Grid/List */}

@@ -30,7 +30,8 @@ import {
 import { Switch } from "@/components/ui/switch.jsx";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
-import { Edit, Loader2 } from "lucide-react";
+import { Edit } from "lucide-react";
+import { InlineLoader } from "@/components/ui/loading-components";
 
 /**
  * MemberUpdateSheet Component
@@ -186,10 +187,7 @@ export function MemberUpdateSheet({
                 disabled={form.formState.isSubmitting}
               >
                 {form.formState.isSubmitting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Updating...
-                  </>
+                  <InlineLoader message="Updating..." size="sm" />
                 ) : (
                   <>
                     <Edit className="h-4 w-4 mr-2" />

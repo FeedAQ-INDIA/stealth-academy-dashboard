@@ -4,7 +4,8 @@ import {Button} from "@/components/ui/button.jsx";
 import {SidebarTrigger} from "@/components/ui/sidebar.jsx";
 import {Separator} from "@/components/ui/separator.jsx";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage} from "@/components/ui/breadcrumb.jsx";
-import {Bell, Smartphone, BookOpen, AlertCircle, Loader2, Archive, ChevronLeft, ChevronRight} from "lucide-react";
+import {Bell, Smartphone, BookOpen, AlertCircle, Archive, ChevronLeft, ChevronRight} from "lucide-react";
+import { ContentLoader } from "@/components/ui/loading-components";
 import {Pagination, PaginationContent, PaginationItem} from "@/components/ui/pagination";
 import axiosConn from "@/axioscon.js";
 import { useAuthStore } from "@/zustland/store.js";
@@ -360,10 +361,7 @@ function Notifications() {
                 </Card>
 
                 {loading && (
-                    <div className="flex items-center justify-center py-12">
-                        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-                        <span className="ml-2 text-gray-600">Loading notifications...</span>
-                    </div>
+                    <ContentLoader message="Loading notifications..." size="lg" className="min-h-[400px]" />
                 )}
                 
                 {!loading && notifications.length === 0 && (

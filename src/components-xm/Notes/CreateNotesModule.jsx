@@ -17,7 +17,6 @@ import {
   Save,
   RotateCcw,
   FileText,
-  Loader2,
   Upload,
   Mic,
   Square,
@@ -28,6 +27,7 @@ import {
   File,
   Paperclip,
 } from "lucide-react";
+import { InlineLoader } from "@/components/ui/loading-components";
 import PropTypes from "prop-types";
 
 function CreateNotesModule({
@@ -664,10 +664,10 @@ function CreateNotesModule({
                 title="Save notes"
               >
                 {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-                    {isUploadingFiles ? "Uploading..." : "Saving..."}
-                  </>
+                  <InlineLoader 
+                    message={isUploadingFiles ? "Uploading..." : "Saving..."} 
+                    size="sm" 
+                  />
                 ) : (
                   <>
                     <Save className="w-4 h-4 mr-1" />

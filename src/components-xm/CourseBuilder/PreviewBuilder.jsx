@@ -28,6 +28,7 @@ import {
   Youtube,
   RotateCcw,
 } from "lucide-react";
+import { InlineLoader } from "@/components/ui/loading-components";
 import ContentTypeSelector from "./ContentTypeSelector";
 import ContentCreator from "./creators/ContentCreator";
 
@@ -1012,10 +1013,7 @@ export default function PreviewBuilder() {
               className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {unpublishLoading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Deleting Course...
-                </>
+                <InlineLoader message="Deleting Course..." size="sm" />
               ) : (
                 "Delete Course"
               )}

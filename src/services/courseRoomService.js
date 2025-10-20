@@ -188,7 +188,7 @@ export const courseRoomService = {
     }
 
     try {
-      const response = await axiosConn.post("/course-access/cancelInvite", {
+      const response = await axiosConn.post("/course-access/revokeInvite", {
         inviteId,
       });
       

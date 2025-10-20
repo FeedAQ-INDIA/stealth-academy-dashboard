@@ -43,6 +43,7 @@ import languagestudio from "../assets/language-studio.png";
 import companiontalks from "../assets/companion-talks.png";
 import { ProgressCourseCard } from "./Modules/ProgressCourseCard";
 import { Spinner } from "@/components/ui/spinner";
+import { ContentLoader, CardLoader } from "@/components/ui/loading-components";
 
 export function Dashboard() {
   const {
@@ -445,10 +446,7 @@ export function Dashboard() {
           <CardContent>
             <div className="">
               {isLoadingCourses ? (
-                <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                  <Spinner size="lg" />
-                  <p className="text-sm text-muted-foreground">Loading your courses...</p>
-                </div>
+                <ContentLoader message="Loading your courses..." size="lg" />
               ) : courseList?.length > 0 ? (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {courseList.map((course) => (
