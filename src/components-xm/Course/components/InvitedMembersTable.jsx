@@ -56,7 +56,7 @@ export function InvitedMembersTable({
                     {member.inviteeEmail}
                   </div>
                 </TableCell>
- d
+
 
                 <TableCell className="font-medium">
                   <div className="font-medium text-gray-900">
