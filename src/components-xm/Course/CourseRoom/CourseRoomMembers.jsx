@@ -12,15 +12,15 @@ import {
 } from "@/components/ui/select.jsx";
 import { useState } from "react";
 import { Users, Mail } from "lucide-react";
-import { useCourse } from "./CourseContext";
+import { useCourse } from "../CourseContext";
 import { useAuthStore } from "@/zustland/store";
 import { useCourseRoomMembers } from "@/hooks/useCourseRoomMembers.js";
-import { MemberInviteSheet } from "./components/MemberInviteSheet";
-import { MemberDetailsSheet } from "./components/MemberDetailsSheet";
-import { MemberUpdateSheet } from "./components/MemberUpdateSheet";
-import { RevokeAccessDialog } from "./components/RevokeAccessDialog";
-import { MembersTable } from "./components/MembersTable";
-import { InvitedMembersTable } from "./components/InvitedMembersTable";
+import { MemberInviteSheet } from "../components/MemberInviteSheet";
+import { MemberDetailsSheet } from "../components/MemberDetailsSheet";
+import { MemberUpdateSheet } from "../components/MemberUpdateSheet";
+import { RevokeAccessDialog } from "../components/RevokeAccessDialog";
+import { MembersTable } from "../components/MembersTable";
+import { InvitedMembersTable } from "../components/InvitedMembersTable";
 
 /**
  * CourseRoomMembers Component

@@ -16,7 +16,7 @@ import {
   Award,
   Users
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Pagination,
@@ -253,6 +253,33 @@ export function BringYourOwnCourse() {
   }, [exploreCourseText]);
 
   return (
+    <div className="p-4">
+
+            {/* Hero Section with Enhanced Gradient */}
+            <div className="relative overflow-hidden">
+              <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700  rounded-2xl text-white shadow-2xl  ">
+                {/* Background Pattern */}
+                <div className="absolute inset-0 opacity-20">
+                  <div className="absolute inset-0" style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+                  }}></div>
+                </div>
+                
+                <CardHeader className="relative z-10 pb-2">
+                  {/* <div className="flex items-center justify-center mb-2">
+                    <Sparkles className="w-6 h-6 text-yellow-300 animate-float" />
+                  </div> */}
+                  <CardTitle className="text-center tracking-wide text-2xl md:text-3xl  font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                    What would you like to learn today?
+                  </CardTitle>
+                  <p className="text-center text-white/90 mt-2 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                    Discover thousands of courses from beginner to advanced levels
+                  </p>
+                </CardHeader>
+
+              </Card>
+            </div>
+
     <div className=" space-y-4">
        {/* Content */}
       <div className="min-h-[400px] mt-6">
@@ -367,7 +394,7 @@ export function BringYourOwnCourse() {
           </>
         )}
       </div>
-    </div>
+    </div></div>
   );
 
    

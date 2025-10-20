@@ -208,8 +208,41 @@ function BillingHistory() {
 
   return (
     <>
-      {/* Transaction History Content */}
-      <div className="space-y-6">
+      <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
+        <SidebarTrigger className="-ml-1" />
+        <Separator orientation="vertical" className="mr-2 h-4" />
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbPage className="truncate max-w-[30ch]">
+                Credits & Billing
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <div className="ml-auto sm:flex-initial"></div>
+      </header>
+
+      <div className="space-y-6 p-4">
+        <div className="relative overflow-hidden">
+          <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700  rounded-2xl text-white shadow-2xl backdrop-blur-sm">
+            <div className="absolute inset-0 opacity-20">
+              <div
+                className="absolute inset-0"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+                }}
+              ></div>
+            </div>
+
+            <CardHeader className=" ">
+              <CardTitle className="text-center tracking-wide text-2xl md:text-3xl  font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                Transaction History
+              </CardTitle>
+            </CardHeader>
+          </Card>
+        </div>
+
         {/* Transaction Table */}
         <Card className="border-0 shadow-lg bg-white/90 backdrop-blur">
           <CardHeader>
@@ -248,9 +281,7 @@ function BillingHistory() {
                     <TableHeader>
                       <TableRow>
                         <TableHead className="font-semibold">Date</TableHead>
-                        <TableHead className="font-semibold">
-                          ID
-                        </TableHead>
+                        <TableHead className="font-semibold">ID</TableHead>
                         <TableHead className="font-semibold">Type</TableHead>
                         <TableHead className="font-semibold">
                           Description

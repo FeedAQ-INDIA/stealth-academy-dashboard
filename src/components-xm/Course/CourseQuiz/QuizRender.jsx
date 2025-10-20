@@ -29,7 +29,7 @@ import axiosConn from "@/axioscon.js";
 import {toast} from "@/components/hooks/use-toast.js";
 import {Checkbox} from "@/components/ui/checkbox.jsx";
 import QuizQuestionCard from "@/components-xm/Course/CourseQuiz/QuizQuestionCard.jsx";
-import QuizResultReview from "@/components-xm/Course/QuizResultReview.jsx";
+import QuizResultReview from "@/components-xm/Course/CourseQuiz/QuizResultReview.jsx";
 import {useAuthStore} from "@/zustland/store.js";
 import {Progress} from "@/components/ui/progress.jsx";
 import {Alert, AlertDescription} from "@/components/ui/alert.jsx";

@@ -9,16 +9,14 @@ import { Toaster } from "./components/ui/toaster.jsx";
 import { refreshToken } from "./utils/refreshTokenUtils";
 
 import { Dashboard } from "@/components-xm/Dashboard.jsx";
-import { Explore } from "@/components-xm/Explore/Explore.jsx";
-import { BringYourOwnCourse as BringYourOwnCourseExplore } from "@/components-xm/Explore/index.js";
-import { MyLearningLayout } from "@/components-xm/MyJourney/MyJourneyLayout.jsx";
+import { BringYourOwnCourse as BringYourOwnCourseExplore } from "@/components-xm/Explore/BringYourOwnCourse.jsx";
+import { MyJourney } from "@/components-xm/MyJourney/MyJourney.jsx";
 import { CourseDetail } from "@/components-xm/Course/CourseDetail.jsx";
 import CourseOverview from "@/components-xm/Course/CourseOverview.jsx";
 import CourseVideoTutorial from "@/components-xm/Course/CourseVideoTutorial.jsx";
 import { AccountDetail } from "@/components-xm/AccountSettings/AccountDetail.jsx";
 import MyAccount from "@/components-xm/AccountSettings/MyAccount.jsx";
-import Billing from "@/components-xm/AccountSettings/Billing/Billing.jsx";
-import BillingOverview from "@/components-xm/AccountSettings/Billing/BillingOverview.jsx";
+import BillingOverview from "@/components-xm/AccountSettings/BillingOverview.jsx";
 
 import {
   RegisterAsOrg,
@@ -30,21 +28,19 @@ import CourseQuiz from "@/components-xm/Course/CourseQuiz/CourseQuiz.jsx";
 import CourseFlashcard from "@/components-xm/Course/CourseFlashcard.jsx";
 import { useProtectedURIStore } from "@/zustland/store";
 import CourseSchedule from "@/components-xm/Course/CourseSchedule.jsx";
-import { MyCourse } from "./components-xm/MyJourney/MyCourse.jsx";
-import MyJourneyOverview from "./components-xm/MyJourney/MyJourneyOverview.jsx";
-import CourseCertificate from "./components-xm/Course/CourseCertificate.jsx";
+ import CourseCertificate from "./components-xm/Course/CourseCertificate.jsx";
 import CourseNotes from "./components-xm/Course/CourseNotes.jsx";
-import MyAchievement from "./components-xm/MyJourney/MyAchievement.jsx";
 import CourseEmbedder from "./components-xm/Course/CourseEmbedder.jsx";
 import Builder from "./components-xm/CourseBuilder/Builder.jsx";
 import PreviewBuilder from "./components-xm/CourseBuilder/PreviewBuilder.jsx";
-import CourseRoom from "./components-xm/Course/CourseRoom.jsx";
- import CourseRoomDiscussions from "./components-xm/Course/CourseRoomDiscussions.jsx";
-import CourseRoomResources from "./components-xm/Course/CourseRoomResources.jsx";
-import CourseRoomActivities from "./components-xm/Course/CourseRoomActivities.jsx";
-import CourseRoomSettings from "./components-xm/Course/CourseRoomSettings.jsx";
-import CourseRoomMembers from "./components-xm/Course/CourseRoomMembers.jsx";
+import CourseRoom from "./components-xm/Course/CourseRoom/CourseRoom.jsx";
+ import CourseRoomDiscussions from "./components-xm/Course/CourseRoom/CourseRoomDiscussions.jsx";
+import CourseRoomResources from "./components-xm/Course/CourseRoom/CourseRoomResources.jsx";
+import CourseRoomActivities from "./components-xm/Course/CourseRoom/CourseRoomActivities.jsx";
+import CourseRoomSettings from "./components-xm/Course/CourseRoom/CourseRoomSettings.jsx";
+import CourseRoomMembers from "./components-xm/Course/CourseRoom/CourseRoomMembers.jsx";
 import Notifications from "./components-xm/AccountSettings/Notifications.jsx";
+import TransactionHistory from "./components-xm/AccountSettings/TransactionHistory.jsx";
 // NOTE: PreviewBuilder & CourseEditorBuilder direct routes removed; they are accessed through Builder component flow.
 
 const router = createBrowserRouter([
@@ -61,14 +57,8 @@ const router = createBrowserRouter([
       { index: true, element: <Dashboard /> }, // now "/" goes to HomePage
 
       {
-        path: "/explore",
-        element: <Explore />,
-        children: [
-          {
-            path: "bring-your-own-course",
-            element: <BringYourOwnCourseExplore />,
-          },
-        ],
+        path: "/content-library",
+        element: <BringYourOwnCourseExplore />,
       },
 
       {
@@ -85,14 +75,13 @@ const router = createBrowserRouter([
           },
 
           {
-            path: "/account-settings/credit-and-order",
-            element: <Billing />,
-            children: [
-              {
-                index: true,
-                element: <BillingOverview />,
-              },
-            ],
+            path: "/account-settings/billing",
+            element: <BillingOverview />,
+          },
+
+          {
+            path: "/account-settings/transaction-history",
+            element: <TransactionHistory />,
           },
 
           {
@@ -197,22 +186,8 @@ const router = createBrowserRouter([
 
       {
         path: "/my-journey",
-        element: <MyLearningLayout />,
-        children: [
-          {
-            index: true,
-            element: <MyJourneyOverview />,
-          },
-          {
-            path: "/my-journey/courses",
-            element: <MyCourse />,
-          },
-          {
-            path: "/my-journey/my-achievement",
-            element: <MyAchievement />,
-          },
-        ],
-      },
+        element: <MyJourney />,
+       },
 
       {
         path: "/course-builder",

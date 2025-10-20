@@ -167,10 +167,19 @@ function AccountSidebar({ ...props }) {
         icon: User,
       },
       {
-        title: "Credit & Orders",
-        url: `/account-settings/credit-and-order`,
+        title: "Billing",
+        url: `/account-settings/billing`,
         isActive: location.pathname?.includes(
-          "/account-settings/credit-and-order"
+          "/account-settings/billing"
+        ),
+        icon: CreditCard,
+      },
+
+            {
+        title: "Transaction History",
+        url: `/account-settings/transaction-history`,
+        isActive: location.pathname?.includes(
+          "/account-settings/transaction-history"
         ),
         icon: CreditCard,
       },

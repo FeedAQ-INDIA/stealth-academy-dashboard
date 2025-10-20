@@ -63,7 +63,7 @@ function NavigationMenuDemo({ orientation }) {
             <Button
               className="w-full justify-center  px-2"
               variant={
-                location.pathname.includes("dashboard") ? "secondary" : "ghost"
+                location.pathname== "/" ? "secondary" : "ghost"
               }
             >
               DASHBOARD
@@ -76,11 +76,11 @@ function NavigationMenuDemo({ orientation }) {
             orientation === "vertical" ? "w-full" : "flex-1 sm:flex-none"
           }
         >
-          <Link to="/explore/bring-your-own-course" className="w-full block">
+          <Link to="/content-library" className="w-full block">
             <Button
-              className="w-full justify-center px-2"
+              className="w-full justify-center px-2  "
               variant={
-                location.pathname == "/explore/bring-your-own-course"
+                location.pathname == "/content-library"
                   ? "secondary"
                   : "ghost"
               }
@@ -115,7 +115,7 @@ function NavigationMenuDemo({ orientation }) {
             orientation === "vertical" ? "w-full" : "flex-1 sm:flex-none"
           }
         >
-          <Link to="/my-journey/courses" className="w-full block">
+          <Link to="/my-journey" className="w-full block">
             <Button
               className="w-full justify-center  px-2"
               variant={
