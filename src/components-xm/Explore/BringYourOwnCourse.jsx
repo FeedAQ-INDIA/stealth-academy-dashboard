@@ -258,7 +258,7 @@ export function BringYourOwnCourse() {
 
             {/* Hero Section with Enhanced Gradient */}
             <div className="relative overflow-hidden">
-              <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700  rounded-2xl text-white shadow-2xl  ">
+              <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700  rounded-sm text-white shadow-2xl  ">
                 {/* Background Pattern */}
                 <div className="absolute inset-0 opacity-20">
                   <div className="absolute inset-0" style={{
@@ -266,16 +266,14 @@ export function BringYourOwnCourse() {
                   }}></div>
                 </div>
                 
-                <CardHeader className="relative z-10 pb-2">
+                <CardHeader className="relative z-10">
                   {/* <div className="flex items-center justify-center mb-2">
                     <Sparkles className="w-6 h-6 text-yellow-300 animate-float" />
                   </div> */}
-                  <CardTitle className="text-center tracking-wide text-2xl md:text-3xl  font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                  <CardTitle className="text-center tracking-wide text-2xl md:text-3xl  font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent drop-shadow-lg">
                     What would you like to learn today?
                   </CardTitle>
-                  <p className="text-center text-white/90 mt-2 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-                    Discover thousands of courses from beginner to advanced levels
-                  </p>
+ 
                 </CardHeader>
 
               </Card>
