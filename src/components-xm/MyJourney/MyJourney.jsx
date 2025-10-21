@@ -94,6 +94,14 @@ export function MyJourney() {
           },
           required: false,
         },
+        {
+          datasource: "CourseAccess",
+          as: "accessControls",
+          where: {
+            userId: userDetail.userId,
+          },
+          required: true,
+        },
       ],
     },
   });
@@ -221,36 +229,7 @@ export function MyJourney() {
       },
     });
   };
-
-  const handleSortChange = (value) => {
-    setSortBy(value);
-    // Add sorting logic here based on the value
-    let orderClause = [];
-    switch (value) {
-      case 'title':
-        orderClause = [["courseTitle", "ASC"]];
-        break;
-      case 'recent':
-        orderClause = [["createdAt", "DESC"]];
-        break;
-      case 'progress':
-        // This would need to be implemented based on your progress tracking
-        orderClause = [["updatedAt", "DESC"]];
-        break;
-      default:
-        orderClause = [["createdAt", "DESC"]];
-    }
-    
-    updateApiQuery("Course", {
-      order: orderClause,
-    });
-  };
-
-  const handleFilterChange = (value) => {
-    setFilterBy(value);
-    // Add filtering logic here based on the value
-    // This would depend on how you track course status
-  };
+ 
 
   useEffect(() => {
     setApiQuery({
@@ -280,7 +259,15 @@ export function MyJourney() {
               userId: userDetail.userId,
             },
             required: false,
-          }
+          },
+                  {
+          datasource: "CourseAccess",
+          as: "accessControls",
+          where: {
+            userId: userDetail.userId,
+          },
+          required: true,
+        },
         ],
       },
     });

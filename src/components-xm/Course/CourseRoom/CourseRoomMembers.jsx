@@ -17,6 +17,7 @@ import { useAuthStore } from "@/zustland/store";
 import { useCourseRoomMembers } from "@/hooks/useCourseRoomMembers.js";
 import { MemberInviteSheet } from "../components/MemberInviteSheet";
 import { MemberDetailsSheet } from "../components/MemberDetailsSheet";
+import { InvitedMemberDetailsSheet } from "../components/InvitedMemberDetailsSheet";
 import { MemberUpdateSheet } from "../components/MemberUpdateSheet";
 import { RevokeAccessDialog } from "../components/RevokeAccessDialog";
 import { MembersTable } from "../components/MembersTable";
@@ -56,6 +57,7 @@ function CourseRoomMembers() {
   const [viewMode, setViewMode] = useState("members");
   const [inviteSheetOpen, setInviteSheetOpen] = useState(false);
   const [memberDetailsSheetOpen, setMemberDetailsSheetOpen] = useState(false);
+  const [invitedMemberDetailsSheetOpen, setInvitedMemberDetailsSheetOpen] = useState(false);
   const [memberUpdateSheetOpen, setMemberUpdateSheetOpen] = useState(false);
   const [revokeDialogOpen, setRevokeDialogOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
@@ -64,6 +66,11 @@ function CourseRoomMembers() {
   const handleViewMemberDetails = (member) => {
     setSelectedMember(member);
     setMemberDetailsSheetOpen(true);
+  };
+
+  const handleViewInvitedMemberDetails = (member) => {
+    setSelectedMember(member);
+    setInvitedMemberDetailsSheetOpen(true);
   };
 
   const handleUpdateMember = (member) => {
@@ -179,7 +186,7 @@ function CourseRoomMembers() {
             invitedMembers={invitedMembers}
             isCourseOwner={isCourseOwner}
             isAdmin={isAdmin}
-            onViewDetails={handleViewMemberDetails}
+            onViewDetails={handleViewInvitedMemberDetails}
             onCancelInvite={handleCancelInvite}
           />
         )}
@@ -191,6 +198,13 @@ function CourseRoomMembers() {
         onOpenChange={setMemberDetailsSheetOpen}
         member={selectedMember}
         courseOwnerId={courseList?.userId}
+      />
+
+      {/* Invited Member Details Sheet */}
+      <InvitedMemberDetailsSheet
+        open={invitedMemberDetailsSheetOpen}
+        onOpenChange={setInvitedMemberDetailsSheetOpen}
+        member={selectedMember}
       />
 
       {/* Member Update Sheet */}

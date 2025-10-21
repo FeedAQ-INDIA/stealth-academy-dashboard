@@ -19,6 +19,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog.jsx";
 import { Calendar, Eye, Trash2 } from "lucide-react";
+import PropTypes from "prop-types";
 
 /**
  * InvitedMembersTable Component
@@ -89,7 +90,7 @@ export function InvitedMembersTable({
                       View
                     </Button>
 
-                    {(isCourseOwner || isAdmin) && (
+                    {(isCourseOwner || isAdmin ) && member.inviteStatus != 'DECLINED' && (
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button
@@ -134,3 +135,19 @@ export function InvitedMembersTable({
     </div>
   );
 }
+
+InvitedMembersTable.propTypes = {
+  invitedMembers: PropTypes.arrayOf(
+    PropTypes.shape({
+      inviteeEmail: PropTypes.string,
+      inviteStatus: PropTypes.string,
+      v_expires_date: PropTypes.string,
+      v_expires_time: PropTypes.string,
+      v_created_date: PropTypes.string,
+    })
+  ),
+  isCourseOwner: PropTypes.bool,
+  isAdmin: PropTypes.bool,
+  onViewDetails: PropTypes.func.isRequired,
+  onCancelInvite: PropTypes.func.isRequired,
+};
