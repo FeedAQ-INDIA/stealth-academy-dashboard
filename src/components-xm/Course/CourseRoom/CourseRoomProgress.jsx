@@ -107,8 +107,6 @@ function CourseRoomProgress() {
   const [viewMode, setViewMode] = useState("overview"); // overview | detailed
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-
-
   useEffect(() => {
     if (!courseList?.courseId) {
       console.log("No courseId available yet");
@@ -197,10 +195,6 @@ function CourseRoomProgress() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseList?.courseId]);
 
-
-
-
-
   // Calculate overall statistics
   const overallStats = useMemo(() => {
     if (!progressData || progressData.length === 0) {
@@ -234,7 +228,7 @@ function CourseRoomProgress() {
       if (m.progressSummary?.overallProgressPercent != null) {
         return sum + m.progressSummary.overallProgressPercent;
       }
-      
+
       // Fallback to calculating from activity logs
       const activities = m.activityLogs || [];
       const completedActivities = activities.filter(
@@ -261,7 +255,9 @@ function CourseRoomProgress() {
         return sum + days;
       }, 0);
 
-    const completedCount = progressData.filter((m) => m.enrollment?.completionDate).length;
+    const completedCount = progressData.filter(
+      (m) => m.enrollment?.completionDate
+    ).length;
 
     return {
       totalMembers: progressData.length,
@@ -270,9 +266,7 @@ function CourseRoomProgress() {
       averageProgress: Math.round(averageProgress),
       totalActivities,
       avgCompletionTime:
-        completedCount > 0
-          ? Math.round(avgCompletionTime / completedCount)
-          : 0,
+        completedCount > 0 ? Math.round(avgCompletionTime / completedCount) : 0,
     };
   }, [progressData]);
 
@@ -286,7 +280,9 @@ function CourseRoomProgress() {
           return {
             ...member,
             completedCount: member.progressSummary.completedContent || 0,
-            totalProgress: Math.round(member.progressSummary.overallProgressPercent || 0),
+            totalProgress: Math.round(
+              member.progressSummary.overallProgressPercent || 0
+            ),
           };
         }
 
@@ -422,369 +418,210 @@ function CourseRoomProgress() {
         </Card>
       </div>
 
-      {/* Leaderboard Section */}
-      {leaderboard.length > 0 && (
-        <Card className="border-0 bg-white shadow-sm rounded-sm">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-yellow-600" />
-              <CardTitle className="text-lg">Top Performers</CardTitle>
-            </div>
-            <CardDescription>
-              Members leading in course completion
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {leaderboard.map((member, index) => {
-                const displayName =
-                  member.displayName ||
-                  `${member.user?.firstName || ""} ${
-                    member.user?.lastName || ""
-                  }`.trim() ||
-                  "Unknown User";
-                const initials = displayName
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .substring(0, 2)
-                  .toUpperCase();
-
-                return (
-                  <div
-                    key={member.userId || index}
-                    className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                  >
-                    {/* Rank Badge */}
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                        index === 0
-                          ? "bg-yellow-400 text-yellow-900"
-                          : index === 1
-                          ? "bg-gray-300 text-gray-700"
-                          : index === 2
-                          ? "bg-orange-300 text-orange-900"
-                          : "bg-blue-100 text-blue-700"
-                      }`}
-                    >
-                      {index + 1}
-                    </div>
-
-                    {/* User Info */}
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage
-                        src={member.avatar || member.user?.profilePicture}
-                        alt={displayName}
-                      />
-                      <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold">
-                        {initials}
-                      </AvatarFallback>
-                    </Avatar>
-
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 truncate">
-                        {displayName}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {member.completedCount} activities completed
-                      </p>
-                    </div>
-
-                    {/* Progress */}
-                    <div className="flex items-center gap-2">
-                      <div className="w-24">
-                        <Progress
-                          value={member.totalProgress}
-                          className="h-2"
-                        />
-                      </div>
-                      <span className="text-sm font-semibold text-gray-700 w-12 text-right">
-                        {member.totalProgress}%
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Members Progress List */}
-      <Card className="border-0 bg-white shadow-sm rounded-sm">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-blue-600" />
-              <CardTitle className="text-lg">Member Progress Details</CardTitle>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setViewMode(viewMode === "overview" ? "detailed" : "overview")
-              }
-            >
-              {viewMode === "overview" ? "Detailed View" : "Overview"}
-            </Button>
-          </div>
-          <CardDescription>
-            Track individual member progress and activity logs
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {progressData.length === 0 ? (
-            <div className="text-center py-12">
-              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                No Members Found
-              </h3>
-              <p className="text-gray-500">
-                No members have enrolled in this course yet
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {progressData.map((member, index) => {
-                const displayName =
-                  member.displayName ||
-                  `${member.user?.firstName || ""} ${
-                    member.user?.lastName || ""
-                  }`.trim() ||
-                  "Unknown User";
-                const initials = displayName
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .substring(0, 2)
-                  .toUpperCase();
-                const enrollment = member.enrollment;
-                
-                // Use progressSummary if available
-                const activities = member.activityLogs || [];
-                const completedActivities = member.progressSummary 
-                  ? member.progressSummary.completedContent 
-                  : activities.filter((a) => a.progressStatus === "COMPLETED").length;
-                
-                const totalActivities = member.progressSummary 
-                  ? member.progressSummary.totalContent 
-                  : activities.length;
-                
-                const progressPercent = member.progressSummary
-                  ? Math.round(member.progressSummary.overallProgressPercent || 0)
-                  : totalActivities > 0
-                    ? Math.round((completedActivities / totalActivities) * 100)
-                    : 0;
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <BarChart3 className="h-5 w-5 text-blue-600" />
+          <CardTitle className="text-lg tracking-wide">
+            Member Progress
+          </CardTitle>
+        </div>
+      </div>
+      {progressData.length === 0 ? (
+        <div className="text-center py-12">
+          <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">
+            No Members Found
+          </h3>
+          <p className="text-gray-500">
+            No members have enrolled in this course yet
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {progressData.map((member, index) => {
+            const displayName =
+              member.displayName ||
+              `${member.user?.firstName || ""} ${
+                member.user?.lastName || ""
+              }`.trim() ||
+              "Unknown User";
+            const initials = displayName
+              .split(" ")
+              .map((n) => n[0])
+              .join("")
+              .substring(0, 2)
+              .toUpperCase();
+            const enrollment = member.enrollment;
 
-                const statusInfo = enrollment
-                  ? ENROLLMENT_STATUS[enrollment.enrollmentStatus] ||
-                    ENROLLMENT_STATUS.ENROLLED
-                  : null;
+            // Use progressSummary if available
+            const activities = member.activityLogs || [];
+            const completedActivities = member.progressSummary
+              ? member.progressSummary.completedContent
+              : activities.filter((a) => a.progressStatus === "COMPLETED")
+                  .length;
 
-                const StatusIcon = statusInfo?.icon || BookOpen;
+            const totalActivities = member.progressSummary
+              ? member.progressSummary.totalContent
+              : activities.length;
 
-                return (
-                  <div
-                    key={member.userId || index}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+            const progressPercent = member.progressSummary
+              ? Math.round(member.progressSummary.overallProgressPercent || 0)
+              : totalActivities > 0
+              ? Math.round((completedActivities / totalActivities) * 100)
+              : 0;
+
+            const statusInfo = enrollment
+              ? ENROLLMENT_STATUS[enrollment.enrollmentStatus] ||
+                ENROLLMENT_STATUS.ENROLLED
+              : null;
+
+            const StatusIcon = statusInfo?.icon || BookOpen;
+
+            return (
+              <div
+                key={member.userId || index}
+                className="border border-gray-200 bg-white rounded-lg p-4 hover:shadow-md transition-shadow"
+              >
+                {/* Member Header */}
+                <div className="flex items-start gap-4 mb-4">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage
+                      src={member.avatar || member.user?.profilePicture}
+                      alt={displayName}
+                    />
+                    <AvatarFallback className="bg-gradient-to-br from-blue-400 to-purple-500 text-white font-semibold">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-semibold text-gray-900 truncate">
+                        {displayName}
+                      </h4>
+                      {enrollment && (
+                        <Badge className={statusInfo.color}>
+                          <StatusIcon className="h-3 w-3 mr-1" />
+                          {statusInfo.label}
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      {member.user?.email || "No email"}
+                    </p>
+                  </div>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedMember(member);
+                      setIsSheetOpen(true);
+                    }}
                   >
-                    {/* Member Header */}
-                    <div className="flex items-start gap-4 mb-4">
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage
-                          src={member.avatar || member.user?.profilePicture}
-                          alt={displayName}
-                        />
-                        <AvatarFallback className="bg-gradient-to-br from-blue-400 to-purple-500 text-white font-semibold">
-                          {initials}
-                        </AvatarFallback>
-                      </Avatar>
+                    View Details
+                  </Button>
+                </div>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-semibold text-gray-900 truncate">
-                            {displayName}
-                          </h4>
-                          {enrollment && (
-                            <Badge className={statusInfo.color}>
-                              <StatusIcon className="h-3 w-3 mr-1" />
-                              {statusInfo.label}
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          {member.user?.email || "No email"}
+                {/* Enrollment Info */}
+                {enrollment && (
+                  <div className="bg-gray-50 rounded-lg p-3 mb-3">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                      <div>
+                        <p className="text-gray-600 flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          Enrolled
+                        </p>
+                        <p className="font-medium text-gray-900">
+                          {enrollment.v_created_date ||
+                            formatDate(enrollment.enrollmentDate)}
                         </p>
                       </div>
-
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedMember(member);
-                          setIsSheetOpen(true);
-                        }}
-                      >
-                        View Details
-                      </Button>
+                      <div>
+                        <p className="text-gray-600 flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          Last Active
+                        </p>
+                        <p className="font-medium text-gray-900">
+                          {enrollment.v_updated_date ||
+                            formatDate(enrollment.enrollment_updated_at)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 flex items-center gap-1">
+                          <Timer className="h-3 w-3" />
+                          Days Active
+                        </p>
+                        <p className="font-medium text-gray-900">
+                          {getDaysSince(enrollment.enrollmentDate)} days
+                        </p>
+                      </div>
+                      {enrollment.completionDate && (
+                        <div>
+                          <p className="text-gray-600 flex items-center gap-1">
+                            <Award className="h-3 w-3" />
+                            Completed
+                          </p>
+                          <p className="font-medium text-gray-900">
+                            {enrollment.v_completed_date ||
+                              formatDate(enrollment.completionDate)}
+                          </p>
+                        </div>
+                      )}
                     </div>
-
-                    {/* Enrollment Info */}
-                    {enrollment && (
-                      <div className="bg-gray-50 rounded-lg p-3 mb-3">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                          <div>
-                            <p className="text-gray-600 flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              Enrolled
-                            </p>
-                            <p className="font-medium text-gray-900">
-                              {enrollment.v_created_date ||
-                                formatDate(enrollment.enrollmentDate)}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-600 flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              Last Active
-                            </p>
-                            <p className="font-medium text-gray-900">
-                              {enrollment.v_updated_date ||
-                                formatDate(enrollment.enrollment_updated_at)}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-600 flex items-center gap-1">
-                              <Timer className="h-3 w-3" />
-                              Days Active
-                            </p>
-                            <p className="font-medium text-gray-900">
-                              {getDaysSince(enrollment.enrollmentDate)} days
-                            </p>
-                          </div>
-                          {enrollment.completionDate && (
-                            <div>
-                              <p className="text-gray-600 flex items-center gap-1">
-                                <Award className="h-3 w-3" />
-                                Completed
-                              </p>
-                              <p className="font-medium text-gray-900">
-                                {enrollment.v_completed_date ||
-                                  formatDate(enrollment.completionDate)}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Progress Bar */}
-                    <div className="mb-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">
-                          Progress: {completedActivities} / {totalActivities}{" "}
-                          activities
-                        </span>
-                        <span className="text-sm font-bold text-blue-600">
-                          {progressPercent}%
-                        </span>
-                      </div>
-                      <Progress value={progressPercent} className="h-2" />
-                    </div>
-
-                    {/* Activity Summary */}
-                    {totalActivities > 0 && (
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
-                          <span>{completedActivities} completed</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Activity className="h-4 w-4 text-blue-600" />
-                          <span>{totalActivities} total</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* No Enrollment Message */}
-                    {!enrollment && (
-                      <Alert className="bg-yellow-50 border-yellow-200">
-                        <AlertCircle className="h-4 w-4 text-yellow-600" />
-                        <AlertDescription className="text-yellow-800">
-                          This member hasn&apos;t enrolled in the course yet
-                        </AlertDescription>
-                      </Alert>
-                    )}
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                )}
 
-      {/* Insights Card */}
-      <Card className="border-0 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-sm">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <TrendingUp className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900">Course Insights</h3>
-              <p className="text-sm text-gray-600">
-                Performance overview and trends
-              </p>
-            </div>
-          </div>
+                {/* Progress Bar */}
+                <div className="mb-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">
+                      Progress: {completedActivities} / {totalActivities}{" "}
+                      activities
+                    </span>
+                    <span className="text-sm font-bold text-blue-600">
+                      {progressPercent}%
+                    </span>
+                  </div>
+                  <Progress value={progressPercent} className="h-2" />
+                </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div className="bg-white p-4 rounded-lg">
-              <p className="text-gray-600 mb-1">Completion Rate</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {overallStats.enrolledMembers > 0
-                  ? Math.round(
-                      (overallStats.completedMembers /
-                        overallStats.enrolledMembers) *
-                        100
-                    )
-                  : 0}
-                %
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                {overallStats.completedMembers} of{" "}
-                {overallStats.enrolledMembers} completed
-              </p>
-            </div>
-            <div className="bg-white p-4 rounded-lg">
-              <p className="text-gray-600 mb-1">Avg. Completion Time</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {overallStats.avgCompletionTime} days
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                Estimated time to complete
-              </p>
-            </div>
-            <div className="bg-white p-4 rounded-lg">
-              <p className="text-gray-600 mb-1">Engagement Score</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {overallStats.averageProgress > 75
-                  ? "🔥 High"
-                  : overallStats.averageProgress > 40
-                  ? "👍 Good"
-                  : "📈 Growing"}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                Based on activity and progress
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+                {/* Activity Summary */}
+                {totalActivities > 0 && (
+                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                    <div className="flex items-center gap-1">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <span>{completedActivities} completed</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Activity className="h-4 w-4 text-blue-600" />
+                      <span>{totalActivities} total</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* No Enrollment Message */}
+                {!enrollment && (
+                  <Alert className="bg-yellow-50 border-yellow-200">
+                    <AlertCircle className="h-4 w-4 text-yellow-600" />
+                    <AlertDescription className="text-yellow-800">
+                      This member hasn&apos;t enrolled in the course yet
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Member Details Sheet - Full Screen */}
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetContent side="bottom" className="w-full h-full overflow-y-auto p-0">
+        <SheetContent
+          side="bottom"
+          className="w-full h-full overflow-y-auto p-0"
+        >
           {selectedMember &&
             (() => {
               const displayName =
@@ -800,22 +637,25 @@ function CourseRoomProgress() {
                 .substring(0, 2)
                 .toUpperCase();
               const enrollment = selectedMember.enrollment;
-              
+
               // Use progressSummary if available
               const activities = selectedMember.activityLogs || [];
-              const completedActivities = selectedMember.progressSummary 
-                ? selectedMember.progressSummary.completedContent 
-                : activities.filter((a) => a.progressStatus === "COMPLETED").length;
-              
-              const totalActivities = selectedMember.progressSummary 
-                ? selectedMember.progressSummary.totalContent 
+              const completedActivities = selectedMember.progressSummary
+                ? selectedMember.progressSummary.completedContent
+                : activities.filter((a) => a.progressStatus === "COMPLETED")
+                    .length;
+
+              const totalActivities = selectedMember.progressSummary
+                ? selectedMember.progressSummary.totalContent
                 : activities.length;
-              
+
               const progressPercent = selectedMember.progressSummary
-                ? Math.round(selectedMember.progressSummary.overallProgressPercent || 0)
+                ? Math.round(
+                    selectedMember.progressSummary.overallProgressPercent || 0
+                  )
                 : totalActivities > 0
-                  ? Math.round((completedActivities / totalActivities) * 100)
-                  : 0;
+                ? Math.round((completedActivities / totalActivities) * 100)
+                : 0;
 
               const statusInfo = enrollment
                 ? ENROLLMENT_STATUS[enrollment.enrollmentStatus] ||
@@ -873,7 +713,8 @@ function CourseRoomProgress() {
                         </div>
                       </div>
                       <SheetDescription className="text-sm text-gray-600">
-                        Detailed progress tracking and activity timeline for this member
+                        Detailed progress tracking and activity timeline for
+                        this member
                       </SheetDescription>
                     </SheetHeader>
                   </div>
@@ -881,7 +722,7 @@ function CourseRoomProgress() {
                   {/* Content Section */}
                   <div className="flex-1 overflow-y-auto p-6 space-y-6">
                     {/* Progress Overview Cards */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-4 gap-4">
                       <Card className="border-0 bg-white shadow-sm">
                         <CardContent className="p-4">
                           <div className="flex items-center gap-3">
@@ -1053,14 +894,15 @@ function CourseRoomProgress() {
                             {courseContentList.map((content, contentIndex) => {
                               // Find matching activity log for this content
                               const activity = activities.find(
-                                (a) => a.courseContentId === content.courseContentId
+                                (a) =>
+                                  a.courseContentId === content.courseContentId
                               );
-                              
+
                               // Determine status
-                              const progressStatus = activity 
-                                ? activity.progressStatus 
+                              const progressStatus = activity
+                                ? activity.progressStatus
                                 : "NOT_STARTED";
-                              
+
                               const statusConfig =
                                 PROGRESS_STATUS[progressStatus] ||
                                 PROGRESS_STATUS.NOT_STARTED;
@@ -1086,11 +928,13 @@ function CourseRoomProgress() {
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between mb-1">
                                       <h4 className="font-semibold text-sm text-gray-900 line-clamp-2">
-                                        {content.courseContentTitle || 
+                                        {content.courseContentTitle ||
                                           `Content #${content.courseContentId}`}
                                       </h4>
                                       <Badge className={statusConfig.bgColor}>
-                                        <span className={`${statusConfig.color} text-xs`}>
+                                        <span
+                                          className={`${statusConfig.color} text-xs`}
+                                        >
                                           {statusConfig.label}
                                         </span>
                                       </Badge>
@@ -1099,39 +943,52 @@ function CourseRoomProgress() {
                                       {content.courseContentCategory && (
                                         <div className="flex items-center gap-1">
                                           <BookOpen className="h-3 w-3" />
-                                          <span>{content.courseContentCategory}</span>
+                                          <span>
+                                            {content.courseContentCategory}
+                                          </span>
                                         </div>
                                       )}
                                       {content.courseContentSequence && (
                                         <div className="flex items-center gap-1">
-                                          <span className="font-medium">Seq: {content.courseContentSequence}</span>
+                                          <span className="font-medium">
+                                            Seq: {content.courseContentSequence}
+                                          </span>
                                         </div>
                                       )}
                                       {activity?.v_updated_date && (
                                         <>
                                           <div className="flex items-center gap-1">
                                             <Calendar className="h-3 w-3" />
-                                            <span>{activity.v_updated_date}</span>
+                                            <span>
+                                              {activity.v_updated_date}
+                                            </span>
                                           </div>
                                           <div className="flex items-center gap-1">
                                             <Clock className="h-3 w-3" />
-                                            <span>{activity.v_updated_time}</span>
+                                            <span>
+                                              {activity.v_updated_time}
+                                            </span>
                                           </div>
                                         </>
                                       )}
-                                      {activity && activity.activityDuration > 0 && (
-                                        <div className="flex items-center gap-1">
-                                          <Timer className="h-3 w-3" />
-                                          <span>
-                                            {activity.activityDuration} min
-                                          </span>
-                                        </div>
-                                      )}
+                                      {activity &&
+                                        activity.activityDuration > 0 && (
+                                          <div className="flex items-center gap-1">
+                                            <Timer className="h-3 w-3" />
+                                            <span>
+                                              {activity.activityDuration} min
+                                            </span>
+                                          </div>
+                                        )}
                                       {content.courseContentDuration && (
                                         <div className="flex items-center gap-1 text-gray-500">
                                           <Timer className="h-3 w-3" />
                                           <span>
-                                            Duration: {Math.floor(content.courseContentDuration / 60)} min
+                                            Duration:{" "}
+                                            {Math.floor(
+                                              content.courseContentDuration / 60
+                                            )}{" "}
+                                            min
                                           </span>
                                         </div>
                                       )}
@@ -1169,20 +1026,29 @@ function CourseRoomProgress() {
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between mb-1">
                                       <h4 className="font-semibold text-sm text-gray-900 line-clamp-2">
-                                        {activity.contentDetails?.courseContentTitle || 
+                                        {activity.contentDetails
+                                          ?.courseContentTitle ||
                                           `Content #${activity.courseContentId}`}
                                       </h4>
                                       <Badge className={statusConfig.bgColor}>
-                                        <span className={`${statusConfig.color} text-xs`}>
+                                        <span
+                                          className={`${statusConfig.color} text-xs`}
+                                        >
                                           {statusConfig.label}
                                         </span>
                                       </Badge>
                                     </div>
                                     <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600">
-                                      {activity.contentDetails?.courseContentCategory && (
+                                      {activity.contentDetails
+                                        ?.courseContentCategory && (
                                         <div className="flex items-center gap-1">
                                           <BookOpen className="h-3 w-3" />
-                                          <span>{activity.contentDetails.courseContentCategory}</span>
+                                          <span>
+                                            {
+                                              activity.contentDetails
+                                                .courseContentCategory
+                                            }
+                                          </span>
                                         </div>
                                       )}
                                       <div className="flex items-center gap-1">
@@ -1221,54 +1087,7 @@ function CourseRoomProgress() {
                       </CardContent>
                     </Card>
 
-                    {/* User Details */}
-                    <Card className="border-0 bg-white shadow-sm">
-                      <CardHeader>
-                        <CardTitle className="text-base flex items-center gap-2">
-                          <User className="h-4 w-4 text-blue-600" />
-                          User Information
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="grid grid-cols-1 gap-3">
-                          <div className="p-3 bg-gray-50 rounded-lg">
-                            <p className="text-xs text-gray-600 mb-1">
-                              User ID
-                            </p>
-                            <p className="font-semibold text-sm text-gray-900">
-                              {selectedMember.userId}
-                            </p>
-                          </div>
-                          <div className="p-3 bg-gray-50 rounded-lg">
-                            <p className="text-xs text-gray-600 mb-1">
-                              Email Address
-                            </p>
-                            <p className="font-semibold text-sm text-gray-900 break-all">
-                              {selectedMember.user?.email || "Not provided"}
-                            </p>
-                          </div>
-                          <div className="p-3 bg-gray-50 rounded-lg">
-                            <p className="text-xs text-gray-600 mb-1">
-                              Full Name
-                            </p>
-                            <p className="font-semibold text-sm text-gray-900">
-                              {selectedMember.user?.firstName}{" "}
-                              {selectedMember.user?.lastName}
-                            </p>
-                          </div>
-                          {selectedMember.user?.number && (
-                            <div className="p-3 bg-gray-50 rounded-lg">
-                              <p className="text-xs text-gray-600 mb-1">
-                                Phone Number
-                              </p>
-                              <p className="font-semibold text-sm text-gray-900">
-                                {selectedMember.user.number}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
+
                   </div>
                 </div>
               );
