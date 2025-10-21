@@ -60,16 +60,6 @@ function CourseRoom() {
   const [canScrollRight, setCanScrollRight] = useState(false);
   const tabsContainerRef = useRef(null);
 
-  // Tab configuration
-  const tabs = [
-    { id: "members", label: "Members", icon: Users, path: `/course/${CourseId}/room/members` },
-    { id: "progress", label: "Progress", icon: Activity, path: `/course/${CourseId}/room/progress` },
-    { id: "leaderboard", label: "Leaderboard", icon: Activity, path: `/course/${CourseId}/room/leaderboard` },
-    // { id: "discussions", label: "Discussions", icon: MessageSquare, path: `/course/${CourseId}/room/discussions` },
-    // { id: "resources", label: "Resources", icon: BookOpen, path: `/course/${CourseId}/room/resources` },
-    // { id: "activities", label: "Activities", icon: Activity, path: `/course/${CourseId}/room/activities` },
-    { id: "settings", label: "Settings", icon: Settings, path: `/course/${CourseId}/room/settings` },
-  ];
 
   // Get current active tab based on location
   const getCurrentTab = () => {
@@ -178,6 +168,21 @@ function CourseRoom() {
 
   // Check if user is course owner
   const isCourseOwner = courseList?.userId === userDetail?.userId;
+
+  // Tab configuration - using useMemo to recalculate when isCourseOwner changes
+  const tabs = useMemo(() => [
+    ...(isCourseOwner ? [{ id: "members", label: "Members", icon: Users, path: `/course/${CourseId}/room/members` }] : []),
+    ...(isCourseOwner ? [{ id: "progress", label: "Progress", icon: Activity, path: `/course/${CourseId}/room/progress` }] : []),
+    { id: "leaderboard", label: "Leaderboard", icon: Activity, path: `/course/${CourseId}/room/leaderboard` },
+    ...(isCourseOwner ? [{ id: "settings", label: "Settings", icon: Settings, path: `/course/${CourseId}/room/settings` }] : []),
+  ], [isCourseOwner, CourseId]);
+
+  useEffect(() => {
+    if(!isCourseOwner){
+        navigate(`/course/${CourseId}/room/leaderboard`, { replace: true });
+    }
+  },[isCourseOwner])
+
 
   // Handle member removal
   const handleRemoveMember = async (userId, displayName) => {

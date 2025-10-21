@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import {
   Card,
@@ -15,13 +15,17 @@ import { Skeleton } from "@/components/ui/skeleton.jsx";
 import { useToast } from "@/hooks/use-toast.js";
 import {
   Trophy,
-  Medal,
-  Award,
+  Target,
   TrendingUp,
+  Award,
+  Users,
+  BarChart3,
+  Zap,
   Flame,
   Star,
   Crown,
-  Zap,
+  Medal,
+  CheckCircle,
 } from "lucide-react";
 import axiosConn from "@/axioscon.js";
 
@@ -87,7 +91,8 @@ function CourseRoomLeaderboard() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [leaderboardData, setLeaderboardData] = useState([]);
-  const [timeRange, setTimeRange] = useState("all-time"); // all-time, monthly, weekly
+  const [statistics, setStatistics] = useState(null);
+  const [sortBy, setSortBy] = useState("score"); // score, progress, quiz, time
 
   // Fetch leaderboard data
   useEffect(() => {
@@ -96,177 +101,112 @@ function CourseRoomLeaderboard() {
       return;
     }
 
+    setIsLoading(true);
+
     axiosConn
-      .post(import.meta.env.VITE_API_URL + "/searchCourse", {
-        limit: 100,
-        offset: 0,
-        getThisData: {
-          datasource: "User",
-          attributes: [],
-          include: [
-            {
-              datasource: "CourseAccess",
-              as: "courseAccess",
-              required: true,
-              where: {
-                courseId: courseList?.courseId,
-              },
-            },
-            {
-              datasource: "UserCourseEnrollment",
-              as: "enrollments",
-              required: false,
-            },
-            {
-              datasource: "UserCourseContentProgress",
-              as: "activityLogs",
-              required: false,
-              include: [
-                {
-                  datasource: "CourseContent",
-                  as: "courseContent",
-                  required: false,
-                },
-              ],
-            },
-            {
-              datasource: "QuizResultLog",
-              as: "quizResults",
-              required: false,
-            },
-          ],
-        },
+      .post(import.meta.env.VITE_API_URL + "/getCourseLeaderboard", {
+        courseId: courseList.courseId,
+        limit: 0, // Get all users
+        sortBy: sortBy,
       })
       .then((res) => {
-        const users = res.data?.results || [];
+        const data = res.data?.data;
         
-        // Process and calculate leaderboard metrics
-        const processedData = users
-          .map((user) => {
-            const enrollment = user.enrollments?.[0];
-            const activities = user.activityLogs || [];
-            const quizResults = user.quizResults || [];
+        if (!data) {
+          setLeaderboardData([]);
+          setStatistics(null);
+          setIsLoading(false);
+          return;
+        }
 
-            const completedActivities = activities.filter(
-              (a) => a.progressStatus === "COMPLETED"
-            ).length;
+        // Map API response to component format
+        const processedData = (data.leaderboard || []).map((user) => {
+          // Calculate activity streak (days)
+          const activityStreak = user.lastActivityDate 
+            ? Math.max(1, Math.floor((Date.now() - new Date(user.lastActivityDate).getTime()) / (1000 * 60 * 60 * 24)))
+            : 0;
 
-            const totalActivities = activities.length;
-            const progressPercent =
-              totalActivities > 0
-                ? Math.round((completedActivities / totalActivities) * 100)
-                : 0;
+          // Determine achievements based on user stats
+          const achievements = determineAchievements({
+            progressPercent: user.progressPercent,
+            completedActivities: user.completedContent,
+            totalTimeSpent: user.totalActivityHours * 3600, // Convert hours to seconds
+            activityStreak: activityStreak,
+            avgQuizScore: user.averageQuizScore,
+            status: user.status,
+            passedQuizzes: user.passedQuizzes,
+          });
 
-            // Calculate total time spent
-            const totalTimeSpent = activities.reduce(
-              (sum, activity) => sum + (parseInt(activity.activityDuration) || 0),
-              0
-            );
-
-            // Calculate average quiz score
-            const avgQuizScore =
-              quizResults.length > 0
-                ? quizResults.reduce((sum, quiz) => sum + (quiz.score || 0), 0) /
-                  quizResults.length
-                : 0;
-
-            // Calculate activity streak (consecutive days)
-            const activityStreak = calculateStreak(activities);
-
-            // Determine achievements
-            const achievements = determineAchievements({
-              progressPercent,
-              completedActivities,
-              totalTimeSpent,
-              activityStreak,
-              avgQuizScore,
-            });
-
-            // Calculate overall score for ranking
-            const overallScore =
-              progressPercent * 0.4 +
-              (completedActivities / Math.max(totalActivities, 1)) * 100 * 0.3 +
-              Math.min(activityStreak * 5, 100) * 0.2 +
-              avgQuizScore * 0.1;
-
-            return {
-              userId: user.userId,
-              displayName: `${user.firstName || ""} ${user.lastName || ""}`.trim() || "Unknown User",
-              email: user.email,
-              avatar: user.profilePicture,
-              progressPercent,
-              completedActivities,
-              totalActivities,
-              totalTimeSpent,
-              avgQuizScore,
-              activityStreak,
-              achievements,
-              overallScore,
-              enrollment,
-              lastActive: enrollment?.enrollment_updated_at || enrollment?.enrollmentDate,
-            };
-          })
-          .filter((user) => user.enrollment) // Only include enrolled users
-          .sort((a, b) => b.overallScore - a.overallScore); // Sort by overall score
+          return {
+            userId: user.userId,
+            rank: user.rank,
+            displayName: `${user.firstName || ""} ${user.lastName || ""}`.trim() || "Unknown User",
+            email: user.email,
+            avatar: user.profilePic,
+            progressPercent: user.progressPercent,
+            completedActivities: user.completedContent,
+            totalActivities: user.totalContent,
+            totalTimeSpent: user.totalActivityHours * 3600, // Convert to seconds
+            totalTimeHours: user.totalActivityHours,
+            avgQuizScore: user.averageQuizScore,
+            passedQuizzes: user.passedQuizzes,
+            totalQuizzes: user.totalQuizzes,
+            activityStreak: activityStreak,
+            achievements: achievements,
+            overallScore: user.leaderboardScore,
+            status: user.status,
+            enrollmentDate: user.enrollmentDate,
+            lastActive: user.lastActivityDate,
+          };
+        });
 
         setLeaderboardData(processedData);
+        setStatistics(data.statistics || null);
         setIsLoading(false);
       })
       .catch((err) => {
         console.error("Error fetching leaderboard data:", err);
         toast({
           title: "Error",
-          description: "Failed to load leaderboard data",
+          description: err.response?.data?.message || "Failed to load leaderboard data",
           variant: "destructive",
         });
+        setLeaderboardData([]);
+        setStatistics(null);
         setIsLoading(false);
       });
-  }, [courseList?.courseId, toast]);
+  }, [courseList?.courseId, sortBy, toast]);
 
-  // Calculate activity streak
-  const calculateStreak = (activities) => {
-    if (!activities || activities.length === 0) return 0;
-
-    const dates = activities
-      .map((a) => new Date(a.v_created_date || a.createdAt).toDateString())
-      .filter((date, index, self) => self.indexOf(date) === index)
-      .sort((a, b) => new Date(b) - new Date(a));
-
-    let streak = 1;
-    for (let i = 1; i < dates.length; i++) {
-      const diff = Math.floor(
-        (new Date(dates[i - 1]) - new Date(dates[i])) / (1000 * 60 * 60 * 24)
-      );
-      if (diff === 1) {
-        streak++;
-      } else {
-        break;
-      }
-    }
-
-    return streak;
-  };
-
-  // Determine user achievements
+  // Determine user achievements based on performance metrics
   const determineAchievements = ({
     progressPercent,
     completedActivities,
     totalTimeSpent,
     activityStreak,
     avgQuizScore,
+    status,
+    passedQuizzes,
   }) => {
     const achievements = [];
 
-    if (completedActivities >= 10 && progressPercent === 100) {
+    // Completion Master: Completed the course with significant content
+    if (status === "COMPLETED" && completedActivities >= 10) {
       achievements.push("COMPLETION_MASTER");
     }
+    
+    // Consistent: Active for 7+ days
     if (activityStreak >= 7) {
       achievements.push("CONSISTENT");
     }
-    if (avgQuizScore >= 90) {
+    
+    // Top Performer: High quiz average
+    if (avgQuizScore >= 90 && passedQuizzes > 0) {
       achievements.push("TOP_PERFORMER");
     }
-    if (totalTimeSpent > 0 && totalTimeSpent < 300 && progressPercent > 80) {
+    
+    // Fast Learner: High progress with moderate time investment
+    const hoursSpent = totalTimeSpent / 3600;
+    if (hoursSpent > 0 && hoursSpent < 5 && progressPercent >= 80) {
       achievements.push("FAST_LEARNER");
     }
 
@@ -286,15 +226,6 @@ function CourseRoomLeaderboard() {
     }
     return null;
   };
-
-  // Top 3 performers
-  const topThree = useMemo(() => leaderboardData.slice(0, 3), [leaderboardData]);
-
-  // Rest of the leaderboard
-  const restOfLeaderboard = useMemo(
-    () => leaderboardData.slice(3),
-    [leaderboardData]
-  );
 
   if (isLoading || contextLoading) {
     return (
@@ -329,59 +260,72 @@ function CourseRoomLeaderboard() {
   return (
     <div className="space-y-6">
       {/* Leaderboard Header */}
-      <Card className="border-0 bg-gradient-to-r from-yellow-50 via-orange-50 to-red-50 shadow-sm rounded-sm">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
-                <Trophy className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <CardTitle className="text-xl font-bold text-gray-900">
-                  Course Leaderboard
-                </CardTitle>
-                <CardDescription className="text-gray-600">
-                  Top performers ranked by overall score
-                </CardDescription>
-              </div>
-            </div>
 
-            {/* Filter Options */}
-            <div className="flex items-center gap-2">
-              <Button
-                variant={timeRange === "all-time" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setTimeRange("all-time")}
-              >
-                All Time
-              </Button>
-              <Button
-                variant={timeRange === "monthly" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setTimeRange("monthly")}
-              >
-                Monthly
-              </Button>
-              <Button
-                variant={timeRange === "weekly" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setTimeRange("weekly")}
-              >
-                Weekly
-              </Button>
+            {/* Overall Statistics Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Card className="border-0 bg-gradient-to-br from-blue-50 to-blue-100 shadow-sm rounded-sm">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                      <Users className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-blue-700 font-medium">
+                        Total Members
+                      </p>
+                      <p className="text-2xl font-bold text-blue-900">
+                  {statistics.totalUsers}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+      
+              <Card className="border-0 bg-gradient-to-br from-green-50 to-green-100 shadow-sm rounded-sm">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
+                      <CheckCircle className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-green-700 font-medium">Completed</p>
+                      <p className="text-2xl font-bold text-green-900">
+                  {statistics.completedUsers}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+      
+              <Card className="border-0 bg-gradient-to-br from-purple-50 to-purple-100 shadow-sm rounded-sm">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+                      <Target className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-purple-700 font-medium">
+                        Avg. Progress
+                      </p>
+                      <p className="text-2xl font-bold text-purple-900">
+{statistics.averageProgress.toFixed(1)}%                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+      
+         
             </div>
-          </div>
-        </CardHeader>
-      </Card>
+  <CardTitle className="text-lg flex items-center gap-2 tracking-wide">
+            <TrendingUp className="h-5 w-5 text-blue-600" />
+            Rankings
+          </CardTitle>
 
-      {/* Top 3 Podium */}
-      <Card className="border-0 bg-white shadow-sm rounded-sm">
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {topThree.map((user, index) => {
+           <div className="space-y-2">
+            {leaderboardData.map((user, index) => {
               const position = index + 1;
               const rankTier = getRankTier(position);
-              const RankIcon = rankTier?.icon || Trophy;
+              const RankIcon = rankTier?.icon;
               const initials = user.displayName
                 .split(" ")
                 .map((n) => n[0])
@@ -389,219 +333,82 @@ function CourseRoomLeaderboard() {
                 .substring(0, 2)
                 .toUpperCase();
 
+              // Special styling for top 3
+              const isTopThree = position <= 3;
+              const borderColor = 
+                position === 1 ? "border-l-yellow-400" :
+                position === 2 ? "border-l-gray-400" :
+                position === 3 ? "border-l-orange-400" :
+                "border-l-transparent";
+
               return (
                 <div
                   key={user.userId}
-                  className={`relative ${
-                    position === 1 ? "md:order-2 md:scale-110" : position === 2 ? "md:order-1" : "md:order-3"
+                  className={`flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border-l-4 ${borderColor} ${
+                    isTopThree ? "shadow-sm" : ""
                   }`}
                 >
-                  <Card
-                    className={`border-2 ${
-                      position === 1
-                        ? "border-yellow-400 bg-gradient-to-br from-yellow-50 to-orange-50"
-                        : position === 2
-                        ? "border-gray-300 bg-gradient-to-br from-gray-50 to-gray-100"
-                        : "border-orange-300 bg-gradient-to-br from-orange-50 to-red-50"
-                    } rounded-lg shadow-lg`}
-                  >
-                    <CardContent className="p-6 text-center">
-                      {/* Rank Badge */}
-                      <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                        <div
-                          className={`w-12 h-12 rounded-full bg-gradient-to-br ${rankTier.color} flex items-center justify-center shadow-lg border-4 border-white`}
-                        >
-                          <RankIcon className="h-6 w-6 text-white" />
-                        </div>
-                      </div>
 
-                      {/* Position Number */}
-                      <div className="mt-4 mb-4">
-                        <Badge
-                          className={`text-lg font-bold px-3 py-1 ${
-                            position === 1
-                              ? "bg-yellow-500 text-yellow-900"
-                              : position === 2
-                              ? "bg-gray-400 text-gray-900"
-                              : "bg-orange-400 text-orange-900"
-                          }`}
-                        >
-                          #{position}
-                        </Badge>
-                      </div>
+                  {/* Avatar */}
+                  <Avatar className={`${isTopThree ? "h-14 w-14 border-2 border-white shadow-md" : "h-12 w-12"}`}>
+                    <AvatarImage src={user.avatar} alt={user.displayName} />
+                    <AvatarFallback className={`${
+                      isTopThree 
+                        ? `bg-gradient-to-br ${rankTier.color} text-white` 
+                        : "bg-gradient-to-br from-blue-400 to-purple-500 text-white"
+                    } font-semibold`}>
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
 
-                      {/* Avatar */}
-                      <Avatar className="h-20 w-20 mx-auto mb-3 border-4 border-white shadow-lg">
-                        <AvatarImage src={user.avatar} alt={user.displayName} />
-                        <AvatarFallback
-                          className={`text-xl font-bold bg-gradient-to-br ${rankTier.color} text-white`}
-                        >
-                          {initials}
-                        </AvatarFallback>
-                      </Avatar>
-
-                      {/* Name */}
-                      <h3 className="font-bold text-lg text-gray-900 mb-1 truncate">
+                  {/* User Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className={`${isTopThree ? "font-bold text-lg" : "font-semibold"} text-gray-900 truncate`}>
                         {user.displayName}
-                      </h3>
-
-                      {/* Score */}
-                      <p className="text-2xl font-bold text-blue-600 mb-3">
-                        {Math.round(user.overallScore)} pts
-                      </p>
-
-                      {/* Progress */}
-                      <div className="mb-3">
-                        <Progress value={user.progressPercent} className="h-2 mb-1" />
-                        <p className="text-sm text-gray-600">
-                          {user.progressPercent}% Complete
-                        </p>
-                      </div>
-
-                      {/* Stats */}
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div className="bg-white/50 rounded p-2">
-                          <p className="text-gray-600">Activities</p>
-                          <p className="font-bold text-gray-900">
-                            {user.completedActivities}
-                          </p>
-                        </div>
-                        <div className="bg-white/50 rounded p-2">
-                          <p className="text-gray-600">Streak</p>
-                          <p className="font-bold text-gray-900">
-                            {user.activityStreak} days
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Achievements */}
-                      {user.achievements.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-1 justify-center">
-                          {user.achievements.map((achievement) => {
-                            const badge = ACHIEVEMENT_BADGES[achievement];
-                            const BadgeIcon = badge.icon;
-                            return (
-                              <div
-                                key={achievement}
-                                className={`${badge.bgColor} rounded-full p-1.5`}
-                                title={badge.label}
-                              >
-                                <BadgeIcon className={`h-4 w-4 ${badge.color}`} />
-                              </div>
-                            );
-                          })}
-                        </div>
+                      </h4>
+                      {rankTier && (
+                        <Badge variant="outline" className="text-xs">
+                          {rankTier.label}
+                        </Badge>
                       )}
-                    </CardContent>
-                  </Card>
+                      {user.status === "COMPLETED" && (
+                        <Badge className="text-xs bg-green-100 text-green-700 border-green-300">
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Completed
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-gray-600">
+                      <span className="flex items-center gap-1">
+                        <Target className="h-3.5 w-3.5" />
+                        {user.completedActivities}/{user.totalActivities}
+                      </span>
+                      <span>•</span>
+                      <span>{user.totalTimeHours.toFixed(1)}h</span>
+                      {user.totalQuizzes > 0 && (
+                        <>
+                          <span>•</span>
+                          <span>{user.passedQuizzes}/{user.totalQuizzes} quizzes</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="hidden lg:block w-40">
+                    <Progress value={user.progressPercent} className="h-2 mb-1" />
+                    <p className="text-xs text-gray-600 text-center">
+                      {user.progressPercent}% Complete
+                    </p>
+                  </div>
+
                 </div>
               );
             })}
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Rest of Leaderboard */}
-      {restOfLeaderboard.length > 0 && (
-        <Card className="border-0 bg-white shadow-sm rounded-sm">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-blue-600" />
-              Full Leaderboard
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {restOfLeaderboard.map((user, index) => {
-                const position = index + 4;
-                const rankTier = getRankTier(position);
-                const initials = user.displayName
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .substring(0, 2)
-                  .toUpperCase();
-
-                return (
-                  <div
-                    key={user.userId}
-                    className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                  >
-                    {/* Position */}
-                    <div className="w-10 text-center">
-                      <span className="text-lg font-bold text-gray-700">
-                        #{position}
-                      </span>
-                    </div>
-
-                    {/* Avatar */}
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={user.avatar} alt={user.displayName} />
-                      <AvatarFallback className="bg-gradient-to-br from-blue-400 to-purple-500 text-white font-semibold">
-                        {initials}
-                      </AvatarFallback>
-                    </Avatar>
-
-                    {/* User Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-semibold text-gray-900 truncate">
-                          {user.displayName}
-                        </h4>
-                        {rankTier && (
-                          <Badge variant="outline" className="text-xs">
-                            {rankTier.label}
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-3 text-sm text-gray-600">
-                        <span>{user.completedActivities} activities</span>
-                        <span>•</span>
-                        <span>{user.activityStreak} day streak</span>
-                      </div>
-                    </div>
-
-                    {/* Progress */}
-                    <div className="hidden md:block w-32">
-                      <Progress value={user.progressPercent} className="h-2 mb-1" />
-                      <p className="text-xs text-gray-600 text-center">
-                        {user.progressPercent}%
-                      </p>
-                    </div>
-
-                    {/* Score */}
-                    <div className="text-right">
-                      <p className="text-xl font-bold text-blue-600">
-                        {Math.round(user.overallScore)}
-                      </p>
-                      <p className="text-xs text-gray-500">points</p>
-                    </div>
-
-                    {/* Achievements */}
-                    {user.achievements.length > 0 && (
-                      <div className="flex gap-1">
-                        {user.achievements.slice(0, 3).map((achievement) => {
-                          const badge = ACHIEVEMENT_BADGES[achievement];
-                          const BadgeIcon = badge.icon;
-                          return (
-                            <div
-                              key={achievement}
-                              className={`${badge.bgColor} rounded-full p-1.5`}
-                              title={badge.label}
-                            >
-                              <BadgeIcon className={`h-3.5 w-3.5 ${badge.color}`} />
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      
     </div>
   );
 }
