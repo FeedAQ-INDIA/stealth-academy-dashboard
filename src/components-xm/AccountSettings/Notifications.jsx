@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 const mapNotificationType = (notificationType) => {
     const typeMap = {
         'COURSE_INVITE': 'courseInvite',
+        'COURSE_INVITE_DECLINED': 'courseInviteDeclined',
         'STUDY_GROUP_INVITE': 'courseInvite',
         'COURSE_UPDATE': 'courseUpdate',
         'SYSTEM': 'systemAlert',
@@ -58,6 +59,26 @@ const NOTIFICATION_TEMPLATES = {
                     </Button>
                 </div>
             )
+        )
+    },
+    courseInviteDeclined: {
+        icon: <BookOpen className="w-5 h-5 text-red-500" />,
+        getTitle: () => `Course Invitation Declined`,
+        getMessage: (data) => {
+            const declinedBy = data.declinedByEmail || 'A user';
+            const courseName = data.courseName || 'your course';
+            return `${declinedBy} declined your invitation to join "${courseName}"`;
+        },
+        getActions: (notification, handlers) => (
+            <Button 
+                onClick={() => handlers.handleArchive(notification.id)}
+                variant="ghost"
+                size="sm"
+                className="text-gray-500 hover:text-gray-700"
+            >
+                <Archive className="w-4 h-4 mr-1" />
+                Archive
+            </Button>
         )
     },
     courseUpdate: {
@@ -140,7 +161,7 @@ function Notifications() {
             });
 
             if (response.data?.status === 200) {
-                const fetchedNotifications = response.data.data.notifications || [];
+                const fetchedNotifications = response.data.data.results || [];
                 setTotalCount(response.data.data.total || 0);
                 setLimit(response.data.data.limit || 20);
                 setOffset(response.data.data.offset || 0);
@@ -423,20 +444,16 @@ function Notifications() {
                                                             {template.getActions(notification, handlers)}
                                                         </div>
                                                     )}
+                                                    {!notification.isActionRequired && (
+                                                        <div className="flex gap-2 mb-2">
+                                                            {template.getActions(notification, handlers)}
+                                                        </div>
+                                                    )}
                                                     {isExpired && notification.originalType === 'COURSE_INVITE' && (
                                                         <span className="text-sm text-red-600 font-medium">
                                                             Invitation Expired
                                                         </span>
                                                     )}
-                                                    {!notification.isActionRequired  && isExpired && (<Button
-                                                        onClick={() => handlers.handleArchive(notification.id)}
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="text-gray-500 hover:text-gray-700"
-                                                    >
-                                                        <Archive className="w-4 h-4 mr-1" />
-                                                        Archive
-                                                    </Button>)}
                                                     
                                                 </div>
                                             </div>
