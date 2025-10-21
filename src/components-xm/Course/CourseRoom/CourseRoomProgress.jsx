@@ -43,7 +43,7 @@ import {
   Phone,
   User,
 } from "lucide-react";
-import { useOutletContext, useNavigate, useParams } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import axiosConn from "@/axioscon.js";
 import { useToast } from "@/hooks/use-toast.js";
 
@@ -96,93 +96,26 @@ const PROGRESS_STATUS = {
 };
 
 function CourseRoomProgress() {
-  const { courseList, members, isLoading: contextLoading } = useOutletContext();
+  const { courseList } = useOutletContext();
   const { toast } = useToast();
-  const navigate = useNavigate();
-  const { CourseId } = useParams();
 
   // State management
   const [isLoading, setIsLoading] = useState(true);
   const [progressData, setProgressData] = useState([]);
+  const [courseContentList, setCourseContentList] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
   const [viewMode, setViewMode] = useState("overview"); // overview | detailed
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  // Generate mock progress data for demo/testing purposes
-  const generateMockProgressData = (member) => {
-    const totalActivities = Math.floor(Math.random() * 15) + 5; // 5-20 activities
-    const completedActivities = Math.floor(Math.random() * totalActivities);
-    const enrollmentStatus =
-      completedActivities === totalActivities
-        ? "COMPLETED"
-        : completedActivities > 0
-        ? "IN_PROGRESS"
-        : "ENROLLED";
 
-    const activityLogs = Array.from({ length: totalActivities }, (_, i) => ({
-      progressId: i + 1,
-      userId: member.userId || member.user?.userId,
-      courseId: courseList?.courseId,
-      courseContentId: i + 1,
-      progressStatus: i < completedActivities ? "COMPLETED" : "NOT_STARTED",
-      activityDuration:
-        i < completedActivities ? Math.floor(Math.random() * 30) + 5 : 0,
-      progressPercent: i < completedActivities ? "100.00" : "0.00",
-      v_created_date: new Date(
-        Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000
-      ).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }),
-      v_created_time: new Date(
-        Date.now() - Math.random() * 24 * 60 * 60 * 1000
-      ).toLocaleTimeString("en-GB"),
-      v_updated_date: new Date(
-        Date.now() - Math.random() * 2 * 24 * 60 * 60 * 1000
-      ).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }),
-      v_updated_time: new Date().toLocaleTimeString("en-GB"),
-    }));
-
-    const enrollmentDate = new Date(
-      Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000
-    );
-
-    return {
-      enrollments: {
-        enrollmentId: Math.floor(Math.random() * 1000),
-        userId: member.userId || member.user?.userId,
-        courseId: courseList?.courseId,
-        enrollmentStatus,
-        enrollmentDate: enrollmentDate.toISOString(),
-        completionDate:
-          enrollmentStatus === "COMPLETED" ? new Date().toISOString() : null,
-        v_created_date: enrollmentDate.toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        }),
-        v_created_time: enrollmentDate.toLocaleTimeString("en-GB"),
-        v_updated_date: new Date().toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        }),
-        v_updated_time: new Date().toLocaleTimeString("en-GB"),
-      },
-      activityLogs,
-    };
-  };
 
   useEffect(() => {
     if (!courseList?.courseId) {
       console.log("No courseId available yet");
       return;
     }
+
+    setIsLoading(true);
 
     axiosConn
       .post(import.meta.env.VITE_API_URL + "/getCourseProgress", {
@@ -218,12 +151,14 @@ function CourseRoomProgress() {
                 email: user.email,
                 profilePicture: user.profilePic,
                 nameInitial: user.nameInitial,
+                number: user.number,
               },
               avatar: user.profilePic,
               enrollment: enrollment,
               activityLogs: user.activityLogs || [],
               quizResults: user.quizResults || [],
               courseAccess: user.courseAccess || [],
+              progressSummary: user.progressSummary || null,
               progressData: {
                 enrollments: enrollment,
                 activityLogs: user.activityLogs || [],
@@ -235,6 +170,11 @@ function CourseRoomProgress() {
           setProgressData(transformedData);
           setIsLoading(false);
 
+          // Store course content list if available
+          if (res.data?.data?.courseInfo?.contentList) {
+            setCourseContentList(res.data.data.courseInfo.contentList);
+          }
+
           toast({
             title: "Progress Data Loaded",
             description: `Loaded progress data for ${users.length} user(s)`,
@@ -242,10 +182,12 @@ function CourseRoomProgress() {
           });
         } else {
           console.warn("Unexpected API response format:", res.data);
+          setIsLoading(false);
         }
       })
       .catch((err) => {
         console.error("Error fetching progress data:", err);
+        setIsLoading(false);
         toast({
           title: "Error Loading Data",
           description: "Could not load progress data. Please try again.",
@@ -255,152 +197,9 @@ function CourseRoomProgress() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseList?.courseId]);
 
-  // Fetch user progress data
-  const fetchMemberProgress = async (userId) => {
-    try {
-      const response = await axiosConn.get(
-        `/user-progress/${courseList?.courseId}/${userId}`
-      );
-      return response.data?.results || null;
-    } catch (error) {
-      console.error(`Error fetching progress for user ${userId}:`, error);
-      // Return null to indicate API is not available
-      return null;
-    }
-  };
 
-  // Fetch all members' progress
-  const fetchAllProgress = async () => {
-    if (!members || members.length === 0) {
-      setIsLoading(false);
-      return;
-    }
 
-    setIsLoading(true);
-    try {
-      // Try to fetch real data from API
-      const progressPromises = members.map((member) =>
-        fetchMemberProgress(member.user?.userId || member.userId)
-      );
 
-      const results = await Promise.all(progressPromises);
-
-      // Check if any real data was returned
-      const hasRealData = results.some((result) => result !== null);
-
-      const enrichedData = members.map((member, index) => {
-        let progress = results[index];
-
-        // If API returned null (not available), use mock data
-        if (!progress) {
-          progress = generateMockProgressData(member);
-        }
-
-        return {
-          ...member,
-          progressData: progress,
-          enrollment: progress?.enrollments || null,
-          activityLogs: progress?.activityLogs || [],
-        };
-      });
-
-      setProgressData(enrichedData);
-
-      // Show info toast if using mock data
-      if (!hasRealData) {
-        toast({
-          title: "Demo Mode",
-          description:
-            "Showing sample progress data. Connect backend API for real data.",
-          variant: "default",
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching progress data:", error);
-
-      // Fallback to mock data on error
-      const mockData = members.map((member) => ({
-        ...member,
-        progressData: generateMockProgressData(member),
-        enrollment: generateMockProgressData(member).enrollments,
-        activityLogs: generateMockProgressData(member).activityLogs,
-      }));
-
-      setProgressData(mockData);
-
-      toast({
-        title: "Using Demo Data",
-        description: "Could not connect to API. Showing sample data.",
-        variant: "default",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    console.log("CourseRoomProgress - useEffect triggered", {
-      courseList: !!courseList,
-      members: members?.length || 0,
-      contextLoading,
-    });
-
-    // Set a timeout to force loading to false after 3 seconds
-    const timeoutId = setTimeout(() => {
-      console.log("Timeout reached - forcing loading to false");
-      setIsLoading(false);
-
-      if (!progressData || progressData.length === 0) {
-        // Generate mock data if we still don't have any
-        if (members && members.length > 0) {
-          console.log("Generating mock data from timeout");
-          const mockData = members.map((member) => {
-            const generated = generateMockProgressData(member);
-            return {
-              ...member,
-              progressData: generated,
-              enrollment: generated.enrollments,
-              activityLogs: generated.activityLogs,
-            };
-          });
-          setProgressData(mockData);
-          toast({
-            title: "Demo Mode Active",
-            description: "Showing sample data for demonstration.",
-            variant: "default",
-          });
-        }
-      }
-    }, 3000); // 3 second timeout
-
-    if (!courseList) {
-      console.log("No courseList, waiting...");
-      return () => clearTimeout(timeoutId);
-    }
-
-    if (contextLoading) {
-      console.log("Context still loading, waiting...");
-      return () => clearTimeout(timeoutId);
-    }
-
-    // If no members, set loading to false and show empty state
-    if (!members || members.length === 0) {
-      console.log("No members found, showing empty state");
-      setIsLoading(false);
-      setProgressData([]);
-      clearTimeout(timeoutId);
-      return;
-    }
-
-    // Fetch progress data
-    console.log("Fetching progress for", members.length, "members");
-    fetchAllProgress().finally(() => {
-      clearTimeout(timeoutId);
-    });
-
-    return () => clearTimeout(timeoutId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseList, members, contextLoading]);
 
   // Calculate overall statistics
   const overallStats = useMemo(() => {
@@ -422,12 +221,21 @@ function CourseRoomProgress() {
         m.enrollment?.enrollmentStatus === "CERTIFIED"
     ).length;
 
-    const totalActivities = progressData.reduce(
-      (sum, m) => sum + (m.activityLogs?.length || 0),
-      0
-    );
+    // Use progressSummary if available, otherwise calculate from activity logs
+    const totalActivities = progressData.reduce((sum, m) => {
+      if (m.progressSummary) {
+        return sum + (m.progressSummary.totalContent || 0);
+      }
+      return sum + (m.activityLogs?.length || 0);
+    }, 0);
 
     const totalProgress = progressData.reduce((sum, m) => {
+      // Use progressSummary if available
+      if (m.progressSummary?.overallProgressPercent != null) {
+        return sum + m.progressSummary.overallProgressPercent;
+      }
+      
+      // Fallback to calculating from activity logs
       const activities = m.activityLogs || [];
       const completedActivities = activities.filter(
         (a) => a.progressStatus === "COMPLETED"
@@ -453,6 +261,8 @@ function CourseRoomProgress() {
         return sum + days;
       }, 0);
 
+    const completedCount = progressData.filter((m) => m.enrollment?.completionDate).length;
+
     return {
       totalMembers: progressData.length,
       enrolledMembers,
@@ -460,8 +270,8 @@ function CourseRoomProgress() {
       averageProgress: Math.round(averageProgress),
       totalActivities,
       avgCompletionTime:
-        enrolledMembers > 0
-          ? Math.round(avgCompletionTime / enrolledMembers)
+        completedCount > 0
+          ? Math.round(avgCompletionTime / completedCount)
           : 0,
     };
   }, [progressData]);
@@ -471,6 +281,16 @@ function CourseRoomProgress() {
     return progressData
       .filter((m) => m.activityLogs && m.activityLogs.length > 0)
       .map((member) => {
+        // Use progressSummary if available
+        if (member.progressSummary) {
+          return {
+            ...member,
+            completedCount: member.progressSummary.completedContent || 0,
+            totalProgress: Math.round(member.progressSummary.overallProgressPercent || 0),
+          };
+        }
+
+        // Fallback to calculating from activity logs
         const completedCount = member.activityLogs.filter(
           (a) => a.progressStatus === "COMPLETED"
         ).length;
@@ -506,7 +326,7 @@ function CourseRoomProgress() {
     return Math.floor((now - start) / (1000 * 60 * 60 * 24));
   };
 
-  if (isLoading && contextLoading) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -739,15 +559,21 @@ function CourseRoomProgress() {
                   .substring(0, 2)
                   .toUpperCase();
                 const enrollment = member.enrollment;
+                
+                // Use progressSummary if available
                 const activities = member.activityLogs || [];
-                const completedActivities = activities.filter(
-                  (a) => a.progressStatus === "COMPLETED"
-                ).length;
-                const progressPercent =
-                  activities.length > 0
-                    ? Math.round(
-                        (completedActivities / activities.length) * 100
-                      )
+                const completedActivities = member.progressSummary 
+                  ? member.progressSummary.completedContent 
+                  : activities.filter((a) => a.progressStatus === "COMPLETED").length;
+                
+                const totalActivities = member.progressSummary 
+                  ? member.progressSummary.totalContent 
+                  : activities.length;
+                
+                const progressPercent = member.progressSummary
+                  ? Math.round(member.progressSummary.overallProgressPercent || 0)
+                  : totalActivities > 0
+                    ? Math.round((completedActivities / totalActivities) * 100)
                     : 0;
 
                 const statusInfo = enrollment
@@ -795,9 +621,8 @@ function CourseRoomProgress() {
                         variant="ghost"
                         size="sm"
                         onClick={() => {
-                          navigate(
-                            `/course/${CourseId}/room/member/${member.userId}`
-                          );
+                          setSelectedMember(member);
+                          setIsSheetOpen(true);
                         }}
                       >
                         View Details
@@ -857,7 +682,7 @@ function CourseRoomProgress() {
                     <div className="mb-3">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-medium text-gray-700">
-                          Progress: {completedActivities} / {activities.length}{" "}
+                          Progress: {completedActivities} / {totalActivities}{" "}
                           activities
                         </span>
                         <span className="text-sm font-bold text-blue-600">
@@ -868,7 +693,7 @@ function CourseRoomProgress() {
                     </div>
 
                     {/* Activity Summary */}
-                    {activities.length > 0 && (
+                    {totalActivities > 0 && (
                       <div className="flex items-center gap-4 text-sm text-gray-600">
                         <div className="flex items-center gap-1">
                           <CheckCircle className="h-4 w-4 text-green-600" />
@@ -876,7 +701,7 @@ function CourseRoomProgress() {
                         </div>
                         <div className="flex items-center gap-1">
                           <Activity className="h-4 w-4 text-blue-600" />
-                          <span>{activities.length} total</span>
+                          <span>{totalActivities} total</span>
                         </div>
                       </div>
                     )}
@@ -959,7 +784,7 @@ function CourseRoomProgress() {
 
       {/* Member Details Sheet - Full Screen */}
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetContent side="full" className="overflow-y-auto p-0">
+        <SheetContent side="bottom" className="w-full h-full overflow-y-auto p-0">
           {selectedMember &&
             (() => {
               const displayName =
@@ -975,13 +800,21 @@ function CourseRoomProgress() {
                 .substring(0, 2)
                 .toUpperCase();
               const enrollment = selectedMember.enrollment;
+              
+              // Use progressSummary if available
               const activities = selectedMember.activityLogs || [];
-              const completedActivities = activities.filter(
-                (a) => a.progressStatus === "COMPLETED"
-              ).length;
-              const progressPercent =
-                activities.length > 0
-                  ? Math.round((completedActivities / activities.length) * 100)
+              const completedActivities = selectedMember.progressSummary 
+                ? selectedMember.progressSummary.completedContent 
+                : activities.filter((a) => a.progressStatus === "COMPLETED").length;
+              
+              const totalActivities = selectedMember.progressSummary 
+                ? selectedMember.progressSummary.totalContent 
+                : activities.length;
+              
+              const progressPercent = selectedMember.progressSummary
+                ? Math.round(selectedMember.progressSummary.overallProgressPercent || 0)
+                : totalActivities > 0
+                  ? Math.round((completedActivities / totalActivities) * 100)
                   : 0;
 
               const statusInfo = enrollment
@@ -997,7 +830,7 @@ function CourseRoomProgress() {
                   <div className="bg-white border-b border-gray-200 p-6 shadow-sm">
                     <SheetHeader>
                       <div className="flex items-center gap-4 mb-2">
-                        <Avatar className="h-20 w-20 border-4 border-white shadow-lg">
+                        <Avatar className="h-16 w-16 border-4 border-white shadow-lg">
                           <AvatarImage
                             src={
                               selectedMember.avatar ||
@@ -1005,12 +838,12 @@ function CourseRoomProgress() {
                             }
                             alt={displayName}
                           />
-                          <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-2xl font-bold">
+                          <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xl font-bold">
                             {initials}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
-                          <SheetTitle className="text-3xl font-bold text-gray-900 mb-2">
+                          <SheetTitle className="text-2xl font-bold text-gray-900 mb-2">
                             {displayName}
                           </SheetTitle>
                           <div className="flex items-center gap-3 flex-wrap">
@@ -1023,15 +856,15 @@ function CourseRoomProgress() {
                               </Badge>
                             )}
                             <div className="flex items-center gap-1 text-gray-600">
-                              <Mail className="h-4 w-4" />
-                              <span className="text-sm">
+                              <Mail className="h-3 w-3" />
+                              <span className="text-xs">
                                 {selectedMember.user?.email || "No email"}
                               </span>
                             </div>
                             {selectedMember.user?.number && (
                               <div className="flex items-center gap-1 text-gray-600">
-                                <Phone className="h-4 w-4" />
-                                <span className="text-sm">
+                                <Phone className="h-3 w-3" />
+                                <span className="text-xs">
                                   {selectedMember.user.number}
                                 </span>
                               </div>
@@ -1039,9 +872,8 @@ function CourseRoomProgress() {
                           </div>
                         </div>
                       </div>
-                      <SheetDescription className="text-base text-gray-600">
-                        Detailed progress tracking and activity timeline for
-                        this member
+                      <SheetDescription className="text-sm text-gray-600">
+                        Detailed progress tracking and activity timeline for this member
                       </SheetDescription>
                     </SheetHeader>
                   </div>
@@ -1049,16 +881,16 @@ function CourseRoomProgress() {
                   {/* Content Section */}
                   <div className="flex-1 overflow-y-auto p-6 space-y-6">
                     {/* Progress Overview Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                       <Card className="border-0 bg-white shadow-sm">
                         <CardContent className="p-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                              <Target className="h-6 w-6 text-blue-600" />
+                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                              <Target className="h-5 w-5 text-blue-600" />
                             </div>
                             <div>
-                              <p className="text-sm text-gray-600">Progress</p>
-                              <p className="text-2xl font-bold text-gray-900">
+                              <p className="text-xs text-gray-600">Progress</p>
+                              <p className="text-xl font-bold text-gray-900">
                                 {progressPercent}%
                               </p>
                             </div>
@@ -1069,12 +901,12 @@ function CourseRoomProgress() {
                       <Card className="border-0 bg-white shadow-sm">
                         <CardContent className="p-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                              <CheckCircle className="h-6 w-6 text-green-600" />
+                            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                              <CheckCircle className="h-5 w-5 text-green-600" />
                             </div>
                             <div>
-                              <p className="text-sm text-gray-600">Completed</p>
-                              <p className="text-2xl font-bold text-gray-900">
+                              <p className="text-xs text-gray-600">Completed</p>
+                              <p className="text-xl font-bold text-gray-900">
                                 {completedActivities}
                               </p>
                             </div>
@@ -1085,15 +917,15 @@ function CourseRoomProgress() {
                       <Card className="border-0 bg-white shadow-sm">
                         <CardContent className="p-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                              <Activity className="h-6 w-6 text-purple-600" />
+                            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                              <Activity className="h-5 w-5 text-purple-600" />
                             </div>
                             <div>
-                              <p className="text-sm text-gray-600">
+                              <p className="text-xs text-gray-600">
                                 Total Activities
                               </p>
-                              <p className="text-2xl font-bold text-gray-900">
-                                {activities.length}
+                              <p className="text-xl font-bold text-gray-900">
+                                {totalActivities}
                               </p>
                             </div>
                           </div>
@@ -1103,14 +935,14 @@ function CourseRoomProgress() {
                       <Card className="border-0 bg-white shadow-sm">
                         <CardContent className="p-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                              <Timer className="h-6 w-6 text-orange-600" />
+                            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                              <Timer className="h-5 w-5 text-orange-600" />
                             </div>
                             <div>
-                              <p className="text-sm text-gray-600">
+                              <p className="text-xs text-gray-600">
                                 Days Active
                               </p>
-                              <p className="text-2xl font-bold text-gray-900">
+                              <p className="text-xl font-bold text-gray-900">
                                 {enrollment
                                   ? getDaysSince(enrollment.enrollmentDate)
                                   : 0}
@@ -1125,19 +957,19 @@ function CourseRoomProgress() {
                     {enrollment && (
                       <Card className="border-0 bg-white shadow-sm">
                         <CardHeader>
-                          <CardTitle className="text-lg flex items-center gap-2">
-                            <BookOpen className="h-5 w-5 text-blue-600" />
+                          <CardTitle className="text-base flex items-center gap-2">
+                            <BookOpen className="h-4 w-4 text-blue-600" />
                             Enrollment Details
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div className="p-4 bg-gray-50 rounded-lg">
-                              <p className="text-sm text-gray-600 flex items-center gap-1 mb-2">
-                                <Calendar className="h-4 w-4" />
-                                Enrollment Date
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="p-3 bg-gray-50 rounded-lg">
+                              <p className="text-xs text-gray-600 flex items-center gap-1 mb-1">
+                                <Calendar className="h-3 w-3" />
+                                Enrolled
                               </p>
-                              <p className="font-semibold text-gray-900">
+                              <p className="font-semibold text-sm text-gray-900">
                                 {enrollment.v_created_date ||
                                   formatDate(enrollment.enrollmentDate)}
                               </p>
@@ -1145,12 +977,12 @@ function CourseRoomProgress() {
                                 {enrollment.v_created_time}
                               </p>
                             </div>
-                            <div className="p-4 bg-gray-50 rounded-lg">
-                              <p className="text-sm text-gray-600 flex items-center gap-1 mb-2">
-                                <Clock className="h-4 w-4" />
+                            <div className="p-3 bg-gray-50 rounded-lg">
+                              <p className="text-xs text-gray-600 flex items-center gap-1 mb-1">
+                                <Clock className="h-3 w-3" />
                                 Last Updated
                               </p>
-                              <p className="font-semibold text-gray-900">
+                              <p className="font-semibold text-sm text-gray-900">
                                 {enrollment.v_updated_date ||
                                   formatDate(enrollment.enrollment_updated_at)}
                               </p>
@@ -1159,12 +991,12 @@ function CourseRoomProgress() {
                               </p>
                             </div>
                             {enrollment.completionDate && (
-                              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                                <p className="text-sm text-green-700 flex items-center gap-1 mb-2">
-                                  <Award className="h-4 w-4" />
+                              <div className="p-3 bg-green-50 rounded-lg border border-green-200 col-span-2">
+                                <p className="text-xs text-green-700 flex items-center gap-1 mb-1">
+                                  <Award className="h-3 w-3" />
                                   Completion Date
                                 </p>
-                                <p className="font-semibold text-green-900">
+                                <p className="font-semibold text-sm text-green-900">
                                   {enrollment.v_completed_date ||
                                     formatDate(enrollment.completionDate)}
                                 </p>
@@ -1173,18 +1005,6 @@ function CourseRoomProgress() {
                                 </p>
                               </div>
                             )}
-                            <div className="p-4 bg-blue-50 rounded-lg">
-                              <p className="text-sm text-blue-700 flex items-center gap-1 mb-2">
-                                <TrendingUp className="h-4 w-4" />
-                                Completion Rate
-                              </p>
-                              <p className="font-semibold text-blue-900 text-2xl">
-                                {progressPercent}%
-                              </p>
-                              <p className="text-xs text-blue-600 mt-1">
-                                {completedActivities} of {activities.length}
-                              </p>
-                            </div>
                           </div>
                         </CardContent>
                       </Card>
@@ -1193,7 +1013,7 @@ function CourseRoomProgress() {
                     {/* Progress Bar */}
                     <Card className="border-0 bg-white shadow-sm">
                       <CardHeader>
-                        <CardTitle className="text-lg">
+                        <CardTitle className="text-base">
                           Overall Progress
                         </CardTitle>
                         <CardDescription>
@@ -1204,7 +1024,7 @@ function CourseRoomProgress() {
                         <div className="space-y-2">
                           <div className="flex items-center justify-between">
                             <span className="text-sm font-medium text-gray-700">
-                              {completedActivities} of {activities.length}{" "}
+                              {completedActivities} of {totalActivities}{" "}
                               activities completed
                             </span>
                             <span className="text-sm font-bold text-blue-600">
@@ -1217,18 +1037,111 @@ function CourseRoomProgress() {
                     </Card>
 
                     {/* Activity Timeline */}
-                    {activities.length > 0 ? (
-                      <Card className="border-0 bg-white shadow-sm">
-                        <CardHeader>
-                          <CardTitle className="text-lg flex items-center gap-2">
-                            <Sparkles className="h-5 w-5 text-purple-600" />
-                            Activity Timeline
-                          </CardTitle>
-                          <CardDescription>
-                            Detailed progress log for all course activities
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
+                    <Card className="border-0 bg-white shadow-sm">
+                      <CardHeader>
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <Sparkles className="h-4 w-4 text-purple-600" />
+                          Activity Timeline
+                        </CardTitle>
+                        <CardDescription>
+                          Complete course content list with progress status
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        {courseContentList.length > 0 ? (
+                          <div className="space-y-3">
+                            {courseContentList.map((content, contentIndex) => {
+                              // Find matching activity log for this content
+                              const activity = activities.find(
+                                (a) => a.courseContentId === content.courseContentId
+                              );
+                              
+                              // Determine status
+                              const progressStatus = activity 
+                                ? activity.progressStatus 
+                                : "NOT_STARTED";
+                              
+                              const statusConfig =
+                                PROGRESS_STATUS[progressStatus] ||
+                                PROGRESS_STATUS.NOT_STARTED;
+
+                              return (
+                                <div
+                                  key={content.courseContentId || contentIndex}
+                                  className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200"
+                                >
+                                  <div
+                                    className={`w-10 h-10 rounded-full flex items-center justify-center ${statusConfig.bgColor} flex-shrink-0`}
+                                  >
+                                    {progressStatus === "COMPLETED" ? (
+                                      <CheckCircle
+                                        className={`h-5 w-5 ${statusConfig.color}`}
+                                      />
+                                    ) : (
+                                      <PlayCircle
+                                        className={`h-5 w-5 ${statusConfig.color}`}
+                                      />
+                                    )}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between mb-1">
+                                      <h4 className="font-semibold text-sm text-gray-900 line-clamp-2">
+                                        {content.courseContentTitle || 
+                                          `Content #${content.courseContentId}`}
+                                      </h4>
+                                      <Badge className={statusConfig.bgColor}>
+                                        <span className={`${statusConfig.color} text-xs`}>
+                                          {statusConfig.label}
+                                        </span>
+                                      </Badge>
+                                    </div>
+                                    <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600">
+                                      {content.courseContentCategory && (
+                                        <div className="flex items-center gap-1">
+                                          <BookOpen className="h-3 w-3" />
+                                          <span>{content.courseContentCategory}</span>
+                                        </div>
+                                      )}
+                                      {content.courseContentSequence && (
+                                        <div className="flex items-center gap-1">
+                                          <span className="font-medium">Seq: {content.courseContentSequence}</span>
+                                        </div>
+                                      )}
+                                      {activity?.v_updated_date && (
+                                        <>
+                                          <div className="flex items-center gap-1">
+                                            <Calendar className="h-3 w-3" />
+                                            <span>{activity.v_updated_date}</span>
+                                          </div>
+                                          <div className="flex items-center gap-1">
+                                            <Clock className="h-3 w-3" />
+                                            <span>{activity.v_updated_time}</span>
+                                          </div>
+                                        </>
+                                      )}
+                                      {activity && activity.activityDuration > 0 && (
+                                        <div className="flex items-center gap-1">
+                                          <Timer className="h-3 w-3" />
+                                          <span>
+                                            {activity.activityDuration} min
+                                          </span>
+                                        </div>
+                                      )}
+                                      {content.courseContentDuration && (
+                                        <div className="flex items-center gap-1 text-gray-500">
+                                          <Timer className="h-3 w-3" />
+                                          <span>
+                                            Duration: {Math.floor(content.courseContentDuration / 60)} min
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : totalActivities > 0 ? (
                           <div className="space-y-3">
                             {activities.map((activity, actIndex) => {
                               const statusConfig =
@@ -1238,33 +1151,40 @@ function CourseRoomProgress() {
                               return (
                                 <div
                                   key={actIndex}
-                                  className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200"
+                                  className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200"
                                 >
                                   <div
-                                    className={`w-12 h-12 rounded-full flex items-center justify-center ${statusConfig.bgColor} flex-shrink-0`}
+                                    className={`w-10 h-10 rounded-full flex items-center justify-center ${statusConfig.bgColor} flex-shrink-0`}
                                   >
                                     {activity.progressStatus === "COMPLETED" ? (
                                       <CheckCircle
-                                        className={`h-6 w-6 ${statusConfig.color}`}
+                                        className={`h-5 w-5 ${statusConfig.color}`}
                                       />
                                     ) : (
                                       <PlayCircle
-                                        className={`h-6 w-6 ${statusConfig.color}`}
+                                        className={`h-5 w-5 ${statusConfig.color}`}
                                       />
                                     )}
                                   </div>
                                   <div className="flex-1 min-w-0">
-                                    <div className="flex items-center justify-between mb-2">
-                                      <h4 className="font-semibold text-gray-900">
-                                        Content #{activity.courseContentId}
+                                    <div className="flex items-center justify-between mb-1">
+                                      <h4 className="font-semibold text-sm text-gray-900 line-clamp-2">
+                                        {activity.contentDetails?.courseContentTitle || 
+                                          `Content #${activity.courseContentId}`}
                                       </h4>
                                       <Badge className={statusConfig.bgColor}>
-                                        <span className={statusConfig.color}>
+                                        <span className={`${statusConfig.color} text-xs`}>
                                           {statusConfig.label}
                                         </span>
                                       </Badge>
                                     </div>
-                                    <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+                                    <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600">
+                                      {activity.contentDetails?.courseContentCategory && (
+                                        <div className="flex items-center gap-1">
+                                          <BookOpen className="h-3 w-3" />
+                                          <span>{activity.contentDetails.courseContentCategory}</span>
+                                        </div>
+                                      )}
                                       <div className="flex items-center gap-1">
                                         <Calendar className="h-3 w-3" />
                                         <span>{activity.v_updated_date}</span>
@@ -1277,15 +1197,7 @@ function CourseRoomProgress() {
                                         <div className="flex items-center gap-1">
                                           <Timer className="h-3 w-3" />
                                           <span>
-                                            {activity.activityDuration} minutes
-                                          </span>
-                                        </div>
-                                      )}
-                                      {activity.progressPercent && (
-                                        <div className="flex items-center gap-1">
-                                          <Target className="h-3 w-3" />
-                                          <span>
-                                            {activity.progressPercent}%
+                                            {activity.activityDuration} min
                                           </span>
                                         </div>
                                       )}
@@ -1295,64 +1207,61 @@ function CourseRoomProgress() {
                               );
                             })}
                           </div>
-                        </CardContent>
-                      </Card>
-                    ) : (
-                      <Card className="border-0 bg-white shadow-sm">
-                        <CardContent className="p-12 text-center">
-                          <Activity className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                          <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                            No Activity Yet
-                          </h3>
-                          <p className="text-gray-500">
-                            This member hasn&apos;t started any activities in
-                            this course
-                          </p>
-                        </CardContent>
-                      </Card>
-                    )}
+                        ) : (
+                          <div className="p-12 text-center">
+                            <Activity className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                            <h3 className="text-base font-semibold text-gray-700 mb-2">
+                              No Content Available
+                            </h3>
+                            <p className="text-sm text-gray-500">
+                              No course content found
+                            </p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
 
                     {/* User Details */}
                     <Card className="border-0 bg-white shadow-sm">
                       <CardHeader>
-                        <CardTitle className="text-lg flex items-center gap-2">
-                          <User className="h-5 w-5 text-blue-600" />
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <User className="h-4 w-4 text-blue-600" />
                           User Information
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="p-4 bg-gray-50 rounded-lg">
-                            <p className="text-sm text-gray-600 mb-1">
+                        <div className="grid grid-cols-1 gap-3">
+                          <div className="p-3 bg-gray-50 rounded-lg">
+                            <p className="text-xs text-gray-600 mb-1">
                               User ID
                             </p>
-                            <p className="font-semibold text-gray-900">
+                            <p className="font-semibold text-sm text-gray-900">
                               {selectedMember.userId}
                             </p>
                           </div>
-                          <div className="p-4 bg-gray-50 rounded-lg">
-                            <p className="text-sm text-gray-600 mb-1">
+                          <div className="p-3 bg-gray-50 rounded-lg">
+                            <p className="text-xs text-gray-600 mb-1">
                               Email Address
                             </p>
-                            <p className="font-semibold text-gray-900 break-all">
+                            <p className="font-semibold text-sm text-gray-900 break-all">
                               {selectedMember.user?.email || "Not provided"}
                             </p>
                           </div>
-                          <div className="p-4 bg-gray-50 rounded-lg">
-                            <p className="text-sm text-gray-600 mb-1">
+                          <div className="p-3 bg-gray-50 rounded-lg">
+                            <p className="text-xs text-gray-600 mb-1">
                               Full Name
                             </p>
-                            <p className="font-semibold text-gray-900">
+                            <p className="font-semibold text-sm text-gray-900">
                               {selectedMember.user?.firstName}{" "}
                               {selectedMember.user?.lastName}
                             </p>
                           </div>
                           {selectedMember.user?.number && (
-                            <div className="p-4 bg-gray-50 rounded-lg">
-                              <p className="text-sm text-gray-600 mb-1">
+                            <div className="p-3 bg-gray-50 rounded-lg">
+                              <p className="text-xs text-gray-600 mb-1">
                                 Phone Number
                               </p>
-                              <p className="font-semibold text-gray-900">
+                              <p className="font-semibold text-sm text-gray-900">
                                 {selectedMember.user.number}
                               </p>
                             </div>
