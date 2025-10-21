@@ -26,7 +26,7 @@ export default function Header() {
     <>
       <header className="flex h-14 items-center justify-between bg-white text-black px-4 shadow-md border-b">
         <div className="flex gap-2 items-center">
-          <div>
+          {/* <div>
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger className="p-2 hover:bg-muted hover:cursor-pointer rounded-md">
                 <Grip size={25} />
@@ -62,7 +62,7 @@ export default function Header() {
                 </SheetHeader>
               </SheetContent>
             </Sheet>
-          </div>
+          </div> */}
 
           {/* Logo */}
           <a
@@ -72,7 +72,7 @@ export default function Header() {
               fontFamily: "Nosifer",
             }}
           >
-            <span className="text-orange-400">H</span>USKITE
+            <span className="text-orange-500">H</span>USKITE
           </a>
         </div>
 

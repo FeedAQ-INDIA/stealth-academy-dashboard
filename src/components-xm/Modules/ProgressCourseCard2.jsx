@@ -33,7 +33,7 @@ export function ProgressCourseCard2({ course  }) {
             {course.deliveryMode && (
               <Badge variant="outline">{course.deliveryMode}</Badge>
             )}
-            {course.courseDuration && (
+            {course.courseDuration !== null && course.courseDuration !== undefined && (
               <Badge variant="outline">
                 <Clock size={14} className="mr-1 inline" />
                 {(() => {
@@ -42,6 +42,7 @@ export function ProgressCourseCard2({ course  }) {
                   const minutes = Math.floor((totalSeconds % 3600) / 60);
                   const seconds = totalSeconds % 60;
                   const pad = (n) => String(n).padStart(2, "0");
+                  
                   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
                 })()}
               </Badge>

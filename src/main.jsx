@@ -42,6 +42,9 @@ import CourseRoomSettings from "./components-xm/Course/CourseRoom/CourseRoomSett
 import CourseRoomMembers from "./components-xm/Course/CourseRoom/CourseRoomMembers.jsx";
 import Notifications from "./components-xm/AccountSettings/Notifications.jsx";
 import TransactionHistory from "./components-xm/AccountSettings/TransactionHistory.jsx";
+import CourseRoomProgress from "./components-xm/Course/CourseRoom/CourseRoomProgress.jsx";
+import CourseRoomLeaderboard from "./components-xm/Course/CourseRoom/CourseRoomLeaderboard.jsx";
+import CourseRoomMemberDetail from "./components-xm/Course/CourseRoom/CourseRoomMemberDetail.jsx";
 // NOTE: PreviewBuilder & CourseEditorBuilder direct routes removed; they are accessed through Builder component flow.
 
 const router = createBrowserRouter([
@@ -128,6 +131,19 @@ const router = createBrowserRouter([
                 path: "/course/:CourseId/room/members",
                 element: <CourseRoomMembers />,
               },
+              {
+                path: "/course/:CourseId/room/progress",
+                element: <CourseRoomProgress />,
+              },
+              {
+                path: "/course/:CourseId/room/leaderboard",
+                element: <CourseRoomLeaderboard />,
+              },
+              {
+                path: "/course/:CourseId/room/member/:userId",
+                element: <CourseRoomMemberDetail />,
+              },
+              
               {
                 path: "/course/:CourseId/room/discussions",
                 element: <CourseRoomDiscussions />,

@@ -63,6 +63,8 @@ function CourseRoom() {
   // Tab configuration
   const tabs = [
     { id: "members", label: "Members", icon: Users, path: `/course/${CourseId}/room/members` },
+    { id: "progress", label: "Progress", icon: Activity, path: `/course/${CourseId}/room/progress` },
+    { id: "leaderboard", label: "Leaderboard", icon: Activity, path: `/course/${CourseId}/room/leaderboard` },
     // { id: "discussions", label: "Discussions", icon: MessageSquare, path: `/course/${CourseId}/room/discussions` },
     // { id: "resources", label: "Resources", icon: BookOpen, path: `/course/${CourseId}/room/resources` },
     // { id: "activities", label: "Activities", icon: Activity, path: `/course/${CourseId}/room/activities` },
@@ -76,6 +78,9 @@ function CourseRoom() {
     if (path.includes('/resources')) return 'resources';
     if (path.includes('/activities')) return 'activities';
     if (path.includes('/settings')) return 'settings';
+    if (path.includes('/progress')) return 'progress';
+    if (path.includes('/leaderboard')) return 'leaderboard';
+    if (path.includes('/member/')) return 'members';
     return 'members'; // default tab
   };
 
