@@ -24,7 +24,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="flex h-14 items-center justify-between bg-black text-white px-4 shadow-md border-b">
+      <header className="flex h-14 items-center justify-between bg-white text-black px-4 shadow-md border-b">
         <div className="flex gap-2 items-center">
           <div>
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
@@ -66,13 +66,13 @@ export default function Header() {
 
           {/* Logo */}
           <a
-            className="text-2xl sm:text-3xl font-medium text-yellow-400"
+            className="text-2xl sm:text-3xl font-medium"
             href="/"
             style={{
               fontFamily: "Nosifer",
             }}
           >
-            HUSKITE
+            <span className="text-orange-400">H</span>USKITE
           </a>
         </div>
 

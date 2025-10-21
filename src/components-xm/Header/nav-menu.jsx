@@ -99,7 +99,7 @@ function NavigationMenuDemo({ orientation }) {
         >
           <Link to="/course-builder" className="w-full block">
             <Button
-              className="w-full justify-center   flex align-items-center justify-items-center"
+              className="w-full justify-center px-2"
               variant={
                 location.pathname === "/course-builder"
                   ? "secondary"
