@@ -455,7 +455,7 @@ const totalExpense = dailyExpense?.reduce((sum, day) => sum + day.totalExpense, 
     </Card>
 
  
-        <BillingHistory />
+
       </div>
 
       {/* Purchase Confirmation Modal */}
