@@ -235,7 +235,7 @@ export default function Builder() {
     <div className="p-4 md:p-6 space-y-6">
       {/* Hero Section with Enhanced Gradient */}
       <div className="relative overflow-hidden">
-        <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700  rounded-2xl text-white shadow-2xl  ">
+        <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900  rounded-2xl text-white shadow-2xl  ">
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-20">
             <div
@@ -372,9 +372,7 @@ export default function Builder() {
                 {courses.map((course) => (
                   <Card
                     key={course.courseBuilderId}
-                    className={`border-0 shadow-sm hover:shadow-md transition-shadow duration-200 ${
-                      viewMode === "list" ? "flex-row p-4" : "p-4"
-                    }`}
+                    className={`rounded-sm group relative overflow-hidden border shadow-md hover:shadow-xl transition-all hover:-translate-y-1 p-3`}
                   >
                     <CardContent
                       className={`p-0 ${
@@ -430,57 +428,23 @@ export default function Builder() {
 
                         {/* Action Buttons */}
                         <div className="flex gap-2 pt-2">
-                          {(course.status || "DRAFT") === "DRAFT" ? (
-                            <>
+                          
                               <Button
                                 size="sm"
-                                variant="outline"
+                                variant="ghost"
                                 onClick={() =>
                                   navigate(
                                     `/course-builder/${course.courseBuilderId}`
                                   )
                                 }
-                                className="flex-1"
+                                className="flex-1 border-t"
                               >
                                 <Edit className="mr-1 h-3 w-3" />
                                 Edit
                               </Button>
-                            </>
-                          ) : (
-                            <>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() =>
-                                  navigate(
-                                    `/course-builder/${course.courseBuilderId}`
-                                  )
-                                }
-                                className="flex-1"
-                              >
-                                <Edit className="mr-1 h-3 w-3" />
-                                Edit
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="secondary"
-                                onClick={() =>
-                                  handleOpenUnpublishDialog(course)
-                                }
-                                className="flex-1"
-                              >
-                                Unpublish
-                              </Button>
-                            </>
-                          )}
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => handleDelete(course.courseBuilderId)}
-                            className="px-3"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
+                        
+                      
+                     
                         </div>
                       </div>
                     </CardContent>

@@ -62,7 +62,8 @@ export function Dashboard() {
   const [offset, setOffset] = useState(0);
   const [courseList, setCourseList] = useState(null);
   const [isLoadingCourses, setIsLoadingCourses] = useState(true);
-  const [isLoadingCompletedCourses, setIsLoadingCompletedCourses] = useState(true);
+  const [isLoadingCompletedCourses, setIsLoadingCompletedCourses] =
+    useState(true);
   const [apiQuery, setApiQuery] = useState({
     limit: limit,
     offset: offset,
@@ -92,7 +93,7 @@ export function Dashboard() {
           as: "enrollments",
           where: {
             enrollmentStatus: { $ne: "COMPLETED" },
-             userId: userDetail.userId,
+            userId: userDetail.userId,
           },
           required: true,
         },
@@ -128,8 +129,9 @@ export function Dashboard() {
         console.log(err);
         toast({
           title: "Error loading courses",
-          description: "Failed to load your enrolled courses. Please try again.",
-          variant: "destructive"
+          description:
+            "Failed to load your enrolled courses. Please try again.",
+          variant: "destructive",
         });
       })
       .finally(() => {
@@ -165,8 +167,9 @@ export function Dashboard() {
         console.log(err);
         toast({
           title: "Error loading completed courses",
-          description: "Failed to load your completed courses. Please try again.",
-          variant: "destructive"
+          description:
+            "Failed to load your completed courses. Please try again.",
+          variant: "destructive",
         });
       })
       .finally(() => {
@@ -193,8 +196,7 @@ export function Dashboard() {
 
   const [exploreCourseText, setExploreCourseText] = useState("");
 
-
-    const getStatusBadge = (status) => {
+  const getStatusBadge = (status) => {
     const variants = {
       ENROLLED: "bg-blue-100 text-blue-800 border-blue-200",
       COMPLETED: "bg-green-100 text-green-800 border-green-200",
@@ -204,16 +206,15 @@ export function Dashboard() {
     return variants[status] || "bg-gray-100 text-gray-800 border-gray-200";
   };
 
-  
   return (
     <div className="p-4">
-      <Card className="mb-4 border-0 shadow-lg bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700  rounded-2xl  ">
+      <Card className="mb-4 border-0 shadow-lg bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900  rounded-2xl  ">
         <CardHeader className="p-6">
           <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full lg:w-auto">
               <div className="relative flex-shrink-0">
-                <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-blue-200 shadow-xl">
-                  <AvatarFallback className="text-xl sm:text-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold">
+                <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-rose-200 shadow-xl">
+                  <AvatarFallback className="text-xl sm:text-2xl bg-gradient-to-r from-rose-300 to-rose-800 text-white font-bold">
                     {userDetail?.nameInitial}
                   </AvatarFallback>
                 </Avatar>
@@ -399,73 +400,74 @@ export function Dashboard() {
         </Card>
       </div>
 
-      <section className="my-4 animate-slide-in">
-        <Card className="border-0 shadow-md rounded-md">
-          <CardHeader className="flex flex-row gap-2 items-center">
-            <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2 tracking-wide">
-              <BookOpen className="h-5 w-5 text-purple-600" />
-              <span>Continue Learning</span>
-            </CardTitle>
-            <div className="ml-auto flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={offset === 0}
-                onClick={() => {
-                  setOffset(Math.max(offset - limit, 0));
-                  setApiQuery((prevQuery) => ({
-                    ...prevQuery,
-                    offset: Math.max(offset - limit, 0),
-                  }));
-                }}
-                className="hover:bg-blue-50"
-              >
-                <ChevronLeft className="h-4 w-4 mr-1" />
-              </Button>
+      <section className="my-6 animate-slide-in">
+        <div className="flex flex-row gap-2 items-center">
+          <CardTitle className="text-xl font-bold  flex items-center gap-2 tracking-normal">
+            <BookOpen className="h-5 w-5 text-purple-600" />
+            <span>CONTINUE LEARNING</span>
+          </CardTitle>
+          <div className="ml-auto flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={offset === 0}
+              onClick={() => {
+                setOffset(Math.max(offset - limit, 0));
+                setApiQuery((prevQuery) => ({
+                  ...prevQuery,
+                  offset: Math.max(offset - limit, 0),
+                }));
+              }}
+              className="hover:bg-blue-50"
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+            </Button>
 
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={offset + limit >= totalCount}
-                onClick={() => {
-                  setOffset(
-                    offset + limit < totalCount ? offset + limit : offset
-                  );
-                  setApiQuery((prevQuery) => ({
-                    ...prevQuery,
-                    offset:
-                      offset + limit < totalCount ? offset + limit : offset,
-                  }));
-                }}
-                className="hover:bg-blue-50"
-              >
-                <ChevronRight className="h-4 w-4 ml-1" />
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={offset + limit >= totalCount}
+              onClick={() => {
+                setOffset(
+                  offset + limit < totalCount ? offset + limit : offset
+                );
+                setApiQuery((prevQuery) => ({
+                  ...prevQuery,
+                  offset: offset + limit < totalCount ? offset + limit : offset,
+                }));
+              }}
+              className="hover:bg-blue-50"
+            >
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          {isLoadingCourses ? (
+            <ContentLoader message="Loading your courses..." size="lg" />
+          ) : courseList?.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {courseList.map((course) => (
+                <ProgressCourseCard key={course.id} course={course} />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 space-y-4">
+              <BookOpen className="h-12 w-12 text-gray-400" />
+              <h3 className="text-lg font-medium text-gray-500">
+                No courses enrolled yet
+              </h3>
+              <p className="text-sm text-gray-400 text-center">
+                Start your learning journey by exploring our course catalog
+              </p>
+              <Button asChild className="mt-4">
+                <Link to="/explore">Explore Courses</Link>
               </Button>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="">
-              {isLoadingCourses ? (
-                <ContentLoader message="Loading your courses..." size="lg" />
-              ) : courseList?.length > 0 ? (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {courseList.map((course) => (
-                    <ProgressCourseCard key={course.id} course={course} />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                  <BookOpen className="h-12 w-12 text-gray-400" />
-                  <h3 className="text-lg font-medium text-gray-500">No courses enrolled yet</h3>
-                  <p className="text-sm text-gray-400 text-center">Start your learning journey by exploring our course catalog</p>
-                  <Button asChild className="mt-4">
-                    <Link to="/explore">Explore Courses</Link>
-                  </Button>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+          )}
+        </div>
+
       </section>
     </div>
   );

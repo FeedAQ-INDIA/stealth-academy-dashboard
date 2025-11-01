@@ -66,13 +66,14 @@ export default function Header() {
 
           {/* Logo */}
           <a
-            className="text-2xl sm:text-3xl font-medium"
+            className="text-2xl sm:text-3xl font-medium text-shadow-lg
+ "
             href="/"
             style={{
               fontFamily: "Nosifer",
             }}
           >
-            <span className="text-orange-500">H</span>USKITE
+            <span className="text-rose-500 text-shadow-lg">H</span>USKITE
           </a>
         </div>
 

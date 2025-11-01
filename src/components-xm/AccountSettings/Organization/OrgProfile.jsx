@@ -267,7 +267,7 @@ function OrgProfile() {
 
       <div className="p-4 mx-auto">
         {/* Organization Header Card */}
-        <Card className="mb-6 border-0 shadow-lg bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700  rounded-2xl">
+        <Card className="mb-6 border-0 shadow-lg bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900  rounded-2xl">
           <CardHeader className="p-6">
             <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full lg:w-auto">

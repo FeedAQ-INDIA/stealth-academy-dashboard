@@ -174,7 +174,7 @@ function RegisterAsOrg() {
               </header>
         
            <div className="p-4 mx-auto  "> 
-      <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700  rounded-2xl text-white shadow-lg mb-6">
+      <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900  rounded-2xl text-white shadow-lg mb-6">
         <CardHeader>
           <CardTitle className="text-center text-2xl sm:text-3xl font-bold tracking-wide flex items-center justify-center gap-3">
             <Building className="w-8 h-8" />

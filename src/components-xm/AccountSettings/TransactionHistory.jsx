@@ -190,7 +190,7 @@ function BillingHistory() {
 
       <div className="space-y-6 p-4">
         <div className="relative overflow-hidden">
-          <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700  rounded-2xl text-white shadow-2xl backdrop-blur-sm">
+          <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900  rounded-2xl text-white shadow-2xl backdrop-blur-sm">
             <div className="absolute inset-0 opacity-20">
               <div
                 className="absolute inset-0"

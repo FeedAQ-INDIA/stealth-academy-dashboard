@@ -258,7 +258,7 @@ export function BringYourOwnCourse() {
 
             {/* Hero Section with Enhanced Gradient */}
             <div className="relative overflow-hidden">
-              <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700  rounded-sm text-white shadow-2xl  ">
+              <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900  rounded-sm text-white shadow-2xl  ">
                 {/* Background Pattern */}
                 <div className="absolute inset-0 opacity-20">
                   <div className="absolute inset-0" style={{

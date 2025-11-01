@@ -137,7 +137,7 @@ function MyAccount() {
     // Loading state
     if (authLoading || !userDetail) {
         return (
-            <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+            <div className="h-full ">
                 <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
                     <SidebarTrigger className="-ml-1"/>
                     <Separator orientation="vertical" className="mr-2 h-4"/>
@@ -155,7 +155,7 @@ function MyAccount() {
     }
 
     return (
-        <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="h-full bg-gradient-to-br ">
             <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
                 <SidebarTrigger className="-ml-1"/>
                 <Separator orientation="vertical" className="mr-2 h-4"/>
@@ -173,13 +173,13 @@ function MyAccount() {
        
 
                 {/* Profile Information Card */}
-                <Card className="mb-6 border-0 shadow-lg   bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700  rounded-2xl   ">
+                <Card className="mb-6 border-0 shadow-lg   bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900  rounded-2xl   ">
                     <CardHeader className="p-6">
                         <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
                             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full lg:w-auto">
                                 <div className="relative flex-shrink-0">
-                                    <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-blue-200 shadow-xl">
-                                        <AvatarFallback className="text-xl sm:text-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold">
+                                    <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-rose-200 shadow-xl">
+                                        <AvatarFallback className="text-xl sm:text-2xl bg-gradient-to-r from-rose-300 to-rose-800 text-white font-bold">
                                             {userDetail?.nameInitial}
                                         </AvatarFallback>
                                     </Avatar>

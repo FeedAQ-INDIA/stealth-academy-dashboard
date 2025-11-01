@@ -352,7 +352,7 @@ function Notifications() {
     
     
     return (
-        <div className="h-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="h-full ">
             <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b bg-white px-4">
                 <SidebarTrigger className="-ml-1"/>
                 <Separator orientation="vertical" className="mr-2 h-4"/>
@@ -367,7 +367,7 @@ function Notifications() {
             </header>
 
             <div className="p-4 mx-auto">
-                 <Card className="w-full rounded-xl border-0 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 text-white shadow-2xl mb-8">
+                 <Card className="w-full rounded-xl border-0 bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900 text-white shadow-2xl mb-8">
                     <CardHeader>
                         <CardTitle className="text-center text-2xl sm:text-3xl font-bold tracking-wide flex items-center justify-center gap-3">
                             <Bell className="w-8 h-8" />

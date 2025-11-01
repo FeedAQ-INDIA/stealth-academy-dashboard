@@ -190,15 +190,15 @@ function NotesModule({ userId, courseId, courseContentId, refreshTrigger }) {
 
   return (
     <>
-      <Card className="flex items-center justify-between p-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <Card className="flex items-center justify-between p-4 border-b text-white border-gray-100 bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900">
         <div className="flex items-center gap-2">
-          <FileText className="w-5 h-5 text-blue-600" />
-          <h3 className="font-medium text-gray-900">Your Notes</h3>
+          <FileText className="w-5 h-5 text-white" />
+          <h3 className="font-medium">Your Notes</h3>
         </div>
-        <div className="text-sm text-gray-500">
+        <div className="text-sm  ">
           {notesList.length > 0 && (
-            <span className="ml-auto bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium">
-              {notesList.length} note{notesList.length !== 1 ? "s" : ""}
+            <span className="ml-auto bg-white text-black backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium">
+              {notesList.length}  
             </span>
           )}
         </div>

@@ -366,13 +366,13 @@ function CourseOverview() {
       </header>
 
       <div className=" p-3 animate-fade-in">
-        <Card className="rounded-sm bg-gradient-to-br from-blue-50 to-indigo-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+        <Card className="rounded-sm bg-gradient-to-br from-rose-600 via-rose-700 to-rose-900 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
           <CardHeader className=" ">
        
 
             <div className="flex flex-col lg:flex-row gap-4 w-full items-start lg:items-center">
               <div className="flex-1">
-                <CardTitle className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-2 leading-tight">
+                <CardTitle className="text-lg sm:text-xl md:text-2xl font-bold   mb-2 leading-tight">
                   {courseList?.courseTitle}
                 </CardTitle>
                 <div className="flex items-center gap-2 mt-4">
@@ -417,21 +417,7 @@ function CourseOverview() {
                 {enrollmentInfo.status !== "NOT_ENROLLED" && (
                   <div className="text-center">
                     <div
-                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg  font-semibold text-sm ${
-                        enrollmentInfo.color === "green"
-                          ? "bg-green-100 text-green-800 animate-bounce"
-                          : enrollmentInfo.color === "blue"
-                          ? "bg-blue-100 text-blue-800"
-                          : enrollmentInfo.color === "orange"
-                          ? "bg-orange-100 text-orange-800"
-                          : enrollmentInfo.color === "yellow"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : enrollmentInfo.color === "purple"
-                          ? "bg-purple-100 text-purple-800"
-                          : enrollmentInfo.color === "gold"
-                          ? "bg-yellow-100 text-yellow-900"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
+                      className={`inline-flex bg-rose-300 text-black items-center gap-2 px-4 py-2 rounded-lg  font-semibold text-sm `}
                     >
                       {enrollmentInfo.status === "ENROLLED" ||
                       enrollmentInfo.status === "COMPLETED" ||
@@ -440,7 +426,7 @@ function CourseOverview() {
                       ) : null}
                       {enrollmentInfo.displayText}
                     </div>
-                    <p className="text-sm text-gray-600 cursor-pointer hover:text-blue-600 hover:underline transition-colors mt-1">
+                    <p className="text-sm  cursor-pointer hover:text-blue-600 hover:underline transition-colors mt-1">
                       {enrollmentInfo.enrollmentDate &&
                         `Enrolled: ${new Date(
                           enrollmentInfo.enrollmentDate

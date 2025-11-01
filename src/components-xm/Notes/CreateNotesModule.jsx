@@ -455,12 +455,12 @@ function CreateNotesModule({
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm transition-all duration-200 hover:shadow-md">
+    <div className="bg-white text-white rounded-lg border  shadow-sm transition-all duration-200 hover:shadow-md">
       {/* Minimal Header */}
-      <div className="flex items-center justify-between p-3 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <div className="flex items-center justify-between p-3 border-b   bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900">
         <div className="flex items-center gap-2">
-          <FileText className="w-5 h-5 text-blue-600" />
-          <h3 className="font-medium text-gray-900">Notes</h3>
+               <FileText className="  w-5 h-5   text-white" size={20} />
+           <h3 className="font-medium  ">Notes</h3>
         </div>
         {/* Intentionally no controls in header */}
       </div>
