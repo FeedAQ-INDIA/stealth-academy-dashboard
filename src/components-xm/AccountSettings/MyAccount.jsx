@@ -173,13 +173,13 @@ function MyAccount() {
        
 
                 {/* Profile Information Card */}
-                <Card className="mb-6 border-0 shadow-lg   bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900  rounded-2xl   ">
+                <Card className="mb-6 border-0 shadow-lg   bg-gradient-to-r from-orange-400 via-orange-600 to-orange-800  rounded-2xl   ">
                     <CardHeader className="p-6">
                         <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
                             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full lg:w-auto">
                                 <div className="relative flex-shrink-0">
-                                    <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-rose-200 shadow-xl">
-                                        <AvatarFallback className="text-xl sm:text-2xl bg-gradient-to-r from-rose-300 to-rose-800 text-white font-bold">
+                                    <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-orange-200 shadow-xl">
+                                        <AvatarFallback className="text-xl sm:text-2xl bg-gradient-to-r from-orange-300 to-orange-800 text-white font-bold">
                                             {userDetail?.nameInitial}
                                         </AvatarFallback>
                                     </Avatar>

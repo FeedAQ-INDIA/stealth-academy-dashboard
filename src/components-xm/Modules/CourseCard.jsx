@@ -18,7 +18,7 @@ export function CourseCard({ course, viewMode = "grid" }) {
  
   // Grid view (default)
   return (
-    <Card className="rounded-sm group relative overflow-hidden border shadow-md hover:shadow-xl transition-all hover:-translate-y-1 p-3">
+    <Card className="bg-white border border-orange-100 shadow-sm hover:shadow-md  rounded-sm group relative overflow-hidden  transition-all hover:-translate-y-1 p-3">
       <CardHeader className="p-0">
         <div className="  mb-2">
           <div className="flex gap-2">
@@ -75,7 +75,7 @@ export function CourseCard({ course, viewMode = "grid" }) {
             to={`/${userDetail ? "course" : "explore"}/${course.courseId}`}
             className="w-full"
           >
-            <Button size="sm" className="w-full" variant="outline">
+            <Button size="sm" className="w-full mt-4 bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700" variant="outline">
               <ExternalLink className="mr-2 h-4 w-4" />
               EXPLORE COURSE
             </Button>

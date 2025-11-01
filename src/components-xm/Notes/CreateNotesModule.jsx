@@ -457,7 +457,7 @@ function CreateNotesModule({
   return (
     <div className="bg-white text-white rounded-lg border  shadow-sm transition-all duration-200 hover:shadow-md">
       {/* Minimal Header */}
-      <div className="flex items-center justify-between p-3 border-b   bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900">
+      <div className="flex items-center justify-between p-3 border-b   bg-gradient-to-r from-orange-400 via-orange-600 to-orange-800">
         <div className="flex items-center gap-2">
                <FileText className="  w-5 h-5   text-white" size={20} />
            <h3 className="font-medium  ">Notes</h3>
@@ -637,7 +637,7 @@ function CreateNotesModule({
                   onClick={stopRecording}
                   disabled={isSubmitting}
                   title="Stop recording"
-                  className="bg-rose-600 hover:bg-rose-700 text-white animate-pulse"
+                  className="bg-orange-600 hover:bg-orange-700 text-white animate-pulse"
                 >
                   <Square className="w-4 h-4" />
                 </Button>

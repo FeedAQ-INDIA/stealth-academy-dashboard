@@ -277,7 +277,7 @@ export function MyJourney() {
   return (
     <div className="space-y-4 p-4">
               <div className="relative overflow-hidden">
-                <Card className="  border-0 shadow-lg   bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900  rounded-2xl   ">
+                <Card className="  border-0 shadow-lg   bg-gradient-to-r from-orange-400 via-orange-600 to-orange-800  rounded-2xl   ">
                   <CardHeader className="">
                     {/* <div className="flex items-center justify-center mb-2">
                                                        <Sparkles className="w-6 h-6 text-yellow-300 animate-float" />

@@ -73,7 +73,7 @@ export default function Header() {
               fontFamily: "Nosifer",
             }}
           >
-            <span className="text-rose-500 text-shadow-lg">H</span>USKITE
+            <span className="text-orange-500 text-shadow-lg">H</span>USKITE
           </a>
         </div>
 

@@ -73,7 +73,7 @@ export function CourseDetail() {
             <SidebarProvider className="p-0">
                 <CourseSidebar/>
                 <SidebarInset
-                    className="min-h-[calc(100svh-4em)] bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
+                    className="min-h-[calc(100svh-4em)] bg-gradient-to-br from-orange-50 via-orange-50 to-orange-50"
                     style={{borderRadius: '0px', margin: '0px'}}
                 >
                     <div className="w-full">

@@ -522,7 +522,7 @@ function CourseSidebar() {
                               : ""
                           } ${
                             isActive
-                              ? "bg-gradient-to-r from-rose-100 to-rose-200 border-l-4 border-rose-600 shadow-md transform scale-[1.02]"
+                              ? "bg-gradient-to-r from-orange-100 to-orange-200 border-l-4 border-orange-600 shadow-md transform scale-[1.02]"
                               : "hover:bg-gray-50"
                           }`}
                         >
@@ -557,14 +557,14 @@ function CourseSidebar() {
                                 <div
                                   className={`flex-1 text-left ${
                                     isActive
-                                      ? "font-semibold text-rose-700"
+                                      ? "font-semibold text-orange-700"
                                       : "font-medium text-gray-700 hover:text-gray-900"
                                   }`}
                                 >
                                   {item?.title}
                                 </div>
                                 {isActive && (
-                                  <div className="w-2 h-2 bg-rose-500 rounded-full animate-pulse"></div>
+                                  <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
                                 )}
                               </div>
                             </Link>
@@ -601,7 +601,7 @@ function CourseSidebar() {
                               : ""
                           } ${
                             isActive
-                              ? "bg-gradient-to-r from-rose-100 to-rose-200 border-l-4 border-rose-600 shadow-md"
+                              ? "bg-gradient-to-r from-orange-100 to-orange-200 border-l-4 border-orange-600 shadow-md"
                               : "hover:bg-gray-50"
                           }`}
                         >
@@ -620,14 +620,14 @@ function CourseSidebar() {
                                 <div
                                   className={`flex-1 text-left ${
                                     isActive
-                                      ? "font-semibold text-rose-700"
+                                      ? "font-semibold text-orange-700"
                                       : "font-medium text-gray-700 hover:text-gray-900"
                                   }`}
                                 >
                                   {item?.title}
                                 </div>
                                 {isActive && (
-                                  <div className="w-2 h-2 bg-rose-500 rounded-full animate-pulse"></div>
+                                  <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
                                 )}
                               </div>
                             </Link>

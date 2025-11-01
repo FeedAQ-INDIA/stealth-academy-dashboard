@@ -367,7 +367,7 @@ function Notifications() {
             </header>
 
             <div className="p-4 mx-auto">
-                 <Card className="w-full rounded-xl border-0 bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900 text-white shadow-2xl mb-8">
+                 <Card className="w-full rounded-xl border-0 bg-gradient-to-r from-orange-400 via-orange-600 to-orange-800 text-white shadow-2xl mb-8">
                     <CardHeader>
                         <CardTitle className="text-center text-2xl sm:text-3xl font-bold tracking-wide flex items-center justify-center gap-3">
                             <Bell className="w-8 h-8" />

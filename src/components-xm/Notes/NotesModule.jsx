@@ -190,7 +190,7 @@ function NotesModule({ userId, courseId, courseContentId, refreshTrigger }) {
 
   return (
     <>
-      <Card className="flex items-center justify-between p-4 border-b text-white border-gray-100 bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900">
+      <Card className="flex items-center justify-between p-4 border-b text-white border-gray-100 bg-gradient-to-r from-orange-400 via-orange-600 to-orange-800">
         <div className="flex items-center gap-2">
           <FileText className="w-5 h-5 text-white" />
           <h3 className="font-medium">Your Notes</h3>

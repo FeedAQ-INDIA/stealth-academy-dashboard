@@ -270,11 +270,11 @@ const VideoHeader = React.memo(
     onMarkComplete,
     onUndoComplete,
   }) => (
-    <Card className="border-0  bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900 rounded-sm  shadow-md  overflow-hidden relative text-white">
+    <Card className="border-0  bg-gradient-to-r from-orange-400 via-orange-600 to-orange-800 rounded-sm  shadow-md  overflow-hidden relative text-white">
       <CardHeader className=" ">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-rose-300 to-rose-500 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-orange-300 to-orange-500 rounded-lg flex items-center justify-center">
               <Play className="text-white" size={20} />
             </div>
             <CardTitle className="text-lg sm:text-xl font-semibold  ">

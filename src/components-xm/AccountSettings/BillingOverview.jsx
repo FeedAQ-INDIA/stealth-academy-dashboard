@@ -268,11 +268,11 @@ const totalExpense = dailyExpense?.reduce((sum, day) => sum + day.totalExpense, 
           </Card>
 
           {/* Used This Month Card */}
-          <Card className="group relative border-0 shadow-xl bg-gradient-to-br from-blue-50 via-white to-cyan-50 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <Card className="group relative border-0 shadow-xl bg-gradient-to-br from-blue-50 via-white to-orange-50 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <CardContent className="p-6 relative z-10">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-2xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                <div className="p-3 bg-gradient-to-br from-blue-100 to-orange-100 rounded-2xl shadow-md group-hover:scale-110 transition-transform duration-300">
                   <TrendingUp className="w-7 h-7 text-blue-600" />
                 </div>
                 <Badge

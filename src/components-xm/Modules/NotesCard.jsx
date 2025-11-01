@@ -396,7 +396,7 @@ function NotesCard({ a, fetchCourseNotes }) {
 
   return (
     <Card className="relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900" />
+      <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-r from-orange-400 via-orange-600 to-orange-800" />
 
         <div className=" p-4">
 

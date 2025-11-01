@@ -397,7 +397,7 @@ function AccountSidebar({ ...props }) {
                               : ""
                           } ${
                             item.isActive
-                              ? "bg-gradient-to-r from-rose-100 to-rose-200 border-l-4 border-rose-600 shadow-md transform scale-[1.02]"
+                              ? "bg-gradient-to-r from-orange-100 to-orange-200 border-l-4 border-orange-600 shadow-md transform scale-[1.02]"
                               : "hover:bg-gray-50"
                           }`}
                         >

@@ -366,7 +366,7 @@ function CourseOverview() {
       </header>
 
       <div className=" p-3 animate-fade-in">
-        <Card className="rounded-sm bg-gradient-to-br from-rose-600 via-rose-700 to-rose-900 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+        <Card className="rounded-sm bg-gradient-to-br from-orange-400 via-orange-600 to-orange-800 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
           <CardHeader className=" ">
        
 
@@ -417,7 +417,7 @@ function CourseOverview() {
                 {enrollmentInfo.status !== "NOT_ENROLLED" && (
                   <div className="text-center">
                     <div
-                      className={`inline-flex bg-rose-300 text-black items-center gap-2 px-4 py-2 rounded-lg  font-semibold text-sm `}
+                      className={`inline-flex bg-orange-300 text-black items-center gap-2 px-4 py-2 rounded-lg  font-semibold text-sm `}
                     >
                       {enrollmentInfo.status === "ENROLLED" ||
                       enrollmentInfo.status === "COMPLETED" ||

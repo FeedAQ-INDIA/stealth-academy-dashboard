@@ -46,7 +46,7 @@ function SignInPage() {
     }, [userDetail])
     return (
         <div
-            className="min-h-screen w-full flex items-center justify-center bg-cover bg-center px-4  bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900  rounded-2xl "
+            className="min-h-screen w-full flex items-center justify-center bg-cover bg-center px-4  bg-gradient-to-r from-orange-400 via-orange-600 to-orange-800  rounded-2xl "
         >
 
             <div className="  w-full max-w-md sm:max-w-lg md:max-w-xl p-4">

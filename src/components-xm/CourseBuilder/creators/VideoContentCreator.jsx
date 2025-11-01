@@ -175,11 +175,11 @@ export default function VideoContentCreator({
   return (
     <div className="mx-auto p-4 space-y-8">
       {/* Enhanced Header Section */}
-      <Card className="border-l-4 border-l-blue-500 bg-gradient-to-r from-blue-50 to-cyan-50">
+      <Card className="border-l-4 border-l-blue-500 bg-gradient-to-r from-blue-50 to-orange-50">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
                 <Video className="h-6 w-6 text-white" />
               </div>
               <div className="space-y-1">
@@ -504,7 +504,7 @@ export default function VideoContentCreator({
                   <Button
                     type="submit"
                     disabled={isLoading || form.formState.isSubmitting}
-                    className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white min-w-[140px] h-11"
+                    className="bg-gradient-to-r from-blue-500 to-orange-500 hover:from-blue-600 hover:to-orange-600 text-white min-w-[140px] h-11"
                   >
                     {isLoading || form.formState.isSubmitting ? (
                       <div className="flex items-center gap-2">

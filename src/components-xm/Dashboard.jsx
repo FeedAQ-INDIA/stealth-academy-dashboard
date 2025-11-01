@@ -208,13 +208,13 @@ export function Dashboard() {
 
   return (
     <div className="p-4">
-      <Card className="mb-4 border-0 shadow-lg bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900  rounded-2xl  ">
+      <Card className="mb-4 border-0 shadow-lg bg-gradient-to-r from-orange-400 via-orange-600 to-orange-800  rounded-2xl  ">
         <CardHeader className="p-6">
           <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 w-full lg:w-auto">
               <div className="relative flex-shrink-0">
-                <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-rose-200 shadow-xl">
-                  <AvatarFallback className="text-xl sm:text-2xl bg-gradient-to-r from-rose-300 to-rose-800 text-white font-bold">
+                <Avatar className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-orange-200 shadow-xl">
+                  <AvatarFallback className="text-xl sm:text-2xl bg-gradient-to-r from-orange-300 to-orange-800 text-white font-bold">
                     {userDetail?.nameInitial}
                   </AvatarFallback>
                 </Avatar>
@@ -278,37 +278,37 @@ export function Dashboard() {
         </Card>
 
         {/* Enrolled Courses Card */}
-        <Card className="group relative border-0 shadow-lg bg-gradient-to-br from-cyan-50 via-white to-blue-50 backdrop-blur-sm hover:shadow-2xl transition-all duration-700 hover:scale-[1.03] overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/10 to-blue-400/15 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-cyan-200/20 to-blue-200/20 rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-1000"></div>
+        <Card className="group relative border-0 shadow-lg bg-gradient-to-br from-orange-50 via-white to-blue-50 backdrop-blur-sm hover:shadow-2xl transition-all duration-700 hover:scale-[1.03] overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-400/10 to-blue-400/15 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-200/20 to-blue-200/20 rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-1000"></div>
           <CardHeader>
             <div className=" flex gap-4 items-center z-10">
               <div className="flex items-center justify-between ">
-                <div className="p-3 bg-gradient-to-br from-cyan-100 to-blue-100 rounded-2xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300 border border-cyan-200/50">
-                  <BookOpen className="w-7 h-7 text-cyan-600 group-hover:text-cyan-700 transition-colors duration-300" />
+                <div className="p-3 bg-gradient-to-br from-orange-100 to-blue-100 rounded-2xl shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300 border border-orange-200/50">
+                  <BookOpen className="w-7 h-7 text-orange-600 group-hover:text-orange-700 transition-colors duration-300" />
                 </div>
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold text-cyan-700/80 tracking-wide uppercase">
+                  <p className="text-sm font-semibold text-orange-700/80 tracking-wide uppercase">
                     Enrolled Courses
                   </p>
-                  <div className="flex-1 h-px bg-gradient-to-r from-cyan-200 to-transparent"></div>
+                  <div className="flex-1 h-px bg-gradient-to-r from-orange-200 to-transparent"></div>
                 </div>
                 <div className="flex items-end gap-2">
-                  <p className="text-4xl font-black text-gray-800 group-hover:text-cyan-700 transition-colors duration-300 leading-none">
+                  <p className="text-4xl font-black text-gray-800 group-hover:text-orange-700 transition-colors duration-300 leading-none">
                     {courseList?.length || 0}
                   </p>
-                  <p className="text-lg font-semibold text-cyan-600 mb-1">
+                  <p className="text-lg font-semibold text-orange-600 mb-1">
                     {courseList?.length === 1 ? "course" : "courses"}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 mt-4 p-2 bg-cyan-50/50 rounded-xl border border-cyan-100">
-              <BookOpen className="w-4 h-4 text-cyan-500" />
-              <span className="text-xs text-cyan-700 font-medium">
+            <div className="flex items-center gap-2 mt-4 p-2 bg-orange-50/50 rounded-xl border border-orange-100">
+              <BookOpen className="w-4 h-4 text-orange-500" />
+              <span className="text-xs text-orange-700 font-medium">
                 {courseList?.length > 0
                   ? "Active learning paths"
                   : "Ready to explore?"}

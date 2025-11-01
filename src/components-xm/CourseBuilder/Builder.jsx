@@ -235,7 +235,7 @@ export default function Builder() {
     <div className="p-4 md:p-6 space-y-6">
       {/* Hero Section with Enhanced Gradient */}
       <div className="relative overflow-hidden">
-        <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900  rounded-2xl text-white shadow-2xl  ">
+        <Card className="w-full rounded-lg border-0 bg-gradient-to-r from-orange-400 via-orange-600 to-orange-800  rounded-2xl text-white shadow-2xl  ">
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-20">
             <div

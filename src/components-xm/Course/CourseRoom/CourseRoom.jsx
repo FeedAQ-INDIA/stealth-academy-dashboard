@@ -290,11 +290,11 @@ function CourseRoom() {
 
       <div className="p-4 space-y-6">
         {/* Course Room Header Card */}
-        <Card className="border-0 bg-gradient-to-r from-rose-600 via-rose-700 to-rose-900 text-white rounded-sm shadow-md overflow-hidden">
+        <Card className="border-0 bg-gradient-to-r from-orange-400 via-orange-600 to-orange-800 text-white rounded-sm shadow-md overflow-hidden">
           <CardHeader>
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-rose-300 to-rose-500 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-orange-300 to-orange-500 rounded-lg flex items-center justify-center">
                   <Users className="text-white" size={20} />
                 </div>
                 <div>
