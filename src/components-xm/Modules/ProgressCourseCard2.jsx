@@ -1,8 +1,9 @@
-import { Clock, ExternalLink, Lock, BookOpen , TrendingUp } from "lucide-react";
+import { Clock, ExternalLink, Lock, BookOpen, Calendar, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge.jsx";
 import { Button } from "@/components/ui/button.jsx";
 import {
   Card,
+  CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -11,104 +12,163 @@ import { Link } from "react-router-dom";
 import { useAuthStore } from "@/zustland/store.js";
 import PropTypes from "prop-types";
 
-export function ProgressCourseCard2({ course  }) {
+export function ProgressCourseCard2({ course, viewMode = "grid" }) {
   const { userDetail } = useAuthStore();
 
- 
-  // Grid view (default)
+  // Format duration helper
+  const formatDuration = (totalSeconds) => {
+    if (!totalSeconds || totalSeconds === 0) return null;
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+    return `${minutes}m`;
+  };
+
+  // Format date helper
+  const formatDate = (dateString) => {
+    if (!dateString) return null;
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  // Get status color
+  const getStatusColor = (status) => {
+    const colors = {
+      'IN_PROGRESS': 'bg-blue-50 text-blue-700 border-blue-200',
+      'COMPLETED': 'bg-green-50 text-green-700 border-green-200',
+      'NOT_STARTED': 'bg-gray-50 text-gray-700 border-gray-200',
+      'ENROLLED': 'bg-purple-50 text-purple-700 border-purple-200',
+      'PAUSED': 'bg-yellow-50 text-yellow-700 border-yellow-200',
+    };
+    return colors[status] || 'bg-gray-50 text-gray-700 border-gray-200';
+  };
+
+  const enrollmentStatus = course.enrollments?.[0]?.enrollmentStatus;
+  const enrollmentDate = course.enrollments?.[0]?.enrollmentDate;
+  const duration = formatDuration(course.courseDuration);
+  const progress = course.progress || 0;
+
   return (
-    <Card className="group relative overflow-hidden border shadow-md hover:shadow-xl transition-all hover:-translate-y-1 p-4">
-      <CardHeader className="p-0">
-        <div className="overflow-x-auto mb-2">
-          <div className="flex gap-2">
-            {course.courseSource && (
-              <Badge variant="outline">{course.courseSource}</Badge>
+    <Card className="bg-gradient-to-br from-white to-orange-50/30 border-2 border-orange-100 hover:border-orange-300 shadow-sm hover:shadow-xl rounded-lg group relative overflow-hidden transition-all duration-300 hover:-translate-y-2">
+      {/* Decorative gradient top bar */}
+      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600" />
+      
+      <CardHeader className="pb-3 pt-5">
+        {/* Course Image */}
+        <div className="relative mb-4 -mx-6 -mt-5">
+          {course.courseImageUrl ? (
+            <img
+              src={course.courseImageUrl}
+              className="w-full h-48 object-cover"
+              alt={course.courseTitle}
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextElementSibling.style.display = 'flex';
+              }}
+            />
+          ) : null}
+          <div 
+            className="w-full h-48 bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 flex items-center justify-center"
+            style={{ display: course.courseImageUrl ? 'none' : 'flex' }}
+          >
+            <BookOpen className="w-20 h-20 text-white/30" />
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          
+          {/* Status badges overlay on image */}
+          <div className="absolute top-3 left-3 right-3 flex flex-wrap gap-2">
+            {enrollmentStatus && (
+              <Badge className={`${getStatusColor(enrollmentStatus)} font-medium px-3 py-1 shadow-md`}>
+                <TrendingUp size={12} className="mr-1.5" />
+                {enrollmentStatus.replaceAll("_", " ")}
+              </Badge>
             )}
-            {course.courseLevel && (
-              <Badge variant="outline">{course.courseLevel}</Badge>
-            )}
-            {course.courseMode && (
-              <Badge variant="outline">{course.courseMode}</Badge>
-            )}
-            {course.deliveryMode && (
-              <Badge variant="outline">{course.deliveryMode}</Badge>
-            )}
-            {course.courseDuration !== null && course.courseDuration !== undefined && (
-              <Badge variant="outline">
-                <Clock size={14} className="mr-1 inline" />
-                {(() => {
-                  const totalSeconds = +course?.courseDuration || 0;
-                  const hours = Math.floor(totalSeconds / 3600);
-                  const minutes = Math.floor((totalSeconds % 3600) / 60);
-                  const seconds = totalSeconds % 60;
-                  const pad = (n) => String(n).padStart(2, "0");
-                  
-                  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-                })()}
+            {course.accessControls?.[0]?.accessLevel && (
+              <Badge className="bg-orange-100 text-orange-800 border-orange-300 font-semibold px-3 py-1 shadow-md">
+                {course.accessControls[0].accessLevel}
               </Badge>
             )}
           </div>
         </div>
+      </CardHeader>
 
-        <div className="relative mb-2">
-          <img
-            src={course.courseImageUrl || 'http://localhost:5174/src/assets/byoc_2.png'}
-            className="w-full h-40 object-cover rounded-lg"
-            alt={course.courseTitle}
-          />
-          {course.enrollments && course.enrollments?.length > 0 && (
-            <div className="absolute top-2 right-2">
-              <Badge variant="secondary">
-                {course.enrollments[0]?.enrollmentStatus?.replaceAll("_", " ")}
-              </Badge>
+      <CardContent className="pb-2 px-3">
+        {/* Course title */}
+        <div className="flex items-start gap-3 mb-3">
+          <CardTitle className="text-lg font-bold line-clamp-2 text-gray-900 flex-1 leading-tight">
+            {course.courseTitle}
+          </CardTitle>
+        </div>
+
+        {/* Course description */}
+        {course.courseDescription && (
+          <p className="text-sm text-gray-600 line-clamp-2 mb-2 leading-relaxed">
+            {course.courseDescription}
+          </p>
+        )}
+
+        {/* Course metadata */}
+        <div className="space-y-2 mb-3">
+          {duration && (
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+              <Clock className="h-4 w-4 text-orange-500 flex-shrink-0" />
+              <span className="font-medium">{duration}</span>
+            </div>
+          )}
+          
+          {enrollmentDate && (
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+              <Calendar className="h-4 w-4 text-orange-500 flex-shrink-0" />
+              <span>Enrolled {formatDate(enrollmentDate)}</span>
             </div>
           )}
         </div>
 
-        <CardTitle className="text-md font-semibold line-clamp-2">
-          {course.courseTitle?.toUpperCase()}
-        </CardTitle>
-
-                    <div className="w-full space-y-2 mt-1">
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-1.5 text-gray-600">
-                  <BookOpen size={12} />
-                  <span>Progress</span>
-                </div>
-                <div className="flex items-center gap-1 text-blue-600 font-medium">
-                  <TrendingUp size={12} />
-                  {course.progress}%
-                </div>
-              </div>
-
-              <div
-                className="w-full bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded-full h-3 overflow-hidden relative group border border-gray-300"
-                aria-label={`Progress: ${course.progress}%`}
-                role="progressbar"
-                aria-valuenow={course.progress}
-                aria-valuemin={0}
-                aria-valuemax={100}
-              >
-                <div
-                  className={
-                    `h-full rounded-full transition-all duration-700 ease-out shadow-sm ` +
-                    (course.progress === 100
-                      ? "bg-gradient-to-r from-green-400 to-green-600"
-                      : course.progress >= 70
-                      ? "bg-gradient-to-r from-blue-500 to-purple-500"
-                      : course.progress >= 40
-                      ? "bg-gradient-to-r from-yellow-400 to-yellow-600"
-                      : "bg-gradient-to-r from-red-400 to-orange-500")
-                  }
-                  style={{ width: `${course.progress}%` }}
-                ></div>
-              </div>
+        {/* Progress Section */}
+        <div className="w-full space-y-2 mt-3">
+          <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center gap-2 text-gray-700 font-medium">
+              <BookOpen className="h-4 w-4 text-orange-500 flex-shrink-0" />
+              <span>Progress</span>
             </div>
-      </CardHeader>
+            <div className="flex items-center gap-1.5 text-orange-600 font-bold">
+              <TrendingUp className="h-4 w-4" />
+              {progress}%
+            </div>
+          </div>
 
-      <CardFooter className="mt-2 p-0">
+          <div
+            className="w-full bg-gray-200 rounded-full h-3 overflow-hidden relative shadow-inner"
+            aria-label={`Progress: ${progress}%`}
+            role="progressbar"
+            aria-valuenow={progress}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            <div
+              className={
+                `h-full rounded-full transition-all duration-1000 ease-out shadow-md relative overflow-hidden ` +
+                (progress === 100
+                  ? "bg-gradient-to-r from-green-500 via-green-600 to-green-500"
+                  : progress >= 70
+                  ? "bg-gradient-to-r from-blue-500 via-purple-500 to-blue-600"
+                  : progress >= 40
+                  ? "bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600"
+                  : "bg-gradient-to-r from-red-400 via-orange-500 to-red-500")
+              }
+              style={{ width: `${progress}%` }}
+            >
+              <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+
+      <CardFooter className="py-3 px-3">
         {course.courseIsLocked ? (
-          <Button className="w-full" variant="secondary" disabled>
+          <Button size="sm" className="w-full bg-gray-100 text-gray-500 hover:bg-gray-200" disabled>
             <Lock className="mr-2 h-4 w-4" />
             COMING SOON
           </Button>
@@ -117,9 +177,12 @@ export function ProgressCourseCard2({ course  }) {
             to={`/${userDetail ? "course" : "explore"}/${course.courseId}`}
             className="w-full"
           >
-            <Button className="w-full">
+            <Button 
+              size="sm" 
+              className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold hover:from-orange-600 hover:to-orange-700 shadow-md hover:shadow-lg transition-all duration-200"
+            >
               <ExternalLink className="mr-2 h-4 w-4" />
-              EXPLORE COURSE
+              CONTINUE LEARNING
             </Button>
           </Link>
         )}
@@ -127,4 +190,9 @@ export function ProgressCourseCard2({ course  }) {
     </Card>
   );
 }
+
+ProgressCourseCard2.propTypes = {
+  course: PropTypes.object.isRequired,
+  viewMode: PropTypes.oneOf(["grid", "list"]),
+};
  

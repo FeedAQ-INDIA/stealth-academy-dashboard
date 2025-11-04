@@ -2,7 +2,8 @@ import { useEffect, useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { toast } from "@/components/hooks/use-toast.js";
 import { useOrganizationStore, useAuthStore } from "@/zustland/store";
 import { useNavigate } from "react-router-dom";
@@ -20,6 +21,7 @@ import {
   ChevronRight,
   Loader2,
   Upload,
+  Clock,
 } from "lucide-react";
 import {
   Pagination,
@@ -369,87 +371,124 @@ export default function Builder() {
                     : "flex flex-col space-y-4"
                 }`}
               >
-                {courses.map((course) => (
+                {courses.map((course) => {
+                  const contentCount = course.courseBuilderData?.courseContent?.length || 0;
+                  const totalDuration = course.courseBuilderData?.courseContent?.reduce(
+                    (acc, content) => acc + (content.courseContentDuration || 0),
+                    0
+                  ) || 0;
+                  
+                  const formatDuration = (totalSeconds) => {
+                    if (!totalSeconds || totalSeconds === 0) return null;
+                    const hours = Math.floor(totalSeconds / 3600);
+                    const minutes = Math.floor((totalSeconds % 3600) / 60);
+                    if (hours > 0) {
+                      return `${hours}h ${minutes}m`;
+                    }
+                    return `${minutes}m`;
+                  };
+
+                  return (
                   <Card
                     key={course.courseBuilderId}
-                    className={`rounded-sm group relative overflow-hidden border shadow-md hover:shadow-xl transition-all hover:-translate-y-1 p-3`}
+                    className="bg-gradient-to-br from-white to-orange-50/30 border-2 border-orange-100 hover:border-orange-300 shadow-sm hover:shadow-xl rounded-lg group relative overflow-hidden transition-all duration-300 hover:-translate-y-2"
                   >
-                    <CardContent
-                      className={`p-0 ${
-                        viewMode === "list"
-                          ? "flex gap-4 items-center"
-                          : "space-y-3"
-                      }`}
-                    >
-                      <div className="  ">
-                        <span
-                          className={`text-xs px-2 py-1 rounded-full border font-medium ${
-                            (course.status || "DRAFT") === "PUBLISHED"
-                              ? "bg-green-50 text-green-700 border-green-200"
-                              : "bg-amber-50 text-amber-700 border-amber-200"
-                          }`}
+                    {/* Decorative gradient top bar */}
+                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600" />
+                    
+                    <CardHeader className="pb-3 pt-5">
+                      {/* Course Image */}
+                      <div className="relative mb-4 -mx-6 -mt-5">
+                        {course.courseBuilderData?.courseImageUrl ? (
+                          <img
+                            src={course.courseBuilderData.courseImageUrl}
+                            className="w-full h-48 object-cover"
+                            alt={course.courseBuilderData?.courseTitle || "Course"}
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.nextElementSibling.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div 
+                          className="w-full h-48 bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 flex items-center justify-center"
+                          style={{ display: course.courseBuilderData?.courseImageUrl ? 'none' : 'flex' }}
                         >
-                          {(course.status || "DRAFT").charAt(0).toUpperCase() +
-                            (course.status || "DRAFT").slice(1).toLowerCase()}
-                        </span>
-                      </div>
-                      {/* Course Details */}
-                      <div
-                        className={`${
-                          viewMode === "list" ? "flex-1" : "space-y-3"
-                        }`}
-                      >
-                        <div className="space-y-2">
-                          <h3
-                            className="font-semibold text-lg line-clamp-2"
-                            title={
-                              course.courseBuilderData?.courseTitle ||
-                              "Untitled Course"
-                            }
-                          >
-                            {course.courseBuilderData?.courseTitle ||
-                              "Untitled Course"}
-                          </h3>
-                          <p className="text-sm text-gray-600 line-clamp-2">
-                            {course.courseBuilderData?.courseDescription ||
-                              "No description available"}
-                          </p>
+                          <BookOpen className="w-20 h-20 text-white/30" />
                         </div>
-
-                        <div className="flex items-center text-xs text-muted-foreground space-x-4">
-                          <div className="flex items-center space-x-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>
-                              Updated{" "}
-                              {formatDate(course.course_builder_updated_at)}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="flex gap-2 pt-2">
-                          
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() =>
-                                  navigate(
-                                    `/course-builder/${course.courseBuilderId}`
-                                  )
-                                }
-                                className="flex-1 border-t"
-                              >
-                                <Edit className="mr-1 h-3 w-3" />
-                                Edit
-                              </Button>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                         
-                      
-                     
+                        {/* Status badge overlay */}
+                        <div className="absolute top-3 left-3 right-3 flex flex-wrap gap-2">
+                          <Badge
+                            className={`font-medium px-3 py-1 shadow-md ${
+                              (course.status || "DRAFT") === "PUBLISHED"
+                                ? "bg-green-50 text-green-700 border-green-200"
+                                : "bg-amber-50 text-amber-700 border-amber-200"
+                            }`}
+                          >
+                            {(course.status || "DRAFT").charAt(0).toUpperCase() +
+                              (course.status || "DRAFT").slice(1).toLowerCase()}
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="pb-2 px-3">
+                      {/* Course title */}
+                      <div className="flex items-start gap-3 mb-3">
+                        <CardTitle className="text-lg font-bold line-clamp-2 text-gray-900 flex-1 leading-tight">
+                          {course.courseBuilderData?.courseTitle || "Untitled Course"}
+                        </CardTitle>
+                      </div>
+
+                      {/* Course description */}
+                      {course.courseBuilderData?.courseDescription && (
+                        <p className="text-sm text-gray-600 line-clamp-2 mb-2 leading-relaxed">
+                          {course.courseBuilderData.courseDescription}
+                        </p>
+                      )}
+
+                      {/* Course metadata */}
+                      <div className="space-y-2">
+                        {totalDuration > 0 && (
+                          <div className="flex items-center gap-2 text-sm text-gray-700">
+                            <Clock className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                            <span className="font-medium">{formatDuration(totalDuration)}</span>
+                          </div>
+                        )}
+                        
+                        {contentCount > 0 && (
+                          <div className="flex items-center gap-2 text-sm text-gray-700">
+                            <BookOpen className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                            <span>{contentCount} {contentCount === 1 ? 'item' : 'items'}</span>
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                          <Calendar className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                          <span>Updated {formatDate(course.course_builder_updated_at)}</span>
                         </div>
                       </div>
                     </CardContent>
+
+                    <CardFooter className="py-3 px-3">
+                      <Button
+                        size="sm"
+                        onClick={() =>
+                          navigate(
+                            `/course-builder/${course.courseBuilderId}`
+                          )
+                        }
+                        className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold hover:from-orange-600 hover:to-orange-700 shadow-md hover:shadow-lg transition-all duration-200"
+                      >
+                        <Edit className="mr-2 h-4 w-4" />
+                        EDIT COURSE
+                      </Button>
+                    </CardFooter>
                   </Card>
-                ))}
+                );
+                })}
               </div>
             )}
 
